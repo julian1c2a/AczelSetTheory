@@ -11,11 +11,6 @@ inductive CList : Type where
   | mk : List CList → CList
   deriving Repr, Inhabited
 
-instance : SizeOf CList where
-  sizeOf c :=
-    match c with
-    | .mk l => 1 + l.foldl (fun s e => s + sizeOf e) 0
-
 namespace CList
 
 /-- El conjunto vacío computacional -/
