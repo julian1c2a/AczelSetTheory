@@ -158,7 +158,7 @@ end CList
 -- ==========================================
 -- FASE 2: CSet (Tipo Cociente)
 -- ==========================================
-
+/-
 def CList.Setoid : Setoid CList where
   r A B := CList.esIgual A B = true
   iseqv := {
@@ -172,3 +172,4 @@ def CSet := Quotient CList.Setoid
 namespace CSet
 def vacio : CSet := Quotient.mk CList.Setoid CList.vacio
 end CSet
+-/
