@@ -42,7 +42,7 @@ def evalOp (op : CListOp) (A B : CList) : Bool :=
 
   | .esIgual, A, B =>
       evalOp .esSubconjunto A B && evalOp .esSubconjunto B A
-termination_by (sizeOf A + sizeOf B) * 3 + opWeight op
+termination_by (((sizeOf A + sizeOf B) * 3) +(opWeight op))
 decreasing_by
   all_goals
     simp_wf
