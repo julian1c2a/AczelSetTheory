@@ -161,9 +161,9 @@ def dos := mk [cero, uno]
 def tres := mk [cero, uno, dos]
 def sucio := mk [uno, dos, cero, tres, uno, cero, cero, dos, tres, dos]
 
-#eval BIn cero uno                   -- True (0 ∈ {0})
-#eval BSbs uno (mk [cero, uno])      -- True ({0} ⊆ {0, {0}})
-#eval (normalizar sucio) == (mk [cero, uno]) -- True (Canonización correcta)
+-- #eval BIn cero uno                   -- True (0 ∈ {0})
+-- #eval BSbs uno (mk [cero, uno])      -- True ({0} ⊆ {0, {0}})
+-- #eval (normalizar sucio) == (mk [cero, uno]) -- True (Canonización correcta)
 
 end CList
 
