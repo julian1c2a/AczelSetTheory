@@ -13,12 +13,24 @@ inductive CList : Type where
 
 namespace CList
 
+-- Función de tamaño personalizada (evita el _sizeOf_inst no compilable para inductivos anidados)
+mutual
+  def cSize : CList → Nat
+    | mk xs => 1 + cSizeList xs
+  def cSizeList : List CList → Nat
+    | [] => 0
+    | x :: xs => 1 + cSize x + cSizeList xs
+end
+
 /-- El conjunto vacío computacional -/
 def vacio : CList := mk []
 
 -- 1. LÓGICA DE COMPARACIÓN BASE (Semántica de conjuntos)
 
-inductive CListOp | pertenece | esSubconjunto | esIgual
+inductive CListOp
+| pertenece
+| esSubconjunto
+| esIgual
 
 @[simp] def opWeight : CListOp → Nat
 | .pertenece => 0
@@ -76,8 +88,8 @@ ordenar las listas de forma única.
 Nota: Usamos el tamaño estructural directo para garantizar la terminación.
 -/
 def esMenor (A B : CList) : Bool :=
-  if sizeOf A < sizeOf B then true
-  else if sizeOf A > sizeOf B then false
+  if cSize A < cSize B then true
+  else if cSize A > cSize B then false
   else match A, B with
     | mk [], mk [] => false
     | mk [], mk (_::_) => true
@@ -87,13 +99,11 @@ def esMenor (A B : CList) : Bool :=
           esMenor (mk xs) (mk ys)
         else
           esMenor x y
-termination_by sizeOf A + sizeOf B
+termination_by cSize A + cSize B
 decreasing_by
-  all_goals
-    simp_wf
-    try simp [sizeOf]
-    try simp_arith
-    try omega
+  all_goals simp_wf
+  all_goals simp [cSize, cSizeList]
+  all_goals omega
 
 -- 3. ALGORITMO DE REDUCCIÓN (Limpieza estructural)
 
@@ -147,7 +157,9 @@ def normalizar : CList → CList
 -- PRUEBAS
 def cero := vacio
 def uno := mk [cero]
-def sucio := mk [uno, cero, uno, cero, cero]
+def dos := mk [cero, uno]
+def tres := mk [cero, uno, dos]
+def sucio := mk [uno, dos, cero, tres, uno, cero, cero, dos, tres, dos]
 
 #eval BIn cero uno                   -- True (0 ∈ {0})
 #eval BSbs uno (mk [cero, uno])      -- True ({0} ⊆ {0, {0}})
@@ -158,18 +170,52 @@ end CList
 -- ==========================================
 -- FASE 2: CSet (Tipo Cociente)
 -- ==========================================
-/-
+
+-- Si mk xs ⊆ mk ys, entonces mk xs ⊆ mk (y::ys)
+theorem subs_mono (xs : List CList) (y : CList) (ys : List CList)
+    (h : CList.evalOp .esSubconjunto (CList.mk xs) (CList.mk ys) = true) :
+    CList.evalOp .esSubconjunto (CList.mk xs) (CList.mk (y :: ys)) = true := by
+  induction xs with
+  | nil => simp [CList.evalOp]
+  | cons z zs ih =>
+    simp only [CList.evalOp, Bool.and_eq_true] at h ⊢
+    exact ⟨by simp [h.1], ih h.2⟩
+
+-- A ⊆ A para todo CList (recursión bien fundada por cSize)
+theorem subs_refl (A : CList) : CList.esSubconjunto A A = true := by
+  match A with
+  | CList.mk [] => simp [CList.esSubconjunto, CList.evalOp]
+  | CList.mk (x :: xs) =>
+    have hx  : CList.esSubconjunto x x = true             := subs_refl x
+    have hxs : CList.esSubconjunto (CList.mk xs) (CList.mk xs) = true := subs_refl (CList.mk xs)
+    simp only [CList.esSubconjunto] at hx hxs
+    simp only [CList.esSubconjunto, CList.evalOp, Bool.and_eq_true]
+    exact ⟨by simp [hx], subs_mono xs x xs hxs⟩
+termination_by CList.cSize A
+decreasing_by
+  all_goals simp_wf
+  all_goals simp [CList.cSize, CList.cSizeList]
+  all_goals omega
+
+-- esIgual A A = true (no recursivo: usa subs_refl)
+theorem esIgual_refl (A : CList) : CList.esIgual A A = true := by
+  simp only [CList.esIgual, CList.evalOp, Bool.and_eq_true]
+  exact ⟨subs_refl A, subs_refl A⟩
+
 def CList.Setoid : Setoid CList where
   r A B := CList.esIgual A B = true
   iseqv := {
-    refl := sorry
-    symm := sorry
+    refl := esIgual_refl
+    symm := fun {A B} h => by
+      simp only [CList.esIgual, CList.evalOp] at h ⊢
+      rwa [Bool.and_comm]
     trans := sorry
   }
 
 def CSet := Quotient CList.Setoid
 
 namespace CSet
+
 def vacio : CSet := Quotient.mk CList.Setoid CList.vacio
+
 end CSet
--/
