@@ -54,7 +54,7 @@ def evalOp (op : CListOp) (A B : CList) : Bool :=
 
   | .esIgual, A, B =>
       evalOp .esSubconjunto A B && evalOp .esSubconjunto B A
-termination_by (((sizeOf A + sizeOf B) * 3) +(opWeight op))
+termination_by (((sizeOf A + sizeOf B) * 3) + opWeight op)
 decreasing_by
   all_goals
     simp_wf
@@ -161,10 +161,6 @@ def dos := mk [cero, uno]
 def tres := mk [cero, uno, dos]
 def sucio := mk [uno, dos, cero, tres, uno, cero, cero, dos, tres, dos]
 
--- #eval BIn cero uno                   -- True (0 ∈ {0})
--- #eval BSbs uno (mk [cero, uno])      -- True ({0} ⊆ {0, {0}})
--- #eval (normalizar sucio) == (mk [cero, uno]) -- True (Canonización correcta)
-
 end CList
 
 -- ==========================================
@@ -202,14 +198,113 @@ theorem esIgual_refl (A : CList) : CList.esIgual A A = true := by
   simp only [CList.esIgual, CList.evalOp, Bool.and_eq_true]
   exact ⟨subs_refl A, subs_refl A⟩
 
+
+-- ==============================================================
+-- DEMOSTRACIÓN DE TRANSITIVIDAD (El Santo Grial Estructural)
+-- ==============================================================
+namespace CList
+
+-- Lemas de apoyo genéricos
+def bool_and_split {a b : Bool} (h : a && b = true) : a = true ∧ b = true := by
+  cases a <;> cases b <;> simp_all
+
+def bool_or_split {a b : Bool} (h : a || b = true) : a = true ∨ b = true := by
+  cases a <;> cases b <;> simp_all
+
+def bool_and_join {a b : Bool} (ha : a = true) (hb : b = true) : a && b = true := by
+  simp [ha, hb]
+
+def bool_or_join_left {a b : Bool} (ha : a = true) : a || b = true := by
+  simp [ha]
+
+def bool_or_join_right {a b : Bool} (hb : b = true) : a || b = true := by
+  simp [hb]
+
+-- Lemas de reducción (necesarios porque evalOp usa recursión bien fundada)
+theorem esIgual_def (A B : CList) :
+    esIgual A B = (esSubconjunto A B && esSubconjunto B A) := by
+  simp only [esIgual, esSubconjunto, evalOp]
+
+theorem esSubconjunto_nil_def (B : CList) :
+    esSubconjunto (mk []) B = true := by
+  simp only [esSubconjunto, evalOp]
+
+theorem esSubconjunto_cons_def (x : CList) (xs : List CList) (B : CList) :
+    esSubconjunto (mk (x :: xs)) B = (pertenece x B && esSubconjunto (mk xs) B) := by
+  simp only [esSubconjunto, pertenece, evalOp]
+
+theorem pertenece_nil_def (x : CList) :
+    pertenece x (mk []) = false := by
+  simp only [pertenece, evalOp]
+
+theorem pertenece_cons_def (x y : CList) (ys : List CList) :
+    pertenece x (mk (y :: ys)) = (esIgual x y || pertenece x (mk ys)) := by
+  simp only [pertenece, esIgual, evalOp]
+
+-- Transitividad mutua (tactic mode para compatibilidad con Lean 4.28)
+mutual
+  theorem eq_trans :
+    (A B C : CList) → (esIgual A B = true) → (esIgual B C = true) → (esIgual A C = true)
+    | A, B, C, h1, h2 => by
+      simp only [esIgual_def, Bool.and_eq_true] at h1 h2 ⊢
+      exact ⟨subs_trans A B C h1.1 h2.1, subs_trans C B A h2.2 h1.2⟩
+  termination_by A B C _ _ => (cSize A + cSize B + cSize C) * 2 + 1
+  decreasing_by
+    all_goals simp_wf
+    all_goals try simp [cSize, cSizeList]
+    all_goals try omega
+
+  theorem subs_trans : (A B C : CList) → esSubconjunto A B = true → esSubconjunto B C = true → esSubconjunto A C = true
+    | mk [], _, _, _, _ => esSubconjunto_nil_def _
+    | mk (x :: xs), B, C, h1, h2 => by
+      simp only [esSubconjunto_cons_def, Bool.and_eq_true] at h1 ⊢
+      exact ⟨mem_subs x B C h1.1 h2, subs_trans (mk xs) B C h1.2 h2⟩
+  termination_by A B C _ _ => (cSize A + cSize B + cSize C) * 2
+  decreasing_by
+    all_goals simp_wf
+    all_goals try simp [cSize, cSizeList]
+    all_goals try omega
+
+  theorem mem_subs : (x B C : CList) → pertenece x B = true → esSubconjunto B C = true → pertenece x C = true
+    | _, mk [], _, h1, _ => by simp [pertenece_nil_def] at h1
+    | x, mk (y :: ys), C, h1, h2 => by
+      simp only [pertenece_cons_def, Bool.or_eq_true] at h1
+      simp only [esSubconjunto_cons_def, Bool.and_eq_true] at h2
+      cases h1 with
+      | inl h1_eq => exact eq_mem x y C h1_eq h2.1
+      | inr h1_mem => exact mem_subs x (mk ys) C h1_mem h2.2
+  termination_by x B C _ _ => (cSize x + cSize B + cSize C) * 2
+  decreasing_by
+    all_goals simp_wf
+    all_goals try simp [cSize, cSizeList]
+    all_goals try omega
+
+  theorem eq_mem : (x y C : CList) → esIgual x y = true → pertenece y C = true → pertenece x C = true
+    | _, _, mk [], _, h2 => by simp [pertenece_nil_def] at h2
+    | x, y, mk (z :: zs), h1, h2 => by
+      simp only [pertenece_cons_def, Bool.or_eq_true] at h2 ⊢
+      cases h2 with
+      | inl h2_eq => exact Or.inl (eq_trans x y z h1 h2_eq)
+      | inr h2_mem => exact Or.inr (eq_mem x y (mk zs) h1 h2_mem)
+  termination_by x y C _ _ => (cSize x + cSize y + cSize C) * 2
+  decreasing_by
+    all_goals simp_wf
+    all_goals try simp [cSize, cSizeList]
+    all_goals try omega
+end
+
+end CList
+
+
+-- El Setoid finalmente con transitividad total
 def CList.Setoid : Setoid CList where
   r A B := CList.esIgual A B = true
   iseqv := {
     refl := esIgual_refl
     symm := fun {A B} h => by
-      simp only [CList.esIgual, CList.evalOp] at h ⊢
+      rw [CList.esIgual_def] at h ⊢
       rwa [Bool.and_comm]
-    trans := sorry
+    trans := fun {A B C} h1 h2 => CList.eq_trans A B C h1 h2
   }
 
 def CSet := Quotient CList.Setoid
