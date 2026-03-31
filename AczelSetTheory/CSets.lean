@@ -293,10 +293,161 @@ mutual
     all_goals try omega
 end
 
+/--
+Define la propiedad de que una lista no tiene duplicados según `esIgual`.
+-/
+def Nodup (l : List CList) : Prop :=
+  l.Pairwise (fun a b => esIgual a b = false)
+
+-- Lema: reducirDuplicados produce una lista sin duplicados.
+theorem reducirDuplicados_nodup (l : List CList) : Nodup (reducirDuplicados l) := by
+  -- Probamos una afirmación más fuerte sobre la función auxiliar por inducción.
+  -- La propiedad `P(l', vistos)` es:
+  --   1. El resultado no tiene duplicados (`Nodup`).
+  --   2. Todos los elementos del resultado son "nuevos" con respecto a `vistos`.
+  have stronger_lemma : ∀ (l' : List CList) (vistos : List CList),
+    Nodup (reducirDuplicadosAux l' vistos) ∧
+    (∀ y ∈ (reducirDuplicadosAux l' vistos), (vistos.any (fun z => esIgual y z)) = false) := by
+    intro l'
+    induction l' with
+    | nil =>
+      intro _; simp [reducirDuplicadosAux, Nodup]
+    | head tail IH =>
+      intro vistos
+      simp only [reducirDuplicadosAux]
+      by_cases h_seen : (vistos.any fun y => esIgual head y)
+      -- Caso 1: `head` ya se ha visto. La llamada recursiva usa el mismo `vistos`.
+      · simp [h_seen]; exact IH vistos
+      -- Caso 2: `head` es nuevo. Se añade a `vistos` en la llamada recursiva.
+      · simp [h_seen]
+        -- Aplicamos la hipótesis de inducción con la lista de `vistos` actualizada.
+        have ih_recursed := IH (head :: vistos)
+        rcases ih_recursed with ⟨nodup_tail, tail_is_new⟩
+
+        -- Probamos las dos propiedades para `head :: reducirDuplicadosAux ...`
+        constructor
+        -- Parte 1: Demostrar `Nodup (head :: ...)`
+        · simp only [Nodup, List.pairwise_cons]
+          constructor
+          -- 1a: `head` no es igual a ningún elemento del resto.
+          · have esIgual_comm : ∀ a b, esIgual a b = esIgual b a := by
+              intros a b; simp [esIgual, esSubconjunto, evalOp, Bool.and_comm]
+            intro y y_in_tail
+            specialize tail_is_new y y_in_tail
+            rw [List.any_cons, List.any_or, Bool.or_eq_false_iff] at tail_is_new
+            rw [esIgual_comm]; exact tail_is_new.1
+          -- 1b: El resto de la lista no tiene duplicados.
+          · exact nodup_tail
+        -- Parte 2: Demostrar que todos los elementos son nuevos para `vistos`.
+        · intro y y_in_list
+          simp only [List.mem_cons] at y_in_list
+          cases y_in_list with
+          | inl h_y_eq_head =>
+            rw [h_y_eq_head]; exact h_seen
+          | inr h_y_in_tail =>
+            specialize tail_is_new y h_y_in_tail
+            rw [List.any_cons, List.any_or, Bool.or_eq_false_iff] at tail_is_new
+            exact tail_is_new.2
+  -- Nuestro objetivo principal es la primera parte del lema, con `vistos` inicializado a `[]`.
+  rw [reducirDuplicados]
+  exact (stronger_lemma l []).1
+
+/--
+Define la equivalencia de conjuntos entre dos listas.
+-/
+def SetEquiv (l₁ l₂ : List CList) : Prop :=
+  ∀ x, (l₁.any (fun y => esIgual x y)) ↔ (l₂.any (fun y => esIgual x y))
+
+-- Lema: `reducirDuplicados` conserva el conjunto de elementos.
+theorem reducirDuplicados_set_equiv_self (l : List CList) : SetEquiv (reducirDuplicados l) l := by
+  intro x; constructor
+  -- Parte 1: Soundness (`reducirDuplicados l` es un subconjunto de `l`)
+  · intro h_mem_reduced
+    -- `h_mem_reduced` significa `∃ z ∈ reducirDuplicados l, esIgual x z`
+    rcases h_mem_reduced with ⟨z, z_in_reduced, xz_eq⟩
+    -- Probamos que todo elemento de la lista reducida está en la original.
+    have z_in_l_ext : (l.any (fun y => esIgual z y)) := by
+      -- Esto se demuestra por inducción sobre la lista `l` en `reducirDuplicadosAux`.
+      have helper : ∀ (l' vistos : List CList), ∀ z' ∈ (reducirDuplicadosAux l' vistos),
+        (l'.any (fun y => esIgual z' y)) ∨ (vistos.any (fun y => esIgual z' y)) := by
+        intro l'
+        induction l' with
+        | nil => intro vistos z' h_mem; cases h_mem
+        | head tail IH =>
+          intro vistos z' h_mem
+          simp [reducirDuplicadosAux] at h_mem
+          by_cases h_seen : (vistos.any (fun y => esIgual head y))
+          · simp [h_seen] at h_mem; exact IH vistos z' h_mem
+          · simp [h_seen] at h_mem
+            rcases h_mem with (rfl | h_in_tail)
+            · exact Or.inl ⟨head, List.mem_cons_self _ _, esIgual_refl head⟩
+            · have := IH (head :: vistos) z' h_in_tail
+              rcases this with (h_in_t | h_in_v)
+              · exact Or.inl ⟨h_in_t.choose, List.mem_cons_of_mem _ h_in_t.choose_spec.1, h_in_t.choose_spec.2⟩
+              · simp [List.any_cons, List.any_or] at h_in_v
+                exact Or.inr h_in_v
+      -- Aplicamos el helper al caso base.
+      rw [reducirDuplicados] at z_in_reduced
+      have := helper l [] z z_in_reduced
+      cases this with
+      | inl h => exact h
+      | inr h => simp at h
+    -- Usamos transitividad para conectar `x` con el elemento encontrado en `l`.
+    rcases z_in_l_ext with ⟨w, w_in_l, zw_eq⟩
+    exact ⟨w, w_in_l, CList.eq_trans x z w xz_eq zw_eq⟩
+  -- Parte 2: Completeness (`l` es un subconjunto de `reducirDuplicados l`)
+  · intro h_mem_l
+    -- `h_mem_l` nos da `z` en `l` tal que `esIgual x z`.
+    rcases h_mem_l with ⟨z, z_in_l, xz_eq⟩
+    -- Probamos que `∀ z' ∈ l, Mem z' (reducirDuplicados l)`.
+    have completeness_aux : ∀ z' ∈ l, (reducirDuplicados l).any (fun y => esIgual z' y) := by
+      -- Esto se demuestra por inducción, probando que ningún elemento se pierde.
+      have helper : ∀ (l' vistos : List CList), ∀ z' ∈ l',
+        (reducirDuplicadosAux l' vistos).any (fun y => esIgual z' y) ∨ (vistos.any (fun y => esIgual z' y)) := by
+        intro l'
+        induction l' with
+        | nil => intro vistos z' h_mem; cases h_mem
+        | head tail IH =>
+          intro vistos z' h_mem
+          simp only [reducirDuplicadosAux]
+          rcases (List.mem_cons.mp h_mem) with (rfl | h_in_tail)
+          -- Caso 1: z' = head
+          · by_cases h_seen : (vistos.any (fun y => esIgual head y))
+            · simp [h_seen]; exact Or.inr h_seen
+            · simp [h_seen]; exact Or.inl ⟨head, List.mem_cons_self _ _, esIgual_refl _⟩
+          -- Caso 2: z' ∈ tail
+          · have := IH (head :: vistos) z' h_in_tail
+            by_cases h_seen : (vistos.any (fun y => esIgual head y))
+            · simp [h_seen]
+              -- `vistos` no cambia, así que la IH simple sobre `tail` es suficiente.
+              exact IH vistos z' h_in_tail
+            · simp [h_seen]
+              -- `vistos` se actualiza. La IH fuerte nos da la propiedad para `tail` y `head::vistos`.
+              rcases (IH (head :: vistos) z' h_in_tail) with (h_in_res | h_in_v_ext)
+              -- Si `z'` está en el resultado recursivo, está en el resultado extendido.
+              · exact Or.inl ⟨h_in_res.choose, List.mem_cons_of_mem _ h_in_res.choose_spec.1, h_in_res.choose_spec.2⟩
+              -- Si `z'` estaba en `head::vistos`, hay que ver dónde.
+              · simp [List.any_cons, List.any_or] at h_in_v_ext
+                -- Si `esIgual z' head`, entonces está en el resultado (`head :: ...`).
+                -- Si no, estaba en `vistos` y se cumple la segunda parte del `or`.
+                cases h_in_v_ext with
+                | inl h_eq_h => exact Or.inl ⟨head, List.mem_cons_self _ _, h_eq_h⟩
+                | inr h_in_v => exact Or.inr h_in_v
+      -- Aplicamos el helper al caso inicial y simplificamos.
+      intro z' hz'
+      rw [reducirDuplicados]
+      have := helper l [] z' hz'
+      simp at this; exact this
+    -- Usamos transitividad para finalizar.
+    have := completeness_aux z z_in_l
+    rcases this with ⟨w, w_in_reduced, zw_eq⟩
+    exact ⟨w, w_in_reduced, CList.eq_trans x z w xz_eq zw_eq⟩
+
+
 end CList
 
 
--- El Setoid finalmente con transitividad total
+-- El Setoid finalmente con reflexividad, simetría y transitividad
 def CList.Setoid : Setoid CList where
   r A B := CList.esIgual A B = true
   iseqv := {
@@ -310,6 +461,43 @@ def CList.Setoid : Setoid CList where
 def CSet := Quotient CList.Setoid
 
 namespace CSet
+
+/-!
+Dadas dos CList A y B que son extensionalmente iguales ()
+-/
+
+theorem normalizar_eq_of_eq {A B : CList} (h : CList.esIgual A B = true) :
+    CList.normalizar A = CList.normalizar B := by
+  sorry
+
+/--
+Esta es la función que extrae el representante canónico (una `CList` normalizada)
+de un `CSet` abstracto.
+
+Usa ``Quotient.lift``, que "levanta" una función del tipo base (`CList`)
+al tipo cociente (`CSet`), siempre que la función respete la relación
+de equivalencia (lo que demostramos con `normalizar_eq_of_eq`).
+-/
+def repr (s : CSet) : CList :=
+  Quotient.lift CList.normalizar (fun A B h => normalizar_eq_of_eq h) s
+
+-- EJEMPLO DE USO:
+
+-- 1. Creamos dos CList "sucias" y distintas, pero extensionalmente iguales.
+def clist_sucia_1 := CList.mk [CList.uno, CList.cero, CList.uno]
+def clist_sucia_2 := CList.mk [CList.cero, CList.uno]
+
+-- 2. "Subimos" una de ellas para crear un CSet abstracto.
+--    ``Quotient.mk` `CList.Setoid` clist_sucia_1` y ``Quotient.mk` `CList.Setoid` clist_sucia_2`
+--    producirían el *mismo* `CSet`.
+def mi_cset : CSet := Quotient.mk CList.Setoid clist_sucia_1
+
+-- 3. "Bajamos" del CSet abstracto a su representante canónico usando nuestra función.
+def mi_repr_canonico : CList := repr mi_cset
+
+-- El valor de `mi_repr_canonico` sería ``CList.mk` [`CList.cero`, `CList.uno`]`,
+-- que es el resultado de aplicar ``CList.normalizar`` tanto a `clist_sucia_1`
+-- como a `clist_sucia_2`.
 
 def vacio : CSet := Quotient.mk CList.Setoid CList.vacio
 
