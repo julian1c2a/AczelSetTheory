@@ -369,35 +369,18 @@ theorem symm {l₁ l₂ : List CList} (h : SetEquiv l₁ l₂) : SetEquiv l₂ l
   intro x; exact (h x).symm
 
 @[trans]
-theorem trans {l₁ l₂ l₃ : List CList} (h₁₂ : SetEquiv l₁ l₂) (h₂₃ : SetEquiv l₂ l₃) : SetEquiv l₁ l₃ := by
+theorem trans {l₁ l₂ l₃ : List CList} (h₁₂ : SetEquiv l₁ l₂) (h₂₃ : SetEquiv l₂ l₃) :
+  SetEquiv l₁ l₃
+  := by
   intro x; exact (h₁₂ x).trans (h₂₃ x)
 
 end SetEquiv
 
-
-
 theorem pertenece_eq_any (x : CList) (l : List CList) :
-
-
-
     pertenece x (mk l) = l.any (fun y => esIgual x y) := by
-
-
-
   induction l with
-
-
-
   | nil => simp [pertenece_nil_def]
-
-
-
   | cons y ys ih => simp [pertenece_cons_def, ih]
-
-
-
-
-
 
 
 theorem esIgual_mk_iff_setEquiv (l₁ l₂ : List CList) :
@@ -413,80 +396,23 @@ theorem esIgual_mk_iff_setEquiv (l₁ l₂ : List CList) :
   simp_rw [esIgual_def, Bool.and_eq_true, subs_iff_forall_mem_pertenece]
   unfold SetEquiv
   simp_rw [pertenece_eq_any, Bool.eq_true_iff_true]
-
-
-
-
-
-
-
   constructor
-
-
-
   · intro h x
-
-
-
     constructor
-
-
-
     · intro h_pert_l1
-
-
-
       rcases h_pert_l1 with ⟨z, z_in_l1, xz_eq⟩
-
-
-
       exact eq_mem x z (mk l₂) xz_eq (h.1 z z_in_l1)
-
-
-
     · intro h_pert_l2
-
-
-
       rcases h_pert_l2 with ⟨z, z_in_l2, xz_eq⟩
-
-
-
       exact eq_mem x z (mk l₁) xz_eq (h.2 z z_in_l2)
-
-
-
   · intro h
-
-
-
     constructor
-
-
-
     · intro x x_in_l1
-
-
-
       apply (h x).mp
-
-
-
       exact ⟨x, x_in_l1, esIgual_refl x⟩
-
-
-
     · intro x x_in_l2
-
-
-
       apply (h x).mpr
-
-
-
       exact ⟨x, x_in_l2, esIgual_refl x⟩
-
-
 
 -- Lema: `reducirDuplicados` conserva el conjunto de elementos.
 
