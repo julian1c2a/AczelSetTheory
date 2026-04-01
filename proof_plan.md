@@ -252,6 +252,215 @@ listas distintas propositional-mente y ordenadas por la misma función total det
 
 ---
 
+---
+
+## Errores de compilación actuales (`lake build` 2026-04-01)
+
+El archivo NO compila. Hay 8 clases de errores. Todos deben resolverse antes de añadir teoremas nuevos.
+
+### E1 (L315/L433/L467): Sintaxis incorrecta de `induction`
+
+```
+error: Invalid alternative name `head`: Expected `cons`
+```
+
+**Causa**: En Lean 4.28, `induction l with | head tail IH =>` no existe. El nombre del caso para `cons` es `cons`.
+
+**Fix**: `| cons head tail IH =>` en todos los `induction l' with`.
+
+---
+
+### E2 (L320): Type mismatch `IH vistos` en `reducirDuplicados_nodup`
+
+```
+IH vistos : Nodup ... ∧ ∀ y ∈ ..., (vistos.any ...) = false
+expected  : Nodup ... ∧ ∀ y ∈ ..., ∀ x ∈ vistos, y.esIgual x = false
+```
+
+**Causa**: `simp [h_seen]` en el caso 1 (`· simp [h_seen]; exact IH vistos`) transforma el goal expandiendo `List.any` en `∀ x ∈ vistos, ...`. Pero el `stronger_lemma` enuncia la segunda propiedad como `(vistos.any ...) = false`, no en forma universalmente cuantificada.
+
+**Fix**: Reemplazar `simp [h_seen]` por `rw [if_pos h_seen]` (o `if_neg h_seen`) para reducir el `if` sin tocar la forma de `List.any` en el goal.
+
+```lean
+-- Caso 1: visto
+· rw [if_pos h_seen]; exact IH vistos
+-- Caso 2: nuevo
+· rw [if_neg h_seen]
+  have ih_recursed := IH (head :: vistos)
+  ...
+```
+
+---
+
+### E3 (L337/L349): `List.any_or` no existe en Lean 4.28
+
+```
+error: Unknown constant `List.any_or`
+```
+
+**Causa**: La constante correcta en Lean 4.28 es `List.any_cons` (para un elemento) y no existe `List.any_or`.
+
+**Forma correcta** de reescribir `((head :: vistos).any fun z => y.esIgual z) = false`:
+
+```lean
+simp only [List.any_cons, Bool.or_eq_false_iff] at tail_is_new
+-- Da: ¬ (esIgual y head = true) ∧ (vistos.any ...) = false
+```
+
+Pero esto introduce `= true` en la negación. Más limpio:
+
+```lean
+rw [List.any_cons] at tail_is_new
+rw [Bool.or_eq_false_iff] at tail_is_new
+-- tail_is_new.1 : esIgual y head = false
+-- tail_is_new.2 : (vistos.any ...) = false
+```
+
+---
+
+### E4 (L342): `introN` falla tras `simp [h_seen]` en parte 2 de `reducirDuplicados_nodup`
+
+```
+error: Tactic `introN` failed: There are no additional binders...
+⊢ (∀ x ∈ vistos, head.esIgual x = false) ∧ ∀ a ∈ ..., ∀ x ∈ vistos, a.esIgual x = false
+```
+
+**Causa**: `simp [h_seen]` ha transformado el goal de `(vistos.any ...) = false` a `∀ x ∈ vistos, ...`. Pero la segunda parte del bloque `constructor` hace `intro y y_in_list` intentando introducir `y : CList` y `y_in_list : y ∈ (head :: ...)`, cuando el goal ya tiene forma diferente.
+
+**Fix**: Es consecuencia del E2. Al usar `rw [if_neg h_seen]` en lugar de `simp`, el goal mantendrá la forma original y la prueba de la parte 2 fluirá igual.
+
+---
+
+### E5 (L371): `@[trans]` desconocido
+
+```
+error: Unknown attribute `[trans]`
+```
+
+**Causa**: En Lean 4.28, `@[trans]` requiere que el tipo implemente la clase `Trans`. No aplica directamente a tipos `Prop` customizados sin instancia.
+
+**Fix**: Eliminar el atributo. El teorema sigue siendo usable como `SetEquiv.trans h₁₂ h₂₃`.
+
+```lean
+-- Quitar @[trans], dejar solo:
+theorem trans {l₁ l₂ l₃} (h₁₂ : SetEquiv l₁ l₂) (h₂₃ : SetEquiv l₂ l₃) : SetEquiv l₁ l₃ := ...
+```
+
+---
+
+### E6 (L396-398): `Bool.eq_true_iff_true` y `simp_rw` fallan en `esIgual_mk_iff_setEquiv`
+
+```
+error: unknown tactic  (en simp_rw [..., Bool.eq_true_iff_true])
+```
+
+**Causa**: `Bool.eq_true_iff_true` no existe en Lean 4.28.
+
+**Estado del goal** después de las primeras dos líneas:
+```
+(∀ x ∈ l₁, (l₂.any fun y => esIgual x y) = true) ∧
+(∀ x ∈ l₂, (l₁.any fun y => esIgual x y) = true) ↔
+∀ x, (l₁.any fun y => esIgual x y) ↔ (l₂.any fun y => esIgual x y)
+```
+
+**Fix**: Eliminar la línea `simp_rw [pertenece_eq_any, Bool.eq_true_iff_true]` y hacer la prueba directamente sobre ese goal. La estructura del `constructor` que sigue (líneas 399–415) ya construye la prueba correctamente siempre que los tipos coincidan. Solo hay que adaptar `rcases h_pert_l1 with ⟨z, z_in_l1, xz_eq⟩` — ver E7.
+
+```lean
+  simp_rw [esIgual_def, Bool.and_eq_true, subs_iff_forall_mem_pertenece]
+  simp_rw [pertenece_eq_any]   -- sin Bool.eq_true_iff_true
+  unfold SetEquiv
+  constructor
+  ...
+```
+
+---
+
+### E7 (L424, L458): `cases`/`rcases` falla sobre `Bool = true`
+
+```
+error: Tactic `cases` failed: Dependent elimination failed
+  true = (reducirDuplicados l).any fun y => x.esIgual y
+```
+
+**Causa**: `h_mem_reduced : (reducirDuplicados l).any (fun y => esIgual x y) = true` es una proposición `Bool = true`, no un existencial. `rcases ... with ⟨z, z_in, eq⟩` no funciona directamente.
+
+**Fix**: Convertir primero con `List.any_eq_true`:
+
+```lean
+-- En lugar de: rcases h_mem_reduced with ⟨z, z_in_reduced, xz_eq⟩
+rw [List.any_eq_true] at h_mem_reduced
+rcases h_mem_reduced with ⟨z, z_in_reduced, xz_eq⟩
+```
+
+`List.any_eq_true : l.any p = true ↔ ∃ a ∈ l, p a = true`  (existe en Lean 4.28)
+
+Aplicar lo mismo en L458 y en L499–500.
+
+---
+
+### E8 (L570): `omega` falla en `decreasing_by` de `normalizar_cSize_le`
+
+```
+omega could not prove the goal:
+  a := ↑x.cSize
+  b := ↑(cSizeList xs)
+  a - b ≥ 1   -- es decir, intenta probar cSize x < cSizeList xs, imposible
+```
+
+**Causa**: Dentro de `induction xs | cons x rest ih =>`, el `decreasing_by` necesita probar `cSize x < cSize A = cSize (mk (x :: rest)) = 1 + 1 + cSize x + cSizeList rest`. Pero `simp [cSize, cSizeList]` en `decreasing_by` no tiene acceso al hecho de que `xs = x :: rest`, y trata `cSizeList xs` como una variable abstracta. Por eso omega solo ve `cSize x < 1 + cSizeList xs` sin poder usar la definición de `cSizeList`.
+
+**Fix**: Evitar `termination_by/decreasing_by` por completo. Usar un bloque `mutual` estructuralmente recursivo:
+
+```lean
+mutual
+  theorem normalizar_cSize_le : (A : CList) → cSize (normalizar A) ≤ cSize A
+    | mk xs => by
+        have h_list := normalizar_list_cSize_le xs
+        have h_red  := cSizeList_reducirDuplicados_le (xs.map normalizar)
+        have h_ord  := cSizeList_ordenarLista_le (reducirDuplicados (xs.map normalizar))
+        simp only [normalizar, cSize]; omega
+
+  theorem normalizar_list_cSize_le : (xs : List CList) → cSizeList (xs.map normalizar) ≤ cSizeList xs
+    | []       => by simp [cSizeList]
+    | x :: rest => by
+        simp only [List.map, cSizeList]
+        have hx   := normalizar_cSize_le x
+        have hrest := normalizar_list_cSize_le rest
+        omega
+end
+```
+
+Esto es **estructuralmente recursivo** (sin `termination_by`), Lean lo acepta directamente.
+
+---
+
+### E9 (L605): `normalizar` desconocido en `namespace CSet`
+
+```
+error: Unknown identifier `normalizar`
+```
+
+**Causa**: `simp only [normalizar]` dentro de `namespace CSet` no encuentra `normalizar` porque pertenece a `CList`.
+
+**Fix**: `simp only [CList.normalizar]`
+
+---
+
+## Estado pre-existente de los errores
+
+Los errores E1–E7 y E9 son **pre-existentes** (existían antes de mis cambios del 2026-04-01).
+El error E8 es **introducido** por mi nuevo código `normalizar_cSize_le` con `termination_by`.
+
+**Orden de corrección recomendado**:
+1. E1 (sintaxis `cons`) — afecta `reducirDuplicados_nodup` y `reducirDuplicados_set_equiv_self`
+2. E2+E3+E4 (lógica `reducirDuplicados_nodup`) — dependientes entre sí
+3. E5 (`@[trans]`) — trivial, quitar atributo
+4. E6+E7 (`esIgual_mk_iff_setEquiv` y `reducirDuplicados_set_equiv_self`) — dependientes
+5. E8 (`normalizar_cSize_le`) — reescribir con `mutual`
+6. E9 (`normalizar` en CSet) — trivial, calificar nombre
+
+---
+
 ## Plan de implementación (orden de ataque)
 
 ```

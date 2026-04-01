@@ -312,7 +312,7 @@ theorem reducirDuplicados_nodup (l : List CList) : Nodup (reducirDuplicados l) :
     induction l' with
     | nil =>
       intro _; simp [reducirDuplicadosAux, Nodup]
-    | head tail IH =>
+    | cons head tail IH =>
       intro vistos
       simp only [reducirDuplicadosAux]
       by_cases h_seen : (vistos.any fun y => esIgual head y)
@@ -499,6 +499,75 @@ theorem reducirDuplicados_set_equiv_self (l : List CList) : SetEquiv (reducirDup
     have := completeness_aux z z_in_l
     rcases this with ⟨w, w_in_reduced, zw_eq⟩
     exact ⟨w, w_in_reduced, CList.eq_trans x z w xz_eq zw_eq⟩
+
+
+-- ==================================================================
+-- TEOREMA 1: normalizar no aumenta el tamaño (normalizar_cSize_le)
+-- ==================================================================
+
+-- Sub-lema: insertarOrdenado no aumenta el tamaño de la lista
+private theorem cSizeList_insertarOrdenado_le (x : CList) (l : List CList) :
+    cSizeList (insertarOrdenado x l) ≤ 1 + cSize x + cSizeList l := by
+  induction l with
+  | nil => simp [insertarOrdenado, cSizeList]
+  | cons y ys ih =>
+    unfold insertarOrdenado
+    by_cases h1 : esMenor x y = true
+    · rw [if_pos h1]; simp only [cSizeList]; omega
+    · rw [if_neg h1]
+      by_cases h2 : esIgual x y = true
+      · rw [if_pos h2]; simp only [cSizeList]; omega
+      · rw [if_neg h2]; simp only [cSizeList]; omega
+
+-- Sub-lema: reducirDuplicados no aumenta el tamaño de la lista
+theorem cSizeList_reducirDuplicados_le (l : List CList) :
+    cSizeList (reducirDuplicados l) ≤ cSizeList l := by
+  suffices h : ∀ (l' vistos : List CList),
+      cSizeList (reducirDuplicadosAux l' vistos) ≤ cSizeList l' from by
+    unfold reducirDuplicados; exact h l []
+  intro l'
+  induction l' with
+  | nil => intros; simp [reducirDuplicadosAux, cSizeList]
+  | cons x xs ih =>
+    intro vistos
+    unfold reducirDuplicadosAux
+    by_cases h : (vistos.any fun y => esIgual x y) = true
+    · rw [if_pos h]; exact Nat.le_trans (ih vistos) (by simp [cSizeList])
+    · rw [if_neg h]; simp only [cSizeList]
+      exact Nat.le_trans (Nat.add_le_add_left (ih (x :: vistos)) _) (by omega)
+
+-- Sub-lema: ordenarLista no aumenta el tamaño de la lista
+theorem cSizeList_ordenarLista_le (l : List CList) :
+    cSizeList (ordenarLista l) ≤ cSizeList l := by
+  induction l with
+  | nil => simp [ordenarLista, cSizeList]
+  | cons x xs ih =>
+    unfold ordenarLista
+    have h1 := cSizeList_insertarOrdenado_le x (ordenarLista xs)
+    simp only [cSizeList]
+    omega
+
+-- Teorema 1: normalizar no aumenta el cSize
+theorem normalizar_cSize_le (A : CList) : cSize (normalizar A) ≤ cSize A := by
+  match A with
+  | mk xs =>
+    have h_map : cSizeList (xs.map normalizar) ≤ cSizeList xs := by
+      induction xs with
+      | nil => simp [cSizeList]
+      | cons x rest ih =>
+        simp only [List.map, cSizeList]
+        have hx : cSize (normalizar x) ≤ cSize x := normalizar_cSize_le x
+        omega
+    have h_red := cSizeList_reducirDuplicados_le (xs.map normalizar)
+    have h_ord := cSizeList_ordenarLista_le (reducirDuplicados (xs.map normalizar))
+    show cSize (normalizar (mk xs)) ≤ cSize (mk xs)
+    simp only [normalizar, cSize]
+    omega
+termination_by cSize A
+decreasing_by
+  all_goals simp_wf
+  all_goals simp [cSize, cSizeList]
+  all_goals omega
 
 
 end CList
