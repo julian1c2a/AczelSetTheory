@@ -358,7 +358,138 @@ Define la equivalencia de conjuntos entre dos listas.
 def SetEquiv (l₁ l₂ : List CList) : Prop :=
   ∀ x, (l₁.any (fun y => esIgual x y)) ↔ (l₂.any (fun y => esIgual x y))
 
+namespace SetEquiv
+
+@[refl]
+theorem refl (l : List CList) : SetEquiv l l := by
+  intro _; exact Iff.rfl
+
+@[symm]
+theorem symm {l₁ l₂ : List CList} (h : SetEquiv l₁ l₂) : SetEquiv l₂ l₁ := by
+  intro x; exact (h x).symm
+
+@[trans]
+theorem trans {l₁ l₂ l₃ : List CList} (h₁₂ : SetEquiv l₁ l₂) (h₂₃ : SetEquiv l₂ l₃) : SetEquiv l₁ l₃ := by
+  intro x; exact (h₁₂ x).trans (h₂₃ x)
+
+end SetEquiv
+
+
+
+theorem pertenece_eq_any (x : CList) (l : List CList) :
+
+
+
+    pertenece x (mk l) = l.any (fun y => esIgual x y) := by
+
+
+
+  induction l with
+
+
+
+  | nil => simp [pertenece_nil_def]
+
+
+
+  | cons y ys ih => simp [pertenece_cons_def, ih]
+
+
+
+
+
+
+
+theorem esIgual_mk_iff_setEquiv (l₁ l₂ : List CList) :
+    esIgual (mk l₁) (mk l₂) = true ↔ SetEquiv l₁ l₂ := by
+  have subs_iff_forall_mem_pertenece (l₁ l₂ : List CList) :
+      esSubconjunto (mk l₁) (mk l₂) = true ↔ (∀ x ∈ l₁, pertenece x (mk l₂) = true) := by
+    induction l₁ with
+    | nil => simp [esSubconjunto_nil_def]
+    | cons x xs ih =>
+      simp only [esSubconjunto_cons_def, Bool.and_eq_true, List.mem_cons, forall_eq_or_imp]
+      rw [ih]
+  -- Main proof
+  simp_rw [esIgual_def, Bool.and_eq_true, subs_iff_forall_mem_pertenece]
+  unfold SetEquiv
+  simp_rw [pertenece_eq_any, Bool.eq_true_iff_true]
+
+
+
+
+
+
+
+  constructor
+
+
+
+  · intro h x
+
+
+
+    constructor
+
+
+
+    · intro h_pert_l1
+
+
+
+      rcases h_pert_l1 with ⟨z, z_in_l1, xz_eq⟩
+
+
+
+      exact eq_mem x z (mk l₂) xz_eq (h.1 z z_in_l1)
+
+
+
+    · intro h_pert_l2
+
+
+
+      rcases h_pert_l2 with ⟨z, z_in_l2, xz_eq⟩
+
+
+
+      exact eq_mem x z (mk l₁) xz_eq (h.2 z z_in_l2)
+
+
+
+  · intro h
+
+
+
+    constructor
+
+
+
+    · intro x x_in_l1
+
+
+
+      apply (h x).mp
+
+
+
+      exact ⟨x, x_in_l1, esIgual_refl x⟩
+
+
+
+    · intro x x_in_l2
+
+
+
+      apply (h x).mpr
+
+
+
+      exact ⟨x, x_in_l2, esIgual_refl x⟩
+
+
+
 -- Lema: `reducirDuplicados` conserva el conjunto de elementos.
+
 theorem reducirDuplicados_set_equiv_self (l : List CList) : SetEquiv (reducirDuplicados l) l := by
   intro x; constructor
   -- Parte 1: Soundness (`reducirDuplicados l` es un subconjunto de `l`)
@@ -468,7 +599,61 @@ Dadas dos CList A y B que son extensionalmente iguales ()
 
 theorem normalizar_eq_of_eq {A B : CList} (h : CList.esIgual A B = true) :
     CList.normalizar A = CList.normalizar B := by
-  sorry
+  -- La prueba es por recursión bien fundada sobre el tamaño de los CList.
+  -- Lean es capaz de deducir la terminación porque las llamadas recursivas
+  -- se hacen sobre elementos internos, que son estructuralmente más pequeños.
+  cases A with | mk Ax =>
+  cases B with | mk Bx =>
+  -- Desplegamos la definición de `normalizar`.
+  -- La meta es `mk (...) = mk (...)`, por lo que podemos usar `congr`
+  -- para probar que los argumentos de `mk` son iguales.
+  simp only [normalizar]
+  congr
+
+  -- Lema clave 1: Si los CList son iguales, sus listas internas son SetEquiv.
+  have h_equiv_Ax_Bx : SetEquiv Ax Bx := (esIgual_mk_iff_setEquiv Ax Bx).mp h
+
+  -- Lema clave 2: `map normalizar` preserva SetEquiv.
+  -- Esto funciona porque podemos aplicar la hipótesis de inducción (`normalizar_eq_of_eq`)
+  -- a los elementos de las listas, que son más pequeños.
+  have h_equiv_map : SetEquiv (Ax.map normalizar) (Bx.map normalizar) := by
+    intro x
+    constructor
+    · rintro ⟨norm_a, ⟨a, ha, rfl⟩, hx_eq_norm_a⟩
+      have ⟨b, hb, hab⟩ := (h_equiv_Ax_Bx a).mp ⟨a, ha, esIgual_refl a⟩
+      have h_norm_eq : normalizar a = normalizar b := normalizar_eq_of_eq hab
+      rw [h_norm_eq] at hx_eq_norm_a
+      exact ⟨normalizar b, ⟨b, hb, rfl⟩, hx_eq_norm_a⟩
+    · rintro ⟨norm_b, ⟨b, hb, rfl⟩, hx_eq_norm_b⟩
+      have ⟨a, ha, hab⟩ := (h_equiv_Ax_Bx b).mpr ⟨b, hb, esIgual_refl b⟩
+      have h_norm_eq : normalizar a = normalizar b := normalizar_eq_of_eq hab
+      rw [←h_norm_eq] at hx_eq_norm_b
+      exact ⟨normalizar a, ⟨a, ha, rfl⟩, hx_eq_norm_b⟩
+
+  -- Lema clave 3: Las listas reducidas son SetEquiv.
+  -- Usamos transitividad: A ≈ B, B ≈ C => A ≈ C
+  have h_equiv_reduced : SetEquiv (reducirDuplicados (Ax.map normalizar)) (reducirDuplicados (Bx.map normalizar)) :=
+    SetEquiv.trans (SetEquiv.symm (reducirDuplicados_set_equiv_self _)) (SetEquiv.trans h_equiv_map (reducirDuplicados_set_equiv_self _))
+
+  -- Ahora sabemos que las listas que entran a `ordenarLista` son SetEquiv.
+  -- También sabemos por `reducirDuplicados_nodup` que no tienen duplicados.
+  have h_nodup1 : Nodup (reducirDuplicados (Ax.map normalizar)) := reducirDuplicados_nodup _
+  have h_nodup2 : Nodup (reducirDuplicados (Bx.map normalizar)) := reducirDuplicados_nodup _
+
+  -- El paso final: si dos listas sin duplicados son SetEquiv, `ordenarLista`
+  -- debe producir el mismo resultado para ambas, ya que actúa como una
+  -- función de canonización.
+  -- Esta es la última pieza que falta por demostrar.
+  have h_canon_eq : ordenarLista (reducirDuplicados (Ax.map normalizar)) = ordenarLista (reducirDuplicados (Bx.map normalizar)) := by
+    sorry
+
+
+  exact h_canon_eq
+termination_by cSize A + cSize B
+decreasing_by
+  all_goals simp_wf
+  all_goals simp [cSize, cSizeList]
+  all_goals omega
 
 /--
 Esta es la función que extrae el representante canónico (una `CList` normalizada)
