@@ -446,18 +446,23 @@ error: Unknown identifier `normalizar`
 
 ---
 
-## Estado pre-existente de los errores
+## Estado de corrección de errores
 
-Los errores E1–E7 y E9 son **pre-existentes** (existían antes de mis cambios del 2026-04-01).
-El error E8 es **introducido** por mi nuevo código `normalizar_cSize_le` con `termination_by`.
+| Error | Estado | Descripción |
+|---|---|---|
+| E1 (L315) | ✅ RESUELTO | `head` → `cons head` en `reducirDuplicados_nodup` |
+| E2+E3+E4 (L320–350) | ✅ RESUELTO | `reducirDuplicados_nodup` compila con `by_cases/if_pos/if_neg` |
+| E5 (L372) | ⏳ pendiente | `@[trans]` desconocido |
+| E6 (L397) | ⏳ pendiente | `Bool.eq_true_iff_true` no existe en `esIgual_mk_iff_setEquiv` |
+| E7 (L425, L459) | ⏳ pendiente | `rcases` sobre `Bool=true` en `reducirDuplicados_set_equiv_self` |
+| E8 (L571) | ⏳ pendiente | `omega` falla en `decreasing_by` de `normalizar_cSize_le` |
+| E9 (L606) | ⏳ pendiente | `normalizar` desconocido en `namespace CSet` |
 
 **Orden de corrección recomendado**:
-1. E1 (sintaxis `cons`) — afecta `reducirDuplicados_nodup` y `reducirDuplicados_set_equiv_self`
-2. E2+E3+E4 (lógica `reducirDuplicados_nodup`) — dependientes entre sí
-3. E5 (`@[trans]`) — trivial, quitar atributo
-4. E6+E7 (`esIgual_mk_iff_setEquiv` y `reducirDuplicados_set_equiv_self`) — dependientes
-5. E8 (`normalizar_cSize_le`) — reescribir con `mutual`
-6. E9 (`normalizar` en CSet) — trivial, calificar nombre
+1. E5 (`@[trans]`) — trivial, quitar atributo
+2. E6+E7 (`esIgual_mk_iff_setEquiv` y `reducirDuplicados_set_equiv_self`) — dependientes
+3. E8 (`normalizar_cSize_le`) — reescribir con `mutual`
+4. E9 (`normalizar` en CSet) — trivial, calificar nombre
 
 ---
 

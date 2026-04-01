@@ -315,15 +315,16 @@ theorem reducirDuplicados_nodup (l : List CList) : Nodup (reducirDuplicados l) :
     | cons head tail IH =>
       intro vistos
       simp only [reducirDuplicadosAux]
-      by_cases h_seen : (vistos.any fun y => esIgual head y)
+      by_cases h_seen : (vistos.any fun y => esIgual head y) = true
       -- Caso 1: `head` ya se ha visto. La llamada recursiva usa el mismo `vistos`.
-      · simp [h_seen]; exact IH vistos
+      · rw [if_pos h_seen]; exact IH vistos
       -- Caso 2: `head` es nuevo. Se añade a `vistos` en la llamada recursiva.
-      · simp [h_seen]
+      · rw [if_neg h_seen]
+        have h_false : (vistos.any fun y => esIgual head y) = false :=
+          Bool.eq_false_iff.mpr (fun h => h_seen h)
         -- Aplicamos la hipótesis de inducción con la lista de `vistos` actualizada.
         have ih_recursed := IH (head :: vistos)
         rcases ih_recursed with ⟨nodup_tail, tail_is_new⟩
-
         -- Probamos las dos propiedades para `head :: reducirDuplicadosAux ...`
         constructor
         -- Parte 1: Demostrar `Nodup (head :: ...)`
@@ -331,10 +332,10 @@ theorem reducirDuplicados_nodup (l : List CList) : Nodup (reducirDuplicados l) :
           constructor
           -- 1a: `head` no es igual a ningún elemento del resto.
           · have esIgual_comm : ∀ a b, esIgual a b = esIgual b a := by
-              intros a b; simp [esIgual, esSubconjunto, evalOp, Bool.and_comm]
+              intros a b; simp [esIgual, evalOp, Bool.and_comm]
             intro y y_in_tail
             specialize tail_is_new y y_in_tail
-            rw [List.any_cons, List.any_or, Bool.or_eq_false_iff] at tail_is_new
+            rw [List.any_cons, Bool.or_eq_false_iff] at tail_is_new
             rw [esIgual_comm]; exact tail_is_new.1
           -- 1b: El resto de la lista no tiene duplicados.
           · exact nodup_tail
@@ -343,10 +344,10 @@ theorem reducirDuplicados_nodup (l : List CList) : Nodup (reducirDuplicados l) :
           simp only [List.mem_cons] at y_in_list
           cases y_in_list with
           | inl h_y_eq_head =>
-            rw [h_y_eq_head]; exact h_seen
+            rw [h_y_eq_head]; exact h_false
           | inr h_y_in_tail =>
             specialize tail_is_new y h_y_in_tail
-            rw [List.any_cons, List.any_or, Bool.or_eq_false_iff] at tail_is_new
+            rw [List.any_cons, Bool.or_eq_false_iff] at tail_is_new
             exact tail_is_new.2
   -- Nuestro objetivo principal es la primera parte del lema, con `vistos` inicializado a `[]`.
   rw [reducirDuplicados]
