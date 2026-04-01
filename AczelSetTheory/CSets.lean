@@ -369,10 +369,8 @@ theorem refl (l : List CList) : SetEquiv l l := by
 theorem symm {l₁ l₂ : List CList} (h : SetEquiv l₁ l₂) : SetEquiv l₂ l₁ := by
   intro x; exact (h x).symm
 
-@[trans]
 theorem trans {l₁ l₂ l₃ : List CList} (h₁₂ : SetEquiv l₁ l₂) (h₂₃ : SetEquiv l₂ l₃) :
-  SetEquiv l₁ l₃
-  := by
+    SetEquiv l₁ l₃ := by
   intro x; exact (h₁₂ x).trans (h₂₃ x)
 
 end SetEquiv
@@ -394,112 +392,107 @@ theorem esIgual_mk_iff_setEquiv (l₁ l₂ : List CList) :
       simp only [esSubconjunto_cons_def, Bool.and_eq_true, List.mem_cons, forall_eq_or_imp]
       rw [ih]
   -- Main proof
-  simp_rw [esIgual_def, Bool.and_eq_true, subs_iff_forall_mem_pertenece]
+  simp_rw [esIgual_def, Bool.and_eq_true, subs_iff_forall_mem_pertenece, pertenece_eq_any]
   unfold SetEquiv
-  simp_rw [pertenece_eq_any, Bool.eq_true_iff_true]
   constructor
-  · intro h x
+  · intro ⟨h1, h2⟩ x
     constructor
-    · intro h_pert_l1
-      rcases h_pert_l1 with ⟨z, z_in_l1, xz_eq⟩
-      exact eq_mem x z (mk l₂) xz_eq (h.1 z z_in_l1)
-    · intro h_pert_l2
-      rcases h_pert_l2 with ⟨z, z_in_l2, xz_eq⟩
-      exact eq_mem x z (mk l₁) xz_eq (h.2 z z_in_l2)
+    · intro hx
+      rw [List.any_eq_true] at hx
+      obtain ⟨z, hz, hxz⟩ := hx
+      have hzl2 := h1 z hz
+      rw [List.any_eq_true] at hzl2
+      obtain ⟨w, hw, hzw⟩ := hzl2
+      exact List.any_eq_true.mpr ⟨w, hw, eq_trans x z w hxz hzw⟩
+    · intro hx
+      rw [List.any_eq_true] at hx
+      obtain ⟨z, hz, hxz⟩ := hx
+      have hzl1 := h2 z hz
+      rw [List.any_eq_true] at hzl1
+      obtain ⟨w, hw, hzw⟩ := hzl1
+      exact List.any_eq_true.mpr ⟨w, hw, eq_trans x z w hxz hzw⟩
   · intro h
-    constructor
-    · intro x x_in_l1
-      apply (h x).mp
-      exact ⟨x, x_in_l1, esIgual_refl x⟩
-    · intro x x_in_l2
-      apply (h x).mpr
-      exact ⟨x, x_in_l2, esIgual_refl x⟩
+    exact ⟨fun x hx => (h x).mp  (List.any_eq_true.mpr ⟨x, hx, esIgual_refl x⟩),
+           fun x hx => (h x).mpr (List.any_eq_true.mpr ⟨x, hx, esIgual_refl x⟩)⟩
 
 -- Lema: `reducirDuplicados` conserva el conjunto de elementos.
 
 theorem reducirDuplicados_set_equiv_self (l : List CList) : SetEquiv (reducirDuplicados l) l := by
   intro x; constructor
-  -- Parte 1: Soundness (`reducirDuplicados l` es un subconjunto de `l`)
+  -- Parte 1: Soundness
   · intro h_mem_reduced
-    -- `h_mem_reduced` significa `∃ z ∈ reducirDuplicados l, esIgual x z`
-    rcases h_mem_reduced with ⟨z, z_in_reduced, xz_eq⟩
-    -- Probamos que todo elemento de la lista reducida está en la original.
-    have z_in_l_ext : (l.any (fun y => esIgual z y)) := by
-      -- Esto se demuestra por inducción sobre la lista `l` en `reducirDuplicadosAux`.
+    rw [List.any_eq_true] at h_mem_reduced
+    obtain ⟨z, z_in_reduced, xz_eq⟩ := h_mem_reduced
+    have z_in_l_ext : (l.any (fun y => esIgual z y)) = true := by
       have helper : ∀ (l' vistos : List CList), ∀ z' ∈ (reducirDuplicadosAux l' vistos),
-        (l'.any (fun y => esIgual z' y)) ∨ (vistos.any (fun y => esIgual z' y)) := by
+          (l'.any (fun y => esIgual z' y)) = true ∨ (vistos.any (fun y => esIgual z' y)) = true := by
         intro l'
         induction l' with
         | nil => intro vistos z' h_mem; cases h_mem
-        | head tail IH =>
+        | cons head tail IH =>
           intro vistos z' h_mem
-          simp [reducirDuplicadosAux] at h_mem
-          by_cases h_seen : (vistos.any (fun y => esIgual head y))
-          · simp [h_seen] at h_mem; exact IH vistos z' h_mem
-          · simp [h_seen] at h_mem
+          unfold reducirDuplicadosAux at h_mem
+          by_cases h_seen : (vistos.any (fun y => esIgual head y)) = true
+          · rw [if_pos h_seen] at h_mem
+            rcases IH vistos z' h_mem with (h | h)
+            · exact Or.inl (by simp [List.any_cons, h])
+            · exact Or.inr h
+          · rw [if_neg h_seen] at h_mem
+            simp only [List.mem_cons] at h_mem
             rcases h_mem with (rfl | h_in_tail)
-            · exact Or.inl ⟨head, List.mem_cons_self _ _, esIgual_refl head⟩
-            · have := IH (head :: vistos) z' h_in_tail
-              rcases this with (h_in_t | h_in_v)
-              · exact Or.inl ⟨h_in_t.choose, List.mem_cons_of_mem _ h_in_t.choose_spec.1, h_in_t.choose_spec.2⟩
-              · simp [List.any_cons, List.any_or] at h_in_v
-                exact Or.inr h_in_v
-      -- Aplicamos el helper al caso base.
+            · exact Or.inl (by simp [List.any_cons, esIgual_refl])
+            · rcases IH (head :: vistos) z' h_in_tail with (h_in_t | h_in_v)
+              · exact Or.inl (by simp [List.any_cons, h_in_t])
+              · rw [List.any_cons, Bool.or_eq_true] at h_in_v
+                rcases h_in_v with (h_head | h_vis)
+                · exact Or.inl (by simp [List.any_cons, h_head])
+                · exact Or.inr h_vis
       rw [reducirDuplicados] at z_in_reduced
-      have := helper l [] z z_in_reduced
-      cases this with
-      | inl h => exact h
-      | inr h => simp at h
-    -- Usamos transitividad para conectar `x` con el elemento encontrado en `l`.
-    rcases z_in_l_ext with ⟨w, w_in_l, zw_eq⟩
-    exact ⟨w, w_in_l, CList.eq_trans x z w xz_eq zw_eq⟩
-  -- Parte 2: Completeness (`l` es un subconjunto de `reducirDuplicados l`)
+      rcases helper l [] z z_in_reduced with (h | h)
+      · exact h
+      · simp at h
+    rw [List.any_eq_true] at z_in_l_ext
+    obtain ⟨w, w_in_l, zw_eq⟩ := z_in_l_ext
+    exact List.any_eq_true.mpr ⟨w, w_in_l, CList.eq_trans x z w xz_eq zw_eq⟩
+  -- Parte 2: Completeness
   · intro h_mem_l
-    -- `h_mem_l` nos da `z` en `l` tal que `esIgual x z`.
-    rcases h_mem_l with ⟨z, z_in_l, xz_eq⟩
-    -- Probamos que `∀ z' ∈ l, Mem z' (reducirDuplicados l)`.
-    have completeness_aux : ∀ z' ∈ l, (reducirDuplicados l).any (fun y => esIgual z' y) := by
-      -- Esto se demuestra por inducción, probando que ningún elemento se pierde.
+    rw [List.any_eq_true] at h_mem_l
+    obtain ⟨z, z_in_l, xz_eq⟩ := h_mem_l
+    have completeness_aux : ∀ z' ∈ l, (reducirDuplicados l).any (fun y => esIgual z' y) = true := by
       have helper : ∀ (l' vistos : List CList), ∀ z' ∈ l',
-        (reducirDuplicadosAux l' vistos).any (fun y => esIgual z' y) ∨ (vistos.any (fun y => esIgual z' y)) := by
+          (reducirDuplicadosAux l' vistos).any (fun y => esIgual z' y) = true ∨
+          (vistos.any (fun y => esIgual z' y)) = true := by
         intro l'
         induction l' with
         | nil => intro vistos z' h_mem; cases h_mem
-        | head tail IH =>
+        | cons head tail IH =>
           intro vistos z' h_mem
           simp only [reducirDuplicadosAux]
-          rcases (List.mem_cons.mp h_mem) with (rfl | h_in_tail)
-          -- Caso 1: z' = head
-          · by_cases h_seen : (vistos.any (fun y => esIgual head y))
-            · simp [h_seen]; exact Or.inr h_seen
-            · simp [h_seen]; exact Or.inl ⟨head, List.mem_cons_self _ _, esIgual_refl _⟩
-          -- Caso 2: z' ∈ tail
-          · have := IH (head :: vistos) z' h_in_tail
-            by_cases h_seen : (vistos.any (fun y => esIgual head y))
-            · simp [h_seen]
-              -- `vistos` no cambia, así que la IH simple sobre `tail` es suficiente.
-              exact IH vistos z' h_in_tail
-            · simp [h_seen]
-              -- `vistos` se actualiza. La IH fuerte nos da la propiedad para `tail` y `head::vistos`.
-              rcases (IH (head :: vistos) z' h_in_tail) with (h_in_res | h_in_v_ext)
-              -- Si `z'` está en el resultado recursivo, está en el resultado extendido.
-              · exact Or.inl ⟨h_in_res.choose, List.mem_cons_of_mem _ h_in_res.choose_spec.1, h_in_res.choose_spec.2⟩
-              -- Si `z'` estaba en `head::vistos`, hay que ver dónde.
-              · simp [List.any_cons, List.any_or] at h_in_v_ext
-                -- Si `esIgual z' head`, entonces está en el resultado (`head :: ...`).
-                -- Si no, estaba en `vistos` y se cumple la segunda parte del `or`.
-                cases h_in_v_ext with
-                | inl h_eq_h => exact Or.inl ⟨head, List.mem_cons_self _ _, h_eq_h⟩
-                | inr h_in_v => exact Or.inr h_in_v
-      -- Aplicamos el helper al caso inicial y simplificamos.
+          rcases List.mem_cons.mp h_mem with (rfl | h_in_tail)
+          · by_cases h_seen : (vistos.any (fun y => esIgual head y)) = true
+            · rw [if_pos h_seen]; exact Or.inr h_seen
+            · rw [if_neg h_seen]
+              exact Or.inl (List.any_eq_true.mpr ⟨head, List.mem_cons_self _ _, esIgual_refl _⟩)
+          · by_cases h_seen : (vistos.any (fun y => esIgual head y)) = true
+            · rw [if_pos h_seen]; exact IH vistos z' h_in_tail
+            · rw [if_neg h_seen]
+              rcases IH (head :: vistos) z' h_in_tail with (h_in_res | h_in_v_ext)
+              · rw [List.any_eq_true] at h_in_res
+                obtain ⟨w, hw, hwz⟩ := h_in_res
+                exact Or.inl (List.any_eq_true.mpr ⟨w, List.mem_cons_of_mem head hw, hwz⟩)
+              · rw [List.any_cons, Bool.or_eq_true] at h_in_v_ext
+                rcases h_in_v_ext with (h_head | h_vis)
+                · exact Or.inl (by simp [List.any_cons, h_head])
+                · exact Or.inr h_vis
       intro z' hz'
       rw [reducirDuplicados]
-      have := helper l [] z' hz'
-      simp at this; exact this
-    -- Usamos transitividad para finalizar.
-    have := completeness_aux z z_in_l
-    rcases this with ⟨w, w_in_reduced, zw_eq⟩
-    exact ⟨w, w_in_reduced, CList.eq_trans x z w xz_eq zw_eq⟩
+      rcases helper l [] z' hz' with (h | h)
+      · exact h
+      · simp at h
+    have hz := completeness_aux z z_in_l
+    rw [List.any_eq_true] at hz
+    obtain ⟨w, w_in_reduced, zw_eq⟩ := hz
+    exact List.any_eq_true.mpr ⟨w, w_in_reduced, CList.eq_trans x z w xz_eq zw_eq⟩
 
 
 -- ==================================================================
