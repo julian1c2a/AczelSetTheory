@@ -546,7 +546,7 @@ mutual
   termination_by xs => cSizeList xs * 2 + 1
   decreasing_by
     all_goals simp_wf
-    all_goals simp [cSize, cSizeList]
+    all_goals simp [cSizeList]
     all_goals omega
 
   theorem normalizar_cSize_le (A : CList) : cSize (normalizar A) ≤ cSize A :=
@@ -560,7 +560,7 @@ mutual
   termination_by cSize A * 2
   decreasing_by
     all_goals simp_wf
-    all_goals simp [cSize, cSizeList]
+    all_goals simp [cSize]
     all_goals omega
 end
 
