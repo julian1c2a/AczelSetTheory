@@ -712,6 +712,94 @@ theorem ordenarLista_sorted (l : List CList) : Sorted (ordenarLista l) := by
   | nil => simp [ordenarLista, Sorted]
   | cons x xs ih => exact insertarOrdenado_sorted x (ordenarLista xs) ih
 
+-- ==================================================================
+-- PIEZA 3: ordenarLista_nodup
+-- ==================================================================
+
+-- Elementos de (insertarOrdenado x l) son un subconjunto de {x} ∪ l
+private theorem mem_of_mem_insertarOrdenado (x z : CList) (l : List CList) :
+    z ∈ insertarOrdenado x l → z = x ∨ z ∈ l := by
+  induction l with
+  | nil =>
+    simp [insertarOrdenado]
+  | cons y ys ih =>
+    simp only [insertarOrdenado]
+    by_cases hlt : esMenor x y = true
+    · rw [if_pos hlt]
+      intro hmem
+      simp only [List.mem_cons] at hmem
+      rcases hmem with rfl | rfl | h
+      · exact Or.inl rfl
+      · exact Or.inr (List.mem_cons.mpr (Or.inl rfl))
+      · exact Or.inr (List.mem_cons.mpr (Or.inr h))
+    · rw [if_neg hlt]
+      by_cases heq : esIgual x y = true
+      · rw [if_pos heq]
+        intro hmem; exact Or.inr hmem
+      · rw [if_neg heq]
+        intro hmem
+        simp only [List.mem_cons] at hmem
+        rcases hmem with rfl | h
+        · exact Or.inr (List.mem_cons.mpr (Or.inl rfl))
+        · rcases ih h with rfl | h'
+          · exact Or.inl rfl
+          · exact Or.inr (List.mem_cons.mpr (Or.inr h'))
+
+-- Elementos de (ordenarLista l) son elementos de l
+private theorem ordenarLista_mem_subset (z : CList) (l : List CList) :
+    z ∈ ordenarLista l → z ∈ l := by
+  induction l with
+  | nil => simp [ordenarLista]
+  | cons y ys ih =>
+    simp only [ordenarLista]
+    intro hmem
+    rcases mem_of_mem_insertarOrdenado y z (ordenarLista ys) hmem with rfl | h
+    · exact List.mem_cons.mpr (Or.inl rfl)
+    · exact List.mem_cons.mpr (Or.inr (ih h))
+
+private theorem insertarOrdenado_nodup (x : CList) (l : List CList)
+    (hxl : ∀ y ∈ l, esIgual x y = false)
+    (hl : Nodup l) : Nodup (insertarOrdenado x l) := by
+  induction l with
+  | nil => simp [insertarOrdenado, Nodup]
+  | cons y ys ih =>
+    have hxy : esIgual x y = false := hxl y (List.mem_cons.mpr (Or.inl rfl))
+    have hxys : ∀ w ∈ ys, esIgual x w = false :=
+      fun w hw => hxl w (List.mem_cons.mpr (Or.inr hw))
+    simp only [Nodup, List.pairwise_cons] at hl
+    obtain ⟨hyl, hys⟩ := hl
+    simp only [insertarOrdenado]
+    by_cases hlt : esMenor x y = true
+    · rw [if_pos hlt]
+      simp only [Nodup, List.pairwise_cons]
+      refine ⟨fun b hb => ?_, hyl, hys⟩
+      simp only [List.mem_cons] at hb
+      rcases hb with rfl | hb
+      · exact hxy
+      · exact hxys b hb
+    · rw [if_neg hlt]
+      by_cases heq : esIgual x y = true
+      · exact absurd heq (by simp [hxy])
+      · rw [if_neg heq]
+        simp only [Nodup, List.pairwise_cons]
+        refine ⟨fun z hz => ?_, ih hxys hys⟩
+        rcases mem_of_mem_insertarOrdenado x z ys hz with rfl | h
+        · rw [esIgual_comm]; exact hxy
+        · exact hyl z h
+
+theorem ordenarLista_nodup (l : List CList) (hl : Nodup l) :
+    Nodup (ordenarLista l) := by
+  induction l with
+  | nil => simp [ordenarLista, Nodup]
+  | cons x xs ih =>
+    simp only [Nodup, List.pairwise_cons] at hl
+    obtain ⟨hx, hxs⟩ := hl
+    simp only [ordenarLista]
+    apply insertarOrdenado_nodup
+    · intro y hy
+      exact hx y (ordenarLista_mem_subset y xs hy)
+    · exact ih hxs
+
 end CList
 
 
