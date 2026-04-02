@@ -565,6 +565,198 @@ mutual
 end
 
 
+-- ==================================================================
+-- PIEZA 4: Propiedades de esMenor
+-- ==================================================================
+
+theorem esMenor_irrefl (A : CList) : esMenor A A = false :=
+  match A with
+  | mk [] => by unfold esMenor; simp
+  | mk (x :: xs) => by
+      unfold esMenor
+      simp only [Nat.lt_irrefl, ite_false, gt_iff_lt, esIgual_refl, ite_true]
+      exact esMenor_irrefl (mk xs)
+termination_by cSize A
+decreasing_by simp_wf; simp [cSize, cSizeList]; omega
+
+theorem esIgual_comm (A B : CList) : esIgual A B = esIgual B A := by
+  simp [esIgual_def, Bool.and_comm]
+
+private theorem esIgual_cons_equiv (x y : CList) (xs ys : List CList)
+    (hxy : esIgual x y = true) (hxsys : esIgual (mk xs) (mk ys) = true) :
+    esIgual (mk (x :: xs)) (mk (y :: ys)) = true := by
+  rw [esIgual_mk_iff_setEquiv] at *
+  intro z
+  simp only [List.any_cons, Bool.or_eq_true]
+  constructor
+  · rintro (h | h)
+    · exact Or.inl (eq_trans z x y h hxy)
+    · exact Or.inr ((hxsys z).mp h)
+  · rintro (h | h)
+    · have hyx : esIgual y x = true := by rwa [esIgual_comm] at hxy
+      exact Or.inl (eq_trans z y x h hyx)
+    · exact Or.inr ((hxsys z).mpr h)
+
+theorem esMenor_total (A B : CList) :
+    esIgual A B = false → esMenor A B = true ∨ esMenor B A = true := by
+  intro h_neq
+  -- Primero tratamos los casos de tamaño diferente
+  by_cases hlt : cSize A < cSize B
+  · left
+    unfold esMenor; simp [hlt]
+  · by_cases hgt : cSize A > cSize B
+    · right
+      unfold esMenor; simp [hgt, show cSize B < cSize A from hgt]
+    · -- Caso cSize A = cSize B
+      have hsize : cSize A = cSize B := Nat.le_antisymm (Nat.le_of_not_lt hlt) (Nat.le_of_not_lt hgt)
+      -- En este caso A y B no pueden ser mk [] simultáneamente (sería esIgual = true)
+      match A, B with
+      | mk [], mk [] =>
+        simp [esIgual_refl] at h_neq
+      | mk [], mk (_ :: _) =>
+        simp [cSize, cSizeList] at hsize
+      | mk (_ :: _), mk [] =>
+        simp [cSize, cSizeList] at hsize
+      | mk (x :: xs), mk (y :: ys) =>
+        -- Ambos tienen cSize iguales; desempaquetamos esMenor
+        have hAB : esMenor (mk (x :: xs)) (mk (y :: ys)) =
+            if esIgual x y then esMenor (mk xs) (mk ys) else esMenor x y := by
+          unfold esMenor
+          simp [hlt, hgt]
+        have hBA : esMenor (mk (y :: ys)) (mk (x :: xs)) =
+            if esIgual y x then esMenor (mk ys) (mk xs) else esMenor y x := by
+          unfold esMenor
+          simp [show ¬ cSize (mk (y::ys)) < cSize (mk (x::xs)) from by omega,
+                show ¬ cSize (mk (y::ys)) > cSize (mk (x::xs)) from by omega]
+        rw [hAB, hBA]
+        by_cases hxy : esIgual x y = true
+        · -- Sub-caso: esIgual x y = true
+          -- Derivamos que esIgual (mk xs) (mk ys) = false
+          have h_tail_neq : esIgual (mk xs) (mk ys) = false := by
+            by_contra h_contra
+            rw [Bool.not_eq_false] at h_contra
+            exact absurd (esIgual_cons_equiv x y xs ys hxy h_contra) (by simp [h_neq])
+          have hyx_true : esIgual y x = true := by rwa [esIgual_comm] at hxy
+          rw [if_pos hxy, if_pos hyx_true]
+          -- Aplicamos IH: esMenor_total (mk xs) (mk ys)
+          have h_xs_neq : esIgual (mk xs) (mk ys) = false := h_tail_neq
+          have := esMenor_total (mk xs) (mk ys) h_xs_neq
+          exact this
+        · -- Sub-caso: esIgual x y = false
+          rw [Bool.not_eq_true] at hxy
+          rw [if_neg hxy]
+          have hyx_false : esIgual y x = false := by rwa [esIgual_comm] at hxy
+          rw [if_neg hyx_false]
+          exact esMenor_total x y hxy
+termination_by cSize A + cSize B
+decreasing_by
+  all_goals simp_wf
+  all_goals simp [cSize, cSizeList]
+  all_goals omega
+
+-- ==================================================================
+-- PIEZA 2: Sorted, ordenarLista_sorted, ordenarLista_nodup
+-- ==================================================================
+
+def Sorted : List CList → Prop
+  | []       => True
+  | [_]      => True
+  | a :: b :: rest => esMenor a b = true ∧ Sorted (b :: rest)
+
+private theorem insertarOrdenado_sorted (x : CList) (l : List CList)
+    (hs : Sorted l) : Sorted (insertarOrdenado x l) := by
+  induction l with
+  | nil => simp [insertarOrdenado, Sorted]
+  | cons y ys ih =>
+    simp only [insertarOrdenado]
+    by_cases hxy : esMenor x y = true
+    · -- x < y: insertar al frente
+      rw [if_pos hxy]
+      match ys with
+      | []     => simp [Sorted, hxy]
+      | z :: _ => exact ⟨hxy, hs⟩
+    · rw [if_neg hxy]
+      by_cases heq : esIgual x y = true
+      · -- x ≈ y: descartar x
+        rw [if_pos heq]; exact hs
+      · -- y < x: insertar en la cola
+        rw [if_neg heq]
+        -- Necesitamos esMenor y x = true
+        have hyx : esMenor y x = true := by
+          rcases esMenor_total x y (by simp [heq]) with h | h
+          · exact absurd h (by simp [hxy])
+          · exact h
+        match ys with
+        | [] =>
+          simp [insertarOrdenado, Sorted, hyx]
+        | z :: rest =>
+          obtain ⟨hyz, hs_rest⟩ := hs
+          specialize ih hs_rest
+          simp only [Sorted]
+          -- La lista resultante es y :: insertarOrdenado x (z :: rest)
+          -- head de insertarOrdenado x (z :: rest):
+          simp only [insertarOrdenado] at ih ⊢
+          by_cases hxz : esMenor x z = true
+          · -- cabeza es x: necesitamos esMenor y x
+            rw [if_pos hxz] at ih ⊢
+            exact ⟨hyx, ih⟩
+          · rw [if_neg hxz]
+            by_cases heqz : esIgual x z = true
+            · rw [if_pos heqz] at ih ⊢
+              exact ⟨hyz, hs_rest⟩
+            · rw [if_neg heqz] at ih ⊢
+              exact ⟨hyz, ih⟩
+
+theorem ordenarLista_sorted (l : List CList) : Sorted (ordenarLista l) := by
+  induction l with
+  | nil => simp [ordenarLista, Sorted]
+  | cons x xs ih => exact insertarOrdenado_sorted x (ordenarLista xs) ih
+
+-- Un elemento no está en una lista Sorted+Nodup si esMenor que la cabeza
+private theorem not_mem_of_esMenor_head (x y : CList) (ys : List CList)
+    (hxy : esMenor x y = true) (hs : Sorted (y :: ys)) (hn : Nodup (y :: ys)) :
+    (y :: ys).any (fun z => esIgual x z) = false := by
+  induction ys generalizing y with
+  | nil =>
+    simp only [List.any_cons, List.any_nil, Bool.or_false]
+    -- esIgual x y = false porque esMenor x y = true implica x ≠ y extensionalmente?
+    -- No necesariamente en general, pero esMenor x y = true ∧ esIgual x y = true
+    -- daría esMenor x x = true tras normalización... aquí podemos argumentar:
+    -- si esIgual x y = true, entonces esMenor y x = true (por total), pero
+    -- esMenor x y = true y esMenor y x = true contradice irrefl si x = y, pero
+    -- esMenor no es antisimétrico en general para no-normalizados.
+    -- En cambio, sabemos de Nodup (y :: []) que no hay dups, trivialmente True.
+    -- Lo que necesitamos: si esMenor x y = true y luego insertamos x antes de y,
+    -- necesitamos saber que x no apareció antes. Redefinimos la estrategia:
+    -- En realidad bastará: si esMenor x y = true, insertarOrdenado x (y::ys)
+    -- pone x al frente sin revisar si x ya estaba.
+    -- Usamos Nodup de la lista resultante de otra forma.
+    sorry
+  | cons z zs ih => sorry
+
+-- En vez de la ruta anterior, probamos nodup directamente por inserción
+private theorem insertarOrdenado_mem_iff (x y : CList) (ys : List CList) :
+    (insertarOrdenado x ys).any (fun z => esIgual y z) =
+    (ys.any (fun z => esIgual y z) || esIgual y x) := by
+  induction ys with
+  | nil => simp [insertarOrdenado, Bool.or_comm]
+  | cons z zs ih =>
+    simp only [insertarOrdenado]
+    by_cases hxz : esMenor x z = true
+    · rw [if_pos hxz]
+      simp [List.any_cons, Bool.or_assoc, Bool.or_comm (esIgual y x)]
+    · rw [if_neg hxz]
+      by_cases heq : esIgual x z = true
+      · rw [if_pos heq]
+        simp only [List.any_cons]
+        rw [Bool.or_comm]
+        constructor
+        · sorry
+        · sorry
+      · rw [if_neg heq]
+        simp only [List.any_cons, ih]
+        ring
+
 end CList
 
 

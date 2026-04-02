@@ -56,3 +56,4 @@ def normalizar : CList → CList
   | mk xs => mk (ordenarLista (reducirDuplicados (xs.map normalizar)))
 
 def CSet : Type := Quotient CList.Setoid
+```
