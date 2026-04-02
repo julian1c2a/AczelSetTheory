@@ -301,10 +301,6 @@ def Nodup (l : List CList) : Prop :=
 
 -- Lema: reducirDuplicados produce una lista sin duplicados.
 theorem reducirDuplicados_nodup (l : List CList) : Nodup (reducirDuplicados l) := by
-  -- Probamos una afirmación más fuerte sobre la función auxiliar por inducción.
-  -- La propiedad `P(l', vistos)` es:
-  --   1. El resultado no tiene duplicados (`Nodup`).
-  --   2. Todos los elementos del resultado son "nuevos" con respecto a `vistos`.
   have stronger_lemma : ∀ (l' : List CList) (vistos : List CList),
     Nodup (reducirDuplicadosAux l' vistos) ∧
     (∀ y ∈ (reducirDuplicadosAux l' vistos), (vistos.any (fun z => esIgual y z)) = false) := by
@@ -316,30 +312,22 @@ theorem reducirDuplicados_nodup (l : List CList) : Nodup (reducirDuplicados l) :
       intro vistos
       simp only [reducirDuplicadosAux]
       by_cases h_seen : (vistos.any fun y => esIgual head y) = true
-      -- Caso 1: `head` ya se ha visto. La llamada recursiva usa el mismo `vistos`.
       · rw [if_pos h_seen]; exact IH vistos
-      -- Caso 2: `head` es nuevo. Se añade a `vistos` en la llamada recursiva.
       · rw [if_neg h_seen]
         have h_false : (vistos.any fun y => esIgual head y) = false :=
           Bool.eq_false_iff.mpr (fun h => h_seen h)
-        -- Aplicamos la hipótesis de inducción con la lista de `vistos` actualizada.
         have ih_recursed := IH (head :: vistos)
         rcases ih_recursed with ⟨nodup_tail, tail_is_new⟩
-        -- Probamos las dos propiedades para `head :: reducirDuplicadosAux ...`
         constructor
-        -- Parte 1: Demostrar `Nodup (head :: ...)`
         · simp only [Nodup, List.pairwise_cons]
           constructor
-          -- 1a: `head` no es igual a ningún elemento del resto.
           · have esIgual_comm : ∀ a b, esIgual a b = esIgual b a := by
               intros a b; simp [esIgual, evalOp, Bool.and_comm]
             intro y y_in_tail
             specialize tail_is_new y y_in_tail
             rw [List.any_cons, Bool.or_eq_false_iff] at tail_is_new
             rw [esIgual_comm]; exact tail_is_new.1
-          -- 1b: El resto de la lista no tiene duplicados.
           · exact nodup_tail
-        -- Parte 2: Demostrar que todos los elementos son nuevos para `vistos`.
         · intro y y_in_list
           simp only [List.mem_cons] at y_in_list
           cases y_in_list with
@@ -349,7 +337,6 @@ theorem reducirDuplicados_nodup (l : List CList) : Nodup (reducirDuplicados l) :
             specialize tail_is_new y h_y_in_tail
             rw [List.any_cons, Bool.or_eq_false_iff] at tail_is_new
             exact tail_is_new.2
-  -- Nuestro objetivo principal es la primera parte del lema, con `vistos` inicializado a `[]`.
   rw [reducirDuplicados]
   exact (stronger_lemma l []).1
 
@@ -381,21 +368,30 @@ theorem pertenece_eq_any (x : CList) (l : List CList) :
   | nil => simp [pertenece_nil_def]
   | cons y ys ih => simp [pertenece_cons_def, ih]
 
+private theorem subs_iff_forall_mem_pertenece (l₁ l₂ : List CList) :
+    esSubconjunto (mk l₁) (mk l₂) = true ↔ (∀ x ∈ l₁, pertenece x (mk l₂) = true) := by
+  induction l₁ with
+  | nil => simp [esSubconjunto_nil_def]
+  | cons x xs ih =>
+    simp only [esSubconjunto_cons_def, Bool.and_eq_true]
+    constructor
+    · intro ⟨h1, h2⟩ y hy
+      simp only [List.mem_cons] at hy
+      rcases hy with rfl | hy
+      · exact h1
+      · exact ih.mp h2 y hy
+    · intro h
+      exact ⟨h x List.mem_cons_self, ih.mpr (fun y hy => h y (List.mem_cons_of_mem _ hy))⟩
 
 theorem esIgual_mk_iff_setEquiv (l₁ l₂ : List CList) :
     esIgual (mk l₁) (mk l₂) = true ↔ SetEquiv l₁ l₂ := by
-  have subs_iff_forall_mem_pertenece (l₁ l₂ : List CList) :
-      esSubconjunto (mk l₁) (mk l₂) = true ↔ (∀ x ∈ l₁, pertenece x (mk l₂) = true) := by
-    induction l₁ with
-    | nil => simp [esSubconjunto_nil_def]
-    | cons x xs ih =>
-      simp only [esSubconjunto_cons_def, Bool.and_eq_true, List.mem_cons, forall_eq_or_imp]
-      rw [ih]
-  -- Main proof
-  simp_rw [esIgual_def, Bool.and_eq_true, subs_iff_forall_mem_pertenece, pertenece_eq_any]
-  unfold SetEquiv
   constructor
-  · intro ⟨h1, h2⟩ x
+  · intro h
+    unfold SetEquiv
+    rw [esIgual_def, Bool.and_eq_true] at h
+    simp only [subs_iff_forall_mem_pertenece, pertenece_eq_any] at h
+    obtain ⟨h1, h2⟩ := h
+    intro x
     constructor
     · intro hx
       rw [List.any_eq_true] at hx
@@ -412,14 +408,15 @@ theorem esIgual_mk_iff_setEquiv (l₁ l₂ : List CList) :
       obtain ⟨w, hw, hzw⟩ := hzl1
       exact List.any_eq_true.mpr ⟨w, hw, eq_trans x z w hxz hzw⟩
   · intro h
+    unfold SetEquiv at h
+    rw [esIgual_def, Bool.and_eq_true]
+    simp only [subs_iff_forall_mem_pertenece, pertenece_eq_any]
     exact ⟨fun x hx => (h x).mp  (List.any_eq_true.mpr ⟨x, hx, esIgual_refl x⟩),
            fun x hx => (h x).mpr (List.any_eq_true.mpr ⟨x, hx, esIgual_refl x⟩)⟩
 
 -- Lema: `reducirDuplicados` conserva el conjunto de elementos.
-
 theorem reducirDuplicados_set_equiv_self (l : List CList) : SetEquiv (reducirDuplicados l) l := by
   intro x; constructor
-  -- Parte 1: Soundness
   · intro h_mem_reduced
     rw [List.any_eq_true] at h_mem_reduced
     obtain ⟨z, z_in_reduced, xz_eq⟩ := h_mem_reduced
@@ -454,7 +451,6 @@ theorem reducirDuplicados_set_equiv_self (l : List CList) : SetEquiv (reducirDup
     rw [List.any_eq_true] at z_in_l_ext
     obtain ⟨w, w_in_l, zw_eq⟩ := z_in_l_ext
     exact List.any_eq_true.mpr ⟨w, w_in_l, CList.eq_trans x z w xz_eq zw_eq⟩
-  -- Parte 2: Completeness
   · intro h_mem_l
     rw [List.any_eq_true] at h_mem_l
     obtain ⟨z, z_in_l, xz_eq⟩ := h_mem_l
@@ -465,24 +461,24 @@ theorem reducirDuplicados_set_equiv_self (l : List CList) : SetEquiv (reducirDup
         intro l'
         induction l' with
         | nil => intro vistos z' h_mem; cases h_mem
-        | cons head tail IH =>
+        | cons hd tail IH =>
           intro vistos z' h_mem
           simp only [reducirDuplicadosAux]
           rcases List.mem_cons.mp h_mem with (rfl | h_in_tail)
-          · by_cases h_seen : (vistos.any (fun y => esIgual head y)) = true
+          · by_cases h_seen : (vistos.any (fun y => esIgual z' y)) = true
             · rw [if_pos h_seen]; exact Or.inr h_seen
             · rw [if_neg h_seen]
-              exact Or.inl (List.any_eq_true.mpr ⟨head, List.mem_cons_self _ _, esIgual_refl _⟩)
-          · by_cases h_seen : (vistos.any (fun y => esIgual head y)) = true
+              exact Or.inl (List.any_eq_true.mpr ⟨z', List.mem_cons_self, esIgual_refl _⟩)
+          · by_cases h_seen : (vistos.any (fun y => esIgual hd y)) = true
             · rw [if_pos h_seen]; exact IH vistos z' h_in_tail
             · rw [if_neg h_seen]
-              rcases IH (head :: vistos) z' h_in_tail with (h_in_res | h_in_v_ext)
+              rcases IH (hd :: vistos) z' h_in_tail with (h_in_res | h_in_v_ext)
               · rw [List.any_eq_true] at h_in_res
                 obtain ⟨w, hw, hwz⟩ := h_in_res
-                exact Or.inl (List.any_eq_true.mpr ⟨w, List.mem_cons_of_mem head hw, hwz⟩)
+                exact Or.inl (List.any_eq_true.mpr ⟨w, List.mem_cons_of_mem hd hw, hwz⟩)
               · rw [List.any_cons, Bool.or_eq_true] at h_in_v_ext
-                rcases h_in_v_ext with (h_head | h_vis)
-                · exact Or.inl (by simp [List.any_cons, h_head])
+                rcases h_in_v_ext with (h_hd | h_vis)
+                · exact Or.inl (by simp [List.any_cons, h_hd])
                 · exact Or.inr h_vis
       intro z' hz'
       rw [reducirDuplicados]
@@ -499,7 +495,6 @@ theorem reducirDuplicados_set_equiv_self (l : List CList) : SetEquiv (reducirDup
 -- TEOREMA 1: normalizar no aumenta el tamaño (normalizar_cSize_le)
 -- ==================================================================
 
--- Sub-lema: insertarOrdenado no aumenta el tamaño de la lista
 private theorem cSizeList_insertarOrdenado_le (x : CList) (l : List CList) :
     cSizeList (insertarOrdenado x l) ≤ 1 + cSize x + cSizeList l := by
   induction l with
@@ -513,7 +508,6 @@ private theorem cSizeList_insertarOrdenado_le (x : CList) (l : List CList) :
       · rw [if_pos h2]; simp only [cSizeList]; omega
       · rw [if_neg h2]; simp only [cSizeList]; omega
 
--- Sub-lema: reducirDuplicados no aumenta el tamaño de la lista
 theorem cSizeList_reducirDuplicados_le (l : List CList) :
     cSizeList (reducirDuplicados l) ≤ cSizeList l := by
   suffices h : ∀ (l' vistos : List CList),
@@ -530,7 +524,6 @@ theorem cSizeList_reducirDuplicados_le (l : List CList) :
     · rw [if_neg h]; simp only [cSizeList]
       exact Nat.le_trans (Nat.add_le_add_left (ih (x :: vistos)) _) (by omega)
 
--- Sub-lema: ordenarLista no aumenta el tamaño de la lista
 theorem cSizeList_ordenarLista_le (l : List CList) :
     cSizeList (ordenarLista l) ≤ cSizeList l := by
   induction l with
@@ -541,27 +534,35 @@ theorem cSizeList_ordenarLista_le (l : List CList) :
     simp only [cSizeList]
     omega
 
--- Teorema 1: normalizar no aumenta el cSize
-theorem normalizar_cSize_le (A : CList) : cSize (normalizar A) ≤ cSize A := by
-  match A with
-  | mk xs =>
-    have h_map : cSizeList (xs.map normalizar) ≤ cSizeList xs := by
-      induction xs with
-      | nil => simp [cSizeList]
-      | cons x rest ih =>
+mutual
+  private theorem normalizar_cSizeList_le : ∀ (xs : List CList),
+      cSizeList (xs.map normalizar) ≤ cSizeList xs
+    | [] => by simp [cSizeList]
+    | (x :: rest) => by
         simp only [List.map, cSizeList]
-        have hx : cSize (normalizar x) ≤ cSize x := normalizar_cSize_le x
+        have hx := normalizar_cSize_le x
+        have ih := normalizar_cSizeList_le rest
         omega
-    have h_red := cSizeList_reducirDuplicados_le (xs.map normalizar)
-    have h_ord := cSizeList_ordenarLista_le (reducirDuplicados (xs.map normalizar))
-    show cSize (normalizar (mk xs)) ≤ cSize (mk xs)
-    simp only [normalizar, cSize]
-    omega
-termination_by cSize A
-decreasing_by
-  all_goals simp_wf
-  all_goals simp [cSize, cSizeList]
-  all_goals omega
+  termination_by xs => cSizeList xs * 2 + 1
+  decreasing_by
+    all_goals simp_wf
+    all_goals simp [cSize, cSizeList]
+    all_goals omega
+
+  theorem normalizar_cSize_le (A : CList) : cSize (normalizar A) ≤ cSize A :=
+    match A with
+    | mk xs => by
+        have h_map := normalizar_cSizeList_le xs
+        have h_red := cSizeList_reducirDuplicados_le (xs.map normalizar)
+        have h_ord := cSizeList_ordenarLista_le (reducirDuplicados (xs.map normalizar))
+        simp only [normalizar, cSize]
+        omega
+  termination_by cSize A * 2
+  decreasing_by
+    all_goals simp_wf
+    all_goals simp [cSize, cSizeList]
+    all_goals omega
+end
 
 
 end CList
@@ -582,96 +583,28 @@ def CSet := Quotient CList.Setoid
 
 namespace CSet
 
+open CList
+
 /-!
 Dadas dos CList A y B que son extensionalmente iguales ()
 -/
 
 theorem normalizar_eq_of_eq {A B : CList} (h : CList.esIgual A B = true) :
     CList.normalizar A = CList.normalizar B := by
-  -- La prueba es por recursión bien fundada sobre el tamaño de los CList.
-  -- Lean es capaz de deducir la terminación porque las llamadas recursivas
-  -- se hacen sobre elementos internos, que son estructuralmente más pequeños.
-  cases A with | mk Ax =>
-  cases B with | mk Bx =>
-  -- Desplegamos la definición de `normalizar`.
-  -- La meta es `mk (...) = mk (...)`, por lo que podemos usar `congr`
-  -- para probar que los argumentos de `mk` son iguales.
-  simp only [normalizar]
-  congr
-
-  -- Lema clave 1: Si los CList son iguales, sus listas internas son SetEquiv.
-  have h_equiv_Ax_Bx : SetEquiv Ax Bx := (esIgual_mk_iff_setEquiv Ax Bx).mp h
-
-  -- Lema clave 2: `map normalizar` preserva SetEquiv.
-  -- Esto funciona porque podemos aplicar la hipótesis de inducción (`normalizar_eq_of_eq`)
-  -- a los elementos de las listas, que son más pequeños.
-  have h_equiv_map : SetEquiv (Ax.map normalizar) (Bx.map normalizar) := by
-    intro x
-    constructor
-    · rintro ⟨norm_a, ⟨a, ha, rfl⟩, hx_eq_norm_a⟩
-      have ⟨b, hb, hab⟩ := (h_equiv_Ax_Bx a).mp ⟨a, ha, esIgual_refl a⟩
-      have h_norm_eq : normalizar a = normalizar b := normalizar_eq_of_eq hab
-      rw [h_norm_eq] at hx_eq_norm_a
-      exact ⟨normalizar b, ⟨b, hb, rfl⟩, hx_eq_norm_a⟩
-    · rintro ⟨norm_b, ⟨b, hb, rfl⟩, hx_eq_norm_b⟩
-      have ⟨a, ha, hab⟩ := (h_equiv_Ax_Bx b).mpr ⟨b, hb, esIgual_refl b⟩
-      have h_norm_eq : normalizar a = normalizar b := normalizar_eq_of_eq hab
-      rw [←h_norm_eq] at hx_eq_norm_b
-      exact ⟨normalizar a, ⟨a, ha, rfl⟩, hx_eq_norm_b⟩
-
-  -- Lema clave 3: Las listas reducidas son SetEquiv.
-  -- Usamos transitividad: A ≈ B, B ≈ C => A ≈ C
-  have h_equiv_reduced : SetEquiv (reducirDuplicados (Ax.map normalizar)) (reducirDuplicados (Bx.map normalizar)) :=
-    SetEquiv.trans (SetEquiv.symm (reducirDuplicados_set_equiv_self _)) (SetEquiv.trans h_equiv_map (reducirDuplicados_set_equiv_self _))
-
-  -- Ahora sabemos que las listas que entran a `ordenarLista` son SetEquiv.
-  -- También sabemos por `reducirDuplicados_nodup` que no tienen duplicados.
-  have h_nodup1 : Nodup (reducirDuplicados (Ax.map normalizar)) := reducirDuplicados_nodup _
-  have h_nodup2 : Nodup (reducirDuplicados (Bx.map normalizar)) := reducirDuplicados_nodup _
-
-  -- El paso final: si dos listas sin duplicados son SetEquiv, `ordenarLista`
-  -- debe producir el mismo resultado para ambas, ya que actúa como una
-  -- función de canonización.
-  -- Esta es la última pieza que falta por demostrar.
-  have h_canon_eq : ordenarLista (reducirDuplicados (Ax.map normalizar)) = ordenarLista (reducirDuplicados (Bx.map normalizar)) := by
-    sorry
-
-
-  exact h_canon_eq
-termination_by cSize A + cSize B
-decreasing_by
-  all_goals simp_wf
-  all_goals simp [cSize, cSizeList]
-  all_goals omega
+  sorry
 
 /--
 Esta es la función que extrae el representante canónico (una `CList` normalizada)
 de un `CSet` abstracto.
-
-Usa ``Quotient.lift``, que "levanta" una función del tipo base (`CList`)
-al tipo cociente (`CSet`), siempre que la función respete la relación
-de equivalencia (lo que demostramos con `normalizar_eq_of_eq`).
 -/
 def repr (s : CSet) : CList :=
   Quotient.lift CList.normalizar (fun A B h => normalizar_eq_of_eq h) s
 
--- EJEMPLO DE USO:
-
--- 1. Creamos dos CList "sucias" y distintas, pero extensionalmente iguales.
 def clist_sucia_1 := CList.mk [CList.uno, CList.cero, CList.uno]
 def clist_sucia_2 := CList.mk [CList.cero, CList.uno]
 
--- 2. "Subimos" una de ellas para crear un CSet abstracto.
---    ``Quotient.mk` `CList.Setoid` clist_sucia_1` y ``Quotient.mk` `CList.Setoid` clist_sucia_2`
---    producirían el *mismo* `CSet`.
 def mi_cset : CSet := Quotient.mk CList.Setoid clist_sucia_1
-
--- 3. "Bajamos" del CSet abstracto a su representante canónico usando nuestra función.
 def mi_repr_canonico : CList := repr mi_cset
-
--- El valor de `mi_repr_canonico` sería ``CList.mk` [`CList.cero`, `CList.uno`]`,
--- que es el resultado de aplicar ``CList.normalizar`` tanto a `clist_sucia_1`
--- como a `clist_sucia_2`.
 
 def vacio : CSet := Quotient.mk CList.Setoid CList.vacio
 
