@@ -837,6 +837,179 @@ theorem insertionSort_id_of_sorted_nodup (l : List CList)
       unfold orderedInsert
       rw [if_pos hxy]
 
+-- ==================================================================
+-- PIEZA 7: normalize_idem
+-- ==================================================================
+
+-- Helper: l.map normalize = l cuando cada elemento es punto fijo
+private theorem map_normalize_fixed (l : List CList)
+    (h : ∀ y ∈ l, normalize y = y) : l.map normalize = l := by
+  induction l with
+  | nil => rfl
+  | cons x xs ih =>
+    simp only [List.map, List.cons.injEq]
+    exact ⟨h x (List.mem_cons.mpr (Or.inl rfl)),
+           ih (fun y hy => h y (List.mem_cons_of_mem x hy))⟩
+
+-- Helper: membresía proposicional en dedup
+private theorem mem_of_mem_dedupAux :
+    ∀ (l : List CList) (vistos : List CList) (y : CList),
+    y ∈ dedupAux l vistos → y ∈ l
+  | [], _, _, h => by simp [dedupAux] at h
+  | x :: xs, vistos, y, h => by
+      simp only [dedupAux] at h
+      by_cases hseen : (vistos.any fun z => extEq x z) = true
+      · rw [if_pos hseen] at h
+        exact List.mem_cons_of_mem x (mem_of_mem_dedupAux xs vistos y h)
+      · rw [if_neg hseen] at h
+        simp only [List.mem_cons] at h
+        rcases h with rfl | h
+        · exact List.mem_cons.mpr (Or.inl rfl)
+        · exact List.mem_cons_of_mem x (mem_of_mem_dedupAux xs (x :: vistos) y h)
+
+private theorem mem_of_mem_dedup (l : List CList) (y : CList) (h : y ∈ dedup l) : y ∈ l :=
+  mem_of_mem_dedupAux l [] y h
+
+mutual
+  /-- normalize es idempotente: normalizar dos veces = normalizar una vez. -/
+  theorem normalize_idem : (A : CList) → normalize (normalize A) = normalize A
+    | mk xs => by
+        -- Todos los elementos de ys = insertionSort (dedup (xs.map normalize)) son puntos fijos
+        have h_fixed : ∀ y ∈ insertionSort (dedup (xs.map normalize)), normalize y = y := fun y hy =>
+          normalize_idem_list xs y
+            (mem_of_mem_dedup _ y (insertionSort_mem_subset y _ hy))
+        have h_nodup  := insertionSort_nodup _ (dedup_nodup (xs.map normalize))
+        have h_sorted := insertionSort_sorted (dedup (xs.map normalize))
+        simp only [normalize]
+        congr 1
+        rw [map_normalize_fixed _ h_fixed,
+            dedup_id_of_nodup _ h_nodup,
+            insertionSort_id_of_sorted_nodup _ h_sorted h_nodup]
+  termination_by A => cSize A * 2
+  decreasing_by
+    all_goals simp_wf
+    all_goals simp [cSize]
+    all_goals omega
+
+  -- Lema auxiliar: cada elemento de xs.map normalize es punto fijo de normalize
+  private theorem normalize_idem_list : (xs : List CList) →
+      ∀ y ∈ xs.map normalize, normalize y = y
+    | [] => by simp
+    | x :: rest => by
+        intro y hy
+        simp only [List.map, List.mem_cons] at hy
+        rcases hy with rfl | hy
+        · exact normalize_idem x
+        · exact normalize_idem_list rest y hy
+  termination_by xs => cSizeList xs * 2 + 1
+  decreasing_by
+    all_goals simp_wf
+    all_goals simp [cSizeList]
+    all_goals omega
+end
+
+-- ==================================================================
+-- PIEZA 8: sorted_nodup_setEquiv_eq
+-- ==================================================================
+
+-- Lema auxiliar: si l₂ está ordenada y x ∈ l₂ propositional-mente con lt x (head l₂),
+-- entonces x es el primer elemento.
+private theorem sorted_head_le (x y : CList) (ys : List CList)
+    (hlt : lt x y = false) (heq : extEq x y = false)
+    (hs : Sorted (y :: ys)) : False := by
+  -- lt x y = false ∧ extEq x y = false implica lt y x = true (por lt_total)
+  rcases lt_total x y heq with h | h
+  · exact absurd h (by simp [hlt])
+  · -- lt y x = true; pero necesitamos saber que x ∈ y :: ys también tiene lt y x
+    -- Esto es una contradicción con que x sea un elemento de la lista
+    exact absurd h h  -- no funciona; el argumento es más sutil
+
+-- Unicidad: dos listas Sorted+Nodup+SetEquiv son iguales, dado que extEq implica eq en su contexto
+theorem sorted_nodup_setEquiv_eq :
+    ∀ (l₁ l₂ : List CList),
+    Sorted l₁ → Sorted l₂ →
+    Nodup l₁ → Nodup l₂ →
+    SetEquiv l₁ l₂ →
+    (∀ a ∈ l₁, ∀ b ∈ l₂, extEq a b = true → a = b) →
+    l₁ = l₂
+  | [], l₂, _, _, _, _, hequiv, _ => by
+      rcases l₂ with _ | ⟨y, ys⟩
+      · rfl
+      · exfalso
+        have := (hequiv y).mpr (by simp [List.any_cons, extEq_refl])
+        simp at this
+  | x :: xs, [], _, _, _, _, hequiv, _ => by
+      exfalso
+      have := (hequiv x).mp (by simp [List.any_cons, extEq_refl])
+      simp at this
+  | x :: xs, y :: ys, hs1, hs2, hn1, hn2, hequiv, hprop => by
+      -- Paso 1: x = y
+      have hxy_extEq : extEq x y = true := by
+        have hx_in : (List.any (y :: ys) (fun z => extEq x z)) = true := by
+          have := (hequiv x).mp (by simp [List.any_cons, extEq_refl])
+          exact this
+        simp only [List.any_cons, Bool.or_eq_true] at hx_in
+        rcases hx_in with h | h
+        · exact h
+        · -- x está en ys; como l₂ está ordenada, y < z para z ∈ ys,
+          -- pero x = y (primer elemento de l₁ y mínimo)
+          -- Vía: l₁ también tiene y como miembro (por SetEquiv)
+          have hy_in_l1 : (List.any (x :: xs) (fun z => extEq y z)) = true := by
+            have := (hequiv y).mpr (by simp [List.any_cons, extEq_refl])
+            exact this
+          simp only [List.any_cons, Bool.or_eq_true] at hy_in_l1
+          rcases hy_in_l1 with h_yx | h_yx
+          · rwa [extEq_comm]
+          · -- y ∈ xs y x ∈ ys: x < y (Sorted l₂) y y < x (Sorted l₁)
+            -- Contradicción con lt_irrefl
+            have hx_in_ys : extEq x y = false ∨ (List.any ys (fun z => extEq x z)) = true := by
+              simp only [Bool.or_eq_true] at hx_in; exact Or.inr h
+            -- y ∈ xs implica lt x y (sorted l₁)
+            have hltxy : lt x y = true := by
+              have := (List.pairwise_cons.mp hn1).1
+              -- y ∈ xs → extEq x y = false (nodup)
+              sorry
+            -- x ∈ ys implica lt y x (sorted l₂)
+            have hltyx : lt y x = true := by sorry
+            exact absurd (lt_irrefl x) (by
+              rw [Bool.eq_false_iff]
+              intro h'
+              sorry)
+      have hxy_eq : x = y := hprop x (List.mem_cons_self x xs) y (List.mem_cons.mpr (Or.inl rfl)) hxy_extEq
+      -- Paso 2: las colas son SetEquiv
+      have htail_equiv : SetEquiv xs ys := by
+        intro z
+        have hfull := hequiv z
+        simp only [List.any_cons] at hfull
+        constructor
+        · intro hz_xs
+          have := hfull.mp (by simp [hz_xs])
+          simp only [Bool.or_eq_true] at this
+          rcases this with h | h
+          · -- extEq z x = true, so extEq z y = true, but z ∈ xs y Nodup (x :: xs)
+            exfalso
+            have : extEq z x = false := (List.pairwise_cons.mp hn1).1 z
+              (List.any_eq_true.mp hz_xs |>.choose_spec.1)
+            simp [this] at h
+          · exact h
+        · intro hz_ys
+          have := hfull.mpr (by simp [hz_ys])
+          simp only [Bool.or_eq_true] at this
+          rcases this with h | h
+          · exfalso
+            have : extEq z y = false := (List.pairwise_cons.mp hn2).1 z
+              (List.any_eq_true.mp hz_ys |>.choose_spec.1)
+            simp [this, hxy_eq] at h
+          · exact h
+      -- Paso 3: aplicar IH
+      have hs1' : Sorted xs := (List.pairwise_cons.mp hs1).2
+      have hs2' : Sorted ys := (List.pairwise_cons.mp hs2).2
+      have hn1' : Nodup xs  := (List.pairwise_cons.mp hn1).2
+      have hn2' : Nodup ys  := (List.pairwise_cons.mp hn2).2
+      have hprop' : ∀ a ∈ xs, ∀ b ∈ ys, extEq a b = true → a = b :=
+        fun a ha b hb hab => hprop a (List.mem_cons_of_mem x ha) b (List.mem_cons_of_mem y hb) hab
+      rw [hxy_eq, sorted_nodup_setEquiv_eq xs ys hs1' hs2' hn1' hn2' htail_equiv hprop']
+
 end CList
 
 
