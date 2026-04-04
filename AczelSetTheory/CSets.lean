@@ -793,6 +793,50 @@ theorem insertionSort_nodup (l : List CList) (hl : Nodup l) :
       exact hx y (insertionSort_mem_subset y xs hy)
     · exact ih hxs
 
+-- ==================================================================
+-- PIEZA 6: dedup_id_of_nodup e insertionSort_id_of_sorted_nodup
+-- ==================================================================
+
+theorem dedup_id_of_nodup (l : List CList) (h : Nodup l) : dedup l = l := by
+  suffices ∀ (l' : List CList) (vistos : List CList),
+      Nodup l' →
+      (∀ x ∈ l', (vistos.any (fun v => extEq x v)) = false) →
+      dedupAux l' vistos = l' by
+    unfold dedup; exact this l [] h (by simp)
+  intro l'
+  induction l' with
+  | nil => intros; rfl
+  | cons x xs ih =>
+    intro vistos hnd hfresh
+    have hx_nd : ∀ b ∈ xs, extEq x b = false :=
+      (List.pairwise_cons.mp hnd).1
+    have hxs_nd : Nodup xs := (List.pairwise_cons.mp hnd).2
+    have hx_fresh : (vistos.any (fun v => extEq x v)) = false :=
+      hfresh x (List.mem_cons.mpr (Or.inl rfl))
+    simp only [dedupAux, if_neg (Bool.eq_false_iff.mp hx_fresh)]
+    congr 1
+    apply ih (x :: vistos) hxs_nd
+    intro y hy
+    have hy_fresh := hfresh y (List.mem_cons_of_mem x hy)
+    rw [List.any_cons, Bool.or_eq_false_iff]
+    exact ⟨by rw [extEq_comm]; exact hx_nd y hy, hy_fresh⟩
+
+theorem insertionSort_id_of_sorted_nodup (l : List CList)
+    (hs : Sorted l) (hn : Nodup l) : insertionSort l = l := by
+  induction l with
+  | nil => rfl
+  | cons x xs ih =>
+    match xs, hs, hn with
+    | [], _, _ => simp [insertionSort, orderedInsert]
+    | y :: ys, hs, hn =>
+      have hxy     : lt x y = true    := by simp only [Sorted] at hs; exact hs.1
+      have hs_tail : Sorted (y :: ys) := by simp only [Sorted] at hs; exact hs.2
+      have hn_tail : Nodup (y :: ys)  := (List.pairwise_cons.mp hn).2
+      show orderedInsert x (insertionSort (y :: ys)) = x :: y :: ys
+      rw [ih hs_tail hn_tail]
+      unfold orderedInsert
+      rw [if_pos hxy]
+
 end CList
 
 
