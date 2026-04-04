@@ -23,19 +23,19 @@ mutual
 end
 
 /-- El conjunto vacío computacional -/
-def vacio : CList := mk []
+def empty : CList := mk []
 
 -- 1. LÓGICA DE COMPARACIÓN BASE (Semántica de conjuntos)
 
 inductive CListOp
-| pertenece
-| esSubconjunto
-| esIgual
+| mem
+| subset
+| eq
 
 @[simp] def opWeight : CListOp → Nat
-| .pertenece => 0
-| .esSubconjunto => 1
-| .esIgual => 2
+| .mem => 0
+| .subset => 1
+| .eq => 2
 
 set_option linter.unusedSimpArgs false in
 /--
@@ -44,16 +44,16 @@ Agrupamos estas tres para que Lean pueda verificar la terminación mutua.
 -/
 def evalOp (op : CListOp) (A B : CList) : Bool :=
   match op, A, B with
-  | .pertenece, _, mk [] => false
-  | .pertenece, x, mk (y :: ys) =>
-      evalOp .esIgual x y || evalOp .pertenece x (mk ys)
+  | .mem, _, mk [] => false
+  | .mem, x, mk (y :: ys) =>
+      evalOp .eq x y || evalOp .mem x (mk ys)
 
-  | .esSubconjunto, mk [], _ => true
-  | .esSubconjunto, mk (x :: xs), B =>
-      evalOp .pertenece x B && evalOp .esSubconjunto (mk xs) B
+  | .subset, mk [], _ => true
+  | .subset, mk (x :: xs), B =>
+      evalOp .mem x B && evalOp .subset (mk xs) B
 
-  | .esIgual, A, B =>
-      evalOp .esSubconjunto A B && evalOp .esSubconjunto B A
+  | .eq, A, B =>
+      evalOp .subset A B && evalOp .subset B A
 termination_by (((sizeOf A + sizeOf B) * 3) + opWeight op)
 decreasing_by
   all_goals
@@ -62,23 +62,16 @@ decreasing_by
     try simp_arith
     try omega
 
-/-- Comprueba si un elemento pertenece a un conjunto. -/
-def pertenece (x A : CList) : Bool := evalOp .pertenece x A
+/-- Comprueba si un elemento mem a un conjunto. -/
+def mem (x A : CList) : Bool := evalOp .mem x A
 
 /-- Comprueba si A es subconjunto de B. -/
-def esSubconjunto (A B : CList) : Bool := evalOp .esSubconjunto A B
+def subset (A B : CList) : Bool := evalOp .subset A B
 
 /-- Comprueba la igualdad extensional (mismos elementos). -/
-def esIgual (A B : CList) : Bool := evalOp .esIgual A B
+def extEq (A B : CList) : Bool := evalOp .eq A B
 
--- Alias visibles solicitados
-/-- Boolean In: Alias de pertenece -/
-def BIn (x A : CList) : Bool := pertenece x A
-
-/-- Boolean Subset: Alias de esSubconjunto -/
-def BSbs (A B : CList) : Bool := esSubconjunto A B
-
-instance : BEq CList where beq := esIgual
+instance : BEq CList where beq := extEq
 
 -- 2. ORDEN TOTAL (Para la canonización)
 
@@ -87,7 +80,7 @@ Define un orden total independiente de la igualdad para poder
 ordenar las listas de forma única.
 Nota: Usamos el tamaño estructural directo para garantizar la terminación.
 -/
-def esMenor (A B : CList) : Bool :=
+def lt (A B : CList) : Bool :=
   if cSize A < cSize B then true
   else if cSize A > cSize B then false
   else match A, B with
@@ -95,10 +88,10 @@ def esMenor (A B : CList) : Bool :=
     | mk [], mk (_::_) => true
     | mk (_::_), mk [] => false
     | mk (x::xs), mk (y::ys) =>
-        if esIgual x y then
-          esMenor (mk xs) (mk ys)
+        if extEq x y then
+          lt (mk xs) (mk ys)
         else
-          esMenor x y
+          lt x y
 termination_by cSize A + cSize B
 decreasing_by
   all_goals simp_wf
@@ -113,53 +106,53 @@ para ignorar las apariciones posteriores.
 Es estructuralmente recursiva (recorre `l` reduciéndola en 1),
 por lo que Lean la acepta instantáneamente sin pruebas matemáticas.
 -/
-def reducirDuplicadosAux (l : List CList) (vistos : List CList) : List CList :=
+def dedupAux (l : List CList) (vistos : List CList) : List CList :=
   match l with
   | [] => []
   | x :: xs =>
-      if vistos.any (fun y => esIgual x y) then
+      if vistos.any (fun y => extEq x y) then
         -- Si ya lo vimos antes, lo ignoramos y seguimos
-        reducirDuplicadosAux xs vistos
+        dedupAux xs vistos
       else
         -- Si es nuevo, lo guardamos y lo añadimos a los 'vistos'
-        x :: reducirDuplicadosAux xs (x :: vistos)
+        x :: dedupAux xs (x :: vistos)
 
 /--
 Reduce los duplicados de una lista recorriéndola hacia adelante
 y conservando solo la primera aparición de cada elemento.
 -/
-def reducirDuplicados (l : List CList) : List CList :=
-  reducirDuplicadosAux l []
+def dedup (l : List CList) : List CList :=
+  dedupAux l []
 
 -- 4. CANONIZACIÓN (Forma normal)
 
-def insertarOrdenado (x : CList) : List CList → List CList
+def orderedInsert (x : CList) : List CList → List CList
   | [] => [x]
   | y :: ys =>
-      if esMenor x y then x :: y :: ys
-      else if esIgual x y then y :: ys
-      else y :: insertarOrdenado x ys
+      if lt x y then x :: y :: ys
+      else if extEq x y then y :: ys
+      else y :: orderedInsert x ys
 
-def ordenarLista : List CList → List CList
+def insertionSort : List CList → List CList
   | [] => []
-  | x :: xs => insertarOrdenado x (ordenarLista xs)
+  | x :: xs => orderedInsert x (insertionSort xs)
 
 /--
 Normalización canónica:
 Aplica la normalización a los elementos, elimina duplicados y ordena.
 -/
-def normalizar : CList → CList
+def normalize : CList → CList
   | mk xs =>
-      let hijosNorm := xs.map normalizar
-      let sinDuplicados := reducirDuplicados hijosNorm
-      mk (ordenarLista sinDuplicados)
+      let hijosNorm := xs.map normalize
+      let sinDuplicados := dedup hijosNorm
+      mk (insertionSort sinDuplicados)
 
 -- PRUEBAS
-def cero := vacio
-def uno := mk [cero]
-def dos := mk [cero, uno]
-def tres := mk [cero, uno, dos]
-def sucio := mk [uno, dos, cero, tres, uno, cero, cero, dos, tres, dos]
+def zero := empty
+def one := mk [zero]
+def two := mk [zero, one]
+def three := mk [zero, one, two]
+def dirty := mk [one, two, zero, three, one, zero, zero, two, three, two]
 
 end CList
 
@@ -168,9 +161,9 @@ end CList
 -- ==========================================
 
 -- Si mk xs ⊆ mk ys, entonces mk xs ⊆ mk (y::ys)
-theorem subs_mono (xs : List CList) (y : CList) (ys : List CList)
-    (h : CList.evalOp .esSubconjunto (CList.mk xs) (CList.mk ys) = true) :
-    CList.evalOp .esSubconjunto (CList.mk xs) (CList.mk (y :: ys)) = true := by
+theorem subset_mono (xs : List CList) (y : CList) (ys : List CList)
+    (h : CList.evalOp .subset (CList.mk xs) (CList.mk ys) = true) :
+    CList.evalOp .subset (CList.mk xs) (CList.mk (y :: ys)) = true := by
   induction xs with
   | nil => simp [CList.evalOp]
   | cons z zs ih =>
@@ -178,25 +171,25 @@ theorem subs_mono (xs : List CList) (y : CList) (ys : List CList)
     exact ⟨by simp [h.1], ih h.2⟩
 
 -- A ⊆ A para todo CList (recursión bien fundada por cSize)
-theorem subs_refl (A : CList) : CList.esSubconjunto A A = true := by
+theorem subset_refl (A : CList) : CList.subset A A = true := by
   match A with
-  | CList.mk [] => simp [CList.esSubconjunto, CList.evalOp]
+  | CList.mk [] => simp [CList.subset, CList.evalOp]
   | CList.mk (x :: xs) =>
-    have hx  : CList.esSubconjunto x x = true             := subs_refl x
-    have hxs : CList.esSubconjunto (CList.mk xs) (CList.mk xs) = true := subs_refl (CList.mk xs)
-    simp only [CList.esSubconjunto] at hx hxs
-    simp only [CList.esSubconjunto, CList.evalOp, Bool.and_eq_true]
-    exact ⟨by simp [hx], subs_mono xs x xs hxs⟩
+    have hx  : CList.subset x x = true             := subset_refl x
+    have hxs : CList.subset (CList.mk xs) (CList.mk xs) = true := subset_refl (CList.mk xs)
+    simp only [CList.subset] at hx hxs
+    simp only [CList.subset, CList.evalOp, Bool.and_eq_true]
+    exact ⟨by simp [hx], subset_mono xs x xs hxs⟩
 termination_by CList.cSize A
 decreasing_by
   all_goals simp_wf
   all_goals simp [CList.cSize, CList.cSizeList]
   all_goals omega
 
--- esIgual A A = true (no recursivo: usa subs_refl)
-theorem esIgual_refl (A : CList) : CList.esIgual A A = true := by
-  simp only [CList.esIgual, CList.evalOp, Bool.and_eq_true]
-  exact ⟨subs_refl A, subs_refl A⟩
+-- extEq A A = true (no recursivo: usa subset_refl)
+theorem extEq_refl (A : CList) : CList.extEq A A = true := by
+  simp only [CList.extEq, CList.evalOp, Bool.and_eq_true]
+  exact ⟨subset_refl A, subset_refl A⟩
 
 
 -- ==============================================================
@@ -205,87 +198,87 @@ theorem esIgual_refl (A : CList) : CList.esIgual A A = true := by
 namespace CList
 
 -- Lemas de apoyo genéricos
-def bool_and_split {a b : Bool} (h : a && b = true) : a = true ∧ b = true := by
+private def bool_and_split {a b : Bool} (h : a && b = true) : a = true ∧ b = true := by
   cases a <;> cases b <;> simp_all
 
-def bool_or_split {a b : Bool} (h : a || b = true) : a = true ∨ b = true := by
+private def bool_or_split {a b : Bool} (h : a || b = true) : a = true ∨ b = true := by
   cases a <;> cases b <;> simp_all
 
-def bool_and_join {a b : Bool} (ha : a = true) (hb : b = true) : a && b = true := by
+private def bool_and_join {a b : Bool} (ha : a = true) (hb : b = true) : a && b = true := by
   simp [ha, hb]
 
-def bool_or_join_left {a b : Bool} (ha : a = true) : a || b = true := by
+private def bool_or_join_left {a b : Bool} (ha : a = true) : a || b = true := by
   simp [ha]
 
-def bool_or_join_right {a b : Bool} (hb : b = true) : a || b = true := by
+private def bool_or_join_right {a b : Bool} (hb : b = true) : a || b = true := by
   simp [hb]
 
 -- Lemas de reducción (necesarios porque evalOp usa recursión bien fundada)
-theorem esIgual_def (A B : CList) :
-    esIgual A B = (esSubconjunto A B && esSubconjunto B A) := by
-  simp only [esIgual, esSubconjunto, evalOp]
+theorem extEq_def (A B : CList) :
+    extEq A B = (subset A B && subset B A) := by
+  simp only [extEq, subset, evalOp]
 
-theorem esSubconjunto_nil_def (B : CList) :
-    esSubconjunto (mk []) B = true := by
-  simp only [esSubconjunto, evalOp]
+theorem subset_nil (B : CList) :
+    subset (mk []) B = true := by
+  simp only [subset, evalOp]
 
-theorem esSubconjunto_cons_def (x : CList) (xs : List CList) (B : CList) :
-    esSubconjunto (mk (x :: xs)) B = (pertenece x B && esSubconjunto (mk xs) B) := by
-  simp only [esSubconjunto, pertenece, evalOp]
+theorem subset_cons (x : CList) (xs : List CList) (B : CList) :
+    subset (mk (x :: xs)) B = (mem x B && subset (mk xs) B) := by
+  simp only [subset, mem, evalOp]
 
-theorem pertenece_nil_def (x : CList) :
-    pertenece x (mk []) = false := by
-  simp only [pertenece, evalOp]
+theorem mem_nil (x : CList) :
+    mem x (mk []) = false := by
+  simp only [mem, evalOp]
 
-theorem pertenece_cons_def (x y : CList) (ys : List CList) :
-    pertenece x (mk (y :: ys)) = (esIgual x y || pertenece x (mk ys)) := by
-  simp only [pertenece, esIgual, evalOp]
+theorem mem_cons (x y : CList) (ys : List CList) :
+    mem x (mk (y :: ys)) = (extEq x y || mem x (mk ys)) := by
+  simp only [mem, extEq, evalOp]
 
 -- Transitividad mutua (tactic mode para compatibilidad con Lean 4.28)
 mutual
-  theorem eq_trans :
-    (A B C : CList) → (esIgual A B = true) → (esIgual B C = true) → (esIgual A C = true)
+  theorem extEq_trans :
+    (A B C : CList) → (extEq A B = true) → (extEq B C = true) → (extEq A C = true)
     | A, B, C, h1, h2 => by
-      simp only [esIgual_def, Bool.and_eq_true] at h1 h2 ⊢
-      exact ⟨subs_trans A B C h1.1 h2.1, subs_trans C B A h2.2 h1.2⟩
+      simp only [extEq_def, Bool.and_eq_true] at h1 h2 ⊢
+      exact ⟨subset_trans A B C h1.1 h2.1, subset_trans C B A h2.2 h1.2⟩
   termination_by A B C _ _ => (cSize A + cSize B + cSize C) * 2 + 1
   decreasing_by
     all_goals simp_wf
     all_goals try simp [cSize, cSizeList]
     all_goals try omega
 
-  theorem subs_trans : (A B C : CList) → esSubconjunto A B = true → esSubconjunto B C = true → esSubconjunto A C = true
-    | mk [], _, _, _, _ => esSubconjunto_nil_def _
+  theorem subset_trans : (A B C : CList) → subset A B = true → subset B C = true → subset A C = true
+    | mk [], _, _, _, _ => subset_nil _
     | mk (x :: xs), B, C, h1, h2 => by
-      simp only [esSubconjunto_cons_def, Bool.and_eq_true] at h1 ⊢
-      exact ⟨mem_subs x B C h1.1 h2, subs_trans (mk xs) B C h1.2 h2⟩
+      simp only [subset_cons, Bool.and_eq_true] at h1 ⊢
+      exact ⟨mem_subset x B C h1.1 h2, subset_trans (mk xs) B C h1.2 h2⟩
   termination_by A B C _ _ => (cSize A + cSize B + cSize C) * 2
   decreasing_by
     all_goals simp_wf
     all_goals try simp [cSize, cSizeList]
     all_goals try omega
 
-  theorem mem_subs : (x B C : CList) → pertenece x B = true → esSubconjunto B C = true → pertenece x C = true
-    | _, mk [], _, h1, _ => by simp [pertenece_nil_def] at h1
+  theorem mem_subset : (x B C : CList) → mem x B = true → subset B C = true → mem x C = true
+    | _, mk [], _, h1, _ => by simp [mem_nil] at h1
     | x, mk (y :: ys), C, h1, h2 => by
-      simp only [pertenece_cons_def, Bool.or_eq_true] at h1
-      simp only [esSubconjunto_cons_def, Bool.and_eq_true] at h2
+      simp only [mem_cons, Bool.or_eq_true] at h1
+      simp only [subset_cons, Bool.and_eq_true] at h2
       cases h1 with
-      | inl h1_eq => exact eq_mem x y C h1_eq h2.1
-      | inr h1_mem => exact mem_subs x (mk ys) C h1_mem h2.2
+      | inl h1_eq => exact mem_of_extEq x y C h1_eq h2.1
+      | inr h1_mem => exact mem_subset x (mk ys) C h1_mem h2.2
   termination_by x B C _ _ => (cSize x + cSize B + cSize C) * 2
   decreasing_by
     all_goals simp_wf
     all_goals try simp [cSize, cSizeList]
     all_goals try omega
 
-  theorem eq_mem : (x y C : CList) → esIgual x y = true → pertenece y C = true → pertenece x C = true
-    | _, _, mk [], _, h2 => by simp [pertenece_nil_def] at h2
+  theorem mem_of_extEq : (x y C : CList) → extEq x y = true → mem y C = true → mem x C = true
+    | _, _, mk [], _, h2 => by simp [mem_nil] at h2
     | x, y, mk (z :: zs), h1, h2 => by
-      simp only [pertenece_cons_def, Bool.or_eq_true] at h2 ⊢
+      simp only [mem_cons, Bool.or_eq_true] at h2 ⊢
       cases h2 with
-      | inl h2_eq => exact Or.inl (eq_trans x y z h1 h2_eq)
-      | inr h2_mem => exact Or.inr (eq_mem x y (mk zs) h1 h2_mem)
+      | inl h2_eq => exact Or.inl (extEq_trans x y z h1 h2_eq)
+      | inr h2_mem => exact Or.inr (mem_of_extEq x y (mk zs) h1 h2_mem)
   termination_by x y C _ _ => (cSize x + cSize y + cSize C) * 2
   decreasing_by
     all_goals simp_wf
@@ -294,39 +287,39 @@ mutual
 end
 
 /--
-Define la propiedad de que una lista no tiene duplicados según `esIgual`.
+Define la propiedad de que una lista no tiene duplicados según `extEq`.
 -/
 def Nodup (l : List CList) : Prop :=
-  l.Pairwise (fun a b => esIgual a b = false)
+  l.Pairwise (fun a b => extEq a b = false)
 
--- Lema: reducirDuplicados produce una lista sin duplicados.
-theorem reducirDuplicados_nodup (l : List CList) : Nodup (reducirDuplicados l) := by
+-- Lema: dedup produce una lista sin duplicados.
+theorem dedup_nodup (l : List CList) : Nodup (dedup l) := by
   have stronger_lemma : ∀ (l' : List CList) (vistos : List CList),
-    Nodup (reducirDuplicadosAux l' vistos) ∧
-    (∀ y ∈ (reducirDuplicadosAux l' vistos), (vistos.any (fun z => esIgual y z)) = false) := by
+    Nodup (dedupAux l' vistos) ∧
+    (∀ y ∈ (dedupAux l' vistos), (vistos.any (fun z => extEq y z)) = false) := by
     intro l'
     induction l' with
     | nil =>
-      intro _; simp [reducirDuplicadosAux, Nodup]
+      intro _; simp [dedupAux, Nodup]
     | cons head tail IH =>
       intro vistos
-      simp only [reducirDuplicadosAux]
-      by_cases h_seen : (vistos.any fun y => esIgual head y) = true
+      simp only [dedupAux]
+      by_cases h_seen : (vistos.any fun y => extEq head y) = true
       · rw [if_pos h_seen]; exact IH vistos
       · rw [if_neg h_seen]
-        have h_false : (vistos.any fun y => esIgual head y) = false :=
+        have h_false : (vistos.any fun y => extEq head y) = false :=
           Bool.eq_false_iff.mpr (fun h => h_seen h)
         have ih_recursed := IH (head :: vistos)
         rcases ih_recursed with ⟨nodup_tail, tail_is_new⟩
         constructor
         · simp only [Nodup, List.pairwise_cons]
           constructor
-          · have esIgual_comm : ∀ a b, esIgual a b = esIgual b a := by
-              intros a b; simp [esIgual, evalOp, Bool.and_comm]
+          · have extEq_comm : ∀ a b, extEq a b = extEq b a := by
+              intros a b; simp [extEq, evalOp, Bool.and_comm]
             intro y y_in_tail
             specialize tail_is_new y y_in_tail
             rw [List.any_cons, Bool.or_eq_false_iff] at tail_is_new
-            rw [esIgual_comm]; exact tail_is_new.1
+            rw [extEq_comm]; exact tail_is_new.1
           · exact nodup_tail
         · intro y y_in_list
           simp only [List.mem_cons] at y_in_list
@@ -337,14 +330,14 @@ theorem reducirDuplicados_nodup (l : List CList) : Nodup (reducirDuplicados l) :
             specialize tail_is_new y h_y_in_tail
             rw [List.any_cons, Bool.or_eq_false_iff] at tail_is_new
             exact tail_is_new.2
-  rw [reducirDuplicados]
+  rw [dedup]
   exact (stronger_lemma l []).1
 
 /--
 Define la equivalencia de conjuntos entre dos listas.
 -/
 def SetEquiv (l₁ l₂ : List CList) : Prop :=
-  ∀ x, (l₁.any (fun y => esIgual x y)) ↔ (l₂.any (fun y => esIgual x y))
+  ∀ x, (l₁.any (fun y => extEq x y)) ↔ (l₂.any (fun y => extEq x y))
 
 namespace SetEquiv
 
@@ -362,18 +355,18 @@ theorem trans {l₁ l₂ l₃ : List CList} (h₁₂ : SetEquiv l₁ l₂) (h₂
 
 end SetEquiv
 
-theorem pertenece_eq_any (x : CList) (l : List CList) :
-    pertenece x (mk l) = l.any (fun y => esIgual x y) := by
+theorem mem_eq_any (x : CList) (l : List CList) :
+    mem x (mk l) = l.any (fun y => extEq x y) := by
   induction l with
-  | nil => simp [pertenece_nil_def]
-  | cons y ys ih => simp [pertenece_cons_def, ih]
+  | nil => simp [mem_nil]
+  | cons y ys ih => simp [mem_cons, ih]
 
-private theorem subs_iff_forall_mem_pertenece (l₁ l₂ : List CList) :
-    esSubconjunto (mk l₁) (mk l₂) = true ↔ (∀ x ∈ l₁, pertenece x (mk l₂) = true) := by
+private theorem subset_iff_forall_mem (l₁ l₂ : List CList) :
+    subset (mk l₁) (mk l₂) = true ↔ (∀ x ∈ l₁, mem x (mk l₂) = true) := by
   induction l₁ with
-  | nil => simp [esSubconjunto_nil_def]
+  | nil => simp [subset_nil]
   | cons x xs ih =>
-    simp only [esSubconjunto_cons_def, Bool.and_eq_true]
+    simp only [subset_cons, Bool.and_eq_true]
     constructor
     · intro ⟨h1, h2⟩ y hy
       simp only [List.mem_cons] at hy
@@ -383,13 +376,13 @@ private theorem subs_iff_forall_mem_pertenece (l₁ l₂ : List CList) :
     · intro h
       exact ⟨h x List.mem_cons_self, ih.mpr (fun y hy => h y (List.mem_cons_of_mem _ hy))⟩
 
-theorem esIgual_mk_iff_setEquiv (l₁ l₂ : List CList) :
-    esIgual (mk l₁) (mk l₂) = true ↔ SetEquiv l₁ l₂ := by
+theorem extEq_mk_iff_setEquiv (l₁ l₂ : List CList) :
+    extEq (mk l₁) (mk l₂) = true ↔ SetEquiv l₁ l₂ := by
   constructor
   · intro h
     unfold SetEquiv
-    rw [esIgual_def, Bool.and_eq_true] at h
-    simp only [subs_iff_forall_mem_pertenece, pertenece_eq_any] at h
+    rw [extEq_def, Bool.and_eq_true] at h
+    simp only [subset_iff_forall_mem, mem_eq_any] at h
     obtain ⟨h1, h2⟩ := h
     intro x
     constructor
@@ -399,37 +392,37 @@ theorem esIgual_mk_iff_setEquiv (l₁ l₂ : List CList) :
       have hzl2 := h1 z hz
       rw [List.any_eq_true] at hzl2
       obtain ⟨w, hw, hzw⟩ := hzl2
-      exact List.any_eq_true.mpr ⟨w, hw, eq_trans x z w hxz hzw⟩
+      exact List.any_eq_true.mpr ⟨w, hw, extEq_trans x z w hxz hzw⟩
     · intro hx
       rw [List.any_eq_true] at hx
       obtain ⟨z, hz, hxz⟩ := hx
       have hzl1 := h2 z hz
       rw [List.any_eq_true] at hzl1
       obtain ⟨w, hw, hzw⟩ := hzl1
-      exact List.any_eq_true.mpr ⟨w, hw, eq_trans x z w hxz hzw⟩
+      exact List.any_eq_true.mpr ⟨w, hw, extEq_trans x z w hxz hzw⟩
   · intro h
     unfold SetEquiv at h
-    rw [esIgual_def, Bool.and_eq_true]
-    simp only [subs_iff_forall_mem_pertenece, pertenece_eq_any]
-    exact ⟨fun x hx => (h x).mp  (List.any_eq_true.mpr ⟨x, hx, esIgual_refl x⟩),
-           fun x hx => (h x).mpr (List.any_eq_true.mpr ⟨x, hx, esIgual_refl x⟩)⟩
+    rw [extEq_def, Bool.and_eq_true]
+    simp only [subset_iff_forall_mem, mem_eq_any]
+    exact ⟨fun x hx => (h x).mp  (List.any_eq_true.mpr ⟨x, hx, extEq_refl x⟩),
+           fun x hx => (h x).mpr (List.any_eq_true.mpr ⟨x, hx, extEq_refl x⟩)⟩
 
--- Lema: `reducirDuplicados` conserva el conjunto de elementos.
-theorem reducirDuplicados_set_equiv_self (l : List CList) : SetEquiv (reducirDuplicados l) l := by
+-- Lema: `dedup` conserva el conjunto de elementos.
+theorem dedup_setEquiv_self (l : List CList) : SetEquiv (dedup l) l := by
   intro x; constructor
   · intro h_mem_reduced
     rw [List.any_eq_true] at h_mem_reduced
     obtain ⟨z, z_in_reduced, xz_eq⟩ := h_mem_reduced
-    have z_in_l_ext : (l.any (fun y => esIgual z y)) = true := by
-      have helper : ∀ (l' vistos : List CList), ∀ z' ∈ (reducirDuplicadosAux l' vistos),
-          (l'.any (fun y => esIgual z' y)) = true ∨ (vistos.any (fun y => esIgual z' y)) = true := by
+    have z_in_l_ext : (l.any (fun y => extEq z y)) = true := by
+      have helper : ∀ (l' vistos : List CList), ∀ z' ∈ (dedupAux l' vistos),
+          (l'.any (fun y => extEq z' y)) = true ∨ (vistos.any (fun y => extEq z' y)) = true := by
         intro l'
         induction l' with
         | nil => intro vistos z' h_mem; cases h_mem
         | cons head tail IH =>
           intro vistos z' h_mem
-          unfold reducirDuplicadosAux at h_mem
-          by_cases h_seen : (vistos.any (fun y => esIgual head y)) = true
+          unfold dedupAux at h_mem
+          by_cases h_seen : (vistos.any (fun y => extEq head y)) = true
           · rw [if_pos h_seen] at h_mem
             rcases IH vistos z' h_mem with (h | h)
             · exact Or.inl (by simp [List.any_cons, h])
@@ -437,39 +430,39 @@ theorem reducirDuplicados_set_equiv_self (l : List CList) : SetEquiv (reducirDup
           · rw [if_neg h_seen] at h_mem
             simp only [List.mem_cons] at h_mem
             rcases h_mem with (rfl | h_in_tail)
-            · exact Or.inl (by simp [List.any_cons, esIgual_refl])
+            · exact Or.inl (by simp [List.any_cons, extEq_refl])
             · rcases IH (head :: vistos) z' h_in_tail with (h_in_t | h_in_v)
               · exact Or.inl (by simp [List.any_cons, h_in_t])
               · rw [List.any_cons, Bool.or_eq_true] at h_in_v
                 rcases h_in_v with (h_head | h_vis)
                 · exact Or.inl (by simp [List.any_cons, h_head])
                 · exact Or.inr h_vis
-      rw [reducirDuplicados] at z_in_reduced
+      rw [dedup] at z_in_reduced
       rcases helper l [] z z_in_reduced with (h | h)
       · exact h
       · simp at h
     rw [List.any_eq_true] at z_in_l_ext
     obtain ⟨w, w_in_l, zw_eq⟩ := z_in_l_ext
-    exact List.any_eq_true.mpr ⟨w, w_in_l, CList.eq_trans x z w xz_eq zw_eq⟩
+    exact List.any_eq_true.mpr ⟨w, w_in_l, CList.extEq_trans x z w xz_eq zw_eq⟩
   · intro h_mem_l
     rw [List.any_eq_true] at h_mem_l
     obtain ⟨z, z_in_l, xz_eq⟩ := h_mem_l
-    have completeness_aux : ∀ z' ∈ l, (reducirDuplicados l).any (fun y => esIgual z' y) = true := by
+    have completeness_aux : ∀ z' ∈ l, (dedup l).any (fun y => extEq z' y) = true := by
       have helper : ∀ (l' vistos : List CList), ∀ z' ∈ l',
-          (reducirDuplicadosAux l' vistos).any (fun y => esIgual z' y) = true ∨
-          (vistos.any (fun y => esIgual z' y)) = true := by
+          (dedupAux l' vistos).any (fun y => extEq z' y) = true ∨
+          (vistos.any (fun y => extEq z' y)) = true := by
         intro l'
         induction l' with
         | nil => intro vistos z' h_mem; cases h_mem
         | cons hd tail IH =>
           intro vistos z' h_mem
-          simp only [reducirDuplicadosAux]
+          simp only [dedupAux]
           rcases List.mem_cons.mp h_mem with (rfl | h_in_tail)
-          · by_cases h_seen : (vistos.any (fun y => esIgual z' y)) = true
+          · by_cases h_seen : (vistos.any (fun y => extEq z' y)) = true
             · rw [if_pos h_seen]; exact Or.inr h_seen
             · rw [if_neg h_seen]
-              exact Or.inl (List.any_eq_true.mpr ⟨z', List.mem_cons_self, esIgual_refl _⟩)
-          · by_cases h_seen : (vistos.any (fun y => esIgual hd y)) = true
+              exact Or.inl (List.any_eq_true.mpr ⟨z', List.mem_cons_self, extEq_refl _⟩)
+          · by_cases h_seen : (vistos.any (fun y => extEq hd y)) = true
             · rw [if_pos h_seen]; exact IH vistos z' h_in_tail
             · rw [if_neg h_seen]
               rcases IH (hd :: vistos) z' h_in_tail with (h_in_res | h_in_v_ext)
@@ -481,67 +474,67 @@ theorem reducirDuplicados_set_equiv_self (l : List CList) : SetEquiv (reducirDup
                 · exact Or.inl (by simp [List.any_cons, h_hd])
                 · exact Or.inr h_vis
       intro z' hz'
-      rw [reducirDuplicados]
+      rw [dedup]
       rcases helper l [] z' hz' with (h | h)
       · exact h
       · simp at h
     have hz := completeness_aux z z_in_l
     rw [List.any_eq_true] at hz
     obtain ⟨w, w_in_reduced, zw_eq⟩ := hz
-    exact List.any_eq_true.mpr ⟨w, w_in_reduced, CList.eq_trans x z w xz_eq zw_eq⟩
+    exact List.any_eq_true.mpr ⟨w, w_in_reduced, CList.extEq_trans x z w xz_eq zw_eq⟩
 
 
 -- ==================================================================
--- TEOREMA 1: normalizar no aumenta el tamaño (normalizar_cSize_le)
+-- TEOREMA 1: normalize no aumenta el tamaño (normalize_cSize_le)
 -- ==================================================================
 
-private theorem cSizeList_insertarOrdenado_le (x : CList) (l : List CList) :
-    cSizeList (insertarOrdenado x l) ≤ 1 + cSize x + cSizeList l := by
+private theorem cSizeList_orderedInsert_le (x : CList) (l : List CList) :
+    cSizeList (orderedInsert x l) ≤ 1 + cSize x + cSizeList l := by
   induction l with
-  | nil => simp [insertarOrdenado, cSizeList]
+  | nil => simp [orderedInsert, cSizeList]
   | cons y ys ih =>
-    unfold insertarOrdenado
-    by_cases h1 : esMenor x y = true
+    unfold orderedInsert
+    by_cases h1 : lt x y = true
     · rw [if_pos h1]; simp only [cSizeList]; omega
     · rw [if_neg h1]
-      by_cases h2 : esIgual x y = true
+      by_cases h2 : extEq x y = true
       · rw [if_pos h2]; simp only [cSizeList]; omega
       · rw [if_neg h2]; simp only [cSizeList]; omega
 
-theorem cSizeList_reducirDuplicados_le (l : List CList) :
-    cSizeList (reducirDuplicados l) ≤ cSizeList l := by
+theorem cSizeList_dedup_le (l : List CList) :
+    cSizeList (dedup l) ≤ cSizeList l := by
   suffices h : ∀ (l' vistos : List CList),
-      cSizeList (reducirDuplicadosAux l' vistos) ≤ cSizeList l' from by
-    unfold reducirDuplicados; exact h l []
+      cSizeList (dedupAux l' vistos) ≤ cSizeList l' from by
+    unfold dedup; exact h l []
   intro l'
   induction l' with
-  | nil => intros; simp [reducirDuplicadosAux, cSizeList]
+  | nil => intros; simp [dedupAux, cSizeList]
   | cons x xs ih =>
     intro vistos
-    unfold reducirDuplicadosAux
-    by_cases h : (vistos.any fun y => esIgual x y) = true
+    unfold dedupAux
+    by_cases h : (vistos.any fun y => extEq x y) = true
     · rw [if_pos h]; exact Nat.le_trans (ih vistos) (by simp [cSizeList])
     · rw [if_neg h]; simp only [cSizeList]
       exact Nat.le_trans (Nat.add_le_add_left (ih (x :: vistos)) _) (by omega)
 
-theorem cSizeList_ordenarLista_le (l : List CList) :
-    cSizeList (ordenarLista l) ≤ cSizeList l := by
+theorem cSizeList_insertionSort_le (l : List CList) :
+    cSizeList (insertionSort l) ≤ cSizeList l := by
   induction l with
-  | nil => simp [ordenarLista, cSizeList]
+  | nil => simp [insertionSort, cSizeList]
   | cons x xs ih =>
-    unfold ordenarLista
-    have h1 := cSizeList_insertarOrdenado_le x (ordenarLista xs)
+    unfold insertionSort
+    have h1 := cSizeList_orderedInsert_le x (insertionSort xs)
     simp only [cSizeList]
     omega
 
 mutual
-  private theorem normalizar_cSizeList_le : ∀ (xs : List CList),
-      cSizeList (xs.map normalizar) ≤ cSizeList xs
+  private theorem normalize_cSizeList_le : ∀ (xs : List CList),
+      cSizeList (xs.map normalize) ≤ cSizeList xs
     | [] => by simp [cSizeList]
     | (x :: rest) => by
         simp only [List.map, cSizeList]
-        have hx := normalizar_cSize_le x
-        have ih := normalizar_cSizeList_le rest
+        have hx := normalize_cSize_le x
+        have ih := normalize_cSizeList_le rest
         omega
   termination_by xs => cSizeList xs * 2 + 1
   decreasing_by
@@ -549,13 +542,13 @@ mutual
     all_goals simp [cSizeList]
     all_goals omega
 
-  theorem normalizar_cSize_le (A : CList) : cSize (normalizar A) ≤ cSize A :=
+  theorem normalize_cSize_le (A : CList) : cSize (normalize A) ≤ cSize A :=
     match A with
     | mk xs => by
-        have h_map := normalizar_cSizeList_le xs
-        have h_red := cSizeList_reducirDuplicados_le (xs.map normalizar)
-        have h_ord := cSizeList_ordenarLista_le (reducirDuplicados (xs.map normalizar))
-        simp only [normalizar, cSize]
+        have h_map := normalize_cSizeList_le xs
+        have h_red := cSizeList_dedup_le (xs.map normalize)
+        have h_ord := cSizeList_insertionSort_le (dedup (xs.map normalize))
+        simp only [normalize, cSize]
         omega
   termination_by cSize A * 2
   decreasing_by
@@ -566,91 +559,91 @@ end
 
 
 -- ==================================================================
--- PIEZA 4: Propiedades de esMenor
+-- PIEZA 4: Propiedades de lt
 -- ==================================================================
 
-theorem esMenor_irrefl (A : CList) : esMenor A A = false :=
+theorem lt_irrefl (A : CList) : lt A A = false :=
   match A with
-  | mk [] => by unfold esMenor; simp
+  | mk [] => by unfold lt; simp
   | mk (x :: xs) => by
-      unfold esMenor
-      simp only [Nat.lt_irrefl, ite_false, gt_iff_lt, esIgual_refl, ite_true]
-      exact esMenor_irrefl (mk xs)
+      unfold lt
+      simp only [Nat.lt_irrefl, ite_false, gt_iff_lt, extEq_refl, ite_true]
+      exact lt_irrefl (mk xs)
 termination_by cSize A
 decreasing_by simp_wf; simp [cSize, cSizeList]; omega
 
-theorem esIgual_comm (A B : CList) : esIgual A B = esIgual B A := by
-  simp [esIgual_def, Bool.and_comm]
+theorem extEq_comm (A B : CList) : extEq A B = extEq B A := by
+  simp [extEq_def, Bool.and_comm]
 
-private theorem esIgual_cons_equiv (x y : CList) (xs ys : List CList)
-    (hxy : esIgual x y = true) (hxsys : esIgual (mk xs) (mk ys) = true) :
-    esIgual (mk (x :: xs)) (mk (y :: ys)) = true := by
-  rw [esIgual_mk_iff_setEquiv] at *
+private theorem extEq_cons_equiv (x y : CList) (xs ys : List CList)
+    (hxy : extEq x y = true) (hxsys : extEq (mk xs) (mk ys) = true) :
+    extEq (mk (x :: xs)) (mk (y :: ys)) = true := by
+  rw [extEq_mk_iff_setEquiv] at *
   intro z
   simp only [List.any_cons, Bool.or_eq_true]
   constructor
   · rintro (h | h)
-    · exact Or.inl (eq_trans z x y h hxy)
+    · exact Or.inl (extEq_trans z x y h hxy)
     · exact Or.inr ((hxsys z).mp h)
   · rintro (h | h)
-    · have hyx : esIgual y x = true := by rwa [esIgual_comm] at hxy
-      exact Or.inl (eq_trans z y x h hyx)
+    · have hyx : extEq y x = true := by rwa [extEq_comm] at hxy
+      exact Or.inl (extEq_trans z y x h hyx)
     · exact Or.inr ((hxsys z).mpr h)
 
-theorem esMenor_total (A B : CList) :
-    esIgual A B = false → esMenor A B = true ∨ esMenor B A = true := by
+theorem lt_total (A B : CList) :
+    extEq A B = false → lt A B = true ∨ lt B A = true := by
   intro h_neq
   by_cases hlt : cSize A < cSize B
   · left
-    unfold esMenor
+    unfold lt
     simp [hlt]
   · by_cases hgt : cSize B < cSize A
     · right
-      unfold esMenor
+      unfold lt
       simp [hgt]
     · have hsize : cSize A = cSize B :=
           Nat.le_antisymm (Nat.le_of_not_lt hgt) (Nat.le_of_not_lt hlt)
       match A, B with
-      | mk [], mk [] => simp [esIgual_refl] at h_neq
+      | mk [], mk [] => simp [extEq_refl] at h_neq
       | mk [], mk (_ :: _) => simp [cSize, cSizeList] at hsize
       | mk (_ :: _), mk [] => simp [cSize, cSizeList] at hsize
       | mk (x :: xs), mk (y :: ys) =>
-          by_cases hxy : esIgual x y = true
-          · have h_tail : esIgual (mk xs) (mk ys) = false := by
-              rcases Bool.eq_false_or_eq_true (esIgual (mk xs) (mk ys)) with h | h
-              · have hcontra := esIgual_cons_equiv x y xs ys hxy h
+          by_cases hxy : extEq x y = true
+          · have h_tail : extEq (mk xs) (mk ys) = false := by
+              rcases Bool.eq_false_or_eq_true (extEq (mk xs) (mk ys)) with h | h
+              · have hcontra := extEq_cons_equiv x y xs ys hxy h
                 rw [hcontra] at h_neq
                 exact absurd h_neq (by decide)
               · exact h
-            have hyx : esIgual y x = true := by rwa [esIgual_comm] at hxy
-            rcases esMenor_total (mk xs) (mk ys) h_tail with h | h
+            have hyx : extEq y x = true := by rwa [extEq_comm] at hxy
+            rcases lt_total (mk xs) (mk ys) h_tail with h | h
             · left
-              unfold esMenor
+              unfold lt
               rw [if_neg (show ¬ cSize (mk (x::xs)) < cSize (mk (y::ys)) from by omega)]
               rw [if_neg (show ¬ cSize (mk (x::xs)) > cSize (mk (y::ys)) from by omega)]
-              show (if esIgual x y = true then esMenor (mk xs) (mk ys) else esMenor x y) = true
+              show (if extEq x y = true then lt (mk xs) (mk ys) else lt x y) = true
               rw [if_pos hxy]; exact h
             · right
-              unfold esMenor
+              unfold lt
               rw [if_neg (show ¬ cSize (mk (y::ys)) < cSize (mk (x::xs)) from by omega)]
               rw [if_neg (show ¬ cSize (mk (y::ys)) > cSize (mk (x::xs)) from by omega)]
-              show (if esIgual y x = true then esMenor (mk ys) (mk xs) else esMenor y x) = true
+              show (if extEq y x = true then lt (mk ys) (mk xs) else lt y x) = true
               rw [if_pos hyx]; exact h
           · rw [Bool.not_eq_true] at hxy
-            have hyx : esIgual y x = false := by rwa [esIgual_comm] at hxy
-            rcases esMenor_total x y hxy with h | h
+            have hyx : extEq y x = false := by rwa [extEq_comm] at hxy
+            rcases lt_total x y hxy with h | h
             · left
-              unfold esMenor
+              unfold lt
               rw [if_neg (show ¬ cSize (mk (x::xs)) < cSize (mk (y::ys)) from by omega)]
               rw [if_neg (show ¬ cSize (mk (x::xs)) > cSize (mk (y::ys)) from by omega)]
-              show (if esIgual x y = true then esMenor (mk xs) (mk ys) else esMenor x y) = true
-              rw [if_neg (show ¬ esIgual x y = true from by simp [hxy])]; exact h
+              show (if extEq x y = true then lt (mk xs) (mk ys) else lt x y) = true
+              rw [if_neg (show ¬ extEq x y = true from by simp [hxy])]; exact h
             · right
-              unfold esMenor
+              unfold lt
               rw [if_neg (show ¬ cSize (mk (y::ys)) < cSize (mk (x::xs)) from by omega)]
               rw [if_neg (show ¬ cSize (mk (y::ys)) > cSize (mk (x::xs)) from by omega)]
-              show (if esIgual y x = true then esMenor (mk ys) (mk xs) else esMenor y x) = true
-              rw [if_neg (show ¬ esIgual y x = true from by simp [hyx])]; exact h
+              show (if extEq y x = true then lt (mk ys) (mk xs) else lt y x) = true
+              rw [if_neg (show ¬ extEq y x = true from by simp [hyx])]; exact h
 termination_by cSize A + cSize B
 decreasing_by
   all_goals simp_wf
@@ -658,73 +651,73 @@ decreasing_by
   all_goals omega
 
 -- ==================================================================
--- PIEZA 2: Sorted, ordenarLista_sorted, ordenarLista_nodup
+-- PIEZA 2: Sorted, insertionSort_sorted, insertionSort_nodup
 -- ==================================================================
 
 def Sorted : List CList → Prop
   | []           => True
   | [_]          => True
-  | a :: b :: rest => esMenor a b = true ∧ Sorted (b :: rest)
+  | a :: b :: rest => lt a b = true ∧ Sorted (b :: rest)
 
-private theorem insertarOrdenado_sorted (x : CList) (l : List CList)
-    (hs : Sorted l) : Sorted (insertarOrdenado x l) := by
+private theorem orderedInsert_sorted (x : CList) (l : List CList)
+    (hs : Sorted l) : Sorted (orderedInsert x l) := by
   induction l with
-  | nil => simp [insertarOrdenado, Sorted]
+  | nil => simp [orderedInsert, Sorted]
   | cons y ys ih =>
-    simp only [insertarOrdenado]
-    by_cases hxy : esMenor x y = true
+    simp only [orderedInsert]
+    by_cases hxy : lt x y = true
     · rw [if_pos hxy]
       match ys with
       | []     => simp [Sorted, hxy]
       | z :: _ => exact ⟨hxy, hs⟩
     · rw [if_neg hxy]
-      by_cases heq : esIgual x y = true
+      by_cases heq : extEq x y = true
       · rw [if_pos heq]; exact hs
       · rw [if_neg heq]
-        have hyx : esMenor y x = true := by
-          rcases esMenor_total x y (by simp [heq]) with h | h
+        have hyx : lt y x = true := by
+          rcases lt_total x y (by simp [heq]) with h | h
           · exact absurd h (by simp [hxy])
           · exact h
         match ys with
-        | [] => simp [insertarOrdenado, Sorted, hyx]
+        | [] => simp [orderedInsert, Sorted, hyx]
         | z :: rest =>
           obtain ⟨hyz, hs_rest⟩ := hs
           specialize ih hs_rest
-          -- ih : Sorted (insertarOrdenado x (z :: rest))
-          -- goal : Sorted (y :: insertarOrdenado x (z :: rest))
-          by_cases hxz : esMenor x z = true
-          · have hins : insertarOrdenado x (z :: rest) = x :: z :: rest := by
-              unfold insertarOrdenado; rw [if_pos hxz]
+          -- ih : Sorted (orderedInsert x (z :: rest))
+          -- goal : Sorted (y :: orderedInsert x (z :: rest))
+          by_cases hxz : lt x z = true
+          · have hins : orderedInsert x (z :: rest) = x :: z :: rest := by
+              unfold orderedInsert; rw [if_pos hxz]
             rw [hins] at ih ⊢
             exact ⟨hyx, hxz, hs_rest⟩
-          · by_cases heqz : esIgual x z = true
-            · have hins : insertarOrdenado x (z :: rest) = z :: rest := by
-                unfold insertarOrdenado; rw [if_neg hxz, if_pos heqz]
+          · by_cases heqz : extEq x z = true
+            · have hins : orderedInsert x (z :: rest) = z :: rest := by
+                unfold orderedInsert; rw [if_neg hxz, if_pos heqz]
               rw [hins] at ih ⊢
               exact ⟨hyz, hs_rest⟩
-            · have hins : insertarOrdenado x (z :: rest) = z :: insertarOrdenado x rest := by
-                simp only [insertarOrdenado, if_neg hxz, if_neg heqz]
+            · have hins : orderedInsert x (z :: rest) = z :: orderedInsert x rest := by
+                simp only [orderedInsert, if_neg hxz, if_neg heqz]
               rw [hins] at ih ⊢
               exact ⟨hyz, ih⟩
 
-theorem ordenarLista_sorted (l : List CList) : Sorted (ordenarLista l) := by
+theorem insertionSort_sorted (l : List CList) : Sorted (insertionSort l) := by
   induction l with
-  | nil => simp [ordenarLista, Sorted]
-  | cons x xs ih => exact insertarOrdenado_sorted x (ordenarLista xs) ih
+  | nil => simp [insertionSort, Sorted]
+  | cons x xs ih => exact orderedInsert_sorted x (insertionSort xs) ih
 
 -- ==================================================================
--- PIEZA 3: ordenarLista_nodup
+-- PIEZA 3: insertionSort_nodup
 -- ==================================================================
 
--- Elementos de (insertarOrdenado x l) son un subconjunto de {x} ∪ l
-private theorem mem_of_mem_insertarOrdenado (x z : CList) (l : List CList) :
-    z ∈ insertarOrdenado x l → z = x ∨ z ∈ l := by
+-- Elementos de (orderedInsert x l) son un subconjunto de {x} ∪ l
+private theorem mem_of_mem_orderedInsert (x z : CList) (l : List CList) :
+    z ∈ orderedInsert x l → z = x ∨ z ∈ l := by
   induction l with
   | nil =>
-    simp [insertarOrdenado]
+    simp [orderedInsert]
   | cons y ys ih =>
-    simp only [insertarOrdenado]
-    by_cases hlt : esMenor x y = true
+    simp only [orderedInsert]
+    by_cases hlt : lt x y = true
     · rw [if_pos hlt]
       intro hmem
       simp only [List.mem_cons] at hmem
@@ -733,7 +726,7 @@ private theorem mem_of_mem_insertarOrdenado (x z : CList) (l : List CList) :
       · exact Or.inr (List.mem_cons.mpr (Or.inl rfl))
       · exact Or.inr (List.mem_cons.mpr (Or.inr h))
     · rw [if_neg hlt]
-      by_cases heq : esIgual x y = true
+      by_cases heq : extEq x y = true
       · rw [if_pos heq]
         intro hmem; exact Or.inr hmem
       · rw [if_neg heq]
@@ -745,31 +738,31 @@ private theorem mem_of_mem_insertarOrdenado (x z : CList) (l : List CList) :
           · exact Or.inl rfl
           · exact Or.inr (List.mem_cons.mpr (Or.inr h'))
 
--- Elementos de (ordenarLista l) son elementos de l
-private theorem ordenarLista_mem_subset (z : CList) (l : List CList) :
-    z ∈ ordenarLista l → z ∈ l := by
+-- Elementos de (insertionSort l) son elementos de l
+private theorem insertionSort_mem_subset (z : CList) (l : List CList) :
+    z ∈ insertionSort l → z ∈ l := by
   induction l with
-  | nil => simp [ordenarLista]
+  | nil => simp [insertionSort]
   | cons y ys ih =>
-    simp only [ordenarLista]
+    simp only [insertionSort]
     intro hmem
-    rcases mem_of_mem_insertarOrdenado y z (ordenarLista ys) hmem with rfl | h
+    rcases mem_of_mem_orderedInsert y z (insertionSort ys) hmem with rfl | h
     · exact List.mem_cons.mpr (Or.inl rfl)
     · exact List.mem_cons.mpr (Or.inr (ih h))
 
-private theorem insertarOrdenado_nodup (x : CList) (l : List CList)
-    (hxl : ∀ y ∈ l, esIgual x y = false)
-    (hl : Nodup l) : Nodup (insertarOrdenado x l) := by
+private theorem orderedInsert_nodup (x : CList) (l : List CList)
+    (hxl : ∀ y ∈ l, extEq x y = false)
+    (hl : Nodup l) : Nodup (orderedInsert x l) := by
   induction l with
-  | nil => simp [insertarOrdenado, Nodup]
+  | nil => simp [orderedInsert, Nodup]
   | cons y ys ih =>
-    have hxy : esIgual x y = false := hxl y (List.mem_cons.mpr (Or.inl rfl))
-    have hxys : ∀ w ∈ ys, esIgual x w = false :=
+    have hxy : extEq x y = false := hxl y (List.mem_cons.mpr (Or.inl rfl))
+    have hxys : ∀ w ∈ ys, extEq x w = false :=
       fun w hw => hxl w (List.mem_cons.mpr (Or.inr hw))
     simp only [Nodup, List.pairwise_cons] at hl
     obtain ⟨hyl, hys⟩ := hl
-    simp only [insertarOrdenado]
-    by_cases hlt : esMenor x y = true
+    simp only [orderedInsert]
+    by_cases hlt : lt x y = true
     · rw [if_pos hlt]
       simp only [Nodup, List.pairwise_cons]
       refine ⟨fun b hb => ?_, hyl, hys⟩
@@ -778,26 +771,26 @@ private theorem insertarOrdenado_nodup (x : CList) (l : List CList)
       · exact hxy
       · exact hxys b hb
     · rw [if_neg hlt]
-      by_cases heq : esIgual x y = true
+      by_cases heq : extEq x y = true
       · exact absurd heq (by simp [hxy])
       · rw [if_neg heq]
         simp only [Nodup, List.pairwise_cons]
         refine ⟨fun z hz => ?_, ih hxys hys⟩
-        rcases mem_of_mem_insertarOrdenado x z ys hz with rfl | h
-        · rw [esIgual_comm]; exact hxy
+        rcases mem_of_mem_orderedInsert x z ys hz with rfl | h
+        · rw [extEq_comm]; exact hxy
         · exact hyl z h
 
-theorem ordenarLista_nodup (l : List CList) (hl : Nodup l) :
-    Nodup (ordenarLista l) := by
+theorem insertionSort_nodup (l : List CList) (hl : Nodup l) :
+    Nodup (insertionSort l) := by
   induction l with
-  | nil => simp [ordenarLista, Nodup]
+  | nil => simp [insertionSort, Nodup]
   | cons x xs ih =>
     simp only [Nodup, List.pairwise_cons] at hl
     obtain ⟨hx, hxs⟩ := hl
-    simp only [ordenarLista]
-    apply insertarOrdenado_nodup
+    simp only [insertionSort]
+    apply orderedInsert_nodup
     · intro y hy
-      exact hx y (ordenarLista_mem_subset y xs hy)
+      exact hx y (insertionSort_mem_subset y xs hy)
     · exact ih hxs
 
 end CList
@@ -805,13 +798,13 @@ end CList
 
 -- El Setoid finalmente con reflexividad, simetría y transitividad
 def CList.Setoid : Setoid CList where
-  r A B := CList.esIgual A B = true
+  r A B := CList.extEq A B = true
   iseqv := {
-    refl := esIgual_refl
+    refl := extEq_refl
     symm := fun {A B} h => by
-      rw [CList.esIgual_def] at h ⊢
+      rw [CList.extEq_def] at h ⊢
       rwa [Bool.and_comm]
-    trans := fun {A B C} h1 h2 => CList.eq_trans A B C h1 h2
+    trans := fun {A B C} h1 h2 => CList.extEq_trans A B C h1 h2
   }
 
 def CSet := Quotient CList.Setoid
@@ -824,8 +817,8 @@ open CList
 Dadas dos CList A y B que son extensionalmente iguales ()
 -/
 
-theorem normalizar_eq_of_eq {A B : CList} (h : CList.esIgual A B = true) :
-    CList.normalizar A = CList.normalizar B := by
+theorem normalize_eq_of_extEq {A B : CList} (h : CList.extEq A B = true) :
+    CList.normalize A = CList.normalize B := by
   sorry
 
 /--
@@ -833,14 +826,14 @@ Esta es la función que extrae el representante canónico (una `CList` normaliza
 de un `CSet` abstracto.
 -/
 def repr (s : CSet) : CList :=
-  Quotient.lift CList.normalizar (fun A B h => normalizar_eq_of_eq h) s
+  Quotient.lift CList.normalize (fun A B h => normalize_eq_of_extEq h) s
 
-def clist_sucia_1 := CList.mk [CList.uno, CList.cero, CList.uno]
-def clist_sucia_2 := CList.mk [CList.cero, CList.uno]
+def clist_sucia_1 := CList.mk [CList.one, CList.zero, CList.one]
+def clist_sucia_2 := CList.mk [CList.zero, CList.one]
 
 def mi_cset : CSet := Quotient.mk CList.Setoid clist_sucia_1
 def mi_repr_canonico : CList := repr mi_cset
 
-def vacio : CSet := Quotient.mk CList.Setoid CList.vacio
+def empty : CSet := Quotient.mk CList.Setoid CList.empty
 
 end CSet

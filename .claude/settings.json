@@ -1,7 +1,20 @@
 {
   "permissions": {
     "allow": [
-      "Bash(lake build:*)"
+      "Bash(lake build:*)",
+      "Bash(gh repo:*)",
+      "Bash(gh api:*)",
+      "Bash(cat e:/Dropbox/GitHub/lean4/AczelSetTheory/.github/workflows/*.yml)",
+      "Bash(chmod +x check-sorry.bash gen-root.bash new-module.bash git-lock.bash update-toolchain.bash)",
+      "Bash(bash git-lock.bash init)",
+      "Bash(bash check-sorry.bash)",
+      "Bash(bash gen-root.bash)",
+      "Bash(make status:*)",
+      "Bash(sed -i 's/\\\\beq_trans\\\\b/extEq_trans/g' e:/Dropbox/GitHub/lean4/AczelSetTheory/AczelSetTheory/CSets.lean)",
+      "Bash(sed -i 's/\\\\bsubs_trans\\\\b/subset_trans/g' e:/Dropbox/GitHub/lean4/AczelSetTheory/AczelSetTheory/CSets.lean)",
+      "Bash(sed -i 's/\\\\bmem_subs\\\\b/mem_subset/g' e:/Dropbox/GitHub/lean4/AczelSetTheory/AczelSetTheory/CSets.lean)",
+      "Bash(sed -i 's/| esIgual/| eq/g' e:/Dropbox/GitHub/lean4/AczelSetTheory/AczelSetTheory/CSets.lean)",
+      "Bash(sed -i 's/\\\\bvacio\\\\b/empty/g' e:/Dropbox/GitHub/lean4/AczelSetTheory/AczelSetTheory/CSets.lean)"
     ]
   }
 }
