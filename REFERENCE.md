@@ -1,6 +1,6 @@
 # Technical Reference — AczelSetTheory
 
-**Last updated:** 2026-04-08 00:00
+**Last updated:** 2026-04-09 00:00
 **Author**: Julián Calderón Almendros
 **Lean version**: v4.29.0
 
@@ -294,6 +294,56 @@ def empty : HFSet := Quotient.mk CList.Setoid CList.empty
 - **Math**: ∅_HF ≔ [∅]
 - Computable.
 
+#### 4.7.5 `HFSet.Mem`
+
+```lean
+def Mem (x A : HFSet) : Prop :=
+  Quotient.liftOn₂ x A (fun a b => CList.mem a b = true) ...
+```
+
+- **Math**: x ∈ A ⟺ mem(x̃, Ã) = true, where x̃, Ã are any CList representatives.
+- Well-defined by `mem_respects` (private).
+- Computable (via `Quotient.liftOn₂`).
+
+#### 4.7.6 `Membership HFSet HFSet` instance
+
+```lean
+instance : Membership HFSet HFSet where
+  mem A x := Mem x A
+```
+
+- Enables `x ∈ A` notation on HFSet.
+
+#### 4.7.7 `HFSet.mem_mk`
+
+```lean
+theorem mem_mk (x A : CList) :
+    (toHFSet x) ∈ (toHFSet A) ↔ CList.mem x A = true
+```
+
+- **Math**: [x] ∈ [A] ⟺ mem(x, A) = true
+- Reduction lemma connecting quotient membership to CList membership.
+
+#### 4.7.8 `HFSet.mkPair`
+
+```lean
+def mkPair (a b : CList) : CList := mk [a, b]
+```
+
+- **Math**: mkPair(a, b) ≔ {a, b} at CList level.
+- Computable.
+
+#### 4.7.9 `HFSet.pair`
+
+```lean
+def pair (a b : HFSet) : HFSet :=
+  Quotient.liftOn₂ a b (fun x y => toHFSet (mkPair x y)) ...
+```
+
+- **Math**: pair([a], [b]) ≔ [{a, b}]
+- Well-defined: respects extEq in both arguments.
+- Computable.
+
 ---
 
 ## 5. Axioms
@@ -388,6 +438,15 @@ None. This project builds constructively from Lean 4 without additional axioms.
 | # | Theorem | Lean signature | Terminated by |
 |---|---------|---------------|---------------|
 | 1 | `normalize_eq_of_extEq` | `{A B : CList} (h : CList.extEq A B = true) : CList.normalize A = CList.normalize B` | `CList.cSize A + CList.cSize B` |
+| 2 | `extensionality` | `(A B : HFSet) (h : ∀ x : HFSet, x ∈ A ↔ x ∈ B) : A = B` | — |
+| 3 | `not_mem_empty` | `(x : HFSet) : ¬ (x ∈ empty)` | — |
+| 4 | `mem_pair` | `(x a b : HFSet) : x ∈ pair a b ↔ x = a ∨ x = b` | — |
+
+**Derived Zermelo axioms** (proven as theorems, not postulated):
+
+- **Extensionality** (#2): ∀ A B, (∀ x, x ∈ A ↔ x ∈ B) → A = B
+- **Empty Set** (#3): ∀ x, x ∉ ∅
+- **Pairs** (#4): ∀ x a b, x ∈ {a, b} ↔ x = a ∨ x = b
 
 ---
 
@@ -419,7 +478,7 @@ None. This project builds constructively from Lean 4 without additional axioms.
 
 ### HFSets.lean
 
-`CList.Setoid`, `HFSet`, `HFSet.normalize_eq_of_extEq`, `HFSet.repr`, `HFSet.empty`
+`CList.Setoid`, `HFSet`, `HFSet.normalize_eq_of_extEq`, `HFSet.repr`, `HFSet.empty`, `HFSet.Mem`, `Membership HFSet HFSet`, `HFSet.mem_mk`, `HFSet.mkPair`, `HFSet.pair`, `HFSet.extensionality`, `HFSet.not_mem_empty`, `HFSet.mem_pair`
 
 ---
 
@@ -428,8 +487,7 @@ None. This project builds constructively from Lean 4 without additional axioms.
 | Symbol | Lean definition | Module | Notes |
 |--------|----------------|--------|-------|
 | `==` | `BEq CList` instance via `extEq` | Basic | Standard Lean `BEq` typeclass |
-
-No custom infix/prefix notations are currently defined.
+| `∈` | `Membership HFSet HFSet` instance via `Mem` | HFSets | Standard Lean `Membership` typeclass |
 
 ---
 
@@ -439,5 +497,6 @@ No custom infix/prefix notations are currently defined.
 |------|----------------|-----------|
 | 2026-04-04 | (stub created) | Julián Calderón Almendros |
 | 2026-04-08 | CList/{Basic,ExtEq,SetEquiv,Order,Sort,Normalize}.lean, CList.lean, HFSets.lean | Claude (AI assistant) |
+| 2026-04-09 | HFSets.lean (Mem, pair, Zermelo axioms) | Claude (AI assistant) |
 
 > To project a file: read it fully, then update sections 1–8 above following AI-GUIDE.md §4–14.
