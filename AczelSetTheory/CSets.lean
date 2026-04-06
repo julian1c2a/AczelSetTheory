@@ -1299,7 +1299,7 @@ Esta es la función que extrae el representante canónico (una `CList` normaliza
 de un `CSet` abstracto.
 -/
 def repr (s : CSet) : CList :=
-  Quotient.lift CList.normalize (fun A B h => normalize_eq_of_extEq h) s
+  Quotient.lift CList.normalize (fun _ _ h => normalize_eq_of_extEq h) s
 
 def empty : CSet := Quotient.mk CList.Setoid CList.empty
 
