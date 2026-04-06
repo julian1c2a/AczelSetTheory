@@ -1,54 +1,72 @@
 # Next Steps
 
-The project compiles cleanly on Lean 4.29.0. The single remaining `sorry` is
-in `CSet.normalizar_eq_of_eq`. Closing it requires a chain of supporting
-lemmas, ordered by dependency below.
+**Last updated:** 2026-04-06 00:00
 
-## The open goal
+The project compiles cleanly on Lean 4.29.0 with **0 sorry** across all 8 modules.
+The first three Zermelo axioms (Extensionality, Empty Set, Pairs) are derived as
+theorems over the `HFSet` quotient type.
 
-```lean
-theorem normalizar_eq_of_eq {A B : CList} (h : esIgual A B = true) :
-    normalizar A = normalizar B
+---
+
+## Completed milestones
+
+- ✅ CList foundations: 6 sub-modules (Basic, ExtEq, SetEquiv, Order, Sort, Normalize)
+- ✅ `normalize_eq_of_extEq` proven — last sorry eliminated
+- ✅ HFSet quotient type with `repr` and `empty`
+- ✅ `HFSet.Mem` and `Membership` instance (∈ notation)
+- ✅ Extensionality: ∀ A B, (∀ x, x ∈ A ↔ x ∈ B) → A = B
+- ✅ Empty Set: ∀ x, x ∉ ∅
+- ✅ Pairs: x ∈ {a, b} ↔ x = a ∨ x = b
+
+---
+
+## Next: Remaining Zermelo axioms (without infinity/choice)
+
+### Union axiom
+
+```
+∀ A, ∃ U, ∀ x, x ∈ U ↔ ∃ B ∈ A, x ∈ B
 ```
 
-Key insight: if normalizar is idempotent, then esIgual na nb = true
-implies na = nb (propositional equality) for normalized na, nb. With
-that, both sides become permutations of the same finite set; with Sorted +
-Nodup, they are equal lists.
+- Requires CList-level `flatten` operation: `mk [mk xs₁, mk xs₂, ...] → mk (xs₁ ++ xs₂ ++ ...)`
+- Must prove flatten respects extEq for Quotient lifting
+- Define `HFSet.sUnion` via `Quotient.liftOn`
 
-Step 1 — normalizar_idem (highest priority)
-theorem normalizar_idem (A : CList) : normalizar (normalizar A) = normalizar A
+### Separation (Comprehension) axiom
 
-Needs: Steps 2a, 2b, 2c, and normalizar_cSize_le (already proved ✅).
+```
+∀ A φ, ∃ B, ∀ x, x ∈ B ↔ x ∈ A ∧ φ(x)
+```
 
-Step 2 — Lemmas about ordenarLista / reducirDuplicados
-2a ordenarLista_nodup — insertarOrdenado never inserts duplicates
-2b reducirDuplicados_id_of_nodup — identity on duplicate-free lists
-2c ordenarLista_id_of_sorted_nodup — identity on sorted+nodup lists (needs Step 3)
-Step 3 — Order properties of esMenor
-3a esMenor_irrefl — straightforward
-3b esMenor_total — hardest; requires induction on the recursive structure of esMenor
-3c ordenarLista_sorted — needs esMenor_total
-Step 4 — Close the sorry
-With Steps 1–3: prove sorted_nodup_setequiv_eq (two sorted nodup lists that
-are SetEquiv with propositionally equal elements must be equal), then apply
-it inside normalizar_eq_of_eq.
+- Requires CList-level `filter` operation
+- Predicate φ must respect extEq (decidable predicate on HFSet)
+- Define `HFSet.sep` via `Quotient.liftOn`
 
-Dependency graph
-esMenor_total (3b) ──────────────────────────────┐
-                                                  │
-ordenarLista_sorted (3c) ◄────────────────────────┤
-ordenarLista_nodup (2a)                           │
-                                                  │
-ordenarLista_id_of_sorted_nodup (2c) ◄────────────┘
-reducirDuplicados_id_of_nodup (2b)
+### Power Set axiom
 
-normalizar_idem (1) ◄── 2a, 2b, 2c
-                     ◄── normalizar_cSize_le  ✅
+```
+∀ A, ∃ P, ∀ B, B ∈ P ↔ B ⊆ A
+```
 
-normalizar_eq_of_eq sorry ◄── normalizar_idem (1) + esMenor_total (3b)
+- Requires CList-level `sublists` / `powerset` operation
+- Most complex: generates all subsets of a CList
+- Must prove result respects extEq
 
-Optional future work
-esMenor_trans — needed for the "minimum element" argument
-Union, intersection, powerset
-Natural numbers as sets (Peano axioms)
+### Foundation (Regularity) axiom
+
+```
+∀ A ≠ ∅, ∃ x ∈ A, x ∩ A = ∅
+```
+
+- Proof strategy: well-founded induction on `cSize`
+- An element with minimal `cSize` in A serves as the ∈-minimal element
+
+---
+
+## Future directions
+
+- Singleton notation `{a}` as sugar for `pair a a`
+- Ordered pair `⟨a, b⟩` as `{{a}, {a, b}}`
+- Natural numbers as von Neumann ordinals
+- Ordinal arithmetic
+- Decidability results for HFSet predicates

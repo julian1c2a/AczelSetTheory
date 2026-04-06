@@ -1,6 +1,6 @@
 # Current Project Status — AczelSetTheory
 
-**Last updated:** 2026-04-04 00:00
+**Last updated:** 2026-04-06 00:00
 **Author**: Julián Calderón Almendros
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | 1 |
-| Modules with 0 sorry | 0 / 1 |
-| Total sorry | 1 (in `normalizar_eq_of_eq`) |
-| Build status | ✅ Passing |
+| Total modules | 8 (+2 root/entry) |
+| Modules with 0 sorry | 8 / 8 |
+| Total sorry | 0 |
+| Build status | ✅ Passing (11 jobs) |
 | Lean version | v4.29.0 |
 | Naming convention | Mathlib-style (see NAMING-CONVENTIONS.md) |
 
@@ -22,7 +22,14 @@
 
 | Module | Sorry | Status |
 |--------|-------|--------|
-| `AczelSetTheory/CSets.lean` | 1 | 🔄 In progress |
+| `AczelSetTheory/CList/Basic.lean` | 0 | ✅ Complete |
+| `AczelSetTheory/CList/ExtEq.lean` | 0 | ✅ Complete |
+| `AczelSetTheory/CList/SetEquiv.lean` | 0 | ✅ Complete |
+| `AczelSetTheory/CList/Order.lean` | 0 | ✅ Complete |
+| `AczelSetTheory/CList/Sort.lean` | 0 | ✅ Complete |
+| `AczelSetTheory/CList/Normalize.lean` | 0 | ✅ Complete |
+| `AczelSetTheory/CList.lean` | 0 | ✅ Complete |
+| `AczelSetTheory/HFSets.lean` | 0 | ✅ Complete |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
@@ -30,27 +37,29 @@
 
 ## Known Sorry Locations
 
-| File | Function/Theorem | Note |
-|------|-----------------|------|
-| `AczelSetTheory/CSets.lean` | `normalizar_eq_of_eq` | Pending proof |
+None. All theorems are fully proven.
 
 ---
 
 ## Recent Achievements
 
+- Derived Zermelo axioms as theorems over HFSet (2026-04-06):
+  - Extensionality: ∀ A B, (∀ x, x ∈ A ↔ x ∈ B) → A = B
+  - Empty Set: ∀ x, x ∉ ∅
+  - Pairs: x ∈ {a, b} ↔ x = a ∨ x = b
+- Defined membership on HFSet (Quotient.liftOn₂ + respects proof)
+- Refactored CSets.lean into 6 CList sub-modules + CList.lean + HFSets.lean (2026-04-05)
+- Proved `normalize_eq_of_extEq` — eliminated last sorry (2026-04-05)
 - Migrated project to Lean 4.29.0 (2026-04-02)
-- Added theorems for uniqueness and membership in `ordenarLista`
-- Improved `esMenor_total` comparison logic
-- Added theorems about comparison properties in CList
-- Optimized mutual termination logic in `cSize` and `cSizeList`
 
 ---
 
 ## Pending Work
 
-- [ ] Prove `normalizar_eq_of_eq` (remove last sorry)
-- [ ] Project `CSets.lean` into `REFERENCE.md`
-- [ ] Design next module structure (ordinals, axioms, etc.)
+- [ ] Derive remaining Zermelo axioms: Union, Power Set, Separation, Foundation
+- [ ] Define singleton, unordered pair notation
+- [ ] Natural numbers as hereditarily finite sets
+- [ ] Explore ordinal arithmetic
 
 ---
 
@@ -58,7 +67,17 @@
 
 ```
 AczelSetTheory/
-└── CSets.lean      # Level 0: canonical set representation (CList/CSet)
+  CList/
+    Basic.lean       — Core type, size, comparison, order, dedup, sort, normalize
+    ExtEq.lean       — Extensional equality properties
+    SetEquiv.lean    — Nodup, SetEquiv, dedup properties
+    Order.lean       — lt: total strict order
+    Sort.lean        — Sorted, insertionSort properties
+    Normalize.lean   — Idempotency, uniqueness of normal form
+  CList.lean         — Root import aggregating all CList sub-modules
+  HFSets.lean        — HFSet quotient type, membership, Zermelo axioms
+AczelSetTheory.lean  — Project root import
+Main.lean            — Executable entry point
 ```
 
 ---
@@ -67,16 +86,17 @@ AczelSetTheory/
 
 | Phase | Description | Status |
 |-------|-------------|--------|
-| Phase 1: CList foundations | `CSets.lean` — canonical lists, sorting, normalization | 🔄 In progress |
-| Phase 2: Set axioms | Extensionality, pairing, union, powerset | ❌ Pending |
-| Phase 3: Naming migration | Adopt Mathlib naming conventions fully | ❌ Pending |
-| Phase 4: REFERENCE.md | Project CSets.lean fully into REFERENCE.md | ❌ Pending |
+| Phase 1: CList foundations | 6 sub-modules — canonical lists, sorting, normalization | ✅ Complete |
+| Phase 2: HFSet quotient | Quotient type, repr, canonical representatives | ✅ Complete |
+| Phase 3: Zermelo axioms (basic) | Extensionality, Empty Set, Pairs | ✅ Complete |
+| Phase 4: Zermelo axioms (advanced) | Union, Power Set, Separation, Foundation | 🔄 Next |
+| Phase 5: Natural numbers | Von Neumann ordinals as HFSets | ❌ Pending |
 
-> See [NEXT_STEPS.md](NEXT_STEPS.md) for detailed phase planning.
+> See [NEXT_STEPS.md](NEXT_STEPS.md) for detailed planning.
 
 ---
 
 **Author**: Julián Calderón Almendros
-*Last updated: 2026-04-04 00:00*
+*Last updated: 2026-04-06 00:00*
 
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)

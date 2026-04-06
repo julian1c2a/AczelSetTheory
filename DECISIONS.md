@@ -1,6 +1,6 @@
 # Design Decisions — AczelSetTheory
 
-**Last updated:** 2026-04-04 00:00
+**Last updated:** 2026-04-06 00:00
 **Author**: Julián Calderón Almendros
 
 Architectural Decision Records (ADR) for this project.
@@ -96,6 +96,32 @@ Each entry records *what* was decided and *why*, for future reference.
 **Rationale**: Signals axiomatic (unproven) status at a glance. Consistent with the convention in sibling projects (MK_, ZF_, etc.).
 
 **Consequences**: Axioms are immediately distinguishable from theorems. See AI-GUIDE.md NC-5.
+
+---
+
+## ADR-008: Module split — CList sub-modules
+
+**Date**: 2026-04-05
+**Status**: Accepted
+
+**Decision**: Split the monolithic `CSets.lean` into 6 focused sub-modules under `CList/` (Basic, ExtEq, SetEquiv, Order, Sort, Normalize), aggregated by `CList.lean`.
+
+**Rationale**: The single file exceeded 2000 lines. Dependencies between theorem groups (ordering, sorting, normalization) are naturally hierarchical. Smaller files are easier to lock, freeze, and review.
+
+**Consequences**: Build parallelism improved. Each module can be frozen independently. Naming migrated from Spanish (`esIgual`, `normalizar`) to Mathlib-style English (`extEq`, `normalize`).
+
+---
+
+## ADR-009: Zermelo axioms as derived theorems
+
+**Date**: 2026-04-06
+**Status**: Accepted
+
+**Decision**: The Zermelo axioms (Extensionality, Empty Set, Pairs, etc.) are derived as theorems over the `HFSet` quotient type, not postulated as Lean `axiom`s.
+
+**Rationale**: The CList+normalize infrastructure provides enough structure to prove these properties constructively. Derived axioms strengthen trust in the formalization and confirm the model is correct.
+
+**Consequences**: Each "axiom" requires a proof. ADR-007 (`AST_` prefix for axioms) does not apply to these — they are ordinary theorems with Mathlib-style names (`extensionality`, `not_mem_empty`, `mem_pair`).
 
 ---
 
