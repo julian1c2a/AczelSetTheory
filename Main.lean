@@ -1,4 +1,4 @@
-import AczelSetTheory.CSets
+import AczelSetTheory.CList.Basic
 
 def main : IO Unit := do
   IO.println "Probando la canonización de un CList 'sucio'."
