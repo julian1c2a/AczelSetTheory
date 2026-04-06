@@ -81,17 +81,14 @@ ordenar las listas de forma única.
 Nota: Usamos el tamaño estructural directo para garantizar la terminación.
 -/
 def lt (A B : CList) : Bool :=
-  if cSize A < cSize B then true
-  else if cSize A > cSize B then false
-  else match A, B with
-    | mk [], mk [] => false
-    | mk [], mk (_::_) => true
-    | mk (_::_), mk [] => false
-    | mk (x::xs), mk (y::ys) =>
-        if extEq x y then
-          lt (mk xs) (mk ys)
-        else
-          lt x y
+  match A, B with
+  | mk [], mk [] => false
+  | mk [], mk (_::_) => true
+  | mk (_::_), mk [] => false
+  | mk (x::xs), mk (y::ys) =>
+      if lt x y then true
+      else if lt y x then false
+      else lt (mk xs) (mk ys)
 termination_by cSize A + cSize B
 decreasing_by
   all_goals simp_wf
@@ -567,10 +564,14 @@ theorem lt_irrefl (A : CList) : lt A A = false :=
   | mk [] => by unfold lt; simp
   | mk (x :: xs) => by
       unfold lt
-      simp only [Nat.lt_irrefl, ite_false, gt_iff_lt, extEq_refl, ite_true]
+      have hx := lt_irrefl x
+      rw [if_neg (by simp [hx]), if_neg (by simp [hx])]
       exact lt_irrefl (mk xs)
 termination_by cSize A
-decreasing_by simp_wf; simp [cSize, cSizeList]; omega
+decreasing_by
+  all_goals simp_wf
+  all_goals simp [cSize, cSizeList]
+  all_goals omega
 
 theorem extEq_comm (A B : CList) : extEq A B = extEq B A := by
   simp [extEq_def, Bool.and_comm]
@@ -590,61 +591,146 @@ private theorem extEq_cons_equiv (x y : CList) (xs ys : List CList)
       exact Or.inl (extEq_trans z y x h hyx)
     · exact Or.inr ((hxsys z).mpr h)
 
+-- lt_antisymm: the new lt is antisymmetric (¬lt A B ∧ ¬lt B A → A = B)
+theorem lt_antisymm (A B : CList) (h1 : lt A B = false) (h2 : lt B A = false) : A = B := by
+  match A, B with
+  | mk [], mk [] => rfl
+  | mk [], mk (_ :: _) => simp [lt] at h1
+  | mk (_ :: _), mk [] => simp [lt] at h2
+  | mk (x :: xs), mk (y :: ys) =>
+    unfold lt at h1 h2
+    by_cases hxy : lt x y = true
+    · rw [if_pos hxy] at h1; simp at h1
+    · rw [if_neg hxy] at h1
+      by_cases hyx : lt y x = true
+      · rw [if_pos hyx] at h2; simp at h2
+      · rw [if_neg hyx] at h1
+        rw [if_neg hyx] at h2
+        by_cases hxy' : lt x y = true
+        · exact absurd hxy' hxy
+        · rw [if_neg hxy'] at h2
+          have heq_heads := lt_antisymm x y (Bool.eq_false_iff.mpr hxy) (Bool.eq_false_iff.mpr hyx)
+          have heq_tails := lt_antisymm (mk xs) (mk ys) h1 h2
+          subst heq_heads
+          exact congrArg (mk ∘ (x :: ·)) (mk.inj heq_tails)
+termination_by cSize A + cSize B
+decreasing_by
+  all_goals simp_wf
+  all_goals simp [cSize, cSizeList]
+  all_goals omega
+
+-- lt_asymm: lt A B = true → lt B A = false
+theorem lt_asymm (A B : CList) (h : lt A B = true) : lt B A = false := by
+  match A, B with
+  | mk [], mk [] => simp [lt] at h
+  | mk [], mk (_ :: _) =>
+    unfold lt; simp
+  | mk (_ :: _), mk [] =>
+    simp [lt] at h
+  | mk (x :: xs), mk (y :: ys) =>
+    unfold lt at h ⊢
+    by_cases hxy : lt x y = true
+    · rw [if_pos hxy] at h
+      have hyx := lt_asymm x y hxy
+      rw [if_neg (Bool.eq_false_iff.mp hyx)]
+      rw [if_pos hxy]
+    · rw [if_neg hxy] at h
+      by_cases hyx : lt y x = true
+      · rw [if_pos hyx] at h; simp at h
+      · rw [if_neg hyx] at h
+        -- lt x y = false, lt y x = false, so x = y by antisymmetry
+        have heq := lt_antisymm x y (Bool.eq_false_iff.mpr hxy) (Bool.eq_false_iff.mpr hyx)
+        subst heq
+        rw [if_neg hxy, if_neg hxy]
+        exact lt_asymm (mk xs) (mk ys) h
+termination_by cSize A + cSize B
+decreasing_by
+  all_goals simp_wf
+  all_goals simp [cSize, cSizeList]
+  all_goals omega
+
 theorem lt_total (A B : CList) :
+    A ≠ B → lt A B = true ∨ lt B A = true := by
+  intro h_neq
+  match A, B with
+  | mk [], mk [] => exact absurd rfl h_neq
+  | mk [], mk (_ :: _) => left; unfold lt; simp
+  | mk (_ :: _), mk [] => right; unfold lt; simp
+  | mk (x :: xs), mk (y :: ys) =>
+    by_cases hxy : lt x y = true
+    · left; unfold lt; rw [if_pos hxy]
+    · by_cases hyx : lt y x = true
+      · right; unfold lt; rw [if_pos hyx]
+      · -- x = y by antisymmetry
+        have heq := lt_antisymm x y (Bool.eq_false_iff.mpr hxy) (Bool.eq_false_iff.mpr hyx)
+        subst heq
+        -- Need mk xs ≠ mk ys
+        have h_tails : mk xs ≠ mk ys := by
+          intro h
+          have : x :: xs = x :: ys := List.cons_eq_cons.mpr ⟨rfl, mk.inj h⟩
+          exact h_neq (congrArg mk this)
+        rcases lt_total (mk xs) (mk ys) h_tails with h | h
+        · left; unfold lt; simp only [if_neg hxy]; exact h
+        · right; unfold lt; simp only [if_neg hxy]; exact h
+termination_by cSize A + cSize B
+decreasing_by
+  all_goals simp_wf
+  all_goals simp [cSize, cSizeList]
+  all_goals omega
+
+-- Compatibility with old lt_total form for orderedInsert proofs
+theorem lt_total_extEq (A B : CList) :
     extEq A B = false → lt A B = true ∨ lt B A = true := by
   intro h_neq
-  by_cases hlt : cSize A < cSize B
-  · left
-    unfold lt
-    simp [hlt]
-  · by_cases hgt : cSize B < cSize A
-    · right
-      unfold lt
-      simp [hgt]
-    · have hsize : cSize A = cSize B :=
-          Nat.le_antisymm (Nat.le_of_not_lt hgt) (Nat.le_of_not_lt hlt)
-      match A, B with
-      | mk [], mk [] => simp [extEq_refl] at h_neq
-      | mk [], mk (_ :: _) => simp [cSize, cSizeList] at hsize
-      | mk (_ :: _), mk [] => simp [cSize, cSizeList] at hsize
-      | mk (x :: xs), mk (y :: ys) =>
-          by_cases hxy : extEq x y = true
-          · have h_tail : extEq (mk xs) (mk ys) = false := by
-              rcases Bool.eq_false_or_eq_true (extEq (mk xs) (mk ys)) with h | h
-              · have hcontra := extEq_cons_equiv x y xs ys hxy h
-                rw [hcontra] at h_neq
-                exact absurd h_neq (by decide)
-              · exact h
-            have hyx : extEq y x = true := by rwa [extEq_comm] at hxy
-            rcases lt_total (mk xs) (mk ys) h_tail with h | h
-            · left
-              unfold lt
-              rw [if_neg (show ¬ cSize (mk (x::xs)) < cSize (mk (y::ys)) from by omega)]
-              rw [if_neg (show ¬ cSize (mk (x::xs)) > cSize (mk (y::ys)) from by omega)]
-              show (if extEq x y = true then lt (mk xs) (mk ys) else lt x y) = true
-              rw [if_pos hxy]; exact h
-            · right
-              unfold lt
-              rw [if_neg (show ¬ cSize (mk (y::ys)) < cSize (mk (x::xs)) from by omega)]
-              rw [if_neg (show ¬ cSize (mk (y::ys)) > cSize (mk (x::xs)) from by omega)]
-              show (if extEq y x = true then lt (mk ys) (mk xs) else lt y x) = true
-              rw [if_pos hyx]; exact h
-          · rw [Bool.not_eq_true] at hxy
-            have hyx : extEq y x = false := by rwa [extEq_comm] at hxy
-            rcases lt_total x y hxy with h | h
-            · left
-              unfold lt
-              rw [if_neg (show ¬ cSize (mk (x::xs)) < cSize (mk (y::ys)) from by omega)]
-              rw [if_neg (show ¬ cSize (mk (x::xs)) > cSize (mk (y::ys)) from by omega)]
-              show (if extEq x y = true then lt (mk xs) (mk ys) else lt x y) = true
-              rw [if_neg (show ¬ extEq x y = true from by simp [hxy])]; exact h
-            · right
-              unfold lt
-              rw [if_neg (show ¬ cSize (mk (y::ys)) < cSize (mk (x::xs)) from by omega)]
-              rw [if_neg (show ¬ cSize (mk (y::ys)) > cSize (mk (x::xs)) from by omega)]
-              show (if extEq y x = true then lt (mk ys) (mk xs) else lt y x) = true
-              rw [if_neg (show ¬ extEq y x = true from by simp [hyx])]; exact h
-termination_by cSize A + cSize B
+  apply lt_total
+  intro heq; subst heq; simp [extEq_refl] at h_neq
+
+-- lt_trans: the new lt is transitive
+theorem lt_trans (A B C : CList) (h1 : lt A B = true) (h2 : lt B C = true) : lt A C = true := by
+  match A, B, C with
+  | mk [], mk [], _ => simp [lt] at h1
+  | mk [], mk (_ :: _), mk [] => simp [lt] at h2
+  | mk [], mk (_ :: _), mk (_ :: _) => unfold lt; simp
+  | mk (_ :: _), mk [], _ => simp [lt] at h1
+  | mk (_ :: _), mk (_ :: _), mk [] => simp [lt] at h2
+  | mk (a :: as), mk (b :: bs), mk (c :: cs) =>
+    unfold lt at h1 h2 ⊢
+    by_cases hab : lt a b = true
+    · rw [if_pos hab] at h1
+      by_cases hbc : lt b c = true
+      · rw [if_pos hbc] at h2
+        rw [if_pos (lt_trans a b c hab hbc)]
+      · rw [if_neg hbc] at h2
+        by_cases hcb : lt c b = true
+        · rw [if_pos hcb] at h2; simp at h2
+        · rw [if_neg hcb] at h2
+          -- b = c by antisymmetry
+          have hbc_eq := lt_antisymm b c (Bool.eq_false_iff.mpr hbc) (Bool.eq_false_iff.mpr hcb)
+          subst hbc_eq
+          rw [if_pos hab]
+    · rw [if_neg hab] at h1
+      by_cases hba : lt b a = true
+      · rw [if_pos hba] at h1; simp at h1
+      · rw [if_neg hba] at h1
+        -- a = b by antisymmetry
+        have hab_eq := lt_antisymm a b (Bool.eq_false_iff.mpr hab) (Bool.eq_false_iff.mpr hba)
+        subst hab_eq
+        -- h1 : lt (mk as) (mk bs) = true, h2 involves b and c
+        by_cases hbc : lt a c = true
+        · rw [if_pos hbc]
+        · rw [if_neg hbc]
+          by_cases hca : lt c a = true
+          · -- lt c a and lt a c is false: check h2
+            -- h2: if lt a c then true else if lt c a then false else lt(mk bs)(mk cs)
+            rw [if_neg hbc] at h2
+            rw [if_pos hca] at h2; simp at h2
+          · rw [if_neg hca]
+            -- a = c by antisymmetry... no, that's wrong. a = b, and we need lt(mk as)(mk cs)
+            -- h2: if lt a c then ... else if lt c a then ... else lt(mk bs)(mk cs)
+            rw [if_neg hbc] at h2; rw [if_neg hca] at h2
+            -- h1: lt (mk as) (mk bs), h2: lt (mk bs) (mk cs)
+            exact lt_trans (mk as) (mk bs) (mk cs) h1 h2
+termination_by cSize A + cSize B + cSize C
 decreasing_by
   all_goals simp_wf
   all_goals simp [cSize, cSizeList]
@@ -675,7 +761,7 @@ private theorem orderedInsert_sorted (x : CList) (l : List CList)
       · rw [if_pos heq]; exact hs
       · rw [if_neg heq]
         have hyx : lt y x = true := by
-          rcases lt_total x y (by simp [heq]) with h | h
+          rcases lt_total_extEq x y (by simp [heq]) with h | h
           · exact absurd h (by simp [hxy])
           · exact h
         match ys with
@@ -912,17 +998,21 @@ end
 -- PIEZA 8: sorted_nodup_setEquiv_eq
 -- ==================================================================
 
--- Lema auxiliar: si l₂ está ordenada y x ∈ l₂ propositional-mente con lt x (head l₂),
--- entonces x es el primer elemento.
-private theorem sorted_head_le (x y : CList) (ys : List CList)
-    (hlt : lt x y = false) (heq : extEq x y = false)
-    (hs : Sorted (y :: ys)) : False := by
-  -- lt x y = false ∧ extEq x y = false implica lt y x = true (por lt_total)
-  rcases lt_total x y heq with h | h
-  · exact absurd h (by simp [hlt])
-  · -- lt y x = true; pero necesitamos saber que x ∈ y :: ys también tiene lt y x
-    -- Esto es una contradicción con que x sea un elemento de la lista
-    exact absurd h h  -- no funciona; el argumento es más sutil
+/-- Si `a :: l` está ordenada, `l` también lo está. -/
+private theorem Sorted.tail {a : CList} {l : List CList} (h : Sorted (a :: l)) : Sorted l := by
+  match l with
+  | [] => exact trivial
+  | _ :: _ => exact h.2
+
+/-- If a list is sorted and b is a member, then lt a b = true -/
+private theorem sorted_mem_lt {a : CList} {l : List CList} (hs : Sorted (a :: l))
+    (hm : b ∈ l) : lt a b = true := by
+  match l with
+  | [] => simp at hm
+  | c :: rest =>
+    rcases List.mem_cons.mp hm with rfl | hrest
+    · exact hs.1
+    · exact lt_trans a c b hs.1 (sorted_mem_lt hs.2 hrest)
 
 -- Unicidad: dos listas Sorted+Nodup+SetEquiv son iguales, dado que extEq implica eq en su contexto
 theorem sorted_nodup_setEquiv_eq :
@@ -961,21 +1051,26 @@ theorem sorted_nodup_setEquiv_eq :
           rcases hy_in_l1 with h_yx | h_yx
           · rwa [extEq_comm]
           · -- y ∈ xs y x ∈ ys: x < y (Sorted l₂) y y < x (Sorted l₁)
-            -- Contradicción con lt_irrefl
-            have hx_in_ys : extEq x y = false ∨ (List.any ys (fun z => extEq x z)) = true := by
-              simp only [Bool.or_eq_true] at hx_in; exact Or.inr h
-            -- y ∈ xs implica lt x y (sorted l₁)
-            have hltxy : lt x y = true := by
-              have := (List.pairwise_cons.mp hn1).1
-              -- y ∈ xs → extEq x y = false (nodup)
-              sorry
-            -- x ∈ ys implica lt y x (sorted l₂)
-            have hltyx : lt y x = true := by sorry
-            exact absurd (lt_irrefl x) (by
-              rw [Bool.eq_false_iff]
-              intro h'
-              sorry)
-      have hxy_eq : x = y := hprop x (List.mem_cons_self x xs) y (List.mem_cons.mpr (Or.inl rfl)) hxy_extEq
+            -- Contradicción con lt_asymm
+            -- First, derive y ∈ xs (literally) from h_yx and hprop
+            have ⟨w, hw_mem, hw_eq⟩ := List.any_eq_true.mp h_yx
+            have hw_eq_y : w = y := by
+              have : extEq y w = true := hw_eq
+              have hcomm : extEq w y = true := by rwa [extEq_comm]
+              exact hprop w (List.mem_cons_of_mem x hw_mem) y
+                (List.mem_cons.mpr (Or.inl rfl)) hcomm
+            have hy_in_xs : y ∈ xs := hw_eq_y ▸ hw_mem
+            -- Derive x ∈ ys (literally) from h and hprop
+            have ⟨v, hv_mem, hv_eq⟩ := List.any_eq_true.mp h
+            have hv_eq_x : x = v :=
+              hprop x (List.mem_cons.mpr (Or.inl rfl)) v
+                (List.mem_cons_of_mem y hv_mem) hv_eq
+            have hx_in_ys : x ∈ ys := hv_eq_x ▸ hv_mem
+            -- Now use sorted_mem_lt
+            have hltxy : lt x y = true := sorted_mem_lt hs1 hy_in_xs
+            have hltyx : lt y x = true := sorted_mem_lt hs2 hx_in_ys
+            exact absurd hltyx (by rw [lt_asymm x y hltxy]; simp)
+      have hxy_eq : x = y := hprop x List.mem_cons_self y (List.mem_cons.mpr (Or.inl rfl)) hxy_extEq
       -- Paso 2: las colas son SetEquiv
       have htail_equiv : SetEquiv xs ys := by
         intro z
@@ -986,24 +1081,30 @@ theorem sorted_nodup_setEquiv_eq :
           have := hfull.mp (by simp [hz_xs])
           simp only [Bool.or_eq_true] at this
           rcases this with h | h
-          · -- extEq z x = true, so extEq z y = true, but z ∈ xs y Nodup (x :: xs)
+          · -- extEq z y = true, pero z ∈ xs y Nodup (x :: xs) → contradicción
             exfalso
-            have : extEq z x = false := (List.pairwise_cons.mp hn1).1 z
-              (List.any_eq_true.mp hz_xs |>.choose_spec.1)
-            simp [this] at h
+            obtain ⟨w, hw_mem, hw_eq⟩ := List.any_eq_true.mp hz_xs
+            have hyz : extEq y z = true := by rwa [extEq_comm]
+            have hxz : extEq x z = true := by rw [hxy_eq]; exact hyz
+            have hxw : extEq x w = true := extEq_trans x z w hxz hw_eq
+            have hxw_f := (List.pairwise_cons.mp hn1).1 w hw_mem
+            simp [hxw] at hxw_f
           · exact h
         · intro hz_ys
           have := hfull.mpr (by simp [hz_ys])
           simp only [Bool.or_eq_true] at this
           rcases this with h | h
           · exfalso
-            have : extEq z y = false := (List.pairwise_cons.mp hn2).1 z
-              (List.any_eq_true.mp hz_ys |>.choose_spec.1)
-            simp [this, hxy_eq] at h
+            obtain ⟨w, hw_mem, hw_eq⟩ := List.any_eq_true.mp hz_ys
+            have hzy : extEq z y = true := by rw [← hxy_eq]; exact h
+            have hyz : extEq y z = true := by rwa [extEq_comm]
+            have hyw : extEq y w = true := extEq_trans y z w hyz hw_eq
+            have hyw_f := (List.pairwise_cons.mp hn2).1 w hw_mem
+            simp [hyw] at hyw_f
           · exact h
       -- Paso 3: aplicar IH
-      have hs1' : Sorted xs := (List.pairwise_cons.mp hs1).2
-      have hs2' : Sorted ys := (List.pairwise_cons.mp hs2).2
+      have hs1' : Sorted xs := hs1.tail
+      have hs2' : Sorted ys := hs2.tail
       have hn1' : Nodup xs  := (List.pairwise_cons.mp hn1).2
       have hn2' : Nodup ys  := (List.pairwise_cons.mp hn2).2
       have hprop' : ∀ a ∈ xs, ∀ b ∈ ys, extEq a b = true → a = b :=
@@ -1044,12 +1145,6 @@ de un `CSet` abstracto.
 -/
 def repr (s : CSet) : CList :=
   Quotient.lift CList.normalize (fun A B h => normalize_eq_of_extEq h) s
-
-def clist_sucia_1 := CList.mk [CList.one, CList.zero, CList.one]
-def clist_sucia_2 := CList.mk [CList.zero, CList.one]
-
-def mi_cset : CSet := Quotient.mk CList.Setoid clist_sucia_1
-def mi_repr_canonico : CList := repr mi_cset
 
 def empty : CSet := Quotient.mk CList.Setoid CList.empty
 
