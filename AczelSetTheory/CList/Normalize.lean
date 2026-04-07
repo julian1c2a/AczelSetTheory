@@ -312,4 +312,132 @@ theorem sorted_nodup_setEquiv_eq :
         fun a ha b hb hab => hprop a (List.mem_cons_of_mem x ha) b (List.mem_cons_of_mem y hb) hab
       rw [hxy_eq, sorted_nodup_setEquiv_eq xs ys hs1' hs2' hn1' hn2' htail_equiv hprop']
 
+theorem extEq_normalize (A : CList) : extEq A (normalize A) = true := by
+  match A with
+  | mk xs =>
+    simp only [normalize]
+    rw [extEq_mk_iff_setEquiv]
+    have ih_all : ∀ w ∈ xs, extEq w (normalize w) = true := fun w hw =>
+      have : cSize w < cSize (mk xs) := cSize_lt_of_mem hw
+      extEq_normalize w
+    apply SetEquiv.trans (l₂ := xs.map normalize)
+    · intro z
+      constructor
+      · intro hz
+        obtain ⟨w, hw_mem, hw_eq⟩ := List.any_eq_true.mp hz
+        apply List.any_eq_true.mpr
+        have hw_ih : extEq w (normalize w) = true := ih_all w hw_mem
+        exact ⟨normalize w, List.mem_map.mpr ⟨w, hw_mem, rfl⟩, extEq_trans z w (normalize w) hw_eq hw_ih⟩
+      · intro hz
+        obtain ⟨w_norm, hw_norm_mem, hw_norm_eq⟩ := List.any_eq_true.mp hz
+        obtain ⟨w, hw_mem, rfl⟩ := List.mem_map.mp hw_norm_mem
+        apply List.any_eq_true.mpr
+        have hw_ih : extEq (normalize w) w = true := by rw [extEq_comm]; exact ih_all w hw_mem
+        exact ⟨w, hw_mem, extEq_trans z (normalize w) w hw_norm_eq hw_ih⟩
+    · apply SetEquiv.trans (l₂ := dedup (xs.map normalize))
+      · exact SetEquiv.symm (dedup_setEquiv_self _)
+      · exact SetEquiv.symm (insertionSort_setEquiv _)
+termination_by cSize A
+decreasing_by
+  all_goals simp_wf
+  all_goals exact cSize_lt_of_mem hw
+
+/-!
+Dadas dos CList A y B que son extensionalmente iguales,
+sus formas normales son idénticas.
+-/
+theorem normalize_eq_of_extEq {A B : CList} (h : CList.extEq A B = true) :
+    CList.normalize A = CList.normalize B := by
+  -- Inducción bien fundada en cSize A + cSize B
+  match A, B with
+  | CList.mk xs, CList.mk ys =>
+    -- IH: para todo par (a, b) con cSize a + cSize b < cSize (mk xs) + cSize (mk ys),
+    --     extEq a b = true → normalize a = normalize b
+    simp only [CList.normalize]
+    congr 1
+    -- Goal: insertionSort (dedup (xs.map normalize)) = insertionSort (dedup (ys.map normalize))
+    -- Usamos sorted_nodup_setEquiv_eq
+    apply sorted_nodup_setEquiv_eq
+    -- (1) Sorted
+    · exact insertionSort_sorted _
+    · exact insertionSort_sorted _
+    -- (2) Nodup
+    · exact insertionSort_nodup _ (dedup_nodup _)
+    · exact insertionSort_nodup _ (dedup_nodup _)
+    -- (3) SetEquiv
+    · -- SetEquiv (insertionSort (dedup (xs.map normalize))) (insertionSort (dedup (ys.map normalize)))
+      -- Cadena: insSort(dedup nxs) ≡ dedup nxs ≡ nxs ≡ nys ≡ dedup nys ≡ insSort(dedup nys)
+      have h_nxs_nys : SetEquiv (xs.map normalize) (ys.map normalize) := by
+        rw [extEq_mk_iff_setEquiv] at h
+        intro z
+        constructor
+        · intro hz
+          rw [List.any_eq_true] at hz ⊢
+          obtain ⟨w, hw_mem, hw_eq⟩ := hz
+          rw [List.mem_map] at hw_mem
+          obtain ⟨xi, hxi_mem, rfl⟩ := hw_mem
+          have hxi_in_ys := (h xi).mp (List.any_eq_true.mpr ⟨xi, hxi_mem, extEq_refl xi⟩)
+          rw [List.any_eq_true] at hxi_in_ys
+          obtain ⟨yj, hyj_mem, hyj_eq⟩ := hxi_in_ys
+          have _hxi_lt := cSize_lt_of_mem hxi_mem
+          have _hyj_lt := cSize_lt_of_mem hyj_mem
+          have hIH : normalize xi = normalize yj := normalize_eq_of_extEq hyj_eq
+          exact ⟨normalize yj, List.mem_map.mpr ⟨yj, hyj_mem, rfl⟩, hIH ▸ hw_eq⟩
+        · intro hz
+          rw [List.any_eq_true] at hz ⊢
+          obtain ⟨w, hw_mem, hw_eq⟩ := hz
+          rw [List.mem_map] at hw_mem
+          obtain ⟨yj, hyj_mem, rfl⟩ := hw_mem
+          have hyj_in_xs := (h yj).mpr (List.any_eq_true.mpr ⟨yj, hyj_mem, extEq_refl yj⟩)
+          rw [List.any_eq_true] at hyj_in_xs
+          obtain ⟨xi, hxi_mem, hxi_eq⟩ := hyj_in_xs
+          have _hyj_lt := cSize_lt_of_mem hyj_mem
+          have _hxi_lt := cSize_lt_of_mem hxi_mem
+          have hIH : normalize yj = normalize xi := normalize_eq_of_extEq hxi_eq
+          exact ⟨normalize xi, List.mem_map.mpr ⟨xi, hxi_mem, rfl⟩, hIH ▸ hw_eq⟩
+      exact SetEquiv.trans (insertionSort_setEquiv _)
+        (SetEquiv.trans (dedup_setEquiv_self _)
+          (SetEquiv.trans h_nxs_nys
+            (SetEquiv.trans (SetEquiv.symm (dedup_setEquiv_self _))
+              (SetEquiv.symm (insertionSort_setEquiv _)))))
+    -- (4) ∀ a ∈ insertionSort (dedup (xs.map normalize)),
+    --     ∀ b ∈ insertionSort (dedup (ys.map normalize)),
+    --     extEq a b = true → a = b
+    · intro a ha b hb hab
+      -- a es normalize xi para algún xi ∈ xs
+      have ha' := insertionSort_mem_subset a _ ha
+      have ha'' := mem_of_mem_dedup _ a ha'
+      rw [List.mem_map] at ha''
+      obtain ⟨xi, hxi_mem, rfl⟩ := ha''
+      -- b es normalize yj para algún yj ∈ ys
+      have hb' := insertionSort_mem_subset b _ hb
+      have hb'' := mem_of_mem_dedup _ b hb'
+      rw [List.mem_map] at hb''
+      obtain ⟨yj, hyj_mem, rfl⟩ := hb''
+      -- extEq (normalize xi) (normalize yj) = true
+      -- Bound their sizes for termination
+      have hxi_bound := cSize_lt_of_mem hxi_mem
+      have hyj_bound := cSize_lt_of_mem hyj_mem
+      have hxi_norm := normalize_cSize_le xi
+      have hyj_norm := normalize_cSize_le yj
+      -- Por IH: normalize (normalize xi) = normalize (normalize yj)
+      have hIH := normalize_eq_of_extEq hab
+      -- Por normalize_idem: normalize (normalize xi) = normalize xi
+      rwa [normalize_idem, normalize_idem] at hIH
+termination_by cSize A + cSize B
+decreasing_by
+  all_goals simp_wf
+  all_goals simp only [cSize] at *
+  all_goals omega
+
+theorem extEq_iff_normalize_eq {A B : CList} : extEq A B = true ↔ normalize A = normalize B := by
+  constructor
+  · exact normalize_eq_of_extEq
+  · intro h
+    have ha : extEq A (normalize A) = true := extEq_normalize A
+    have hb : extEq B (normalize B) = true := extEq_normalize B
+    have hb_symm : extEq (normalize B) B = true := by rw [extEq_comm]; exact hb
+    have h1 : extEq A (normalize B) = true := by rw [h] at ha; exact ha
+    exact extEq_trans A (normalize B) B h1 hb_symm
+
 end CList
