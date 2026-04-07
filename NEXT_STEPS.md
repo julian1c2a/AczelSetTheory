@@ -1,10 +1,10 @@
 # Next Steps
 
-**Last updated:** 2026-04-07
+**Last updated:** 2026-04-10
 
-The project compiles on Lean 4.29.0 with **2 sorry** remaining, both in the Powerset module.
-All other Zermelo axioms (Extensionality, Empty Set, Pairs, Union, Separation, Intersection, Setminus) are
-fully derived as theorems over the `HFSet` quotient type.
+The project compiles on Lean 4.29.0 with **0 sorry**.
+All 8 Zermelo axioms (Extensionality, Empty Set, Pairs, Union, Separation, Intersection, Setminus, Powerset)
+are fully derived as theorems over the `HFSet` quotient type.
 
 ---
 
@@ -13,68 +13,164 @@ fully derived as theorems over the `HFSet` quotient type.
 - ✅ CList foundations: 7 sub-modules (Basic, ExtEq, SetEquiv, Order, Sort, Normalize, Filter)
 - ✅ `normalize_eq_of_extEq` proven — last CList sorry eliminated
 - ✅ HFSet quotient type with `repr` and `empty`
-- ✅ `HFSet.Mem` and `Membership` instance (∈ notation)
+- ✅ `HFSet.Mem` and `Membership` instance (in notation)
 - ✅ Extensionality: ∀ A B, (∀ x, x ∈ A ↔ x ∈ B) → A = B
 - ✅ Empty Set: ∀ x, x ∉ ∅
 - ✅ Pairs: x ∈ {a, b} ↔ x = a ∨ x = b
-- ✅ Union: x ∈ ⋃ A ↔ ∃ B ∈ A, x ∈ B  (`HFSet.mem_sUnion`)
+- ✅ Union: z ∈ A ∪ B ↔ z ∈ A ∨ z ∈ B  (`HFSet.mem_union`)
+- ✅ Big Union: z ∈ ⋃ A ↔ ∃ Y ∈ A, z ∈ Y  (`HFSet.mem_sUnion`)
 - ✅ Separation: x ∈ sep A P ↔ x ∈ A ∧ P x  (`HFSet.mem_sep`)
-- ✅ Intersection: x ∈ ⋂ A ↔ ∀ B ∈ A, x ∈ B  (`HFSet.mem_sInter`)
-- ✅ Setminus: x ∈ A \ B ↔ x ∈ A ∧ x ∉ B  (`HFSet.mem_setminus`)
+- ✅ Intersection: x ∈ A ∩ B ↔ x ∈ A ∧ x ∈ B  (`HFSet.mem_inter`)
+- ✅ Setminus: x ∈ A ∖ B ↔ x ∈ A ∧ x ∉ B  (`HFSet.mem_setminus`)
+- ✅ **Powerset: B ∈ 𝒫(A) ↔ ∀ x, x ∈ B → x ∈ A  (`HFSet.mem_powerset`)**
 - ✅ Architecture split: `Operations/` (CList-level) + `Axioms/` (HFSet-level)
+- ✅ Notation system: emptyset, {[a,b]}, {[a]}, {[x in A <|> P]}, von Neumann numerals 0-9
 
 ---
 
-## Current blocker: Powerset (Phase 5)
+## Phase 6: Foundation (Regularity) and Singleton/Ordered Pairs
 
-### Sorry 1 — `powersetCList_extEq` ([Operations/Powerset.lean:22](AczelSetTheory/Operations/Powerset.lean))
+### 6a. Foundation (Regularity) axiom
+
+**Statement**:
+
+```
+forall A != emptyset, exists x in A, x cap A = emptyset
+```
+
+**Proof strategy**: Well-founded induction on `cSize`. For any non-empty A, pick the element `x in A` with minimal `cSize`. Then for any `y in x cap A`, we'd have `cSize y < cSize x` (by `cSize_lt_of_mem`), contradicting minimality.
+
+**Implementation plan**:
+
+1. Define `minCSize (A : CList) : CList` — element with smallest cSize in a non-empty CList
+2. Prove `minCSize_mem : A != empty -> mem (minCSize A) A = true`
+3. Prove `minCSize_is_min : mem y A = true -> cSize (minCSize A) <= cSize y`
+4. Prove `foundation : A != empty -> exists x in A, inter x A = empty`
+5. Store in `Axioms/Foundation.lean`
+
+**Dependencies**: `Operations/Intersection.lean`, `Axioms/Intersection.lean`, `HFSets.lean`
+
+### 6b. Singleton properties
+
+**Statement**: `mem_singleton : x in {a} <-> x = a`
+
+**Implementation**: Follows from `mem_pair` since `singleton a = pair a a`.
+
+**File**: Extend `Notation.lean` or create `Axioms/Singleton.lean`.
+
+### 6c. Ordered pairs (Kuratowski)
+
+**Definition**: `orderedPair a b = {{a}, {a, b}}`
+
+**Key theorems**:
+
+1. `orderedPair_eq_iff : orderedPair a b = orderedPair c d <-> a = c and b = d`
+2. `fst (orderedPair a b) = a`
+3. `snd (orderedPair a b) = b`
+
+**Proof of injectivity**: Use `extensionality` + `mem_pair` + `mem_singleton` to case-split on membership.
+
+**Implementation plan**:
+
+1. Create `Operations/OrderedPair.lean`: define `orderedPair`, `fst`, `snd` at CList level, lift to HFSet
+2. Create `Axioms/OrderedPair.lean`: prove `orderedPair_eq_iff`, `fst_orderedPair`, `snd_orderedPair`
+
+**Dependencies**: `Axioms/Pair.lean`, `Notation.lean` (for singleton)
+
+---
+
+## Phase 7: Von Neumann Natural Numbers
+
+### 7a. Successor function
+
+**Definition**: `succ A = A cup {A}` (using `union` and `singleton`)
+
+**Key theorems**:
+
+1. `mem_succ : x in succ A <-> x in A or x = A`
+2. `succ_injective : succ A = succ B -> A = B`
+3. `succ_ne_empty : succ A != emptyset`
+4. `not_mem_self : not (A in A)` (follows from Foundation)
+
+**Files**: `Operations/Succ.lean`, `Axioms/Succ.lean`
+
+### 7b. Natural number predicate
+
+**Definition**: Inductive characterization of "is a natural number" via transitive sets + Foundation.
 
 ```lean
-theorem powersetCList_extEq (A₁ A₂ : CList) (h : CList.extEq A₁ A₂ = true) :
-    CList.extEq (powersetCList A₁) (powersetCList A₂) = true
+def isNat : HFSet -> Prop
+| x => x = emptyset or exists y, isNat y and x = succ y
 ```
 
-**Proof strategy:**
+Or alternatively: `isTransitive A and (forall x in A, isTransitive x)`
 
-1. Prove auxiliary: `mem_powersetCList : mem y (powersetCList A) = true ↔ subset y A = true`
-   - Forward needs: `sublists_subset : zs ∈ sublists xs → subset (mk zs) (mk xs) = true`  (induction on sublists)
-   - Backward needs: `filter_in_sublists : (xs.filter P) ∈ sublists xs` + show `extEq y (mk (xs.filter (fun z => mem z y)))` given `subset y (mk xs)`
-2. Use `mem_powersetCList` + `subset`-transitivity: `extEq A₁ A₂ → (y ⊆ A₁ ↔ y ⊆ A₂)` → `extEq (powersetCList A₁) (powersetCList A₂)`.
+**Key theorems**:
 
-### Sorry 2 — `mem_powerset` ([Axioms/Powerset.lean:9](AczelSetTheory/Axioms/Powerset.lean))
+1. `isNat_zero : isNat 0`
+2. `isNat_succ : isNat n -> isNat (succ n)`
+3. `isNat_induction : isNat n -> P 0 -> (forall k, isNat k -> P k -> P (succ k)) -> P n`
 
-```lean
-theorem mem_powerset (A : HFSet) (B : HFSet) :
-    B ∈ powerset A ↔ (∀ x, x ∈ B → x ∈ A)
-```
+### 7c. Arithmetic operations
 
-**Proof strategy:** Lift to CList using `Quotient.exists_rep`, reduce to `mem_powersetCList` + `subset_iff_forall_mem_clist`.
+**Definitions** (recursive over `isNat`):
+
+1. `add (m n : HFSet) : HFSet` — m + 0 = m, m + succ(n) = succ(m + n)
+2. `mul (m n : HFSet) : HFSet` — m *0 = 0, m* succ(n) = m * n + m
+
+**Key theorems**:
+
+- `add_zero`, `add_succ`, `add_comm`, `add_assoc`
+- `mul_zero`, `mul_succ`, `mul_comm`, `mul_assoc`, `mul_dist`
+
+**Challenge**: These definitions require well-founded recursion or a recursion principle for `isNat`. Since membership is well-founded in HFSets, we can use `cSize` as termination measure.
+
+**Files**: `Operations/Nat.lean`, `Axioms/Nat.lean`
 
 ---
 
-## Next: Foundation (Regularity) axiom (Phase 6 prerequisite)
+## Phase 8: Cartesian Product and Relations
 
-```text
-∀ A ≠ ∅, ∃ x ∈ A, x ∩ A = ∅
-```
+### 8a. Cartesian product
 
-- Proof strategy: well-founded induction on `cSize`; element with minimal `cSize` in A is ∈-minimal.
+**Definition**: `prod A B = {[p in P(P(A cup B)) <|> exists a in A, exists b in B, p = orderedPair a b]}`
+
+Or more practically via CList-level construction iterating over elements.
+
+**Key theorem**: `mem_prod : p in prod A B <-> exists a b, a in A and b in B and p = orderedPair a b`
+
+### 8b. Relations and functions
+
+**Definitions**:
+
+- `isRelation R A B` — R subseteq prod A B
+- `isFunction f A B` — isRelation f A B and forall a in A, exists! b, orderedPair a b in f
+- `domain f`, `range f`
+- `apply f a` — the unique b such that orderedPair a b in f
+
+**Files**: `Operations/CartesianProduct.lean`, `Operations/Relation.lean`, `Operations/Function.lean`
 
 ---
 
-## Phase 6: Natural numbers as von Neumann ordinals
+## Phase 9: Advanced axioms
 
-- `succ A = A ∪ {A}` via `HFSet.sUnion` + `HFSet.pair`
-- `zero = ∅`, `one = {∅}`, `two = {∅, {∅}}`
-- Singleton notation `{a}` as sugar for `pair a a`
-- Ordered pair `⟨a, b⟩` as `{{a}, {a, b}}`
-- Ordinal arithmetic
+### 9a. Replacement axiom
+
+**Statement**: If F is a function-class and A is a set, then {F(x) | x in A} is a set.
+
+In our finite setting, this is provable by induction on the size of A, using `sep` and `union`.
+
+### 9b. Axiom of Choice
+
+In hereditarily finite sets, Choice is derivable from the well-ordering of CList (already established via `lt_total`). For any family of non-empty finite sets, we can computably select an element from each.
+
+**Proof strategy**: Use `lt`-minimal element selection (already implicit in the CList ordering).
 
 ---
 
 ## Future directions
 
-- Replacement axiom
-- Axiom of Choice (derivable from finite choice?)
-- Decidability results for HFSet predicates
-- Computable functions HFSet → HFSet
+- Decidability proofs for all HFSet predicates
+- Computable functions HFSet -> HFSet (eval framework)
+- Connection to Peano arithmetic via the von Neumann encoding
+- Formal verification of set-theoretic constructions (ordinals, cardinals)

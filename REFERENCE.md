@@ -1,6 +1,6 @@
 # Technical Reference — AczelSetTheory
 
-**Last updated:** 2026-04-09 00:00
+**Last updated:** 2026-04-08 00:00
 **Author**: Julián Calderón Almendros
 **Lean version**: v4.29.0
 
@@ -36,15 +36,29 @@ Below are the keys for reading and searching theorems.
 
 | # | File | Namespace | Status | Depends on | Depended on by |
 |---|------|-----------|--------|------------|----------------|
-| 1 | `AczelSetTheory/CList/Basic.lean` | `CList` | ✅ Complete | `Init.Data.List.Basic` | ExtEq, SetEquiv, Order, Sort, Normalize, HFSets, Main |
-| 2 | `AczelSetTheory/CList/ExtEq.lean` | `CList` | ✅ Complete | Basic | SetEquiv, Order |
-| 3 | `AczelSetTheory/CList/SetEquiv.lean` | `CList` | ✅ Complete | ExtEq | Sort |
-| 4 | `AczelSetTheory/CList/Order.lean` | `CList` | ✅ Complete | ExtEq | Sort |
-| 5 | `AczelSetTheory/CList/Sort.lean` | `CList` | ✅ Complete | Order, SetEquiv | Normalize |
-| 6 | `AczelSetTheory/CList/Normalize.lean` | `CList` | ✅ Complete | Sort | (via CList root) |
-| 7 | `AczelSetTheory/CList.lean` | — | ✅ Complete | Basic, ExtEq, SetEquiv, Order, Sort, Normalize | HFSets |
-| 8 | `AczelSetTheory/HFSets.lean` | `HFSet` | ✅ Complete | CList (all) | (root) |
-| — | `AczelSetTheory.lean` | — | ✅ Complete | CList, HFSets | Main |
+| 1 | `AczelSetTheory/CList/Basic.lean` | `CList` | ✅ Complete | `Init.Data.List.Basic` | ExtEq, SetEquiv, Order, Sort, Normalize, Filter, HFSets, Main |
+| 2 | `AczelSetTheory/CList/ExtEq.lean` | `CList` | ✅ Complete | Basic | SetEquiv, Order, Filter |
+| 3 | `AczelSetTheory/CList/Filter.lean` | `CList` | ✅ Complete | ExtEq | Operations/Separation, Operations/Intersection, Operations/Setminus |
+| 4 | `AczelSetTheory/CList/SetEquiv.lean` | `CList` | ✅ Complete | ExtEq | Sort |
+| 5 | `AczelSetTheory/CList/Order.lean` | `CList` | ✅ Complete | ExtEq | Sort |
+| 6 | `AczelSetTheory/CList/Sort.lean` | `CList` | ✅ Complete | Order, SetEquiv | Normalize |
+| 7 | `AczelSetTheory/CList/Normalize.lean` | `CList` | ✅ Complete | Sort | (via CList root) |
+| 8 | `AczelSetTheory/CList.lean` | — | ✅ Complete | Basic, ExtEq, Filter, SetEquiv, Order, Sort, Normalize | HFSets |
+| 9 | `AczelSetTheory/HFSets.lean` | `HFSet` | ✅ Complete | CList (all) | Operations/*, Axioms/*, Notation |
+| 10 | `AczelSetTheory/Operations/Union.lean` | `CList`, `HFSet` | ✅ Complete | CList/ExtEq, HFSets | Axioms/Union |
+| 11 | `AczelSetTheory/Operations/Intersection.lean` | `HFSet` | ✅ Complete | HFSets, CList/Filter | Axioms/Intersection |
+| 12 | `AczelSetTheory/Operations/Setminus.lean` | `HFSet` | ✅ Complete | HFSets, CList/Filter | Axioms/Setminus |
+| 13 | `AczelSetTheory/Operations/Separation.lean` | `HFSet` | ✅ Complete | HFSets, CList/Filter | Axioms/Separation |
+| 14 | `AczelSetTheory/Operations/Pair.lean` | `HFSet` | ✅ Complete | HFSets | Axioms/Pair |
+| 15 | `AczelSetTheory/Operations/Powerset.lean` | `CList`, `HFSet` | ✅ Complete | HFSets | Axioms/Powerset |
+| 16 | `AczelSetTheory/Axioms/Union.lean` | `HFSet` | ✅ Complete | HFSets, Operations/Union | — |
+| 17 | `AczelSetTheory/Axioms/Intersection.lean` | `HFSet` | ✅ Complete | HFSets, Operations/Intersection | — |
+| 18 | `AczelSetTheory/Axioms/Setminus.lean` | `HFSet` | ✅ Complete | HFSets, Operations/Setminus | — |
+| 19 | `AczelSetTheory/Axioms/Separation.lean` | `HFSet` | ✅ Complete | HFSets, Operations/Separation | — |
+| 20 | `AczelSetTheory/Axioms/Pair.lean` | `HFSet` | ✅ Complete | HFSets, Operations/Pair | — |
+| 21 | `AczelSetTheory/Axioms/Powerset.lean` | `HFSet` | ✅ Complete | Operations/Powerset, Axioms/Separation | — |
+| 22 | `AczelSetTheory/Notation.lean` | `HFSet` | ✅ Complete | HFSets | AczelSetTheory.lean |
+| — | `AczelSetTheory.lean` | — | ✅ Complete | CList, HFSets, Operations/*, Axioms/*, Notation | Main |
 | — | `Main.lean` | — | ✅ Complete | CList.Basic | — |
 
 ---
@@ -56,14 +70,22 @@ Init.Data.List.Basic
   └─ CList/Basic.lean
        ├─ CList/ExtEq.lean
        │    ├─ CList/SetEquiv.lean ──┐
-       │    └─ CList/Order.lean ─────┤
-       │                             └─ CList/Sort.lean
-       │                                  └─ CList/Normalize.lean
+       │    ├─ CList/Order.lean ─────┤
+       │    │                        └─ CList/Sort.lean
+       │    │                             └─ CList/Normalize.lean
+       │    └─ CList/Filter.lean
        └─ (used directly by Main.lean)
 
-CList.lean (root) ── imports all 6 sub-modules
+CList.lean (root) ── imports all 7 sub-modules
   └─ HFSets.lean
-       └─ AczelSetTheory.lean (project root)
+       ├─ Operations/Union.lean ──────────── Axioms/Union.lean
+       ├─ Operations/Intersection.lean ───── Axioms/Intersection.lean
+       ├─ Operations/Setminus.lean ───────── Axioms/Setminus.lean
+       ├─ Operations/Separation.lean ─────── Axioms/Separation.lean ──┐
+       ├─ Operations/Pair.lean ───────────── Axioms/Pair.lean         │
+       ├─ Operations/Powerset.lean ───────── Axioms/Powerset.lean ◀───┘
+       └─ Notation.lean
+            └─ AczelSetTheory.lean (project root)
 ```
 
 ---
@@ -72,8 +94,8 @@ CList.lean (root) ── imports all 6 sub-modules
 
 | Namespace | Modules | Description |
 |-----------|---------|-------------|
-| `CList` | Basic, ExtEq, SetEquiv, Order, Sort, Normalize | All CList definitions and theorems |
-| `HFSet` | HFSets | Quotient type and its API |
+| `CList` | Basic, ExtEq, Filter, SetEquiv, Order, Sort, Normalize, Operations/Union (partial), Operations/Powerset (partial) | All CList definitions and theorems |
+| `HFSet` | HFSets, Operations/*, Axioms/*, Notation | Quotient type and its API |
 | (top-level) | Basic | `CList` inductive type defined at top level, operations inside `namespace CList` |
 
 ---
@@ -201,9 +223,23 @@ No new definitions. Only theorems (see §6.2).
 
 ---
 
-### 4.3 CList/SetEquiv.lean — `namespace CList`
+### 4.3 CList/Filter.lean — `namespace CList`
 
-#### 4.3.1 `Nodup`
+#### 4.3.1 `P_respects`
+
+```lean
+def P_respects (P : CList → Bool) : Prop :=
+  ∀ (x y : CList), extEq x y = true → P x = P y
+```
+
+- **Math**: P respects extensional equality: A =ₑ B → P(A) = P(B).
+- Noncomputable (Prop with universal quantifier).
+
+---
+
+### 4.4 CList/SetEquiv.lean — `namespace CList`
+
+#### 4.4.1 `Nodup`
 
 ```lean
 def Nodup (l : List CList) : Prop :=
@@ -213,7 +249,7 @@ def Nodup (l : List CList) : Prop :=
 - **Math**: No two distinct positions i < j satisfy aᵢ =ₑ aⱼ.
 - Noncomputable (Prop). Decidable via `extEq`.
 
-#### 4.3.2 `SetEquiv`
+#### 4.4.2 `SetEquiv`
 
 ```lean
 def SetEquiv (l₁ l₂ : List CList) : Prop :=
@@ -225,15 +261,15 @@ def SetEquiv (l₁ l₂ : List CList) : Prop :=
 
 ---
 
-### 4.4 CList/Order.lean — `namespace CList`
+### 4.5 CList/Order.lean — `namespace CList`
 
-No new definitions. Only theorems (see §6.4).
+No new definitions. Only theorems (see §6.5).
 
 ---
 
-### 4.5 CList/Sort.lean — `namespace CList`
+### 4.6 CList/Sort.lean — `namespace CList`
 
-#### 4.5.1 `Sorted`
+#### 4.6.1 `Sorted`
 
 ```lean
 def Sorted : List CList → Prop
@@ -247,15 +283,15 @@ def Sorted : List CList → Prop
 
 ---
 
-### 4.6 CList/Normalize.lean — `namespace CList`
+### 4.7 CList/Normalize.lean — `namespace CList`
 
-No new definitions. Only theorems (see §6.6).
+No new definitions. Only theorems (see §6.7).
 
 ---
 
-### 4.7 HFSets.lean
+### 4.8 HFSets.lean
 
-#### 4.7.1 `CList.Setoid`
+#### 4.8.1 `CList.Setoid`
 
 ```lean
 def CList.Setoid : Setoid CList where
@@ -266,7 +302,7 @@ def CList.Setoid : Setoid CList where
 - **Math**: A ~ B ⟺ extEq(A, B) = true. Equivalence relation.
 - Computable.
 
-#### 4.7.2 `HFSet`
+#### 4.8.2 `HFSet`
 
 ```lean
 def HFSet := Quotient CList.Setoid
@@ -275,7 +311,7 @@ def HFSet := Quotient CList.Setoid
 - **Math**: HF ≔ CList / ~  (hereditarily finite sets as equivalence classes)
 - Computable.
 
-#### 4.7.3 `HFSet.repr`
+#### 4.8.3 `HFSet.repr`
 
 ```lean
 def repr (s : HFSet) : CList :=
@@ -285,7 +321,7 @@ def repr (s : HFSet) : CList :=
 - **Math**: repr([A]) ≔ norm(A). Well-defined by `normalize_eq_of_extEq`.
 - Computable.
 
-#### 4.7.4 `HFSet.empty`
+#### 4.8.4 `HFSet.empty`
 
 ```lean
 def empty : HFSet := Quotient.mk CList.Setoid CList.empty
@@ -294,7 +330,7 @@ def empty : HFSet := Quotient.mk CList.Setoid CList.empty
 - **Math**: ∅_HF ≔ [∅]
 - Computable.
 
-#### 4.7.5 `HFSet.Mem`
+#### 4.8.5 `HFSet.Mem`
 
 ```lean
 def Mem (x A : HFSet) : Prop :=
@@ -305,7 +341,7 @@ def Mem (x A : HFSet) : Prop :=
 - Well-defined by `mem_respects` (private).
 - Computable (via `Quotient.liftOn₂`).
 
-#### 4.7.6 `Membership HFSet HFSet` instance
+#### 4.8.6 `Membership HFSet HFSet` instance
 
 ```lean
 instance : Membership HFSet HFSet where
@@ -314,7 +350,7 @@ instance : Membership HFSet HFSet where
 
 - Enables `x ∈ A` notation on HFSet.
 
-#### 4.7.7 `HFSet.mem_mk`
+#### 4.8.7 `HFSet.mem_mk`
 
 ```lean
 theorem mem_mk (x A : CList) :
@@ -324,25 +360,224 @@ theorem mem_mk (x A : CList) :
 - **Math**: [x] ∈ [A] ⟺ mem(x, A) = true
 - Reduction lemma connecting quotient membership to CList membership.
 
-#### 4.7.8 `HFSet.mkPair`
+---
+
+### 4.9 Operations/Union.lean — `namespace CList`, `namespace HFSet`
+
+#### 4.9.1 `CList.union`
 
 ```lean
-def mkPair (a b : CList) : CList := mk [a, b]
+def union (a b : CList) : CList :=
+  match a, b with
+  | mk xs, mk ys => mk (xs ++ ys)
+```
+
+- **Math**: A ∪ B ≔ {x | x ∈ A ∨ x ∈ B} (via list concatenation)
+- Computable. Structural.
+
+#### 4.9.2 `CList.sUnion`
+
+```lean
+def sUnion (A : CList) : CList :=
+  match A with
+  | mk xs => mk (xs.flatMap (fun x => match x with | mk ys => ys))
+```
+
+- **Math**: ⋃ A ≔ {x | ∃ B ∈ A, x ∈ B} (generalized union via flatMap)
+- Computable. Structural.
+
+#### 4.9.3 `HFSet.union`
+
+```lean
+def union (A B : HFSet) : HFSet
+```
+
+- **Math**: A ∪ B (lifted to quotient via `union_extEq`)
+- Computable.
+
+#### 4.9.4 `HFSet.sUnion`
+
+```lean
+def sUnion (A : HFSet) : HFSet
+```
+
+- **Math**: ⋃ A (lifted to quotient via `sUnion_extEq`)
+- Computable.
+
+---
+
+### 4.10 Operations/Intersection.lean — `namespace HFSet`
+
+#### 4.10.1 `HFSet.interCList`
+
+```lean
+def interCList (a b : CList) : CList :=
+  match a with
+  | CList.mk xs => CList.mk (xs.filter (fun c => CList.mem c b))
+```
+
+- **Math**: A ∩ B ≔ {x ∈ A | x ∈ B}
+- Computable. Uses `CList.Filter`.
+
+#### 4.10.2 `HFSet.inter`
+
+```lean
+def inter (A B : HFSet) : HFSet
+```
+
+- **Math**: A ∩ B (lifted via `interCList_extEq_extEq`)
+- Computable.
+
+---
+
+### 4.11 Operations/Setminus.lean — `namespace HFSet`
+
+#### 4.11.1 `HFSet.setminusCList`
+
+```lean
+def setminusCList (a b : CList) : CList :=
+  match a with
+  | CList.mk xs => CList.mk (xs.filter (fun c => !(CList.mem c b)))
+```
+
+- **Math**: A \ B ≔ {x ∈ A | x ∉ B}
+- Computable. Uses `CList.Filter`.
+
+#### 4.11.2 `HFSet.setminus`
+
+```lean
+def setminus (A B : HFSet) : HFSet
+```
+
+- **Math**: A \ B (lifted via `setminusCList_extEq_extEq`)
+- Computable.
+
+---
+
+### 4.12 Operations/Separation.lean — `namespace HFSet`
+
+#### 4.12.1 `HFSet.filterCList`
+
+```lean
+def filterCList (P : HFSet → Prop) [DecidablePred P] (A : CList) : CList
+```
+
+- **Math**: {x ∈ A | P(x)} at CList level
+- Computable (via `decide`).
+
+#### 4.12.2 `HFSet.sep`
+
+```lean
+def sep (A : HFSet) (P : HFSet → Prop) [DecidablePred P] : HFSet
+```
+
+- **Math**: {x ∈ A | P(x)} (lifted via `filterCList_extEq_extEq`)
+- Computable.
+
+---
+
+### 4.13 Operations/Pair.lean — `namespace HFSet`
+
+#### 4.13.1 `HFSet.mkPair`
+
+```lean
+def mkPair (a b : CList) : CList := CList.mk [a, b]
 ```
 
 - **Math**: mkPair(a, b) ≔ {a, b} at CList level.
 - Computable.
 
-#### 4.7.9 `HFSet.pair`
+#### 4.13.2 `HFSet.pair`
 
 ```lean
-def pair (a b : HFSet) : HFSet :=
-  Quotient.liftOn₂ a b (fun x y => toHFSet (mkPair x y)) ...
+def pair (a b : HFSet) : HFSet
 ```
 
-- **Math**: pair([a], [b]) ≔ [{a, b}]
-- Well-defined: respects extEq in both arguments.
+- **Math**: {a, b} (lifted via extEq-respecting proof)
 - Computable.
+
+---
+
+### 4.14 Operations/Powerset.lean — `namespace CList`, `namespace HFSet`
+
+#### 4.14.1 `CList.sublists`
+
+```lean
+def sublists {α : Type} : List α → List (List α)
+  | [] => [[]]
+  | a :: as => let rest := sublists as; rest ++ rest.map (a :: ·)
+```
+
+- **Math**: sublists(l) = all sublists of l (2^|l| elements)
+- Computable. Structural recursion.
+
+#### 4.14.2 `HFSet.powersetCList`
+
+```lean
+def powersetCList (A : CList) : CList :=
+  match A with
+  | CList.mk xs => CList.mk (CList.sublists xs |>.map CList.mk)
+```
+
+- **Math**: 𝒫(A) ≔ {mk(zs) | zs ∈ sublists(children(A))}
+- Computable. Structural.
+
+#### 4.14.3 `HFSet.powerset`
+
+```lean
+def powerset (A : HFSet) : HFSet
+```
+
+- **Math**: 𝒫(A) (lifted via `powersetCList_extEq`)
+- Computable.
+
+---
+
+### 4.15 Notation.lean — `namespace HFSet`
+
+#### 4.15.1 `HFSet.singleton`
+
+```lean
+def singleton (a : HFSet) : HFSet := pair a a
+```
+
+- **Math**: {a} ≔ {a, a}
+- Computable.
+
+#### 4.15.2 `HFSet.insertCList`
+
+```lean
+def insertCList (x A : CList) : CList :=
+  match A with | CList.mk ys => CList.mk (x :: ys)
+```
+
+- **Math**: insert(x, A) ≔ {x} ∪ A at CList level
+- Computable.
+
+#### 4.15.3 `HFSet.insert`
+
+```lean
+def insert (x A : HFSet) : HFSet
+```
+
+- **Math**: {x} ∪ A (lifted via `insertCList_extEq`)
+- Computable.
+
+#### 4.15.4 Von Neumann numerals
+
+```lean
+def zero : HFSet := ∅
+def one   : HFSet := insert zero zero
+def two   : HFSet := insert one one
+-- ... through nine
+```
+
+- **Math**: 0 ≔ ∅, n+1 ≔ {n} ∪ n (von Neumann encoding)
+- Computable. With `OfNat` instances for `0` through `9`.
+
+#### 4.15.5 `filterCList` and `sep` (duplicated from Operations/Separation)
+
+Duplicate definitions in Notation.lean for the comprehension syntax macro. Same signatures as §4.12.
 
 ---
 
@@ -366,11 +601,11 @@ None. This project builds constructively from Lean 4 without additional axioms.
 
 | # | Theorem | Lean signature | Terminated by |
 |---|---------|---------------|---------------|
-| 1 | `subset_mono` | `(x : CList) (xs : List CList) : subset (mk xs) A = true → mem x A = true → subset (mk (x :: xs)) A = true` | — |
+| 1 | `subset_mono` | `(xs : List CList) (y : CList) (ys : List CList) (h : evalOp .subset (mk xs) (mk ys) = true) : evalOp .subset (mk xs) (mk (y :: ys)) = true` | — |
 | 2 | `subset_refl` | `(A : CList) : subset A A = true` | `cSize A` |
 | 3 | `extEq_refl` | `(A : CList) : extEq A A = true` | — (uses `subset_refl`) |
 | 4 | `extEq_def` | `(A B : CList) : extEq A B = (subset A B && subset B A)` | — |
-| 5 | `subset_nil` | `(A : CList) : subset (mk []) A = true` | — |
+| 5 | `subset_nil` | `(B : CList) : subset (mk []) B = true` | — |
 | 6 | `subset_cons` | `(x : CList) (xs : List CList) (B : CList) : subset (mk (x :: xs)) B = (mem x B && subset (mk xs) B)` | — |
 | 7 | `mem_nil` | `(x : CList) : mem x (mk []) = false` | — |
 | 8 | `mem_cons` | `(x y : CList) (ys : List CList) : mem x (mk (y :: ys)) = (extEq x y \|\| mem x (mk ys))` | — |
@@ -381,14 +616,24 @@ None. This project builds constructively from Lean 4 without additional axioms.
 |---|---------|---------------|
 | 9 | `extEq_trans` | `(A B C : CList) (h1 : extEq A B = true) (h2 : extEq B C = true) : extEq A C = true` |
 | 10 | `subset_trans` | `(A B C : CList) (h1 : subset A B = true) (h2 : subset B C = true) : subset A C = true` |
-| 11 | `mem_subset` | `(x A B : CList) (h1 : mem x A = true) (h2 : subset A B = true) : mem x B = true` |
-| 12 | `mem_of_extEq` | `(x A B : CList) (h1 : mem x A = true) (h2 : extEq A B = true) : mem x B = true` |
+| 11 | `mem_subset` | `(x B C : CList) (h1 : mem x B = true) (h2 : subset B C = true) : mem x C = true` |
+| 12 | `mem_of_extEq` | `(x y C : CList) (h1 : extEq x y = true) (h2 : mem y C = true) : mem x C = true` |
 
 | # | Theorem | Lean signature |
 |---|---------|---------------|
-| 13 | `extEq_comm` | `(A B : CList) : extEq A B = extEq B A` | — |
+| 13 | `extEq_comm` | `(A B : CList) : extEq A B = extEq B A` |
 
-### 6.3 CList/SetEquiv.lean
+### 6.3 CList/Filter.lean
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `subset_filter` | `(P : CList → Bool) (xs : List CList) : subset (mk (xs.filter P)) (mk xs) = true` |
+| 2 | `mem_filter_of_mem` | `(P : CList → Bool) (hP_resp : P_respects P) (x : CList) (xs : List CList) (hx : mem x (mk xs) = true) (hPx : P x = true) : mem x (mk (xs.filter P)) = true` |
+| 3 | `filter_subset_filter` | `(P : CList → Bool) (hP_resp : P_respects P) (xs ys : List CList) (hsub : subset (mk xs) (mk ys) = true) : subset (mk (xs.filter P)) (mk (ys.filter P)) = true` |
+| 4 | `extEq_filter` | `(P : CList → Bool) (hP_resp : P_respects P) (xs ys : List CList) (heq : extEq (mk xs) (mk ys) = true) : extEq (mk (xs.filter P)) (mk (ys.filter P)) = true` |
+| 5 | `P_of_mem_filter` | `(P : CList → Bool) (hP_resp : P_respects P) (x : CList) (xs : List CList) (hx : mem x (mk (xs.filter P)) = true) : P x = true` |
+
+### 6.4 CList/SetEquiv.lean
 
 | # | Theorem | Lean signature |
 |---|---------|---------------|
@@ -400,7 +645,7 @@ None. This project builds constructively from Lean 4 without additional axioms.
 | 6 | `extEq_mk_iff_setEquiv` | `(xs ys : List CList) : extEq (mk xs) (mk ys) = true ↔ SetEquiv xs ys` |
 | 7 | `dedup_setEquiv_self` | `(l : List CList) : SetEquiv (dedup l) l` |
 
-### 6.4 CList/Order.lean
+### 6.5 CList/Order.lean
 
 | # | Theorem | Lean signature | Terminated by |
 |---|---------|---------------|---------------|
@@ -411,7 +656,7 @@ None. This project builds constructively from Lean 4 without additional axioms.
 | 5 | `lt_total_extEq` | `(A B : CList) : extEq A B = false → lt A B = true ∨ lt B A = true` | — (uses `lt_total`) |
 | 6 | `lt_trans` | `(A B C : CList) (h1 : lt A B = true) (h2 : lt B C = true) : lt A C = true` | `cSize A + cSize B + cSize C` |
 
-### 6.5 CList/Sort.lean
+### 6.6 CList/Sort.lean
 
 | # | Theorem | Lean signature | Dependencies |
 |---|---------|---------------|--------------|
@@ -420,7 +665,7 @@ None. This project builds constructively from Lean 4 without additional axioms.
 | 3 | `insertionSort_nodup` | `(l : List CList) (hl : Nodup l) : Nodup (insertionSort l)` | `orderedInsert_nodup` (private) |
 | 4 | `insertionSort_setEquiv` | `(l : List CList) : SetEquiv (insertionSort l) l` | `orderedInsert_setEquiv` (private) |
 
-### 6.6 CList/Normalize.lean
+### 6.7 CList/Normalize.lean
 
 | # | Theorem | Lean signature | Terminated by |
 |---|---------|---------------|---------------|
@@ -432,21 +677,100 @@ None. This project builds constructively from Lean 4 without additional axioms.
 | 6 | `normalize_idem` | `(A : CList) : normalize (normalize A) = normalize A` | `cSize A * 2` (mutual with `normalize_idem_list`) |
 | 7 | `mem_of_mem_dedup` | `(l : List CList) (y : CList) (h : y ∈ dedup l) : y ∈ l` | — |
 | 8 | `sorted_nodup_setEquiv_eq` | `(l₁ l₂ : List CList) : Sorted l₁ → Sorted l₂ → Nodup l₁ → Nodup l₂ → SetEquiv l₁ l₂ → (∀ a ∈ l₁, ∀ b ∈ l₂, extEq a b = true → a = b) → l₁ = l₂` | structural on `l₁`, `l₂` |
+| 9 | `normalize_eq_of_extEq` | `{A B : CList} (h : CList.extEq A B = true) : CList.normalize A = CList.normalize B` | `CList.cSize A + CList.cSize B` |
 
-### 6.7 HFSets.lean — `namespace HFSet`
+### 6.8 HFSets.lean — `namespace HFSet`
 
 | # | Theorem | Lean signature | Terminated by |
 |---|---------|---------------|---------------|
-| 1 | `normalize_eq_of_extEq` | `{A B : CList} (h : CList.extEq A B = true) : CList.normalize A = CList.normalize B` | `CList.cSize A + CList.cSize B` |
-| 2 | `extensionality` | `(A B : HFSet) (h : ∀ x : HFSet, x ∈ A ↔ x ∈ B) : A = B` | — |
-| 3 | `not_mem_empty` | `(x : HFSet) : ¬ (x ∈ empty)` | — |
-| 4 | `mem_pair` | `(x a b : HFSet) : x ∈ pair a b ↔ x = a ∨ x = b` | — |
+| 1 | `canonicalEq_iff_eq` | `(A B : HFSet) : canonicalEq A B ↔ A = B` | — |
+| 2 | `mem_resp_right` | `(x A B : CList) (h : extEq A B = true) : mem x A = true → mem x B = true` | — |
+| 3 | `mem_resp_left` | `(x y A : CList) (h : extEq x y = true) : mem x A = true → mem y A = true` | — |
+| 4 | `mem_mk` | `(x A : CList) : (Quotient.mk CList.Setoid x) ∈ (Quotient.mk CList.Setoid A) ↔ CList.mem x A = true` | — |
+| 5 | `subset_iff_forall_mem_clist` | `(A B : CList) : CList.subset A B = true ↔ ∀ x : CList, CList.mem x A = true → CList.mem x B = true` | — |
+| 6 | `extensionality` | `(A B : HFSet) (h : ∀ x : HFSet, x ∈ A ↔ x ∈ B) : A = B` | — |
+| 7 | `not_mem_empty` | `(x : HFSet) : ¬ (x ∈ empty)` | — |
 
-**Derived Zermelo axioms** (proven as theorems, not postulated):
+### 6.9 Operations/Union.lean — `namespace CList` + `namespace HFSet`
 
-- **Extensionality** (#2): ∀ A B, (∀ x, x ∈ A ↔ x ∈ B) → A = B
-- **Empty Set** (#3): ∀ x, x ∉ ∅
-- **Pairs** (#4): ∀ x a b, x ∈ {a, b} ↔ x = a ∨ x = b
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `CList.mem_union` | `(z a b : CList) : mem z (union a b) = true ↔ mem z a = true ∨ mem z b = true` |
+| 2 | `CList.mem_sUnion` | `(z A : CList) : mem z (sUnion A) = true ↔ ∃ Y, mem Y A = true ∧ mem z Y = true` |
+| 3 | `CList.union_extEq` | `(a₁ a₂ b₁ b₂ : CList) (ha : extEq a₁ a₂ = true) (hb : extEq b₁ b₂ = true) : extEq (union a₁ b₁) (union a₂ b₂) = true` |
+| 4 | `CList.sUnion_extEq` | `(A₁ A₂ : CList) (hA : extEq A₁ A₂ = true) : extEq (sUnion A₁) (sUnion A₂) = true` |
+
+### 6.10 Operations/Intersection.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `interCList_extEq_left` | `(a₁ a₂ b : CList) (ha : CList.extEq a₁ a₂ = true) : CList.extEq (interCList a₁ b) (interCList a₂ b) = true` |
+| 2 | `interCList_extEq_right` | `(a b₁ b₂ : CList) (hb : CList.extEq b₁ b₂ = true) : CList.extEq (interCList a b₁) (interCList a b₂) = true` |
+| 3 | `interCList_extEq_extEq` | `(a₁ a₂ b₁ b₂ : CList) (ha : CList.extEq a₁ a₂ = true) (hb : CList.extEq b₁ b₂ = true) : CList.extEq (interCList a₁ b₁) (interCList a₂ b₂) = true` |
+
+### 6.11 Operations/Setminus.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `setminusCList_extEq_left` | `(a₁ a₂ b : CList) (ha : CList.extEq a₁ a₂ = true) : CList.extEq (setminusCList a₁ b) (setminusCList a₂ b) = true` |
+| 2 | `setminusCList_extEq_right` | `(a b₁ b₂ : CList) (hb : CList.extEq b₁ b₂ = true) : CList.extEq (setminusCList a b₁) (setminusCList a b₂) = true` |
+| 3 | `setminusCList_extEq_extEq` | `(a₁ a₂ b₁ b₂ : CList) (ha : CList.extEq a₁ a₂ = true) (hb : CList.extEq b₁ b₂ = true) : CList.extEq (setminusCList a₁ b₁) (setminusCList a₂ b₂) = true` |
+
+### 6.12 Operations/Separation.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `filterCList_extEq_extEq` | `(P : HFSet → Prop) [DecidablePred P] (A₁ A₂ : CList) (hA : CList.extEq A₁ A₂ = true) : CList.extEq (filterCList P A₁) (filterCList P A₂) = true` |
+
+### 6.13 Operations/Powerset.lean — `namespace CList` + `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `CList.sublists_subset` | `(xs zs : List CList) (h : zs ∈ sublists xs) : subset (mk zs) (mk xs) = true` |
+| 2 | `CList.filter_in_sublists` | `{α : Type} (P : α → Bool) (xs : List α) : xs.filter P ∈ sublists xs` |
+| 3 | `CList.mem_right_respects_extEq` | `(y : CList) : P_respects (fun z => mem z y)` |
+| 4 | `HFSet.mem_powersetCList` | `(y A : CList) : CList.mem y (powersetCList A) = true ↔ CList.subset y A = true` |
+| 5 | `HFSet.powersetCList_extEq` | `(A₁ A₂ : CList) (h : CList.extEq A₁ A₂ = true) : CList.extEq (powersetCList A₁) (powersetCList A₂) = true` |
+
+### 6.14 Axioms/*.lean — `namespace HFSet`
+
+All **Zermelo axioms** are proven as theorems (not postulated):
+
+| # | Theorem | File | Lean signature |
+|---|---------|------|---------------|
+| 1 | `mem_union` | Axioms/Union | `(z A B : HFSet) : z ∈ union A B ↔ z ∈ A ∨ z ∈ B` |
+| 2 | `mem_sUnion` | Axioms/Union | `(z A : HFSet) : z ∈ sUnion A ↔ ∃ Y : HFSet, Y ∈ A ∧ z ∈ Y` |
+| 3 | `mem_interCList_iff` | Axioms/Intersection | `(a b xc : CList) : CList.mem xc (interCList a b) = true ↔ CList.mem xc a = true ∧ CList.mem xc b = true` |
+| 4 | `mem_inter` | Axioms/Intersection | `(A B : HFSet) (x : HFSet) : x ∈ inter A B ↔ x ∈ A ∧ x ∈ B` |
+| 5 | `mem_setminusCList_iff` | Axioms/Setminus | `(a b xc : CList) : CList.mem xc (setminusCList a b) = true ↔ CList.mem xc a = true ∧ CList.mem xc b = false` |
+| 6 | `mem_setminus` | Axioms/Setminus | `(A B : HFSet) (x : HFSet) : x ∈ setminus A B ↔ x ∈ A ∧ ¬ (x ∈ B)` |
+| 7 | `mem_filterCList_iff` | Axioms/Separation | `(a xc : CList) (P : HFSet → Prop) [DecidablePred P] : CList.mem xc (filterCList P a) = true ↔ CList.mem xc a = true ∧ P (Quotient.mk CList.Setoid xc)` |
+| 8 | `mem_sep` | Axioms/Separation | `(A : HFSet) (P : HFSet → Prop) [DecidablePred P] (x : HFSet) : x ∈ sep A P ↔ x ∈ A ∧ P x` |
+| 9 | `mem_pair` | Axioms/Pair | `(x a b : HFSet) : x ∈ pair a b ↔ x = a ∨ x = b` |
+| 10 | `mem_powerset` | Axioms/Powerset | `(A B : HFSet) : B ∈ powerset A ↔ (∀ x, x ∈ B → x ∈ A)` |
+
+**Derived Zermelo axiom summary** (all proven, none postulated):
+
+| Axiom | Theorem | Statement |
+|-------|---------|-----------|
+| Extensionality | `extensionality` | ∀ A B, (∀ x, x ∈ A ↔ x ∈ B) → A = B |
+| Empty Set | `not_mem_empty` | ∀ x, x ∉ ∅ |
+| Pairs | `mem_pair` | x ∈ {a, b} ↔ x = a ∨ x = b |
+| Union | `mem_union` / `mem_sUnion` | z ∈ A ∪ B ↔ z ∈ A ∨ z ∈ B |
+| Separation | `mem_sep` | x ∈ {x ∈ A \| P x} ↔ x ∈ A ∧ P x |
+| Intersection | `mem_inter` | x ∈ A ∩ B ↔ x ∈ A ∧ x ∈ B |
+| Set Difference | `mem_setminus` | x ∈ A \ B ↔ x ∈ A ∧ x ∉ B |
+| Powerset | `mem_powerset` | B ∈ 𝒫(A) ↔ ∀ x, x ∈ B → x ∈ A |
+
+### 6.15 Notation.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `mem_insertCList_right` | `(x₁ x₂ A₂ : CList) (hx : CList.extEq x₁ x₂ = true) : CList.mem x₁ (insertCList x₂ A₂) = true` |
+| 2 | `subset_insertCList_right` | `(A₁ x₂ A₂ : CList) (hA : CList.subset A₁ A₂ = true) : CList.subset A₁ (insertCList x₂ A₂) = true` |
+| 3 | `insertCList_subset` | `(x₁ A₁ x₂ A₂ : CList) (hx : CList.extEq x₁ x₂ = true) (hA : CList.subset A₁ A₂ = true) : CList.subset (insertCList x₁ A₁) (insertCList x₂ A₂) = true` |
+| 4 | `insertCList_extEq` | `(x₁ A₁ x₂ A₂ : CList) (hx : CList.extEq x₁ x₂ = true) (hA : CList.extEq A₁ A₂ = true) : CList.extEq (insertCList x₁ A₁) (insertCList x₂ A₂) = true` |
+| 5 | `filterCList_extEq_extEq` | `(P : HFSet → Prop) [DecidablePred P] (A₁ A₂ : CList) (hA : CList.extEq A₁ A₂ = true) : CList.extEq (filterCList P A₁) (filterCList P A₂) = true` |
 
 ---
 
@@ -474,11 +798,67 @@ None. This project builds constructively from Lean 4 without additional axioms.
 
 ### CList/Normalize.lean
 
-`CList.cSizeList_dedup_le`, `CList.cSizeList_insertionSort_le`, `CList.normalize_cSize_le`, `CList.dedup_id_of_nodup`, `CList.insertionSort_id_of_sorted_nodup`, `CList.normalize_idem`, `CList.mem_of_mem_dedup`, `CList.sorted_nodup_setEquiv_eq`
+`CList.cSizeList_dedup_le`, `CList.cSizeList_insertionSort_le`, `CList.normalize_cSize_le`, `CList.dedup_id_of_nodup`, `CList.insertionSort_id_of_sorted_nodup`, `CList.normalize_idem`, `CList.mem_of_mem_dedup`, `CList.sorted_nodup_setEquiv_eq`, `CList.normalize_eq_of_extEq`
 
 ### HFSets.lean
 
-`CList.Setoid`, `HFSet`, `HFSet.normalize_eq_of_extEq`, `HFSet.repr`, `HFSet.empty`, `HFSet.Mem`, `Membership HFSet HFSet`, `HFSet.mem_mk`, `HFSet.mkPair`, `HFSet.pair`, `HFSet.extensionality`, `HFSet.not_mem_empty`, `HFSet.mem_pair`
+`CList.Setoid`, `HFSet`, `HFSet.repr`, `HFSet.canonicalEq`, `HFSet.canonicalEq_iff_eq`, `HFSet.empty`, `HFSet.mem_resp_right`, `HFSet.mem_resp_left`, `HFSet.Mem`, `Membership HFSet HFSet`, `HFSet.mem_mk`, `HFSet.subset_iff_forall_mem_clist`, `HFSet.extensionality`, `HFSet.not_mem_empty`
+
+### CList/Filter.lean
+
+`CList.P_respects`, `CList.subset_filter`, `CList.mem_filter_of_mem`, `CList.filter_subset_filter`, `CList.extEq_filter`, `CList.P_of_mem_filter`
+
+### Operations/Union.lean
+
+`CList.union`, `CList.mem_union`, `CList.sUnion`, `CList.mem_sUnion`, `CList.union_extEq`, `CList.sUnion_extEq`, `HFSet.union`, `HFSet.sUnion`
+
+### Operations/Intersection.lean
+
+`HFSet.interCList`, `HFSet.interCList_extEq_left`, `HFSet.interCList_extEq_right`, `HFSet.interCList_extEq_extEq`, `HFSet.inter`
+
+### Operations/Setminus.lean
+
+`HFSet.setminusCList`, `HFSet.setminusCList_extEq_left`, `HFSet.setminusCList_extEq_right`, `HFSet.setminusCList_extEq_extEq`, `HFSet.setminus`
+
+### Operations/Separation.lean
+
+`HFSet.filterCList`, `HFSet.filterCList_extEq_extEq`, `HFSet.sep`
+
+### Operations/Pair.lean
+
+`HFSet.mkPair`, `HFSet.pair`
+
+### Operations/Powerset.lean
+
+`CList.sublists`, `CList.sublists_subset`, `CList.filter_in_sublists`, `CList.mem_right_respects_extEq`, `HFSet.powersetCList`, `HFSet.mem_powersetCList`, `HFSet.powersetCList_extEq`, `HFSet.powerset`
+
+### Axioms/Union.lean
+
+`HFSet.mem_union`, `HFSet.mem_sUnion`
+
+### Axioms/Intersection.lean
+
+`HFSet.mem_interCList_iff`, `HFSet.mem_inter`
+
+### Axioms/Setminus.lean
+
+`HFSet.mem_setminusCList_iff`, `HFSet.mem_setminus`
+
+### Axioms/Separation.lean
+
+`HFSet.mem_filterCList_iff`, `HFSet.mem_sep`
+
+### Axioms/Pair.lean
+
+`HFSet.mem_pair`
+
+### Axioms/Powerset.lean
+
+`HFSet.mem_powerset`
+
+### Notation.lean
+
+`HFSet.singleton`, `HFSet.insertCList`, `HFSet.insert`, `HFSet.mem_insertCList_right`, `HFSet.subset_insertCList_right`, `HFSet.insertCList_subset`, `HFSet.insertCList_extEq`, `HFSet.filterCList` (redefined), `HFSet.filterCList_extEq_extEq` (redefined), `HFSet.sep` (redefined), `HFSet.zero` … `HFSet.nine`, `OfNat HFSet 0` … `OfNat HFSet 9`
 
 ---
 
@@ -488,6 +868,12 @@ None. This project builds constructively from Lean 4 without additional axioms.
 |--------|----------------|--------|-------|
 | `==` | `BEq CList` instance via `extEq` | Basic | Standard Lean `BEq` typeclass |
 | `∈` | `Membership HFSet HFSet` instance via `Mem` | HFSets | Standard Lean `Membership` typeclass |
+| `∅` | `notation "∅" => empty` | Notation | Empty set |
+| `{[a, b]}` | `macro` → `pair $a $b` | Notation | Unordered pair |
+| `{[a]}` | `macro` → `singleton $a` | Notation | Singleton |
+| `{[a, b, c, ...]}` | `macro_rules` → `insert a {[b, c, ...]}` | Notation | Finite set (3+ elements, recursive) |
+| `{[x ∈ A <\|> P]}` | `macro_rules` → `sep A (fun x => P)` | Notation | Separation / comprehension |
+| `0` … `9` | `OfNat HFSet n` instances | Notation | Von Neumann numerals |
 
 ---
 
@@ -498,5 +884,6 @@ None. This project builds constructively from Lean 4 without additional axioms.
 | 2026-04-04 | (stub created) | Julián Calderón Almendros |
 | 2026-04-08 | CList/{Basic,ExtEq,SetEquiv,Order,Sort,Normalize}.lean, CList.lean, HFSets.lean | Claude (AI assistant) |
 | 2026-04-09 | HFSets.lean (Mem, pair, Zermelo axioms) | Claude (AI assistant) |
+| 2026-04-10 | CList/Filter, Operations/{Union,Intersection,Setminus,Separation,Pair,Powerset}, Axioms/{Union,Intersection,Setminus,Separation,Pair,Powerset}, Notation | Claude (AI assistant) |
 
 > To project a file: read it fully, then update sections 1–8 above following AI-GUIDE.md §4–14.

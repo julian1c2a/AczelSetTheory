@@ -1,6 +1,6 @@
 # Design Decisions — AczelSetTheory
 
-**Last updated:** 2026-04-07 00:00
+**Last updated:** 2026-04-10 00:00
 **Author**: Julián Calderón Almendros
 
 Architectural Decision Records (ADR) for this project.

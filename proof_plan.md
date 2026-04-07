@@ -1,38 +1,33 @@
 # Plan de demostración: Powerset
 
-## Estado actual del archivo (2026-04-07 00:00)
+## Estado actual del archivo (2026-04-10 00:00)
 
-Build: **⚠️ Pasa con warnings** por 2 sorry.
+Build: **✅ 0 sorry, 0 errores, 0 warnings.**
 
 | Teorema | Estado | Ubicación |
 |---|---|---|
-| powersetCList_extEq | ⚠️ 1 sorry | Operations/Powerset.lean |
-| mem_powerset | ⚠️ 1 sorry | Axioms/Powerset.lean |
+| powersetCList_extEq | ✅ Probado | Operations/Powerset.lean |
+| mem_powerset | ✅ Probado | Axioms/Powerset.lean |
 
-El bloqueo es probar que extEq A B → extEq (powersetCList A) (powersetCList B).
-
----
-
-## Análisis del problema
-
-### La dificultad de Powerset
-El conjunto potencia está definido utilizando la función generadora de sublistas List.sublists.
-Al comparar dos listas CList que son extensionalmente iguales (xtEq A B = true), necesitamos demostrar que mapear sublists sobre ellas y encapsular los resultados produce listas extensionalmente equivalentes de conjuntos.
-
-### Pieza 1: Lemas sobre CList.sublists
-Requeriríamos:
-- Lemas de map sobre sublists: CList.sublists_map
-- Monotonía: Si todo x ∈ A cumple x ∈ B, entonces toda sublista de A genera correspondencia estricta en las sublistas de B.
-
-### Pieza 2: El axioma base mem_powerset
-Una vez probado powersetCList_extEq, aplicaremos el Quotient.sound y el respeto de la igualdad extensional para definir HFSet.powerset.
-A partir de ahí, la demostración de mem_powerset (B ∈ powerset A ↔ ∀ x ∈ B, x ∈ A) recaerá sobre el comportamiento constructivo de CList.sublists y su relación con CList.mem.
+**Ambos sorry resueltos el 2026-04-10.**
 
 ---
 
-## Plan de implementación (Próxima sesión)
+## Técnica de demostración utilizada
 
-1. Crear infraestructura de List.sublists (lemas que expliquen su comportamiento bajo List.mem).
-2. Demostrar monotonías extensionales de CList bajo sublistas.
-3. Resolver powersetCList_extEq.
-4. Extender a mem_powerset.
+### powersetCList_extEq
+
+Se probó mediante el lema intermedio `mem_powersetCList`:
+
+```
+mem y (powersetCList A) = true ↔ subset y A = true
+```
+
+- **Dirección →**: Si `y ∈ powersetCList A`, existe `zs ∈ sublists xs` tal que `extEq y (mk zs)`. Por `sublists_subset`, `subset (mk zs) (mk xs)`, y por `subset_trans`, `subset y A`.
+- **Dirección ←**: Si `subset y A`, construimos testigo `xs.filter (fun z => mem z y)` que está en `sublists xs` (por `filter_in_sublists`) y es `extEq` a `y` (vía `mem_right_respects_extEq` + propiedades de filter).
+
+Una vez con `mem_powersetCList`, la prueba de `powersetCList_extEq` se reduce a `subset_trans`.
+
+### mem_powerset
+
+Levantamiento a CList vía `Quotient.exists_rep`, reducción a `mem_powersetCList` + `subset_iff_forall_mem_clist`.

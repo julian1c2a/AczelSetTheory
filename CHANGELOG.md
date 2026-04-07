@@ -5,9 +5,26 @@ All notable changes to this project are documented here.
 
 ---
 
+## [2026-04-10] — Powerset axiom complete — 0 sorry project-wide
+
+### Added — Powerset proofs
+
+- **Operations/Powerset.lean**: Proved `sublists_subset`, `filter_in_sublists`, `mem_right_respects_extEq`, `mem_powersetCList`, and `powersetCList_extEq`. Key insight: use `filter (fun z => mem z y)` as sublists witness for the backward direction of `mem_powersetCList`.
+- **Axioms/Powerset.lean**: Proved `mem_powerset` by lifting to CList via `Quotient.exists_rep`, reducing to `mem_powersetCList` + `subset_iff_forall_mem_clist`.
+
+### Changed — Project documentation
+
+- Full projection of all Operations/*, Axioms/*, CList/Filter, and Notation modules into REFERENCE.md.
+- Updated all .md files to reflect 0 sorry and Phase 5 completion.
+
+**Project status: 0 sorry, 0 errors, 0 warnings. All 8 Zermelo axioms derived.**
+
+---
+
 ## [2026-04-07] — Advanced Operations and Powerset Draft
 
 ### Added — Union, Intersection, Setminus, Pair, and Powerset operations
+
 - **Union (HFSet.sUnion)**: Extracted from definitions and proved mem_sUnion.
 - **Intersection (HFSet.sInter)**: Defined and proved mem_sInter.
 - **Setminus (HFSet.setminus)**: Defined and proved mem_setminus.
@@ -23,7 +40,7 @@ All notable changes to this project are documented here.
 
 Derived the first three Zermelo axioms as theorems over HFSet (quotient type),without postulating them:
 
-- **HFSet.Mem**: Membership on HFSet via Quotient.liftOn₂, with proof       
+- **HFSet.Mem**: Membership on HFSet via Quotient.liftOn₂, with proof
   that CList.mem respects xtEq in both arguments.
 - **Membership HFSet HFSet instance**: enables x ∈ A notation.
 - **mem_mk**: reduction lemma [x] ∈ [A] ↔ CList.mem x A = true.
@@ -38,7 +55,7 @@ All theorems fully proven. **0 sorry, 0 errors, 0 warnings.**
 
 ## [2026-04-05] — Module split and sorry elimination
 
-### Changed — Full refactor: CSets.lean → CList sub-modules + HFSets.lean       
+### Changed — Full refactor: CSets.lean → CList sub-modules + HFSets.lean
 
 Completely restructured the project from a single monolithic CSets.lean into  
 8 focused modules with Mathlib-style English naming:
@@ -47,17 +64,18 @@ Completely restructured the project from a single monolithic CSets.lean into
 - CList/ExtEq.lean — Extensional equality: reflexivity, transitivity, commutativity
 - CList/SetEquiv.lean — Nodup, SetEquiv, dedup properties
 - CList/Order.lean — lt: irreflexivity, antisymmetry, totality, transitivity  
-- CList/Sort.lean — Sorted, insertionSort preserves sorted/nodup/setEquiv     
+- CList/Sort.lean — Sorted, insertionSort preserves sorted/nodup/setEquiv
 - CList/Normalize.lean — Size bounds, idempotency, uniqueness
 - CList.lean — Root import aggregating all sub-modules
 - HFSets.lean — HFSet quotient type, repr, empty
 
-### Fixed — 
+### Fixed —
+
 ormalize_eq_of_extEq sorry eliminated
 
-Proved 
-ormalize_eq_of_extEq (the last remaining sorry) using well-founded    
-recursion on cSize A + cSize B, combined with sorted_nodup_setEquiv_eq.     
+Proved
+ormalize_eq_of_extEq (the last remaining sorry) using well-founded
+recursion on cSize A + cSize B, combined with sorted_nodup_setEquiv_eq.
 
 **Project status: 0 sorry across all modules.**
 
@@ -67,5 +85,5 @@ recursion on cSize A + cSize B, combined with sorted_nodup_setEquiv_eq.
 
 ### Changed — Lean 4.29.0 migration
 
-Migrated the entire project from Lean **4.28.0** to **4.29.0**. The build now   
+Migrated the entire project from Lean **4.28.0** to **4.29.0**. The build now
 completes successfully (lake build — no errors).

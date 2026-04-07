@@ -1,6 +1,6 @@
 # Dependency Diagram — AczelSetTheory
 
-**Last updated:** 2026-04-07
+**Last updated:** 2026-04-10
 **Author**: Julián Calderón Almendros
 
 ## Project Structure
@@ -23,15 +23,15 @@ AczelSetTheory/
 │   ├── Setminus.lean      # setminusCList, setminus
 │   ├── Separation.lean    # filterCList, sep
 │   ├── Pair.lean          # mkPair, pair
-│   └── Powerset.lean      # powersetCList, powerset  ⚠️ 1 sorry
+│   └── Powerset.lean      # powersetCList, powerset
 ├── Axioms/
 │   ├── Union.lean         # mem_sUnion
 │   ├── Intersection.lean  # mem_sInter
 │   ├── Setminus.lean      # mem_setminus
 │   ├── Separation.lean    # mem_sep
 │   ├── Pair.lean          # mem_mkPair
-│   └── Powerset.lean      # mem_powerset  ⚠️ 1 sorry
-├── Notation.lean          # Operator notation
+│   └── Powerset.lean      # mem_powerset
+├── Notation.lean          # ∅, {[a,b]}, {[x ∈ A <|> P]}, von Neumann 0–9
 ├── _template.lean         # Module template (not imported)
 └── AczelSetTheory.lean    # Project root (auto-imports all modules)
 Main.lean                  # Executable entry point
@@ -160,7 +160,7 @@ end HFSet
 - `Operations/Setminus.lean` — depends on HFSets
 - `Operations/Separation.lean` — depends on HFSets, CList/Filter
 - `Operations/Pair.lean` — depends on HFSets
-- `Operations/Powerset.lean` — depends on HFSets  ⚠️
+- `Operations/Powerset.lean` — depends on HFSets, CList/Filter
 
 ### Level 5b: Axioms (HFSet-level statements)
 
@@ -169,11 +169,12 @@ end HFSet
 - `Axioms/Setminus.lean` — depends on HFSets, Operations/Setminus
 - `Axioms/Separation.lean` — depends on HFSets, Operations/Separation
 - `Axioms/Pair.lean` — depends on HFSets, Operations/Pair
-- `Axioms/Powerset.lean` — depends on HFSets, Operations/Powerset, Axioms/Separation  ⚠️
+- `Axioms/Powerset.lean` — depends on HFSets, Operations/Powerset, Axioms/Separation
 
 ### Root
 
 - `AczelSetTheory.lean` — imports all modules
+- `Notation.lean` — depends on HFSets, Operations/Separation
 - `Main.lean` — imports `AczelSetTheory.CList.Basic` directly (executable entry point)
 
 ## Exports by Module

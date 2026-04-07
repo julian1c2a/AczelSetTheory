@@ -2,16 +2,18 @@ import AczelSetTheory.HFSets
 
 namespace CList
 
-def sublists {α : Type} : List α → List (List α)
+def sublists {α : Type} :
+  List α → List (List α)
   | [] => [[]]
   | a :: as =>
     let rest := sublists as
     rest ++ rest.map (a :: ·)
 
 /-- Toda sublista de `xs` es subconjunto de `mk xs`. -/
-theorem sublists_subset (xs : List CList) (zs : List CList)
-    (h : zs ∈ sublists xs) :
-    subset (mk zs) (mk xs) = true := by
+theorem sublists_subset
+  (xs : List CList) (zs : List CList) (h : zs ∈ sublists xs) :
+    subset (mk zs) (mk xs) = true
+      := by
   induction xs with
   | nil =>
     simp only [sublists, List.mem_cons, List.mem_nil_iff, or_false] at h
@@ -26,8 +28,10 @@ theorem sublists_subset (xs : List CList) (zs : List CList)
       · exact subset_mono ws x xs' (ih ws h_ws_in_rest)
 
 /-- `List.filter P xs` es miembro de `sublists xs`. -/
-theorem filter_in_sublists {α : Type} (P : α → Bool) (xs : List α) :
-    xs.filter P ∈ sublists xs := by
+theorem filter_in_sublists {α : Type}
+  (P : α → Bool) (xs : List α) :
+    xs.filter P ∈ sublists xs
+      := by
   induction xs with
   | nil => simp [sublists, List.filter_nil]
   | cons a as ih =>
@@ -39,8 +43,10 @@ theorem filter_in_sublists {α : Type} (P : α → Bool) (xs : List α) :
       exact Or.inl ih
 
 /-- `fun z => mem z y` respeta la igualdad extensional. -/
-theorem mem_right_respects_extEq (y : CList) :
-    P_respects (fun z => mem z y) := by
+theorem mem_right_respects_extEq
+  (y : CList) :
+    P_respects (fun z => mem z y)
+      := by
   intro a b hab
   apply Bool.eq_iff_iff.mpr
   constructor
@@ -59,8 +65,10 @@ def powersetCList (A : CList) : CList :=
 
 /-- Caracterización fundamental de la pertenencia al powerset a nivel CList:
     `y ∈ powerset(A) ↔ y ⊆ A`. -/
-theorem mem_powersetCList (y A : CList) :
-    CList.mem y (powersetCList A) = true ↔ CList.subset y A = true := by
+theorem mem_powersetCList
+  (y A : CList) :
+    CList.mem y (powersetCList A) = true ↔ CList.subset y A = true
+      := by
   match A with
   | CList.mk xs =>
     constructor
@@ -105,8 +113,10 @@ theorem mem_powersetCList (y A : CList) :
              List.mem_map_of_mem CList.mk h_filtered,
              h_extEq⟩
 
-theorem powersetCList_extEq (A₁ A₂ : CList) (h : CList.extEq A₁ A₂ = true) :
-    CList.extEq (powersetCList A₁) (powersetCList A₂) = true := by
+theorem powersetCList_extEq
+  (A₁ A₂ : CList) (h : CList.extEq A₁ A₂ = true) :
+    CList.extEq (powersetCList A₁) (powersetCList A₂) = true
+      := by
   rw [CList.extEq_def, Bool.and_eq_true]
   have h12 : CList.subset A₁ A₂ = true := by
     rw [CList.extEq_def, Bool.and_eq_true] at h; exact h.1

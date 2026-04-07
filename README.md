@@ -5,7 +5,7 @@
 **Author**: Julián Calderón Almendros
 **License**: MIT
 **Lean version**: v4.29.0
-**Build status**: ⚠️ 2 `sorry` remaining (Powerset) — 0 errors, 0 warnings
+**Build status**: ✅ 0 `sorry` — 0 errors, 0 warnings
 
 ---
 
@@ -13,7 +13,7 @@
 
 This repository formalizes Aczel's constructive set theory in Lean 4. The central object is `CList` — a computable representation of hereditarily finite sets as nested lists — together with a provably correct normalization procedure that yields canonical representatives. The quotient type `HFSet` identifies extensionally equal `CList`s.
 
-The Zermelo axioms (Extensionality, Empty Set, Pairs, Union, Separation, Intersection, Setminus) are **derived as theorems**, not postulated. Powerset is in progress.
+The Zermelo axioms (Extensionality, Empty Set, Pairs, Union, Separation, Intersection, Setminus, Powerset) are **derived as theorems**, not postulated.
 
 Key properties of this set theory:
 
@@ -32,9 +32,9 @@ Key properties of this set theory:
 | Pairs | `HFSet.mem_pair` | x ∈ {a, b} ↔ x = a ∨ x = b | ✅ |
 | Union | `HFSet.mem_sUnion` | x ∈ ⋃ A ↔ ∃ B ∈ A, x ∈ B | ✅ |
 | Separation | `HFSet.mem_sep` | x ∈ sep A P ↔ x ∈ A ∧ P x | ✅ |
-| Intersection | `HFSet.mem_sInter` | x ∈ ⋂ A ↔ ∀ B ∈ A, x ∈ B | ✅ |
+| Intersection | `HFSet.mem_inter` | x ∈ A ∩ B ↔ x ∈ A ∧ x ∈ B | ✅ |
 | Setminus | `HFSet.mem_setminus` | x ∈ A \ B ↔ x ∈ A ∧ x ∉ B | ✅ |
-| Powerset | `HFSet.mem_powerset` | B ∈ 𝒫 A ↔ ∀ x, x ∈ B → x ∈ A | 🔄 |
+| Powerset | `HFSet.mem_powerset` | B ∈ 𝒫 A ↔ ∀ x, x ∈ B → x ∈ A | ✅ |
 
 ### Module structure
 
@@ -52,18 +52,19 @@ AczelSetTheory/
   HFSets.lean        — HFSet quotient type, membership, extensionality, empty, pairs
   Operations/
     Union.lean       — sUnion, union (CList-level + lift)
-    Intersection.lean — sInter, interCList
+    Intersection.lean — interCList
     Setminus.lean    — setminusCList, setminus
     Separation.lean  — filterCList, sep
     Pair.lean        — mkPair, pair
-    Powerset.lean    — powersetCList, powerset  ⚠️ 1 sorry
+    Powerset.lean    — powersetCList, powerset
   Axioms/
-    Union.lean       — mem_sUnion
-    Intersection.lean — mem_sInter
+    Union.lean       — mem_union, mem_sUnion
+    Intersection.lean — mem_inter
     Setminus.lean    — mem_setminus
     Separation.lean  — mem_sep
-    Pair.lean        — mem_mkPair
-    Powerset.lean    — mem_powerset  ⚠️ 1 sorry
+    Pair.lean        — mem_pair
+    Powerset.lean    — mem_powerset
+  Notation.lean      — ∅, {[a,b]}, {[x ∈ A <|> P]}, von Neumann numerals 0–9
 ```
 
 ### Key types
