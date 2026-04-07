@@ -22,8 +22,10 @@ mutual
     | x :: xs => 1 + cSize x + cSizeList xs
 end
 
-theorem cSize_lt_of_mem {x : CList} {xs : List CList} (h : x ∈ xs) :
-    cSize x < cSize (mk xs) := by
+theorem cSize_lt_of_mem {x : CList} {xs : List CList}
+  (h : x ∈ xs) :
+    cSize x < cSize (mk xs)
+      := by
   induction xs with
   | nil => simp at h
   | cons y ys ih =>
@@ -42,7 +44,8 @@ inductive CListOp
 | subset
 | eq
 
-@[simp] def opWeight : CListOp → Nat
+@[simp]
+def opWeight : CListOp → Nat
 | .mem => 0
 | .subset => 1
 | .eq => 2
@@ -52,7 +55,10 @@ set_option linter.unusedSimpArgs false in
 Motor lógico para la igualdad extensional.
 Agrupamos estas tres para que Lean pueda verificar la terminación mutua.
 -/
-def evalOp (op : CListOp) (A B : CList) : Bool :=
+def evalOp
+  (op : CListOp) (A B : CList) :
+    Bool
+      :=
   match op, A, B with
   | .mem, _, mk [] => false
   | .mem, x, mk (y :: ys) =>
@@ -113,7 +119,10 @@ para ignorar las apariciones posteriores.
 Es estructuralmente recursiva (recorre `l` reduciéndola en 1),
 por lo que Lean la acepta instantáneamente sin pruebas matemáticas.
 -/
-def dedupAux (l : List CList) (vistos : List CList) : List CList :=
+def dedupAux
+  (l : List CList) (vistos : List CList) :
+    List CList
+      :=
   match l with
   | [] => []
   | x :: xs =>
@@ -128,19 +137,25 @@ def dedupAux (l : List CList) (vistos : List CList) : List CList :=
 Reduce los duplicados de una lista recorriéndola hacia adelante
 y conservando solo la primera aparición de cada elemento.
 -/
-def dedup (l : List CList) : List CList :=
+def dedup
+  (l : List CList) :
+    List CList
+      :=
   dedupAux l []
 
 -- 4. CANONIZACIÓN (Forma normal)
 
-def orderedInsert (x : CList) : List CList → List CList
+def orderedInsert
+  (x : CList) :
+    List CList → List CList
   | [] => [x]
   | y :: ys =>
       if lt x y then x :: y :: ys
       else if extEq x y then y :: ys
       else y :: orderedInsert x ys
 
-def insertionSort : List CList → List CList
+def insertionSort :
+  List CList → List CList
   | [] => []
   | x :: xs => orderedInsert x (insertionSort xs)
 
@@ -155,10 +170,16 @@ def normalize : CList → CList
       mk (insertionSort sinDuplicados)
 
 -- PRUEBAS
-def zero := empty
-def one := mk [zero]
-def two := mk [zero, one]
+def zero  := empty
+def one   := mk [zero]
+def two   := mk [zero, one]
 def three := mk [zero, one, two]
+def four  := mk [zero, one, two, three]
+def five  := mk [zero, one, two, three, four]
+def six   := mk [zero, one, two, three, four, five]
+def seven := mk [zero, one, two, three, four, five, six]
+def eight := mk [zero, one, two, three, four, five, six, seven]
+def nine  := mk [zero, one, two, three, four, five, six, seven, eight]
 def dirty := mk [one, two, zero, three, one, zero, zero, two, three, two]
 
 end CList

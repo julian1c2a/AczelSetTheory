@@ -3,9 +3,12 @@ import AczelSetTheory.Operations.Separation
 
 namespace HFSet
 
-theorem mem_filterCList_iff (a xc : CList) (P : HFSet -> Prop) [DecidablePred P] : 
-    CList.mem xc (filterCList P a) = true ↔ CList.mem xc a = true ∧ P (Quotient.mk CList.Setoid xc) := by
-  cases a with | mk xs =>
+theorem mem_filterCList_iff
+  (a xc : CList) (P : HFSet -> Prop) [DecidablePred P] :
+    CList.mem xc (filterCList P a) = true ↔ CList.mem xc a = true ∧ P (Quotient.mk CList.Setoid xc)
+      := by
+  cases a with
+  | mk xs =>
   dsimp [filterCList]
   have hP_resp : CList.P_respects (fun c => decide (P (Quotient.mk CList.Setoid c))) := by
     intro x y heq
@@ -20,8 +23,10 @@ theorem mem_filterCList_iff (a xc : CList) (P : HFSet -> Prop) [DecidablePred P]
     have hzP : decide (P (Quotient.mk CList.Setoid xc)) = true := decide_eq_true h2
     exact CList.mem_filter_of_mem (fun c => decide (P (Quotient.mk CList.Setoid c))) hP_resp xc xs h1 hzP
 
-theorem mem_sep (A : HFSet) (P : HFSet -> Prop) [DecidablePred P] (x : HFSet) :  
-    x ∈ sep A P ↔ x ∈ A ∧ P x := by
+theorem mem_sep
+  (A : HFSet) (P : HFSet -> Prop) [DecidablePred P] (x : HFSet) :
+    x ∈ sep A P ↔ x ∈ A ∧ P x
+      := by
   rcases Quotient.exists_rep A with ⟨a, rfl⟩
   rcases Quotient.exists_rep x with ⟨xc, rfl⟩
   change CList.mem xc (filterCList P a) = true ↔ CList.mem xc a = true ∧ P (Quotient.mk CList.Setoid xc)

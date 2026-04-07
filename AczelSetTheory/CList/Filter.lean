@@ -6,8 +6,10 @@ namespace CList
 def P_respects (P : CList → Bool) : Prop :=
   ∀ (x y : CList), extEq x y = true → P x = P y
 
-theorem subset_filter (P : CList → Bool) (xs : List CList) :
-    subset (mk (xs.filter P)) (mk xs) = true := by
+theorem subset_filter
+  (P : CList → Bool) (xs : List CList) :
+    subset (mk (xs.filter P)) (mk xs) = true
+      := by
   induction xs with
   | nil => simp only [List.filter_nil, subset_nil]
   | cons z zs ih =>
@@ -21,9 +23,11 @@ theorem subset_filter (P : CList → Bool) (xs : List CList) :
       exact ⟨hz, hsub⟩
     · exact subset_mono (zs.filter P) z zs ih
 
-theorem mem_filter_of_mem (P : CList → Bool) (hP_resp : P_respects P) (x : CList) (xs : List CList)
-    (hx : mem x (mk xs) = true) (hPx : P x = true) :
-    mem x (mk (xs.filter P)) = true := by
+theorem mem_filter_of_mem
+  (P : CList → Bool) (hP_resp : P_respects P) (x : CList) (xs : List CList)
+  (hx : mem x (mk xs) = true) (hPx : P x = true) :
+    mem x (mk (xs.filter P)) = true
+      := by
   induction xs with
   | nil => simp [mem_nil] at hx
   | cons z zs ih =>
@@ -44,9 +48,11 @@ theorem mem_filter_of_mem (P : CList → Bool) (hP_resp : P_respects P) (x : CLi
         exact Or.inr hind
       · exact hind
 
-theorem filter_subset_filter (P : CList → Bool) (hP_resp : P_respects P) (xs ys : List CList)
-    (hsub : subset (mk xs) (mk ys) = true) :
-    subset (mk (xs.filter P)) (mk (ys.filter P)) = true := by
+theorem filter_subset_filter
+  (P : CList → Bool) (hP_resp : P_respects P) (xs ys : List CList)
+  (hsub : subset (mk xs) (mk ys) = true) :
+    subset (mk (xs.filter P)) (mk (ys.filter P)) = true
+      := by
   induction xs with
   | nil => simp [List.filter_nil, subset_nil]
   | cons z zs ih =>
@@ -64,16 +70,20 @@ theorem filter_subset_filter (P : CList → Bool) (hP_resp : P_respects P) (xs y
     · simp only [subset_cons, Bool.and_eq_true] at hsub
       exact ih hsub.2
 
-theorem extEq_filter (P : CList → Bool) (hP_resp : P_respects P) (xs ys : List CList)
-    (heq : extEq (mk xs) (mk ys) = true) :
-    extEq (mk (xs.filter P)) (mk (ys.filter P)) = true := by
+theorem extEq_filter
+  (P : CList → Bool) (hP_resp : P_respects P) (xs ys : List CList)
+  (heq : extEq (mk xs) (mk ys) = true) :
+    extEq (mk (xs.filter P)) (mk (ys.filter P)) = true
+      := by
   simp only [extEq_def, Bool.and_eq_true] at heq ⊢
   exact ⟨filter_subset_filter P hP_resp xs ys heq.1, filter_subset_filter P hP_resp ys xs heq.2⟩
 
 
-theorem P_of_mem_filter (P : CList → Bool) (hP_resp : P_respects P) (x : CList) (xs : List CList)
-    (hx : mem x (mk (xs.filter P)) = true) :
-    P x = true := by
+theorem P_of_mem_filter
+  (P : CList → Bool) (hP_resp : P_respects P) (x : CList) (xs : List CList)
+  (hx : mem x (mk (xs.filter P)) = true) :
+    P x = true
+      := by
   induction xs with
   | nil => simp [mem_nil] at hx
   | cons z zs ih =>
@@ -91,4 +101,3 @@ theorem P_of_mem_filter (P : CList → Bool) (hP_resp : P_respects P) (x : CList
     · exact ih hx
 
 end CList
-

@@ -21,7 +21,10 @@ decreasing_by
   all_goals omega
 
 -- lt_antisymm: the new lt is antisymmetric (¬lt A B ∧ ¬lt B A → A = B)
-theorem lt_antisymm (A B : CList) (h1 : lt A B = false) (h2 : lt B A = false) : A = B := by
+theorem lt_antisymm
+  (A B : CList) (h1 : lt A B = false) (h2 : lt B A = false) :
+    A = B
+      := by
   match A, B with
   | mk [], mk [] => rfl
   | mk [], mk (_ :: _) => simp [lt] at h1
@@ -49,7 +52,10 @@ decreasing_by
   all_goals omega
 
 -- lt_asymm: lt A B = true → lt B A = false
-theorem lt_asymm (A B : CList) (h : lt A B = true) : lt B A = false := by
+theorem lt_asymm
+  (A B : CList) (h : lt A B = true) :
+    lt B A = false
+      := by
   match A, B with
   | mk [], mk [] => simp [lt] at h
   | mk [], mk (_ :: _) =>
@@ -78,8 +84,10 @@ decreasing_by
   all_goals simp [cSize, cSizeList]
   all_goals omega
 
-theorem lt_total (A B : CList) :
-    A ≠ B → lt A B = true ∨ lt B A = true := by
+theorem lt_total
+  (A B : CList) :
+    A ≠ B → lt A B = true ∨ lt B A = true
+      := by
   intro h_neq
   match A, B with
   | mk [], mk [] => exact absurd rfl h_neq
@@ -108,14 +116,19 @@ decreasing_by
   all_goals omega
 
 -- Compatibility with old lt_total form for orderedInsert proofs
-theorem lt_total_extEq (A B : CList) :
-    extEq A B = false → lt A B = true ∨ lt B A = true := by
+theorem lt_total_extEq
+  (A B : CList) :
+    extEq A B = false → lt A B = true ∨ lt B A = true
+      := by
   intro h_neq
   apply lt_total
   intro heq; subst heq; simp [extEq_refl] at h_neq
 
 -- lt_trans: the new lt is transitive
-theorem lt_trans (A B C : CList) (h1 : lt A B = true) (h2 : lt B C = true) : lt A C = true := by
+theorem lt_trans
+  (A B C : CList) (h1 : lt A B = true) (h2 : lt B C = true) :
+    lt A C = true
+      := by
   match A, B, C with
   | mk [], mk [], _ => simp [lt] at h1
   | mk [], mk (_ :: _), mk [] => simp [lt] at h2

@@ -7,8 +7,10 @@ def interCList (a b : CList) : CList :=
   match a with
   | CList.mk xs => CList.mk (xs.filter (fun c => CList.mem c b))
 
-theorem interCList_extEq_left (a₁ a₂ b : CList) (ha : CList.extEq a₁ a₂ = true) :
-    CList.extEq (interCList a₁ b) (interCList a₂ b) = true := by
+theorem interCList_extEq_left
+  (a₁ a₂ b : CList) (ha : CList.extEq a₁ a₂ = true) :
+    CList.extEq (interCList a₁ b) (interCList a₂ b) = true
+      := by
   cases a₁ with | mk xs₁ =>
   cases a₂ with | mk xs₂ =>
   have hP_resp : CList.P_respects (fun c => CList.mem c b) := by
@@ -25,8 +27,10 @@ theorem interCList_extEq_left (a₁ a₂ b : CList) (ha : CList.extEq a₁ a₂ 
       · rfl
   exact CList.extEq_filter (fun c => CList.mem c b) hP_resp xs₁ xs₂ ha
 
-theorem interCList_extEq_right (a b₁ b₂ : CList) (hb : CList.extEq b₁ b₂ = true) :
-    CList.extEq (interCList a b₁) (interCList a b₂) = true := by
+theorem interCList_extEq_right
+  (a b₁ b₂ : CList) (hb : CList.extEq b₁ b₂ = true) :
+    CList.extEq (interCList a b₁) (interCList a b₂) = true
+      := by
   cases a with | mk xs =>
   dsimp [interCList]
   have h_eq : (fun c => CList.mem c b₁) = (fun c => CList.mem c b₂) := by
@@ -47,8 +51,10 @@ theorem interCList_extEq_right (a b₁ b₂ : CList) (hb : CList.extEq b₁ b₂
   rw [h_eq]
   exact CList.extEq_refl (CList.mk (xs.filter (fun c => CList.mem c b₂)))
 
-theorem interCList_extEq_extEq (a₁ a₂ b₁ b₂ : CList) (ha : CList.extEq a₁ a₂ = true) (hb : CList.extEq b₁ b₂ = true) :
-    CList.extEq (interCList a₁ b₁) (interCList a₂ b₂) = true := by
+theorem interCList_extEq_extEq
+  (a₁ a₂ b₁ b₂ : CList) (ha : CList.extEq a₁ a₂ = true) (hb : CList.extEq b₁ b₂ = true) :
+    CList.extEq (interCList a₁ b₁) (interCList a₂ b₂) = true
+      := by
   have h1 : CList.extEq (interCList a₁ b₁) (interCList a₂ b₁) = true := interCList_extEq_left a₁ a₂ b₁ ha
   have h2 : CList.extEq (interCList a₂ b₁) (interCList a₂ b₂) = true := interCList_extEq_right a₂ b₁ b₂ hb
   exact CList.extEq_trans (interCList a₁ b₁) (interCList a₂ b₁) (interCList a₂ b₂) h1 h2

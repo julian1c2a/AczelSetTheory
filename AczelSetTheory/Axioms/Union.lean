@@ -3,14 +3,20 @@ import AczelSetTheory.Operations.Union
 
 namespace HFSet
 
-theorem mem_union (z A B : HFSet) : z ∈ union A B ↔ z ∈ A ∨ z ∈ B := by
+theorem mem_union
+  (z A B : HFSet) :
+    z ∈ union A B ↔ z ∈ A ∨ z ∈ B
+      := by
   rcases Quotient.exists_rep z with ⟨zc, rfl⟩
   rcases Quotient.exists_rep A with ⟨Ac, rfl⟩
   rcases Quotient.exists_rep B with ⟨Bc, rfl⟩
   change CList.mem zc (CList.union Ac Bc) = true ↔ CList.mem zc Ac = true ∨ CList.mem zc Bc = true
   exact CList.mem_union zc Ac Bc
 
-theorem mem_sUnion (z A : HFSet) : z ∈ sUnion A ↔ ∃ Y : HFSet, Y ∈ A ∧ z ∈ Y := by
+theorem mem_sUnion
+  (z A : HFSet) :
+    z ∈ sUnion A ↔ ∃ Y : HFSet, Y ∈ A ∧ z ∈ Y
+      := by
   rcases Quotient.exists_rep z with ⟨zc, rfl⟩
   rcases Quotient.exists_rep A with ⟨Ac, rfl⟩
   constructor

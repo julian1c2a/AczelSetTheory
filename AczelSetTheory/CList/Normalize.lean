@@ -11,8 +11,10 @@ namespace CList
 -- Cotas de tamaño: normalize no aumenta el cSize
 -- ==================================================================
 
-private theorem cSizeList_orderedInsert_le (x : CList) (l : List CList) :
-    cSizeList (orderedInsert x l) ≤ 1 + cSize x + cSizeList l := by
+private theorem cSizeList_orderedInsert_le
+  (x : CList) (l : List CList) :
+    cSizeList (orderedInsert x l) ≤ 1 + cSize x + cSizeList l
+      := by
   induction l with
   | nil => simp [orderedInsert, cSizeList]
   | cons y ys ih =>
@@ -24,8 +26,10 @@ private theorem cSizeList_orderedInsert_le (x : CList) (l : List CList) :
       · rw [if_pos h2]; simp only [cSizeList]; omega
       · rw [if_neg h2]; simp only [cSizeList]; omega
 
-theorem cSizeList_dedup_le (l : List CList) :
-    cSizeList (dedup l) ≤ cSizeList l := by
+theorem cSizeList_dedup_le
+  (l : List CList) :
+    cSizeList (dedup l) ≤ cSizeList l
+      := by
   suffices h : ∀ (l' vistos : List CList),
       cSizeList (dedupAux l' vistos) ≤ cSizeList l' from by
     unfold dedup; exact h l []
@@ -40,8 +44,10 @@ theorem cSizeList_dedup_le (l : List CList) :
     · rw [if_neg h]; simp only [cSizeList]
       exact Nat.le_trans (Nat.add_le_add_left (ih (x :: vistos)) _) (by omega)
 
-theorem cSizeList_insertionSort_le (l : List CList) :
-    cSizeList (insertionSort l) ≤ cSizeList l := by
+theorem cSizeList_insertionSort_le
+  (l : List CList) :
+    cSizeList (insertionSort l) ≤ cSizeList l
+      := by
   induction l with
   | nil => simp [insertionSort, cSizeList]
   | cons x xs ih =>
@@ -51,10 +57,11 @@ theorem cSizeList_insertionSort_le (l : List CList) :
     omega
 
 mutual
-  private theorem normalize_cSizeList_le : ∀ (xs : List CList),
-      cSizeList (xs.map normalize) ≤ cSizeList xs
-    | [] => by simp [cSizeList]
-    | (x :: rest) => by
+  private theorem normalize_cSizeList_le :
+      ∀ (xs : List CList),
+        cSizeList (xs.map normalize) ≤ cSizeList xs
+      | [] => by simp [cSizeList]
+      | (x :: rest) => by
         simp only [List.map, cSizeList]
         have hx := normalize_cSize_le x
         have ih := normalize_cSizeList_le rest
@@ -65,7 +72,10 @@ mutual
     all_goals simp [cSizeList]
     all_goals omega
 
-  theorem normalize_cSize_le (A : CList) : cSize (normalize A) ≤ cSize A :=
+  theorem normalize_cSize_le
+    (A : CList) :
+      cSize (normalize A) ≤ cSize A
+        :=
     match A with
     | mk xs => by
         have h_map := normalize_cSizeList_le xs
@@ -84,7 +94,10 @@ end
 -- Idempotencia de dedup e insertionSort
 -- ==================================================================
 
-theorem dedup_id_of_nodup (l : List CList) (h : Nodup l) : dedup l = l := by
+theorem dedup_id_of_nodup
+  (l : List CList) (h : Nodup l) :
+    dedup l = l
+      := by
   suffices ∀ (l' : List CList) (vistos : List CList),
       Nodup l' →
       (∀ x ∈ l', (vistos.any (fun v => extEq x v)) = false) →
@@ -108,8 +121,10 @@ theorem dedup_id_of_nodup (l : List CList) (h : Nodup l) : dedup l = l := by
     rw [List.any_cons, Bool.or_eq_false_iff]
     exact ⟨by rw [extEq_comm]; exact hx_nd y hy, hy_fresh⟩
 
-theorem insertionSort_id_of_sorted_nodup (l : List CList)
-    (hs : Sorted l) (hn : Nodup l) : insertionSort l = l := by
+theorem insertionSort_id_of_sorted_nodup
+  (l : List CList) (hs : Sorted l) (hn : Nodup l) :
+    insertionSort l = l
+      := by
   induction l with
   | nil => rfl
   | cons x xs ih =>
@@ -129,8 +144,10 @@ theorem insertionSort_id_of_sorted_nodup (l : List CList)
 -- ==================================================================
 
 -- Helper: l.map normalize = l cuando cada elemento es punto fijo
-private theorem map_normalize_fixed (l : List CList)
-    (h : ∀ y ∈ l, normalize y = y) : l.map normalize = l := by
+private theorem map_normalize_fixed
+  (l : List CList) (h : ∀ y ∈ l, normalize y = y) :
+    l.map normalize = l
+      := by
   induction l with
   | nil => rfl
   | cons x xs ih =>
@@ -154,12 +171,16 @@ private theorem mem_of_mem_dedupAux :
         · exact List.mem_cons.mpr (Or.inl rfl)
         · exact List.mem_cons_of_mem x (mem_of_mem_dedupAux xs (x :: vistos) y h)
 
-theorem mem_of_mem_dedup (l : List CList) (y : CList) (h : y ∈ dedup l) : y ∈ l :=
+theorem mem_of_mem_dedup
+  (l : List CList) (y : CList) (h : y ∈ dedup l) :
+    y ∈ l
+      :=
   mem_of_mem_dedupAux l [] y h
 
 mutual
   /-- normalize es idempotente: normalizar dos veces = normalizar una vez. -/
-  theorem normalize_idem : (A : CList) → normalize (normalize A) = normalize A
+  theorem normalize_idem :
+    (A : CList) → normalize (normalize A) = normalize A
     | mk xs => by
         -- Todos los elementos de ys = insertionSort (dedup (xs.map normalize)) son puntos fijos
         have h_fixed : ∀ y ∈ insertionSort (dedup (xs.map normalize)), normalize y = y := fun y hy =>
@@ -179,8 +200,8 @@ mutual
     all_goals omega
 
   -- Lema auxiliar: cada elemento de xs.map normalize es punto fijo de normalize
-  private theorem normalize_idem_list : (xs : List CList) →
-      ∀ y ∈ xs.map normalize, normalize y = y
+  private theorem normalize_idem_list :
+    (xs : List CList) → ∀ y ∈ xs.map normalize, normalize y = y
     | [] => by simp
     | x :: rest => by
         intro y hy
@@ -200,14 +221,19 @@ end
 -- ==================================================================
 
 /-- Si `a :: l` está ordenada, `l` también lo está. -/
-private theorem Sorted.tail {a : CList} {l : List CList} (h : Sorted (a :: l)) : Sorted l := by
+private theorem Sorted.tail {a : CList} {l : List CList}
+  (h : Sorted (a :: l)) :
+    Sorted l
+      := by
   match l with
   | [] => exact trivial
   | _ :: _ => exact h.2
 
 /-- If a list is sorted and b is a member, then lt a b = true -/
-private theorem sorted_mem_lt {a : CList} {l : List CList} (hs : Sorted (a :: l))
-    (hm : b ∈ l) : lt a b = true := by
+private theorem sorted_mem_lt {a : CList} {l : List CList}
+  (hs : Sorted (a :: l)) (hm : b ∈ l) :
+    lt a b = true
+      := by
   match l with
   | [] => simp at hm
   | c :: rest =>
@@ -312,7 +338,10 @@ theorem sorted_nodup_setEquiv_eq :
         fun a ha b hb hab => hprop a (List.mem_cons_of_mem x ha) b (List.mem_cons_of_mem y hb) hab
       rw [hxy_eq, sorted_nodup_setEquiv_eq xs ys hs1' hs2' hn1' hn2' htail_equiv hprop']
 
-theorem extEq_normalize (A : CList) : extEq A (normalize A) = true := by
+theorem extEq_normalize
+  (A : CList) :
+    extEq A (normalize A) = true
+      := by
   match A with
   | mk xs =>
     simp only [normalize]
@@ -346,8 +375,10 @@ decreasing_by
 Dadas dos CList A y B que son extensionalmente iguales,
 sus formas normales son idénticas.
 -/
-theorem normalize_eq_of_extEq {A B : CList} (h : CList.extEq A B = true) :
-    CList.normalize A = CList.normalize B := by
+theorem normalize_eq_of_extEq {A B : CList}
+  (h : CList.extEq A B = true) :
+    CList.normalize A = CList.normalize B
+      := by
   -- Inducción bien fundada en cSize A + cSize B
   match A, B with
   | CList.mk xs, CList.mk ys =>
@@ -430,7 +461,9 @@ decreasing_by
   all_goals simp only [cSize] at *
   all_goals omega
 
-theorem extEq_iff_normalize_eq {A B : CList} : extEq A B = true ↔ normalize A = normalize B := by
+theorem extEq_iff_normalize_eq {A B : CList} :
+    extEq A B = true ↔ normalize A = normalize B
+      := by
   constructor
   · exact normalize_eq_of_extEq
   · intro h

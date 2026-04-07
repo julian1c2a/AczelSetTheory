@@ -12,8 +12,10 @@ def Sorted : List CList → Prop
   | [_]          => True
   | a :: b :: rest => lt a b = true ∧ Sorted (b :: rest)
 
-private theorem orderedInsert_sorted (x : CList) (l : List CList)
-    (hs : Sorted l) : Sorted (orderedInsert x l) := by
+private theorem orderedInsert_sorted
+  (x : CList) (l : List CList) (hs : Sorted l) :
+    Sorted (orderedInsert x l)
+      := by
   induction l with
   | nil => simp [orderedInsert, Sorted]
   | cons y ys ih =>
@@ -53,14 +55,19 @@ private theorem orderedInsert_sorted (x : CList) (l : List CList)
               rw [hins] at ih ⊢
               exact ⟨hyz, ih⟩
 
-theorem insertionSort_sorted (l : List CList) : Sorted (insertionSort l) := by
+theorem insertionSort_sorted
+  (l : List CList) :
+    Sorted (insertionSort l)
+      := by
   induction l with
   | nil => simp [insertionSort, Sorted]
   | cons x xs ih => exact orderedInsert_sorted x (insertionSort xs) ih
 
 -- Elementos de (orderedInsert x l) son un subconjunto de {x} ∪ l
-private theorem mem_of_mem_orderedInsert (x z : CList) (l : List CList) :
-    z ∈ orderedInsert x l → z = x ∨ z ∈ l := by
+private theorem mem_of_mem_orderedInsert
+  (x z : CList) (l : List CList) :
+    z ∈ orderedInsert x l → z = x ∨ z ∈ l
+      := by
   induction l with
   | nil =>
     simp [orderedInsert]
@@ -88,8 +95,10 @@ private theorem mem_of_mem_orderedInsert (x z : CList) (l : List CList) :
           · exact Or.inr (List.mem_cons.mpr (Or.inr h'))
 
 -- Elementos de (insertionSort l) son elementos de l
-theorem insertionSort_mem_subset (z : CList) (l : List CList) :
-    z ∈ insertionSort l → z ∈ l := by
+theorem insertionSort_mem_subset
+  (z : CList) (l : List CList) :
+    z ∈ insertionSort l → z ∈ l
+      := by
   induction l with
   | nil => simp [insertionSort]
   | cons y ys ih =>
@@ -99,9 +108,12 @@ theorem insertionSort_mem_subset (z : CList) (l : List CList) :
     · exact List.mem_cons.mpr (Or.inl rfl)
     · exact List.mem_cons.mpr (Or.inr (ih h))
 
-private theorem orderedInsert_nodup (x : CList) (l : List CList)
-    (hxl : ∀ y ∈ l, extEq x y = false)
-    (hl : Nodup l) : Nodup (orderedInsert x l) := by
+private theorem orderedInsert_nodup
+  (x : CList) (l : List CList)
+  (hxl : ∀ y ∈ l, extEq x y = false)
+  (hl : Nodup l) :
+    Nodup (orderedInsert x l)
+      := by
   induction l with
   | nil => simp [orderedInsert, Nodup]
   | cons y ys ih =>
@@ -129,8 +141,10 @@ private theorem orderedInsert_nodup (x : CList) (l : List CList)
         · rw [extEq_comm]; exact hxy
         · exact hyl z h
 
-theorem insertionSort_nodup (l : List CList) (hl : Nodup l) :
-    Nodup (insertionSort l) := by
+theorem insertionSort_nodup
+  (l : List CList) (hl : Nodup l) :
+    Nodup (insertionSort l)
+      := by
   induction l with
   | nil => simp [insertionSort, Nodup]
   | cons x xs ih =>
@@ -143,8 +157,10 @@ theorem insertionSort_nodup (l : List CList) (hl : Nodup l) :
     · exact ih hxs
 
 /-- orderedInsert conserva la equivalencia de conjuntos (modulo extEq-dedup). -/
-private theorem orderedInsert_setEquiv (x : CList) (l : List CList) :
-    SetEquiv (orderedInsert x l) (x :: l) := by
+private theorem orderedInsert_setEquiv
+  (x : CList) (l : List CList) :
+    SetEquiv (orderedInsert x l) (x :: l)
+      := by
   induction l with
   | nil => simp [orderedInsert]; exact SetEquiv.refl _
   | cons y ys ih =>
@@ -180,8 +196,10 @@ private theorem orderedInsert_setEquiv (x : CList) (l : List CList) :
           · exact Or.inr (ih_z.mpr (Or.inr hys))
 
 /-- insertionSort conserva la equivalencia de conjuntos. -/
-theorem insertionSort_setEquiv (l : List CList) :
-    SetEquiv (insertionSort l) l := by
+theorem insertionSort_setEquiv
+  (l : List CList) :
+    SetEquiv (insertionSort l) l
+      := by
   induction l with
   | nil => exact SetEquiv.refl []
   | cons x xs ih =>

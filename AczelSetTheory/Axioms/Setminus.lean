@@ -3,9 +3,12 @@ import AczelSetTheory.HFSets
 
 namespace HFSet
 
-theorem mem_setminusCList_iff (a b xc : CList) :
-    CList.mem xc (setminusCList a b) = true ↔ CList.mem xc a = true ∧ CList.mem xc b = false := by
-  cases a with | mk xs =>
+theorem mem_setminusCList_iff
+  (a b xc : CList) :
+    CList.mem xc (setminusCList a b) = true ↔ CList.mem xc a = true ∧ CList.mem xc b = false
+      := by
+  cases a with
+  | mk xs =>
   dsimp [setminusCList]
   have hP_resp : CList.P_respects (fun c => !(CList.mem c b)) := by
     intro x y heq
@@ -29,8 +32,10 @@ theorem mem_setminusCList_iff (a b xc : CList) :
     have hPx_true : (!(CList.mem xc b)) = true := by rw [h2]; rfl
     exact CList.mem_filter_of_mem (fun c => !(CList.mem c b)) hP_resp xc xs h1 hPx_true
 
-theorem mem_setminus (A B : HFSet) (x : HFSet) :  
-    x ∈ setminus A B ↔ x ∈ A ∧ ¬ (x ∈ B) := by
+theorem mem_setminus
+  (A B : HFSet) (x : HFSet) :
+    x ∈ setminus A B ↔ x ∈ A ∧ ¬ (x ∈ B)
+      := by
   rcases Quotient.exists_rep A with ⟨a, rfl⟩
   rcases Quotient.exists_rep B with ⟨b, rfl⟩
   rcases Quotient.exists_rep x with ⟨xc, rfl⟩

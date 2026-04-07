@@ -3,11 +3,15 @@ import AczelSetTheory.HFSets
 
 namespace HFSet
 
-theorem mem_interCList_iff (a b xc : CList) :
-    CList.mem xc (interCList a b) = true ↔ CList.mem xc a = true ∧ CList.mem xc b = true := by
-  cases a with | mk xs =>
+theorem mem_interCList_iff
+  (a b xc : CList) :
+    CList.mem xc (interCList a b) = true ↔ CList.mem xc a = true ∧ CList.mem xc b = true
+      := by
+  cases a with
+  | mk xs =>
   dsimp [interCList]
-  have hP_resp : CList.P_respects (fun c => CList.mem c b) := by
+  have hP_resp : CList.P_respects (fun c => CList.mem c b)
+    := by
     intro x y heq
     dsimp
     cases h1 : CList.mem x b
@@ -27,8 +31,10 @@ theorem mem_interCList_iff (a b xc : CList) :
   · rintro ⟨h1, h2⟩
     exact CList.mem_filter_of_mem (fun c => CList.mem c b) hP_resp xc xs h1 h2
 
-theorem mem_inter (A B : HFSet) (x : HFSet) :  
-    x ∈ inter A B ↔ x ∈ A ∧ x ∈ B := by
+theorem mem_inter
+  (A B : HFSet) (x : HFSet) :
+    x ∈ inter A B ↔ x ∈ A ∧ x ∈ B
+      := by
   rcases Quotient.exists_rep A with ⟨a, rfl⟩
   rcases Quotient.exists_rep B with ⟨b, rfl⟩
   rcases Quotient.exists_rep x with ⟨xc, rfl⟩

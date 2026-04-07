@@ -13,7 +13,10 @@ def Nodup (l : List CList) : Prop :=
   l.Pairwise (fun a b => extEq a b = false)
 
 -- Lema: dedup produce una lista sin duplicados.
-theorem dedup_nodup (l : List CList) : Nodup (dedup l) := by
+theorem dedup_nodup
+  (l : List CList) :
+    Nodup (dedup l)
+      := by
   have stronger_lemma : ∀ (l' : List CList) (vistos : List CList),
     Nodup (dedupAux l' vistos) ∧
     (∀ y ∈ (dedupAux l' vistos), (vistos.any (fun z => extEq y z)) = false) := by
@@ -62,27 +65,39 @@ def SetEquiv (l₁ l₂ : List CList) : Prop :=
 namespace SetEquiv
 
 @[refl]
-theorem refl (l : List CList) : SetEquiv l l := by
+theorem refl
+  (l : List CList) :
+    SetEquiv l l
+      := by
   intro _; exact Iff.rfl
 
 @[symm]
-theorem symm {l₁ l₂ : List CList} (h : SetEquiv l₁ l₂) : SetEquiv l₂ l₁ := by
+theorem symm {l₁ l₂ : List CList}
+  (h : SetEquiv l₁ l₂) :
+    SetEquiv l₂ l₁
+      := by
   intro x; exact (h x).symm
 
-theorem trans {l₁ l₂ l₃ : List CList} (h₁₂ : SetEquiv l₁ l₂) (h₂₃ : SetEquiv l₂ l₃) :
-    SetEquiv l₁ l₃ := by
+theorem trans {l₁ l₂ l₃ : List CList}
+  (h₁₂ : SetEquiv l₁ l₂) (h₂₃ : SetEquiv l₂ l₃) :
+    SetEquiv l₁ l₃
+      := by
   intro x; exact (h₁₂ x).trans (h₂₃ x)
 
 end SetEquiv
 
-theorem mem_eq_any (x : CList) (l : List CList) :
-    mem x (mk l) = l.any (fun y => extEq x y) := by
+theorem mem_eq_any
+  (x : CList) (l : List CList) :
+    mem x (mk l) = l.any (fun y => extEq x y)
+      := by
   induction l with
   | nil => simp [mem_nil]
   | cons y ys ih => simp [mem_cons, ih]
 
-private theorem subset_iff_forall_mem (l₁ l₂ : List CList) :
-    subset (mk l₁) (mk l₂) = true ↔ (∀ x ∈ l₁, mem x (mk l₂) = true) := by
+private theorem subset_iff_forall_mem
+  (l₁ l₂ : List CList) :
+    subset (mk l₁) (mk l₂) = true ↔ (∀ x ∈ l₁, mem x (mk l₂) = true)
+      := by
   induction l₁ with
   | nil => simp [subset_nil]
   | cons x xs ih =>
@@ -96,8 +111,10 @@ private theorem subset_iff_forall_mem (l₁ l₂ : List CList) :
     · intro h
       exact ⟨h x List.mem_cons_self, ih.mpr (fun y hy => h y (List.mem_cons_of_mem _ hy))⟩
 
-theorem extEq_mk_iff_setEquiv (l₁ l₂ : List CList) :
-    extEq (mk l₁) (mk l₂) = true ↔ SetEquiv l₁ l₂ := by
+theorem extEq_mk_iff_setEquiv
+  (l₁ l₂ : List CList) :
+    extEq (mk l₁) (mk l₂) = true ↔ SetEquiv l₁ l₂
+      := by
   constructor
   · intro h
     unfold SetEquiv
@@ -128,7 +145,10 @@ theorem extEq_mk_iff_setEquiv (l₁ l₂ : List CList) :
            fun x hx => (h x).mpr (List.any_eq_true.mpr ⟨x, hx, extEq_refl x⟩)⟩
 
 -- Lema: `dedup` conserva el conjunto de elementos.
-theorem dedup_setEquiv_self (l : List CList) : SetEquiv (dedup l) l := by
+theorem dedup_setEquiv_self
+  (l : List CList) :
+    SetEquiv (dedup l) l
+      := by
   intro x; constructor
   · intro h_mem_reduced
     rw [List.any_eq_true] at h_mem_reduced
@@ -203,9 +223,11 @@ theorem dedup_setEquiv_self (l : List CList) : SetEquiv (dedup l) l := by
     obtain ⟨w, w_in_reduced, zw_eq⟩ := hz
     exact List.any_eq_true.mpr ⟨w, w_in_reduced, CList.extEq_trans x z w xz_eq zw_eq⟩
 
-private theorem extEq_cons_equiv (x y : CList) (xs ys : List CList)
-    (hxy : extEq x y = true) (hxsys : extEq (mk xs) (mk ys) = true) :
-    extEq (mk (x :: xs)) (mk (y :: ys)) = true := by
+private theorem extEq_cons_equiv
+  (x y : CList) (xs ys : List CList)
+  (hxy : extEq x y = true) (hxsys : extEq (mk xs) (mk ys) = true) :
+    extEq (mk (x :: xs)) (mk (y :: ys)) = true
+      := by
   rw [extEq_mk_iff_setEquiv] at *
   intro z
   simp only [List.any_cons, Bool.or_eq_true]
