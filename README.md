@@ -25,11 +25,16 @@ Key properties of this set theory:
 
 ### Derived Zermelo Axioms
 
-| Axiom | Theorem | Statement |
-|-------|---------|-----------|
-| Extensionality | `HFSet.extensionality` | ∀ A B, (∀ x, x ∈ A ↔ x ∈ B) → A = B |
-| Empty Set | `HFSet.not_mem_empty` | ∀ x, x ∉ ∅ |
-| Pairs | `HFSet.mem_pair` | x ∈ {a, b} ↔ x = a ∨ x = b |
+| Axiom | Theorem | Statement | Status |
+|-------|---------|-----------|--------|
+| Extensionality | `HFSet.extensionality` | ∀ A B, (∀ x, x ∈ A ↔ x ∈ B) → A = B | ✅ |
+| Empty Set | `HFSet.not_mem_empty` | ∀ x, x ∉ ∅ | ✅ |
+| Pairs | `HFSet.mem_pair` | x ∈ {a, b} ↔ x = a ∨ x = b | ✅ |
+| Union | `HFSet.mem_sUnion` | x ∈ ⋃ A ↔ ∃ B ∈ A, x ∈ B | ✅ |
+| Separation | `HFSet.mem_sep` | x ∈ sep A P ↔ x ∈ A ∧ P x | ✅ |
+| Intersection | `HFSet.mem_sInter` | x ∈ ⋂ A ↔ ∀ B ∈ A, x ∈ B | ✅ |
+| Setminus | `HFSet.mem_setminus` | x ∈ A \ B ↔ x ∈ A ∧ x ∉ B | ✅ |
+| Powerset | `HFSet.mem_powerset` | B ∈ 𝒫 A ↔ ∀ x, x ∈ B → x ∈ A | 🔄 |
 
 ### Module structure
 
