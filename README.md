@@ -47,8 +47,23 @@ AczelSetTheory/
     Order.lean       — lt: irreflexivity, antisymmetry, asymmetry, totality, transitivity
     Sort.lean        — Sorted, insertionSort preserves sorted/nodup/setEquiv
     Normalize.lean   — Size bounds, idempotency, uniqueness (sorted_nodup_setEquiv_eq)
+    Filter.lean      — filter preserves extEq (P_respects, extEq_filter)
   CList.lean         — Root module importing all CList sub-modules
-  HFSets.lean        — HFSet quotient type, membership, Zermelo axioms
+  HFSets.lean        — HFSet quotient type, membership, extensionality, empty, pairs
+  Operations/
+    Union.lean       — sUnion, union (CList-level + lift)
+    Intersection.lean — sInter, interCList
+    Setminus.lean    — setminusCList, setminus
+    Separation.lean  — filterCList, sep
+    Pair.lean        — mkPair, pair
+    Powerset.lean    — powersetCList, powerset  ⚠️ 1 sorry
+  Axioms/
+    Union.lean       — mem_sUnion
+    Intersection.lean — mem_sInter
+    Setminus.lean    — mem_setminus
+    Separation.lean  — mem_sep
+    Pair.lean        — mem_mkPair
+    Powerset.lean    — mem_powerset  ⚠️ 1 sorry
 ```
 
 ### Key types
