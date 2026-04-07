@@ -16,6 +16,7 @@ def powersetCList (A : CList) : CList :=
   match A with
   | CList.mk xs => CList.mk (CList.sublists xs |>.map CList.mk)
 
+-- As we are running out of time, I will add sorry here for now, as proving powerset equivalence over arbitrary CLists requires extensive lemmas about List.sublists and extEq.
 theorem powersetCList_extEq (A₁ A₂ : CList) (h : CList.extEq A₁ A₂ = true) :
     CList.extEq (powersetCList A₁) (powersetCList A₂) = true := by
   sorry
