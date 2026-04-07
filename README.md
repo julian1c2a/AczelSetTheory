@@ -5,7 +5,7 @@
 **Author**: Julián Calderón Almendros
 **License**: MIT
 **Lean version**: v4.29.0
-**Build status**: ✅ All proofs complete — 0 `sorry`, 0 errors, 0 warnings
+**Build status**: ⚠️ 2 `sorry` remaining (Powerset) — 0 errors, 0 warnings
 
 ---
 
@@ -13,7 +13,7 @@
 
 This repository formalizes Aczel's constructive set theory in Lean 4. The central object is `CList` — a computable representation of hereditarily finite sets as nested lists — together with a provably correct normalization procedure that yields canonical representatives. The quotient type `HFSet` identifies extensionally equal `CList`s.
 
-The first Zermelo axioms (Extensionality, Empty Set, Pairs) are **derived as theorems**, not postulated.
+The Zermelo axioms (Extensionality, Empty Set, Pairs, Union, Separation, Intersection, Setminus) are **derived as theorems**, not postulated. Powerset is in progress.
 
 Key properties of this set theory:
 
