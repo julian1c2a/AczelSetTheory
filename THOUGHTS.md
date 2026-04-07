@@ -85,3 +85,12 @@ termination arguments. This is documented in the git history (commit 5e4b3f3).
 - **Ordinals**: Build ordinals as hereditarily transitive sets (HTSets) within the CList framework
 - **Relation to IZF**: Explore which results require full IZF (Infinity + Power Set without
   restrictions) vs. CZF's weaker axioms
+
+## Nuevos pensamientos
+
+- **Sobre CZF y IZF**: Creo que la construcción acutal equivale a CZF, y es evidentemente más débil que IZF. Habría que mirar como habría que redefinir CList para incluir el axioma de infinito, y si eso ya nos da IZF. 
+- **Par no ordenado (Pair)**: Sí, nos hace falta el par no ordenado para ir cubriendo los distintos axiomas habituales de ZF.
+- **Powerset**: Abordaremos el conjunto potencia (powerset) de la misma forma que los axiomas y operaciones anteriores.
+- **Buena Fundación (Regularidad)**: Debemos demostrar el axioma de Buena Fundación en este sistema.
+- **Reemplazo (Fraenkel)**: En este sistema específico se podría demostrar también el axioma de reemplazo.
+- **Axioma de Elección en Conjuntos Finitos**: ¿Tiene sentido que podamos demostrar el axioma de elección en este ambiente de conjuntos finitos, o es una pretensión excesiva?

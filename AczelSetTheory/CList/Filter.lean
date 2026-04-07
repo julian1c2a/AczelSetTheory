@@ -70,4 +70,25 @@ theorem extEq_filter (P : CList → Bool) (hP_resp : P_respects P) (xs ys : List
   simp only [extEq_def, Bool.and_eq_true] at heq ⊢
   exact ⟨filter_subset_filter P hP_resp xs ys heq.1, filter_subset_filter P hP_resp ys xs heq.2⟩
 
+
+theorem P_of_mem_filter (P : CList → Bool) (hP_resp : P_respects P) (x : CList) (xs : List CList)
+    (hx : mem x (mk (xs.filter P)) = true) :
+    P x = true := by
+  induction xs with
+  | nil => simp [mem_nil] at hx
+  | cons z zs ih =>
+    simp only [List.filter_cons] at hx
+    split at hx
+    · next hzP =>
+      simp only [mem_cons, Bool.or_eq_true] at hx
+      cases hx with
+      | inl heq =>
+        have h_px_pz : P x = P z := hP_resp x z heq
+        rw [h_px_pz]
+        exact hzP
+      | inr hmem =>
+        exact ih hmem
+    · exact ih hx
+
 end CList
+

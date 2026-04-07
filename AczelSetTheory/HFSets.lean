@@ -55,7 +55,7 @@ def empty : HFSet := Quotient.mk CList.Setoid CList.empty
 -- ==================================================================
 
 /-- mem respeta extEq en el segundo argumento. -/
-private theorem mem_resp_right (x A B : CList) (h : extEq A B = true) :
+theorem mem_resp_right (x A B : CList) (h : extEq A B = true) :
     mem x A = true → mem x B = true := by
   intro hm
   have hsub : subset A B = true := by
@@ -63,7 +63,7 @@ private theorem mem_resp_right (x A B : CList) (h : extEq A B = true) :
   exact mem_subset x A B hm hsub
 
 /-- mem respeta extEq en el primer argumento (ambas direcciones). -/
-private theorem mem_resp_left (x y A : CList) (h : extEq x y = true) :
+theorem mem_resp_left (x y A : CList) (h : extEq x y = true) :
     mem x A = true ↔ mem y A = true := by
   constructor
   · intro hm
@@ -104,7 +104,7 @@ theorem mem_mk (x A : CList) :
 -- Lemas auxiliares para subset ↔ forall mem
 -- ==================================================================
 
-private theorem subset_iff_forall_mem_clist (A B : CList) :
+theorem subset_iff_forall_mem_clist (A B : CList) :
     subset A B = true ↔ (∀ x : CList, mem x A = true → mem x B = true) := by
   match A with
   | mk xs =>
@@ -150,58 +150,3 @@ theorem not_mem_empty (x : HFSet) : ¬ (x ∈ empty) := by
   unfold CList.empty
   rw [mem_nil]; exact Bool.false_ne_true
 
--- ==================================================================
--- Axioma de Pares
--- ==================================================================
-
-/-- Construye el par {a, b} a nivel CList. -/
-def mkPair (a b : CList) : CList := mk [a, b]
-
-/-- El par {a, b} a nivel HFSet. -/
-def pair (a b : HFSet) : HFSet :=
-  Quotient.liftOn₂ a b
-    (fun x y => toHFSet (mkPair x y))
-    (fun x₁ y₁ x₂ y₂ hx hy => by
-      apply Quotient.sound
-      show extEq (mkPair x₁ y₁) (mkPair x₂ y₂) = true
-      simp only [mkPair, extEq_def, Bool.and_eq_true]
-      constructor
-      · -- subset (mk [x₁, y₁]) (mk [x₂, y₂])
-        rw [subset_cons, Bool.and_eq_true]
-        constructor
-        · rw [mem_cons, mem_cons, mem_nil, Bool.or_false, Bool.or_eq_true]
-          exact Or.inl hx
-        · rw [subset_cons, Bool.and_eq_true]
-          constructor
-          · rw [mem_cons, mem_cons, mem_nil, Bool.or_false, Bool.or_eq_true]
-            exact Or.inr hy
-          · exact subset_nil _
-      · -- subset (mk [x₂, y₂]) (mk [x₁, y₁])
-        rw [subset_cons, Bool.and_eq_true]
-        constructor
-        · rw [mem_cons, mem_cons, mem_nil, Bool.or_false, Bool.or_eq_true]
-          have : extEq x₂ x₁ = true := by rw [extEq_comm]; exact hx
-          exact Or.inl this
-        · rw [subset_cons, Bool.and_eq_true]
-          constructor
-          · rw [mem_cons, mem_cons, mem_nil, Bool.or_false, Bool.or_eq_true]
-            have : extEq y₂ y₁ = true := by rw [extEq_comm]; exact hy
-            exact Or.inr this
-          · exact subset_nil _)
-
-/-- Axioma de Pares: x ∈ pair a b ↔ x = a ∨ x = b. -/
-theorem mem_pair (x a b : HFSet) : x ∈ pair a b ↔ x = a ∨ x = b := by
-  rcases Quotient.exists_rep x with ⟨xc, rfl⟩
-  rcases Quotient.exists_rep a with ⟨ac, rfl⟩
-  rcases Quotient.exists_rep b with ⟨bc, rfl⟩
-  change CList.mem xc (mkPair ac bc) = true ↔ _
-  simp only [mkPair, mem_cons, mem_nil, Bool.or_false, Bool.or_eq_true]
-  constructor
-  · rintro (hxa | hxb)
-    · exact Or.inl (Quotient.sound hxa)
-    · exact Or.inr (Quotient.sound hxb)
-  · rintro (hxa | hxb)
-    · exact Or.inl (Quotient.exact hxa)
-    · exact Or.inr (Quotient.exact hxb)
-
-end HFSet
