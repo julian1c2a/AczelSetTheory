@@ -47,18 +47,23 @@ theorem setminusCList_extEq_right (a b₁ b₂ : CList) (hb : CList.extEq b₁ b
   rw [h_eq]
   exact CList.extEq_refl (CList.mk (xs.filter (fun c => !(CList.mem c b₂))))
 
-theorem setminusCList_extEq_extEq (a₁ a₂ b₁ b₂ : CList) (ha : CList.extEq a₁ a₂ = true) (hb : CList.extEq b₁ b₂ = true) :
-    CList.extEq (setminusCList a₁ b₁) (setminusCList a₂ b₂) = true := by
+theorem setminusCList_extEq_extEq
+  (a₁ a₂ b₁ b₂ : CList) (ha : CList.extEq a₁ a₂ = true) (hb : CList.extEq b₁ b₂ = true) :
+    CList.extEq (setminusCList a₁ b₁) (setminusCList a₂ b₂) = true
+      := by
   have h1 : CList.extEq (setminusCList a₁ b₁) (setminusCList a₂ b₁) = true := setminusCList_extEq_left a₁ a₂ b₁ ha
   have h2 : CList.extEq (setminusCList a₂ b₁) (setminusCList a₂ b₂) = true := setminusCList_extEq_right a₂ b₁ b₂ hb
   exact CList.extEq_trans (setminusCList a₁ b₁) (setminusCList a₂ b₁) (setminusCList a₂ b₂) h1 h2
 
 /-- Operación Diferencia (A \ B) para HFSet -/
-def setminus (A B : HFSet) : HFSet :=
+def setminus (A B : HFSet) :
+  HFSet
+    :=
   Quotient.liftOn₂ A B
     (fun a b => Quotient.mk CList.Setoid (setminusCList a b))
     (fun a₁ b₁ a₂ b₂ ha hb => by
       apply Quotient.sound
-      exact setminusCList_extEq_extEq a₁ a₂ b₁ b₂ ha hb)
+      exact setminusCList_extEq_extEq a₁ a₂ b₁ b₂ ha hb
+    )
 
 end HFSet

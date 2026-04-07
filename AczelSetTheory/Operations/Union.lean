@@ -3,7 +3,9 @@ import AczelSetTheory.HFSets
 
 namespace CList
 
-def union (a b : CList) : CList :=
+def union (a b : CList) :
+  CList
+    :=
   match a, b with
   | mk xs, mk ys => mk (xs ++ ys)
 
@@ -34,13 +36,17 @@ theorem mem_union (z a b : CList) :
         · exact Or.inr (ih.mpr (Or.inl hxs))
       · exact Or.inr (ih.mpr (Or.inr hys))
 
-def sUnion (A : CList) : CList :=
+def sUnion (A : CList) :
+  CList
+    :=
   match A with
   | mk xs => mk (xs.flatMap (fun x => match x with | mk ys => ys))
 
 theorem mem_sUnion (z A : CList) :
-    mem z (sUnion A) = true ↔ ∃ Y, mem Y A = true ∧ mem z Y = true := by
-  cases A with | mk xs =>
+  mem z (sUnion A) = true ↔ ∃ Y, mem Y A = true ∧ mem z Y = true
+    := by
+  cases A with
+  | mk xs =>
   induction xs with
   | nil =>
     simp only [sUnion, List.flatMap_nil, mem_nil]
@@ -64,8 +70,10 @@ theorem mem_sUnion (z A : CList) :
       · exact Or.inl (HFSet.mem_resp_right z Y' (mk ys) hY' hzY')
       · exact Or.inr (ih.mpr ⟨Y', hY', hzY'⟩)
 
-theorem union_extEq (a₁ a₂ b₁ b₂ : CList) (ha : extEq a₁ a₂ = true) (hb : extEq b₁ b₂ = true) :
-    extEq (union a₁ b₁) (union a₂ b₂) = true := by
+theorem union_extEq
+  (a₁ a₂ b₁ b₂ : CList) (ha : extEq a₁ a₂ = true) (hb : extEq b₁ b₂ = true) :
+    extEq (union a₁ b₁) (union a₂ b₂) = true
+      := by
   rw [extEq_def, Bool.and_eq_true]
   constructor
   · rw [HFSet.subset_iff_forall_mem_clist]
@@ -81,8 +89,10 @@ theorem union_extEq (a₁ a₂ b₁ b₂ : CList) (ha : extEq a₁ a₂ = true) 
     | inl h1 => exact Or.inl (mem_of_extEq x x a₁ (extEq_refl _) ((HFSet.mem_resp_right x a₂ a₁ (by rw [extEq_comm]; exact ha)) h1))
     | inr h2 => exact Or.inr (mem_of_extEq x x b₁ (extEq_refl _) ((HFSet.mem_resp_right x b₂ b₁ (by rw [extEq_comm]; exact hb)) h2))
 
-theorem sUnion_extEq (A₁ A₂ : CList) (hA : extEq A₁ A₂ = true) :
-    extEq (sUnion A₁) (sUnion A₂) = true := by
+theorem sUnion_extEq
+  (A₁ A₂ : CList) (hA : extEq A₁ A₂ = true) :
+    extEq (sUnion A₁) (sUnion A₂) = true
+      := by
   rw [extEq_def, Bool.and_eq_true]
   constructor
   · rw [HFSet.subset_iff_forall_mem_clist]
@@ -102,13 +112,17 @@ end CList
 
 namespace HFSet
 
-def union (A B : HFSet) : HFSet :=
+def union (A B : HFSet) :
+  HFSet
+    :=
   Quotient.liftOn₂ A B (fun a b => Quotient.mk CList.Setoid (CList.union a b))
     (fun _ _ _ _ ha hb => by
       apply Quotient.sound
       exact CList.union_extEq _ _ _ _ ha hb)
 
-def sUnion (A : HFSet) : HFSet :=
+def sUnion (A : HFSet) :
+  HFSet
+    :=
   Quotient.liftOn A (fun a => Quotient.mk CList.Setoid (CList.sUnion a))
     (fun _ _ ha => by
       apply Quotient.sound
