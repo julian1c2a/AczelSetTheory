@@ -94,10 +94,10 @@ def sep (A : HFSet) (P : HFSet → Prop) [DecidablePred P] : HFSet :=
       apply Quotient.sound
       exact filterCList_extEq_extEq P A₁ A₂ hA)
 
-/-- Sintaxis de comprensión segura: {[ x ∈ A <|> P(x) ]} -/
-syntax "{[" ident "∈" term "<|>" term "]}" : term
+/-- Sintaxis de comprensión segura: {[ x ∈ A | P(x) ]} -/
+syntax "{[" ident "∈" term " | " term "]}" : term
 macro_rules
-  | `({[$x:ident ∈ $A <|> $P]}) => `(sep $A (fun $x => $P))
+  | `({[$x:ident ∈ $A | $P]}) => `(sep $A (fun $x => $P))
 
 -- ==================================================================
 -- Numerales de von Neumann (0 a 9)

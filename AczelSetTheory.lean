@@ -30,6 +30,7 @@ import AczelSetTheory.Axioms.Lattice
 import AczelSetTheory.Axioms.BooleanAlgebra
 import AczelSetTheory.Axioms.BooleanRing
 import AczelSetTheory.Axioms.Succ
+import AczelSetTheory.Axioms.VonNeumann
 import AczelSetTheory.Notation
 
 export CList
