@@ -906,3 +906,55 @@ permite definir `ASet₂` y `ASet₃` sin tocar `ASet₁`.
   — Definición original de la jerarquía aritmética.
 
 ---
+
+## [4.] Decisión de diseño: alcance del proyecto AczelSetTheory
+
+**Fecha**: 2026-04-08
+**Decisión**: Nivel 1 simple (`fin + inf`).
+
+### 4.1. Contexto de proyectos
+
+Este proyecto (**AczelSetTheory**) es uno de cuatro que eventualmente se fusionarán:
+
+| Proyecto | Alcance | Universo |
+|----------|---------|----------|
+| **AczelSetTheory** (este) | Conjuntos hereditariamente finitos + extensión decidible | $V_\omega$ → $U_1 = \text{HF}(V_\omega \cup \Delta^0_1)$ |
+| **ZFC** (futuro) | Teoría de conjuntos ZFC completa | $V$ (clase universal) |
+| **Peano** (existente) | Números naturales de Peano | $\omega$ |
+| **MK+CAC** (futuro) | Morse-Kelley + Axioma de Elección Contable | Clases y conjuntos |
+
+### 4.2. Rol de AczelSetTheory en el ecosistema
+
+AczelSetTheory explora el fragmento **computacionalmente decidible** de la teoría
+de conjuntos:
+
+- **$V_\omega$ (Phases 1–11)**: Conjuntos hereditariamente finitos. Todo es
+  decidible: membresía, igualdad, subconjunto, operaciones. Equivalente a
+  ZF$^{-\infty}$ (ZF sin infinitud). Axioma de Elección derivable.
+
+- **$U_1$ (Phase futura)**: Extensión con `inf : (HFSet → Bool) → CList₊`.
+  Membresía decidible, igualdad **no** decidible. Captura $\Delta^0_1$ — los
+  subconjuntos recursivos de $\omega$. Axioma de infinitud disponible.
+  Powerset solo para conjuntos finitos.
+
+Lo que AczelSetTheory **no** pretende cubrir:
+
+- Conjuntos no computables ($\Sigma^0_1$, jerarquía analítica, etc.)
+- Powerset completo sobre infinitos
+- Grandes cardinales, forcing, independencia
+- Axiomas que requieran $V_{\omega+1}$ o superior
+
+Estos quedan para el proyecto **ZFC**.
+
+### 4.3. Beneficios de la separación
+
+1. **AczelSetTheory queda autocontenido**: todo dentro de $V_\omega$ (y eventualmente $U_1$) es computable y verificable algorítmicamente.
+2. **Interface limpia con Peano**: La codificación von Neumann ($n \mapsto \{0, 1, \ldots, n-1\}$) ya está desarrollada. Al fusionar, Peano se recibe como subestructura de $V_\omega$.
+3. **ZFC reutiliza la infraestructura**: Las definiciones de relación, función,
+   inyectiva, suryectiva, biyectiva, etc., se transfieren directamente — solo
+   cambia el tipo base de `HFSet` a un tipo axiomático `Set`.
+4. **MK+CAC complementa**: Donde AczelSetTheory usa `Classical.choice` para
+   funciones (Phase 10: `noncomputable def apply`), MK+CAC proporcionará una
+   teoría de clases más expresiva con el Axioma de Elección Contable.
+
+---
