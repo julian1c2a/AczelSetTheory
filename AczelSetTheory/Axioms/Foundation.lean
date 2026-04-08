@@ -4,9 +4,10 @@ import AczelSetTheory.HFSets
 namespace CList
 
 /-- Si `mem x (mk xs) = true`, entonces existe `y ∈ xs` con `extEq x y = true`. -/
-theorem mem_exists_list_mem (x : CList) (xs : List CList)
-  (h : mem x (mk xs) = true) :
-    ∃ y, y ∈ xs ∧ extEq x y = true := by
+theorem mem_exists_list_mem
+  (x : CList) (xs : List CList) (h : mem x (mk xs) = true) :
+    ∃ y, y ∈ xs ∧ extEq x y = true
+      := by
   induction xs with
   | nil => simp [mem_nil] at h
   | cons z zs ih =>
@@ -17,9 +18,10 @@ theorem mem_exists_list_mem (x : CList) (xs : List CList)
       exact ⟨y, List.mem_cons_of_mem z hy_mem, hy_eq⟩
 
 /-- Si `y ∈ xs` (a nivel lista), entonces `mem y (mk xs) = true`. -/
-theorem mem_of_list_mem (y : CList) (xs : List CList)
-  (h : y ∈ xs) :
-    mem y (mk xs) = true := by
+theorem mem_of_list_mem
+  (y : CList) (xs : List CList) (h : y ∈ xs) :
+    mem y (mk xs) = true
+      := by
   induction xs with
   | nil => exact absurd h List.not_mem_nil
   | cons z zs ih =>
@@ -33,9 +35,12 @@ end CList
 namespace HFSet
 
 /-- Lema auxiliar para Fundación por inducción sobre un número natural n ≥ cSize B. -/
-private theorem foundation_aux (n : Nat) :
-    ∀ (B A : CList), CList.cSize B ≤ n → CList.mem B A = true →
-    ∃ e, CList.mem e A = true ∧ ∀ y, CList.mem y e = true → CList.mem y A = false := by
+private theorem foundation_aux
+  (n : Nat) :
+    ∀ (B A : CList),
+      CList.cSize B ≤ n → CList.mem B A = true →
+      ∃ e, CList.mem e A = true ∧ ∀ y, CList.mem y e = true → CList.mem y A = false
+        := by
   induction n with
   | zero =>
     intro B A hle _
@@ -65,8 +70,10 @@ private theorem foundation_aux (n : Nat) :
 /-- **Axioma de Fundación (Regularidad)**:
     Todo conjunto no vacío A contiene un elemento x tal que x ∩ A = ∅.
     Equivalentemente: ∃ x ∈ A, ∀ y ∈ x, y ∉ A. -/
-theorem foundation (A : HFSet) (hne : A ≠ empty) :
-    ∃ x : HFSet, x ∈ A ∧ ∀ y : HFSet, y ∈ x → ¬ y ∈ A := by
+theorem foundation
+  (A : HFSet) (hne : A ≠ empty) :
+    ∃ x : HFSet, x ∈ A ∧ ∀ y : HFSet, y ∈ x → ¬ y ∈ A
+      := by
   rcases Quotient.exists_rep A with ⟨a, rfl⟩
   cases a with | mk as =>
   cases as with

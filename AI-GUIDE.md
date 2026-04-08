@@ -500,3 +500,158 @@ A living document tracking planned development phases. Each phase includes:
 An informal design journal for recording ideas, alternatives considered,
 open questions, and future directions. Not normative — purely exploratory.
 Useful for AI context on "why" decisions were made.
+
+---
+
+## Declaration Header Formatting
+
+### (29.) Vertical layout for theorem and definition headers
+
+All `theorem`, `def`, and `instance` declarations must use a **vertical multi-line layout**
+that separates name, parameters, return type, and definition operator (`:=`) on distinct lines.
+One Lean tab = 2 spaces throughout.
+
+#### Rules
+
+1. **Line 1 — keyword + name + implicit arguments** (no indentation).
+   The keyword (`theorem`, `def`, `instance`, `private theorem`, etc.), the declaration name,
+   and any **implicit** parameters (in braces `{...}`) all go on this first line:
+
+   ```lean
+   theorem union_comm
+   private theorem singleton_eq_pair {a b c : HFSet}
+   instance mem_decidable
+   def compl
+   ```
+
+2. **Line 2 — explicit parameters + colon**, indented 1 tab (2 spaces).
+   All explicit parameters (in parentheses `(...)`) go here, ending with `:`:
+
+   ```lean
+     (A B : HFSet) :
+   ```
+
+   If there are many parameters or hypotheses, they all remain on this line:
+
+   ```lean
+     (U A B : HFSet) (hA : A ⊆ U) (hB : B ⊆ U) :
+   ```
+
+   If the line would be excessively long, parameters may span multiple lines
+   at the same 1-tab indent, with `:` on the last parameter line.
+
+3. **Line 3 — return type / theorem statement**, indented 2 tabs (4 spaces).
+   For theorems this is the proposition being proved; for definitions, the return type.
+   If the statement spans multiple lines, continuation lines stay at 2-tab indent:
+
+   ```lean
+       union A B = union B A
+   ```
+
+   ```lean
+       ∀ (B A : CList),
+         CList.cSize B ≤ n → CList.mem B A = true →
+         ∃ e, CList.mem e A = true ∧ ∀ y, CList.mem y e = true → CList.mem y A = false
+   ```
+
+4. **Line 4 — `:=` or `:= by`**, indented 3 tabs (6 spaces):
+
+   ```lean
+         :=
+         := by
+   ```
+
+5. **Proof body**, indented 1 tab (2 spaces) from column 0 (standard Lean indent).
+
+#### Complete examples
+
+**Term-mode proof:**
+
+```lean
+theorem union_comm
+  (A B : HFSet) :
+    union A B = union B A
+      :=
+  extensionality _ _ fun x => by
+    rw [mem_union x A B, mem_union x B A, or_comm]
+```
+
+**Tactic-mode proof:**
+
+```lean
+theorem empty_union
+  (A : HFSet) :
+    union empty A = A
+      := by
+  rw [union_comm]; exact union_empty A
+```
+
+**Definition:**
+
+```lean
+def compl
+  (U X : HFSet) :
+    HFSet
+      :=
+  setminus U X
+```
+
+**Instance:**
+
+```lean
+instance mem_decidable
+  (x A : HFSet) :
+    Decidable (x ∈ A)
+      :=
+  Quotient.recOnSubsingleton₂ x A fun xc ac =>
+    show Decidable (CList.mem xc ac = true) from
+    match CList.mem xc ac with
+    | true  => isTrue rfl
+    | false => isFalse nofun
+```
+
+**With implicit arguments on line 1:**
+
+```lean
+private theorem singleton_eq_pair {a b c : HFSet}
+  (h : singleton a = pair b c) :
+    a = b ∧ a = c
+      := by
+  ...
+```
+
+**Multi-line statement (long theorem):**
+
+```lean
+private theorem foundation_aux
+  (n : Nat) :
+    ∀ (B A : CList),
+      CList.cSize B ≤ n → CList.mem B A = true →
+      ∃ e, CList.mem e A = true ∧ ∀ y, CList.mem y e = true → CList.mem y A = false
+        := by
+  induction n with
+  ...
+```
+
+#### Exception — one-liner term-mode
+
+When the **entire** declaration (name + params + type + `:=` + body) fits comfortably
+on a single line (≤ ~90 characters) and the proof is a trivial term, the compact form
+is acceptable:
+
+```lean
+theorem subset_refl (A : HFSet) : A ⊆ A := fun _ h => h
+```
+
+Use judgment: if the statement is conceptually important or the line gets long,
+prefer the vertical layout even for short proofs.
+
+#### Indent summary table
+
+| Element | Indent (tabs) | Indent (spaces) |
+|---------|:------------:|:---------------:|
+| keyword + name + `{implicit}` | 0 | 0 |
+| `(explicit params) :` | 1 | 2 |
+| Return type / statement | 2 | 4 |
+| `:=` or `:= by` | 3 | 6 |
+| Proof body | 1 | 2 |
