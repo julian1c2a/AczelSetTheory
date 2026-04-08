@@ -401,8 +401,8 @@ section PairingLemmas
 ## Compliance
 
 Verify that REFERENCE.md, `.lean` files, and documentation files comply with all points
-(0–21) and naming conventions (NC-1–NC-10) before considering documentation complete
-and up to date.
+(0–21), naming conventions (NC-1–NC-10), and export/glob rules (23, 30–33) before
+considering documentation complete and up to date.
 
 ---
 
@@ -435,16 +435,106 @@ Rules:
 - `gen-root.bash` automatically scans subdirectories.
 - Namespace mirrors path: `AczelSetTheory/Nat/Add.lean` → `namespace AczelSetTheory.Nat.Add`.
 
-### (23.) Barrel modules (optional)
+### (23.) Barrel modules (mandatory for subdirectories)
 
-For a subdirectory `Foo/` with many modules, you may create `Foo.lean` at the same level
-that re-exports all submodules:
+Every subdirectory containing 2 or more `.lean` modules **MUST** have a barrel file.
+The barrel file:
+
+- Sits at the same level as the directory, named `DirName.lean` (e.g., `Operations.lean` for `Operations/`).
+- Imports ALL production sub-modules in the directory (excludes `test_*.lean` and `Test*.lean`).
+- Contains NO definitions, theorems, or proofs — only `import` statements and an optional header comment.
+- Serves as the **single import point** for the subdirectory.
 
 ```lean
--- AczelSetTheory/Foo.lean
-import AczelSetTheory.Foo.Basic
-import AczelSetTheory.Foo.Advanced
+-- AczelSetTheory/Operations.lean (barrel file)
+import AczelSetTheory.Operations.Union
+import AczelSetTheory.Operations.Intersection
+import AczelSetTheory.Operations.Setminus
+-- ... all production modules in Operations/
 ```
+
+The root barrel file (`ProjectName.lean`) **prefers barrel imports** over individual
+sub-modules when a barrel exists:
+
+```lean
+-- AczelSetTheory.lean (root barrel)
+import AczelSetTheory.CList          -- barrel for CList/
+import AczelSetTheory.Operations     -- barrel for Operations/
+import AczelSetTheory.Axioms         -- barrel for Axioms/
+import AczelSetTheory.HFSets         -- top-level module (no barrel needed)
+import AczelSetTheory.Notation       -- top-level module
+```
+
+`gen-root.bash` detects barrel files and emits the barrel import instead of listing
+each sub-module individually.
+
+---
+
+## Export/Glob Architecture
+
+### (30.) Export blocks in leaf modules
+
+Every production module (not barrels, not test files) **MUST** end with an `export` block
+that lists all public (non-private) definitions, theorems, lemmas, and instances from the
+module's namespace. This makes declarations available to importers without requiring
+`open Namespace`.
+
+**Pattern:**
+
+```lean
+namespace HFSet
+
+def union (A B : HFSet) : HFSet := ...
+
+theorem mem_union (x A B : HFSet) : x ∈ union A B ↔ x ∈ A ∨ x ∈ B := ...
+
+end HFSet
+
+-- Export: all public declarations from this module
+export HFSet (union mem_union)
+```
+
+**Rules:**
+
+1. The `export` statement goes AFTER `end namespace`, at the top level of the file.
+2. List ALL non-private `def`, `theorem`, `lemma`, `instance` names.
+3. Do NOT export `private` declarations, `_aux` helpers, or intermediate lemmas prefixed with `private`.
+4. Keep the export list **sorted alphabetically** within each namespace.
+5. If a module contributes to multiple namespaces, use one `export` per namespace.
+6. `notation`, `macro`, `syntax` are NOT listed in `export` — they propagate automatically on `import`.
+
+**Effect:** After `import AczelSetTheory.Axioms.Union`, downstream code can write
+`mem_union` directly instead of `HFSet.mem_union`.
+
+### (31.) Export block maintenance
+
+- **Adding** a new public declaration requires adding it to the `export` block.
+- **Renaming** a declaration requires updating the `export` block.
+- **Deleting** a public declaration requires removing it from the `export` block.
+- When **projecting** a module to REFERENCE.md (§14), verify the export list matches.
+- The export list is the **canonical list** of a module's public API.
+
+### (32.) Barrel files and exports
+
+Barrel files (`DirName.lean`) do **not** add their own `export` blocks — the leaf modules
+handle their own exports. The barrel file's sole job is aggregation via `import`.
+
+However, a barrel file **may** include a top-level comment cataloguing the public API:
+
+```lean
+-- AczelSetTheory/Operations.lean
+-- Public API: union, inter, setminus, pair, powerset, symDiff, orderedPair,
+--             sep, sUnion, dom, range, comp, image, ...
+import AczelSetTheory.Operations.Union
+import AczelSetTheory.Operations.Intersection
+-- ...
+```
+
+### (33.) Template compliance
+
+The `_template.lean` file must reflect the export pattern. Section 4 ("Exports") in the
+template shows the `export` block after `end namespace`. New modules created by
+`new-module.bash` inherit this structure.
 
 ---
 
