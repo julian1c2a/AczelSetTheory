@@ -8,8 +8,11 @@ import AczelSetTheory.CList
 import AczelSetTheory.HFSets
 import AczelSetTheory.Operations.Separation
 import AczelSetTheory.Operations.Union
+import AczelSetTheory.Operations.SymDiff
 import AczelSetTheory.Axioms.Separation
 import AczelSetTheory.Axioms.Union
+import AczelSetTheory.Axioms.SymDiff
+import AczelSetTheory.Axioms.Foundation
 import AczelSetTheory.Notation
 
 export CList
