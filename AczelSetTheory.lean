@@ -24,6 +24,11 @@ import AczelSetTheory.Axioms.SymDiff
 import AczelSetTheory.Axioms.Foundation
 import AczelSetTheory.Axioms.Singleton
 import AczelSetTheory.Axioms.OrderedPair
+import AczelSetTheory.Axioms.Decidable
+import AczelSetTheory.Axioms.Subset
+import AczelSetTheory.Axioms.Lattice
+import AczelSetTheory.Axioms.BooleanAlgebra
+import AczelSetTheory.Axioms.BooleanRing
 import AczelSetTheory.Notation
 
 export CList
