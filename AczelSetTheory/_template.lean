@@ -48,7 +48,7 @@ namespace AczelSetTheory.ModuleName
 
 end AczelSetTheory.ModuleName
 
-export AczelSetTheory.ModuleName (
-  -- myDef
-  -- myTheorem
-)
+-- export AczelSetTheory.ModuleName (
+--   myDef
+--   myTheorem
+-- )
