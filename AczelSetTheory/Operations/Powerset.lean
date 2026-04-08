@@ -14,7 +14,7 @@ theorem sublists_subset
   (xs : List CList) (zs : List CList) (h : zs ∈ sublists xs) :
     subset (mk zs) (mk xs) = true
       := by
-  induction xs with
+  induction xs generalizing zs with
   | nil =>
     simp only [sublists, List.mem_cons, List.mem_nil_iff, or_false] at h
     rw [h]; exact subset_nil (mk [])
@@ -93,14 +93,14 @@ theorem mem_powersetCList
         CList.filter_in_sublists P xs
       -- subset y (mk filtered): todo elem de y está en el filtrado
       have h_sub1 : CList.subset y (CList.mk (xs.filter P)) = true := by
-        rw [CList.subset_iff_forall_mem_clist]
+        rw [subset_iff_forall_mem_clist]
         intro w hw
         have hw_xs : CList.mem w (CList.mk xs) = true :=
           CList.mem_subset w y (CList.mk xs) hw h
         exact CList.mem_filter_of_mem P hP_resp w xs hw_xs hw
       -- subset (mk filtered) y: todo elem del filtrado está en y
       have h_sub2 : CList.subset (CList.mk (xs.filter P)) y = true := by
-        rw [CList.subset_iff_forall_mem_clist]
+        rw [subset_iff_forall_mem_clist]
         intro w hw
         exact CList.P_of_mem_filter P hP_resp w xs hw
       -- extEq y (mk filtered)
@@ -110,7 +110,7 @@ theorem mem_powersetCList
       simp only [powersetCList]
       rw [CList.mem_eq_any, List.any_eq_true]
       exact ⟨CList.mk (xs.filter P),
-             List.mem_map_of_mem CList.mk h_filtered,
+             List.mem_map_of_mem h_filtered,
              h_extEq⟩
 
 theorem powersetCList_extEq
@@ -123,11 +123,11 @@ theorem powersetCList_extEq
   have h21 : CList.subset A₂ A₁ = true := by
     rw [CList.extEq_def, Bool.and_eq_true] at h; exact h.2
   constructor
-  · rw [CList.subset_iff_forall_mem_clist]
+  · rw [subset_iff_forall_mem_clist]
     intro y hy
     rw [mem_powersetCList] at hy ⊢
     exact CList.subset_trans y A₁ A₂ hy h12
-  · rw [CList.subset_iff_forall_mem_clist]
+  · rw [subset_iff_forall_mem_clist]
     intro y hy
     rw [mem_powersetCList] at hy ⊢
     exact CList.subset_trans y A₂ A₁ hy h21
