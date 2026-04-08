@@ -1,4 +1,5 @@
 import AczelSetTheory.HFSets
+import AczelSetTheory.Operations.Pair
 
 namespace HFSet
 
