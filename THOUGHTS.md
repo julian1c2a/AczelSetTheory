@@ -424,13 +424,9 @@ Esto es consistente con KP (Kripke-Platek), que **no incluye Powerset**.
   $$\bigcup (\text{inf } P) = \text{inf } (\lambda h.\; \exists h' : \text{HFSet},\; P\, h' \;\wedge\; h \in h')$$
   Este predicado es decidible porque `h ∈ h'` es decidible (ambos son HFSets)
   y la cuantificación `∃ h'` puede acotarse: solo necesitamos buscar entre los
-  elementos de `h` como posibles contenedores. **Pero no**: necesitamos buscar entre
-  **todos** los `h'` con `P h' = true`, que pueden ser infinitos.
+  elementos de `h` como posibles contenedores. **Pero no**: necesitamos buscar entre **todos** los `h'` con `P h' = true`, que pueden ser infinitos.
 
-  Sin embargo, `h ∈ h'` implica que cierto encoding de `h` es "menor" que el de `h'`
-  en la codificación de Ackermann. Dado un `h` fijo, la pregunta "¿existe un `h'`
-  con `P h'` tal que `h ∈ h'`?" requiere buscar entre infinitos candidatos `h'`.
-  Esto es $\Sigma^0_1$ en general (r.e., no decidible).
+  Sin embargo, `h ∈ h'` implica que cierto encoding de `h` es "menor" que el de `h'` en la codificación de Ackermann. Dado un `h` fijo, la pregunta "¿existe un `h'` con `P h'` tal que `h ∈ h'`?" requiere buscar entre infinitos candidatos `h'`. Esto es $\Sigma^0_1$ en general (r.e., no decidible).
 
   **Problema**: $\bigcup (\text{inf } P)$ podría no ser decidible, solo
   recursivamente enumerable. Si `P` es la función característica de un conjunto
@@ -455,9 +451,7 @@ Esto es consistente con KP (Kripke-Platek), que **no incluye Powerset**.
 | **Fundación** | ✓ | Los `inf`-conjuntos contienen solo HFSets (bien fundados por §Foundation actual). No hay cadena $\in$ infinita descendente |
 
 **Nota sobre Fundación**: Un `inf P` tiene como miembros solo HFSets, que son
-árboles de rango finito. Ninguna cadena $\in$-descendente puede pasar indefinidamente
-por `inf`-conjuntos porque $\text{inf } P \ni h \ni h' \ni \ldots$ se reduce a
-una cadena dentro de HFSets, que termina por rango finito.
+árboles de rango finito. Ninguna cadena $\in$-descendente puede pasar indefinidamente por `inf`-conjuntos porque $\text{inf } P \ni h \ni h' \ni \ldots$ se reduce a una cadena dentro de HFSets, que termina por rango finito.
 
 ### 2.6. Caracterización matemática
 
