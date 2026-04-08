@@ -33,6 +33,9 @@ import AczelSetTheory.Axioms.Succ
 import AczelSetTheory.Axioms.VonNeumann
 import AczelSetTheory.Operations.Relation
 import AczelSetTheory.Operations.Function
+import AczelSetTheory.Operations.Replacement
 import AczelSetTheory.Axioms.Relation
 import AczelSetTheory.Axioms.Function
+import AczelSetTheory.Axioms.Replacement
+import AczelSetTheory.Axioms.Choice
 import AczelSetTheory.Notation

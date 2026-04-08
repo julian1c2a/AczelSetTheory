@@ -625,11 +625,42 @@ Or alternatively: `isTransitive A and (forall x in A, isTransitive x)`
 
 In our finite setting, this is provable by induction on the size of A, using `sep` and `union`.
 
+**Status**: ✅ Complete
+
+**Definitions**:
+
+- `image f A` — image of set A under function/relation f: `{b ∈ range f | ∃ a ∈ A, ⟪a, b⟫ ∈ f}`
+
+**Theorems**:
+
+- `mem_image (f A y)` — `y ∈ image f A ↔ ∃ x, x ∈ A ∧ ⟪x, y⟫ ∈ f`
+- `image_empty (f)` — `image f ∅ = ∅`
+- `image_of_empty (A)` — `image ∅ A = ∅`
+- `image_subset_range (f A y)` — `y ∈ image f A → y ∈ range f`
+- `apply_mem_image (f A x)` — function application lands in image
+- `image_totalFunction_subset (f A B y)` — image under total function is subset of codomain
+
+**Files**: `Operations/Replacement.lean`, `Axioms/Replacement.lean`
+
 ### 11b. Axiom of Choice
 
 In hereditarily finite sets, Choice is derivable from the well-ordering of CList (already established via `lt_total`). For any family of non-empty finite sets, we can computably select an element from each.
 
 **Proof strategy**: Use `lt`-minimal element selection (already implicit in the CList ordering).
+
+**Status**: ✅ Complete
+
+**Definitions**:
+
+- `choose A h` — (noncomputable) selects an element from non-empty A
+
+**Theorems**:
+
+- `nonempty_of_ne_empty (A)` — `A ≠ ∅ → ∃ x, x ∈ A`
+- `choose_mem (A h)` — `choose A h ∈ A`
+- `choice_principle (F)` — meta-level AC: `∃ f, ∀ A ∈ F, f A ∈ A`
+
+**Files**: `Axioms/Choice.lean`
 
 ---
 
