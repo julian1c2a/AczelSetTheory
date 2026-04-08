@@ -31,6 +31,8 @@ import AczelSetTheory.Axioms.BooleanAlgebra
 import AczelSetTheory.Axioms.BooleanRing
 import AczelSetTheory.Axioms.Succ
 import AczelSetTheory.Axioms.VonNeumann
+import AczelSetTheory.Operations.Relation
+import AczelSetTheory.Operations.Function
+import AczelSetTheory.Axioms.Relation
+import AczelSetTheory.Axioms.Function
 import AczelSetTheory.Notation
-
-export CList
