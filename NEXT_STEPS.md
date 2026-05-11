@@ -40,30 +40,29 @@ lemas que involucren longitudes.
 
 ---
 
-### 1.3 omega₀ — táctica puente
+### ✅ 1.3 omega₀ — táctica puente
 
-**Archivo:** `AczelSetTheory/PList/Omega0.lean`
+Completado. `AczelSetTheory/PList/Omega0.lean` creado.
+
+**Implementación real (vía Ψ : ℕ₀ → ℕ, no Λ):**
+
+La API de Peano usa `Ψ : ℕ₀ → ℕ` para transportar a `Nat`, no `Λ`.
+Los lemas puente viven en `namespace PList.Omega0` (sin `@[simp]` global):
 
 ```lean
-import Peano.Isomorph   -- Λ : ℕ₀ → ℕ y lemas de preservación
-
--- Lemas simp para transportar via Λ
--- (los nombres exactos dependen de Peano/Isomorph.lean — verificar)
-@[simp] lemma Λ_zero       : Λ 𝟘 = 0                      := ...
-@[simp] lemma Λ_succ (n)   : Λ (σ n) = Λ n + 1            := ...
-@[simp] lemma Λ_add  (m n) : Λ (m +₀ n) = Λ m + Λ n      := ...
-@[simp] lemma Λ_le   (m n) : m ≤₀ n ↔ Λ m ≤ Λ n          := ...
-@[simp] lemma Λ_lt   (m n) : m <₀ n ↔ Λ m < Λ n          := ...
-@[simp] lemma Λ_inj  (m n) : Λ m = Λ n ↔ m = n           := ...
-
--- Táctica
-macro "omega₀" : tactic =>
-  `(tactic| (simp only [Λ_zero, Λ_succ, Λ_add, Λ_le, Λ_lt, Λ_inj]; omega))
+PList.Omega0.ψ_eq_iff  : n = m   ↔ Ψ n = Ψ m       -- Peano.Axioms.Ψ_inj
+PList.Omega0.ψ_le_iff  : n ≤ m   ↔ Ψ n ≤ Ψ m       -- isomorph_Ψ_le.symm
+PList.Omega0.ψ_lt_iff  : n < m   ↔ Ψ n < Ψ m       -- StrictOrder.isomorph_Ψ_lt
+PList.Omega0.ψ_zero    : Ψ 𝟘 = 0                    -- isomorph_0_Ψ
+PList.Omega0.ψ_succ    : Ψ (σ n) = Nat.succ (Ψ n)  -- isomorph_σ_Ψ
+PList.Omega0.ψ_add     : Ψ (add n m) = Ψ n + Ψ m   -- isomorph_Ψ_add
 ```
 
-**Nota:** Antes de escribir los `...`, leer `Peano/Isomorph.lean` para
-confirmar los nombres exactos de los lemas de preservación (`Λ_bij`,
-`Λ_succ`, etc.) que ya existen en ese módulo.
+**Nota técnica:** `ψ_add` usa `@HAdd.hAdd Nat Nat Nat instHAdd` en lugar de
+`+` para evitar la ambigüedad del `Coe Nat ℕ₀` y garantizar que `omega`
+reconozca la suma (omega no reconoce `Nat.add`).
+
+15 tests verificados en `section omega₀_tests`.
 
 ---
 
