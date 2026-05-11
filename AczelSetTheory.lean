@@ -8,6 +8,7 @@ License: MIT
 -- Uses barrel imports for subdirectories (see AI-GUIDE.md §23, §30–33).
 -- Run 'bash gen-root.bash' after adding or removing modules.
 
+import AczelSetTheory.PList
 import AczelSetTheory.Axioms
 import AczelSetTheory.CList
 import AczelSetTheory.Operations

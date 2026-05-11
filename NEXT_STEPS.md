@@ -12,124 +12,31 @@ See PLANNING.md for the full long-term roadmap.
 
 > Objetivo: incorporar Peano como dependencia y construir la infraestructura
 > propia (PList + omega₀) que soporta el resto del plan.
-> No modifica ningún archivo existente hasta el paso 1.4.
 
 ---
 
-### 1.1 Lakefile — añadir Peano
+### ✅ 1.1 Lakefile — añadir Peano
 
-**Archivo:** `lakefile.lean`
-
-```lean
-require peanolib from git
-  "https://github.com/julian1c2a/Peano.git" @ "master"
-```
-
-**Verificación:** `lake update && lake build` sin errores.
-
-**Imports que usaremos:**
-
-```lean
-import Peano.PeanoNatLib.PeanoNatAxioms   -- ℕ₀, 𝟘, σ
-import Peano.PeanoNatLib.PeanoNatArith    -- +₀, *₀
-import Peano.PeanoNatLib.PeanoNatOrder    -- ≤₀, <₀
-import Peano.Isomorph                     -- Λ : ℕ₀ → ℕ, Ψ : ℕ → ℕ₀
-import Peano.ListsAndSets.FSet            -- FSet α
-```
+Completado. `lakefile.lean` actualizado con `require peanolib from git`.
 
 ---
 
-### 1.2 PList — lista propia con ℕ₀
+### ✅ 1.2 PList — lista propia con ℕ₀
 
-**Archivo:** `AczelSetTheory/PList/Basic.lean`
+Completado. Archivos creados:
 
-Tipo inductivo polimórfico propio, usando `ℕ₀` en todas las funciones
-que cuentan o indexan:
+- `AczelSetTheory/PList/Basic.lean` — tipo `PList (α : Type)`, `length : PList α → ℕ₀`,
+  `map`, `filter`, `foldl`, `foldr`, `append`, `flatMap`, `reverse`, `zipWith`,
+  `mem [DecidableEq]` (Bool), `Mem` (Prop), `Membership` instance, `toList`/`ofList`
+- `AczelSetTheory/PList/Lemmas.lean` — lemas `@[simp]` + `length_append` (usa `add`
+  no `+` por la ambigüedad de elaboración), `length_toList`, `length_filter_le`
+- `AczelSetTheory/PList.lean` — barrel
 
-```lean
-import Peano.PeanoNatLib.PeanoNatAxioms
-import Peano.PeanoNatLib.PeanoNatArith
-
-namespace PList
-
-inductive PList (α : Type) : Type where
-  | nil  : PList α
-  | cons : α → PList α → PList α
-
-def length : PList α → ℕ₀
-  | nil      => 𝟘
-  | cons _ t => σ (length t)
-
-def mem [BEq α] (x : α) : PList α → Bool
-  | nil      => false
-  | cons h t => h == x || mem x t
-
-def map (f : α → β) : PList α → PList β
-  | nil      => nil
-  | cons h t => cons (f h) (map f t)
-
-def any (p : α → Bool) : PList α → Bool
-  | nil      => false
-  | cons h t => p h || any p t
-
-def filter (p : α → Bool) : PList α → PList α
-  | nil      => nil
-  | cons h t => if p h then cons h (filter p t) else filter p t
-
-def foldl (f : β → α → β) (init : β) : PList α → β
-  | nil      => init
-  | cons h t => foldl f (f init h) t
-
-def append : PList α → PList α → PList α
-  | nil,      ys => ys
-  | cons h t, ys => cons h (append t ys)
-
-def flatMap (f : α → PList β) : PList α → PList β
-  | nil      => nil
-  | cons h t => append (f h) (flatMap f t)
-
--- Puente hacia List de Lean (solo para transferencia temporal durante Fase 2)
-def toList : PList α → List α
-  | nil      => []
-  | cons h t => h :: toList t
-
-def ofList : List α → PList α
-  | []      => nil
-  | h :: t  => cons h (ofList t)
-
-end PList
-```
-
-**Archivo:** `AczelSetTheory/PList/Lemmas.lean`
-
-Lemas requeridos por la Fase 2 (reescritura de CList):
-
-```lean
--- Membresía
-PList.mem_nil    : mem x nil = false
-PList.mem_cons   : mem x (cons h t) = (h == x || mem x t)
-PList.mem_append : mem x (append l₁ l₂) = (mem x l₁ || mem x l₂)
-PList.mem_map    : mem y (map f l) ↔ ∃ x, mem x l ∧ f x = y
-
--- Longitud
-PList.length_nil    : length nil = 𝟘
-PList.length_cons   : length (cons h t) = σ (length t)
-PList.length_append : length (append l₁ l₂) = length l₁ +₀ length l₂
-PList.length_map    : length (map f l) = length l
-
--- filter
-PList.mem_filter    : mem x (filter p l) ↔ mem x l ∧ p x = true
-
--- flatMap
-PList.mem_flatMap   : mem y (flatMap f l) ↔ ∃ x, mem x l ∧ mem y (f x)
-```
-
-**Archivo:** `AczelSetTheory/PList.lean` (barrel)
-
-```lean
-import AczelSetTheory.PList.Basic
-import AczelSetTheory.PList.Lemmas
-```
+**Nota técnica:** `export Peano.Add(add, ...)` en `Peano.PeanoNat.Add` coloca la
+función `add` directamente en el namespace `Peano`. Con `open Peano`, el operador `+`
+y la función `add` son dos caminos de elaboración distintos para el mismo valor, lo que
+causa ambigüedad. Solución: usar `add n m` en lugar de `n + m` en los enunciados de
+lemas que involucren longitudes.
 
 ---
 
