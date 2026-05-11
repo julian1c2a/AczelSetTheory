@@ -889,7 +889,46 @@ El Nivel 1+ queda documentado como dirección futura y marco teórico. Si alguna
 vez se necesita ir más allá de $\Delta^0_1$, la Estrategia B (niveles explícitos)
 permite definir `ASet₂` y `ASet₃` sin tocar `ASet₁`.
 
-### 3.11. Referencias adicionales
+### 3.11. Dudas abiertas
+
+- Supongamos que además de admitir el conjunto `ω` como urelemento, admitimos también los conjuntos de la forma `{x ∈ ω | P(x)}` (`axioma de separación`) o alguna forma más fuerte como el `axioma de reemplazo`, dónde todo lo que pedimos es que `P` sea decidible y computable para cada `x`. Esto nos permitiría construir subconjuntos decidibles de `ω` y avanzaríamos sobre la jerarquía de construibles. Solo veo el problema de que no conozco la codificación posible. ¿Nos permitría llegar más lejos. ¿O habría que avanzar a los `W-Trees`?
+
+#### 3.11.1. Respuesta: separación/reemplazo sobre ω no llega a Nivel 2
+
+**Separación `{x ∈ ω | P(x)}` con P decidible**: ya está capturada por el constructor
+`inf : (HFSet → Bool) → CList₁` de Nivel 1. La codificación usa los ordinales de von
+Neumann ya presentes en el proyecto (`𝟘`–`𝟡`):
+
+```lean
+{x ∈ ω | P(x)}  ≅  inf (fun a => isVonNeumann a && P (toNat a))
+```
+
+No hay ganancia: la separación sobre ω con predicados decidibles no sale de Δ⁰₁.
+
+**Reemplazo `{F(x) | x ∈ ω}` con F : ℕ → HFSet computable**: la imagen de F es un
+conjunto computably-enumerable (Σ⁰₁). Hay conjuntos Σ⁰₁ \ Δ⁰₁ (p.ej. ∅′ = problema
+de la parada), así que el reemplazo sobre ω sí añade algo respecto a Nivel 1 puro.
+Pero Σ⁰₁ ⊊ Δ⁰₂, así que **no llegamos a Nivel 2**.
+
+**Para llegar a Nivel 2** se necesita `inf : (ASet₁ → Bool) → CList₂` — predicados
+sobre el universo Nivel 1 entero, no solo sobre ω. El dominio del `inf` debe ser el
+tipo `ASet₁`, no `ℕ`. Esto es la Estrategia B (§3.5): definir `CList₂` con `ASet₁`
+como tipo de índice.
+
+**W-Trees**: son una herramienta de **codificación en Lean 4** (Estrategia C, §3.5)
+para definir la familia indexada `ASet n` sin violar positividad estricta. No son un
+universo matemático distinto; son necesarios solo si se quiere U_ω en un único tipo.
+La pregunta sobre separación/reemplazo es independiente de si se usan W-trees.
+
+**Resumen**:
+
+| Extensión                       | Captura        | ¿Sale de Nivel 1?           |
+|---------------------------------|----------------|-----------------------------|
+| Separación sobre ω (P : Bool)   | Δ⁰₁            | No (ya en Nivel 1)          |
+| Reemplazo sobre ω (F : ℕ → HFS) | Δ⁰₁ ∪ Σ⁰₁      | Marginalmente (Σ⁰₁ ⊊ Δ⁰₂)   |
+| Predicados sobre U₁             | Δ⁰₂            | Sí (= Nivel 2)              |
+
+### 3.12. Referencias adicionales
 
 - **Post, E. L. (1944)**. "Recursively enumerable sets of positive integers and
   their decision problems". *Bull. AMS* 50. — Teorema de Post y jerarquía aritmética.
