@@ -1,6 +1,6 @@
 # Current Project Status — AczelSetTheory
 
-**Last updated:** 2026-04-10 00:00
+**Last updated:** 2026-05-11 00:00
 **Author**: Julián Calderón Almendros
 
 ---
@@ -9,8 +9,8 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | 22 |
-| Modules with 0 sorry | 22 / 22 |
+| Total modules | 25 |
+| Modules with 0 sorry | 25 / 25 |
 | Total sorry | 0 |
 | Build status | ✅ Passing — 0 errors, 0 warnings |
 | Lean version | v4.29.0 |
@@ -44,6 +44,9 @@
 | AczelSetTheory/Axioms/Pair.lean | 0 | ✅ Complete |
 | AczelSetTheory/Axioms/Powerset.lean | 0 | ✅ Complete |
 | AczelSetTheory/Notation.lean | 0 | ✅ Complete |
+| AczelSetTheory/PList/Basic.lean | 0 | ✅ Complete |
+| AczelSetTheory/PList/Lemmas.lean | 0 | ✅ Complete |
+| AczelSetTheory/PList/Omega0.lean | 0 | ✅ Complete |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
@@ -57,20 +60,23 @@ None — 0 sorry across the entire project.
 
 ## Recent Achievements
 
+- ✅ Phase 1 (Peano integration): PList + omega₀ tactic (2026-05-11).
 - ✅ All 8 Zermelo axioms derived as theorems (not postulated).
 - ✅ Powerset axiom proof completed (Phase 5).
 - ✅ Full notation system: ∅, {[a,b]}, {[a]}, {[x ∈ A <|> P]}, von Neumann numerals 0–9.
 - ✅ Architecture split: Operations/ (CList-level) + Axioms/ (HFSet-level).
+- ✅ Replacement axiom (Axioms/Replacement.lean).
+- ✅ Axiom of Choice (Axioms/Choice.lean).
 
 ---
 
 ## Pending Work
 
-- [ ] Foundation (Regularity) axiom
-- [ ] Natural numbers as von Neumann ordinals (succ, ordered pairs)
-- [ ] Ordinal arithmetic
-- [ ] Replacement axiom
-- [ ] Axiom of Choice (derivable from finiteness?)
+- [ ] Phase 2: CList refactor — `mk : PList CList → CList`, `cSize : CList → ℕ₀`
+- [ ] Phase 3: vN embedding — `vN : ℕ₀ → HFSet`
+- [ ] Phase 7: Adjunction, ε-induction, Cartesian product
+- [ ] Phase 8: Decidability, Boolean algebra
+- [ ] Phase 9: Von Neumann naturals (internal)
 
 ---
 

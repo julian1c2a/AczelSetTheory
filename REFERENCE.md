@@ -1,6 +1,6 @@
 # Technical Reference — AczelSetTheory
 
-**Last updated:** 2026-04-08 00:00
+**Last updated:** 2026-05-11 00:00
 **Author**: Julián Calderón Almendros
 **Lean version**: v4.29.0
 
@@ -58,7 +58,11 @@ Below are the keys for reading and searching theorems.
 | 20 | `AczelSetTheory/Axioms/Pair.lean` | `HFSet` | ✅ Complete | HFSets, Operations/Pair | — |
 | 21 | `AczelSetTheory/Axioms/Powerset.lean` | `HFSet` | ✅ Complete | Operations/Powerset, Axioms/Separation | — |
 | 22 | `AczelSetTheory/Notation.lean` | `HFSet` | ✅ Complete | HFSets | AczelSetTheory.lean |
-| — | `AczelSetTheory.lean` | — | ✅ Complete | CList, HFSets, Operations/*, Axioms/*, Notation | Main |
+| 23 | `AczelSetTheory/PList/Basic.lean` | `PList` | ✅ Complete | `Peano.PeanoNat`, `Peano.PeanoNat.Add` | PList/Lemmas |
+| 24 | `AczelSetTheory/PList/Lemmas.lean` | `PList` | ✅ Complete | PList/Basic, `Peano.PeanoNat.{Add,Axioms,Order}` | PList/Omega0 |
+| 25 | `AczelSetTheory/PList/Omega0.lean` | `PList.Omega0` | ✅ Complete | PList/Lemmas, `Peano.PeanoNat.{Add,Axioms,Order,StrictOrder}` | — |
+| — | `AczelSetTheory/PList.lean` | — | ✅ Complete | PList/{Basic,Lemmas,Omega0} | AczelSetTheory.lean |
+| — | `AczelSetTheory.lean` | — | ✅ Complete | PList, CList, HFSets, Operations/*, Axioms/*, Notation | Main |
 | — | `Main.lean` | — | ✅ Complete | CList.Basic | — |
 
 ---
@@ -66,6 +70,12 @@ Below are the keys for reading and searching theorems.
 ## 2. Module Dependencies
 
 ```
+Peano.PeanoNat (+ Add, Axioms, Order, StrictOrder)
+  └─ PList/Basic.lean
+       └─ PList/Lemmas.lean
+            └─ PList/Omega0.lean
+PList.lean ── imports Basic + Lemmas + Omega0
+
 Init.Data.List.Basic
   └─ CList/Basic.lean
        ├─ CList/ExtEq.lean
@@ -96,6 +106,8 @@ CList.lean (root) ── imports all 7 sub-modules
 |-----------|---------|-------------|
 | `CList` | Basic, ExtEq, Filter, SetEquiv, Order, Sort, Normalize, Operations/Union (partial), Operations/Powerset (partial) | All CList definitions and theorems |
 | `HFSet` | HFSets, Operations/*, Axioms/*, Notation | Quotient type and its API |
+| `PList` | PList/Basic, PList/Lemmas | Polymorphic list type with ℕ₀ indexing; bridge to `List` |
+| `PList.Omega0` | PList/Omega0 | Bridge lemmas `ψ_*` used internally by the `omega₀` tactic |
 | (top-level) | Basic | `CList` inductive type defined at top level, operations inside `namespace CList` |
 
 ---
@@ -581,6 +593,126 @@ Duplicate definitions in Notation.lean for the comprehension syntax macro. Same 
 
 ---
 
+### 4.16 PList/Basic.lean — `namespace PList`
+
+#### 4.16.1 Core Type
+
+```lean
+inductive PList (α : Type) : Type where
+  | nil  : PList α
+  | cons : α → PList α → PList α
+  deriving Repr, Inhabited
+```
+
+- **Math**: Polymorphic list type; mirror of `List α` with ℕ₀-valued length.
+- Computable. Structural.
+
+#### 4.16.2 `length`
+
+```lean
+def length : PList α → ℕ₀
+  | nil      => 𝟘
+  | cons _ t => σ (length t)
+```
+
+- **Math**: |nil| ≔ 0; |h :: t| ≔ σ(|t|). Returns `ℕ₀` (Peano natural).
+- Computable. Structural recursion.
+
+#### 4.16.3 Structural operations
+
+```lean
+def isEmpty : PList α → Bool
+def head?   : PList α → Option α
+def tail    : PList α → PList α
+def get?    : PList α → ℕ₀ → Option α
+def getD    : α → PList α → ℕ₀ → α
+```
+
+- All computable, structural recursion.
+
+#### 4.16.4 Higher-order operations
+
+```lean
+def map     : (α → β) → PList α → PList β
+def foldl   : (β → α → β) → β → PList α → β
+def foldr   : (α → β → β) → β → PList α → β
+def any     : (α → Bool) → PList α → Bool
+def all     : (α → Bool) → PList α → Bool
+def filter  : (α → Bool) → PList α → PList α
+def append  : PList α → PList α → PList α
+def flatMap : (α → PList β) → PList α → PList β
+def reverse : PList α → PList α
+def zipWith : (α → β → γ) → PList α → PList β → PList γ
+```
+
+- All computable, structural recursion. `Append (PList α)` instance via `append`.
+
+#### 4.16.5 Membership
+
+```lean
+def mem [DecidableEq α] (x : α) : PList α → Bool     -- Bool membership
+inductive Mem (a : α) : PList α → Prop where          -- Prop membership
+  | head : Mem a (cons a t)
+  | tail : Mem a t → Mem a (cons b t)
+instance : Membership α (PList α)                     -- enables x ∈ l notation
+```
+
+- `Membership.mem` has signature `γ → α → Prop` (container first in Lean 4.29).
+- Instance: `⟨fun l a => Mem a l⟩`.
+
+#### 4.16.6 Bridge to `List`
+
+```lean
+def toList : PList α → List α
+def ofList : List α → PList α
+```
+
+- Computable. Structural. `toList ∘ ofList = id` and `ofList ∘ toList = id` (see §6.16).
+
+---
+
+### 4.17 PList/Lemmas.lean — `namespace PList`
+
+No new definitions; only theorems (see §6.16).
+
+**Key technical note**: theorems over `length` use `add n m` (the direct `Peano.Add.add`)
+instead of `n + m` to avoid elaboration ambiguity introduced by
+`export Peano.Add(add, ...)` making both paths available under `open Peano`.
+
+---
+
+### 4.18 PList/Omega0.lean — `namespace PList.Omega0` + tactic macro
+
+#### 4.18.1 Bridge lemmas
+
+```lean
+theorem ψ_eq_iff (n m : ℕ₀) : n = m ↔ Ψ n = Ψ m
+theorem ψ_le_iff (n m : ℕ₀) : n ≤ m ↔ Ψ n ≤ Ψ m
+theorem ψ_lt_iff (n m : ℕ₀) : n < m ↔ Ψ n < Ψ m
+theorem ψ_zero : Ψ (𝟘 : ℕ₀) = (0 : Nat)
+theorem ψ_succ (n : ℕ₀) : Ψ (σ n) = Nat.succ (Ψ n)
+theorem ψ_add (n m : ℕ₀) :
+    Ψ (add n m) = @HAdd.hAdd Nat Nat Nat instHAdd (Ψ n) (Ψ m)
+```
+
+- All use `Ψ : ℕ₀ → ℕ` (the Peano isomorphism in the ℕ₀ → ℕ direction).
+- `ψ_add` uses `@HAdd.hAdd Nat Nat Nat instHAdd` to avoid `Coe Nat ℕ₀` ambiguity
+  and to ensure `omega` recognises the addition (omega does not handle `Nat.add`).
+
+#### 4.18.2 `omega₀` tactic macro
+
+```lean
+macro "omega₀" : tactic =>
+  `(tactic| (simp only [PList.Omega0.ψ_eq_iff, PList.Omega0.ψ_le_iff,
+             PList.Omega0.ψ_lt_iff, PList.Omega0.ψ_zero, PList.Omega0.ψ_succ,
+             PList.Omega0.ψ_add] at *; omega))
+```
+
+- **Use**: solves linear arithmetic goals over `ℕ₀` by transporting to `ℕ` via `Ψ`.
+- Handles `=`, `≤`, `<`, `σ`, `add`, `𝟘` and combinations thereof.
+
+---
+
 ## 5. Axioms
 
 None. This project builds constructively from Lean 4 without additional axioms.
@@ -772,6 +904,64 @@ All **Zermelo axioms** are proven as theorems (not postulated):
 | 4 | `insertCList_extEq` | `(x₁ A₁ x₂ A₂ : CList) (hx : CList.extEq x₁ x₂ = true) (hA : CList.extEq A₁ A₂ = true) : CList.extEq (insertCList x₁ A₁) (insertCList x₂ A₂) = true` |
 | 5 | `filterCList_extEq_extEq` | `(P : HFSet → Prop) [DecidablePred P] (A₁ A₂ : CList) (hA : CList.extEq A₁ A₂ = true) : CList.extEq (filterCList P A₁) (filterCList P A₂) = true` |
 
+### 6.16 PList/Lemmas.lean — `namespace PList`
+
+#### Length
+
+| # | Theorem | Lean signature |
+|---|---------|----------------|
+| 1 | `length_nil` | `length (α := α) nil = 𝟘` |
+| 2 | `length_cons` | `(h : α) (t : PList α) : length (cons h t) = σ (length t)` |
+| 3 | `length_eq_zero_iff_nil` | `(l : PList α) : length l = 𝟘 ↔ l = nil` |
+
+#### Append
+
+| # | Theorem | Lean signature |
+|---|---------|----------------|
+| 4 | `append_nil` | `(l : PList α) : l.append nil = l` |
+| 5 | `nil_append` | `(l : PList α) : (nil : PList α).append l = l` |
+| 6 | `append_assoc` | `(l₁ l₂ l₃ : PList α) : (l₁.append l₂).append l₃ = l₁.append (l₂.append l₃)` |
+| 7 | `length_append` | `(l₁ l₂ : PList α) : length (l₁.append l₂) = add (length l₁) (length l₂)` |
+
+#### Map
+
+| # | Theorem | Lean signature |
+|---|---------|----------------|
+| 8 | `map_nil` | `(f : α → β) : map f (nil : PList α) = nil` |
+| 9 | `map_cons` | `(f : α → β) (h : α) (t : PList α) : map f (cons h t) = cons (f h) (map f t)` |
+| 10 | `length_map` | `(f : α → β) (l : PList α) : length (map f l) = length l` |
+| 11 | `map_append` | `(f : α → β) (l₁ l₂ : PList α) : map f (l₁.append l₂) = (map f l₁).append (map f l₂)` |
+
+#### Bridge toList/ofList
+
+| # | Theorem | Lean signature |
+|---|---------|----------------|
+| 12 | `toList_nil` | `toList (α := α) nil = []` |
+| 13 | `toList_cons` | `(h : α) (t : PList α) : toList (cons h t) = h :: toList t` |
+| 14 | `ofList_nil` | `ofList (α := α) [] = nil` |
+| 15 | `ofList_cons` | `(h : α) (t : List α) : ofList (h :: t) = cons h (ofList t)` |
+| 16 | `toList_ofList` | `(l : List α) : toList (ofList l) = l` |
+| 17 | `ofList_toList` | `(l : PList α) : ofList (toList l) = l` |
+| 18 | `length_toList` | `(l : PList α) : Λ (toList l).length = length l` |
+
+#### Membership
+
+| # | Theorem | Lean signature |
+|---|---------|----------------|
+| 19 | `mem_cons_iff` | `[DecidableEq α] (x h : α) (t : PList α) : mem x (cons h t) = true ↔ x = h ∨ mem x t = true` |
+| 20 | `Mem_cons_iff` | `(x h : α) (t : PList α) : Mem x (cons h t) ↔ x = h ∨ Mem x t` |
+| 21 | `not_mem_nil` | `(x : α) : ¬ Mem x (nil : PList α)` |
+
+#### Filter
+
+| # | Theorem | Lean signature |
+|---|---------|----------------|
+| 22 | `length_filter_le` | `(p : α → Bool) (l : PList α) : Peano.Order.le₀ (length (filter p l)) (length l)` |
+
+### 6.17 PList/Omega0.lean — `namespace PList.Omega0`
+
+Bridge lemmas: see §4.18.1. No additional theorems beyond the 6 bridge lemmas and the `omega₀` tactic macro.
+
 ---
 
 ## 7. Exports per Module
@@ -860,6 +1050,18 @@ All **Zermelo axioms** are proven as theorems (not postulated):
 
 `HFSet.singleton`, `HFSet.insertCList`, `HFSet.insert`, `HFSet.mem_insertCList_right`, `HFSet.subset_insertCList_right`, `HFSet.insertCList_subset`, `HFSet.insertCList_extEq`, `HFSet.filterCList` (redefined), `HFSet.filterCList_extEq_extEq` (redefined), `HFSet.sep` (redefined), `HFSet.zero` … `HFSet.nine`, `OfNat HFSet 0` … `OfNat HFSet 9`
 
+### PList/Basic.lean
+
+`PList`, `PList.nil`, `PList.cons`, `PList.length`, `PList.isEmpty`, `PList.head?`, `PList.tail`, `PList.get?`, `PList.getD`, `PList.map`, `PList.foldl`, `PList.foldr`, `PList.any`, `PList.all`, `PList.filter`, `PList.append`, `Append (PList α)`, `PList.flatMap`, `PList.reverse`, `PList.zipWith`, `PList.mem`, `PList.Mem`, `Membership α (PList α)`, `PList.toList`, `PList.ofList`
+
+### PList/Lemmas.lean
+
+`PList.length_nil`, `PList.length_cons`, `PList.length_eq_zero_iff_nil`, `PList.append_nil`, `PList.nil_append`, `PList.append_assoc`, `PList.length_append`, `PList.map_nil`, `PList.map_cons`, `PList.length_map`, `PList.map_append`, `PList.toList_nil`, `PList.toList_cons`, `PList.ofList_nil`, `PList.ofList_cons`, `PList.toList_ofList`, `PList.ofList_toList`, `PList.length_toList`, `PList.mem_cons_iff`, `PList.Mem_cons_iff`, `PList.not_mem_nil`, `PList.length_filter_le`
+
+### PList/Omega0.lean
+
+`PList.Omega0.ψ_eq_iff`, `PList.Omega0.ψ_le_iff`, `PList.Omega0.ψ_lt_iff`, `PList.Omega0.ψ_zero`, `PList.Omega0.ψ_succ`, `PList.Omega0.ψ_add`, tactic macro `omega₀`
+
 ---
 
 ## 8. Notations
@@ -885,5 +1087,6 @@ All **Zermelo axioms** are proven as theorems (not postulated):
 | 2026-04-08 | CList/{Basic,ExtEq,SetEquiv,Order,Sort,Normalize}.lean, CList.lean, HFSets.lean | Claude (AI assistant) |
 | 2026-04-09 | HFSets.lean (Mem, pair, Zermelo axioms) | Claude (AI assistant) |
 | 2026-04-10 | CList/Filter, Operations/{Union,Intersection,Setminus,Separation,Pair,Powerset}, Axioms/{Union,Intersection,Setminus,Separation,Pair,Powerset}, Notation | Claude (AI assistant) |
+| 2026-05-11 | PList/{Basic,Lemmas,Omega0} — Phase 1 Peano integration | Claude (AI assistant) |
 
 > To project a file: read it fully, then update sections 1–8 above following AI-GUIDE.md §4–14.

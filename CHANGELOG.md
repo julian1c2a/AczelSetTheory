@@ -1,7 +1,37 @@
----
 # Changelog
 
 All notable changes to this project are documented here.
+
+---
+
+## [2026-05-11] — Phase 1 complete: Peano integration (PList + omega₀) — 25 modules, 0 sorry
+
+### Added — PList: polymorphic list type with ℕ₀ indexing
+
+- **lakefile.lean**: added `require peanolib from git` (Peano natural numbers library).
+- **PList/Basic.lean**: `inductive PList (α : Type)` with `length : PList α → ℕ₀`,
+  all standard operations (`map`, `filter`, `append`, `flatMap`, `reverse`, `zipWith`,
+  `foldl`, `foldr`, `any`, `all`, `get?`, `getD`), Bool and Prop membership
+  (`mem`, `Mem`, `Membership` instance), and `toList`/`ofList` bridges to `List`.
+- **PList/Lemmas.lean**: 22 `@[simp]` and supporting lemmas including `length_append`,
+  `length_filter_le`, `toList_ofList`, `ofList_toList`, `length_toList` (via Λ bridge).
+- **PList/Omega0.lean**: `omega₀` tactic macro — transports linear arithmetic goals over
+  ℕ₀ to ℕ via `Ψ : ℕ₀ → ℕ`, then calls `omega`. Includes 6 bridge lemmas in
+  `namespace PList.Omega0` and 15 verified test cases.
+- **PList.lean**: barrel module importing Basic + Lemmas + Omega0.
+
+### Technical notes
+
+- **`+` ambiguity**: `export Peano.Add(add, ...)` makes both `add n m` and `n + m`
+  valid elaborations for ℕ₀ addition under `open Peano`. Solution: use `add n m`
+  in theorem statements involving `length`.
+- **`Membership` argument order**: in Lean 4.29 `Membership.mem` takes container first
+  (`γ → α → Prop`). Instance: `⟨fun l a => Mem a l⟩`.
+- **`omega₀` / `Nat.add`**: omega does not recognise `Nat.add a b`; `ψ_add` uses
+  `@HAdd.hAdd Nat Nat Nat instHAdd` to avoid `Coe Nat ℕ₀` ambiguity and guarantee
+  omega compatibility.
+
+**Project status: 0 sorry, 0 errors, 0 warnings. Phase 1 (Peano foundation) complete.**
 
 ---
 

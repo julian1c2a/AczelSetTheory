@@ -1,12 +1,17 @@
 # Dependency Diagram — AczelSetTheory
 
-**Last updated:** 2026-04-10
+**Last updated:** 2026-05-11
 **Author**: Julián Calderón Almendros
 
 ## Project Structure
 
 ```text
 AczelSetTheory/
+├── PList/
+│   ├── Basic.lean         # PList type, length (ℕ₀), all standard operations, toList/ofList
+│   ├── Lemmas.lean        # @[simp] lemmas: length, append, map, toList, filter, Mem
+│   └── Omega0.lean        # omega₀ tactic macro + 6 bridge lemmas (ψ_* via Ψ : ℕ₀ → ℕ)
+├── PList.lean             # Barrel: Basic + Lemmas + Omega0
 ├── CList/
 │   ├── Basic.lean         # Core type, size, comparison, order, dedup, sort, normalize
 │   ├── ExtEq.lean         # Extensional equality properties
@@ -80,7 +85,18 @@ graph TD
     AxPw --> OpPw
     AxPw --> AxSp
 
-    Z[AczelSetTheory.lean] --> CL
+    Pe[Peano.*]
+    PB[PList/Basic.lean] --> Pe
+    PL[PList/Lemmas.lean] --> PB
+    PL --> Pe
+    PO[PList/Omega0.lean] --> PL
+    PO --> Pe
+    PList[PList.lean] --> PB
+    PList --> PL
+    PList --> PO
+
+    Z[AczelSetTheory.lean] --> PList
+    Z --> CL
     Z --> H
     Z --> OpU
     Z --> OpI
