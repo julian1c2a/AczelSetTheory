@@ -71,7 +71,8 @@ private theorem mem_normalizePList {y : CList} {xs : PList CList} :
 
 -- For PList (non-nested parameterized inductive), rfl holds.
 private theorem sizeOf_pcons_eq (x : CList) (xs : PList CList) :
-    @Eq Nat (sizeOf (PList.cons x xs : PList CList)) (1 + sizeOf x + sizeOf xs) := by simp_wf
+    @Eq Nat (sizeOf (PList.cons x xs : PList CList)) (1 + @sizeOf CList _ x + sizeOf xs) := by
+  simp_wf
 
 private theorem sizeOf_pnil_eq :
     sizeOf (PList.nil : PList CList) = (1 : Nat) := rfl
