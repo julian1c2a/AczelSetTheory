@@ -1,43 +1,65 @@
-import Init.Data.List.Basic
-
--- ==========================================
--- CList: La estructura computacional (definiciones)
--- ==========================================
-
-/--
-Definición de nuestro pre-conjunto basado en listas.
+/-
+Copyright (c) 2026. All rights reserved.
+Author: Julián Calderón Almendros
+License: MIT
 -/
+
+-- AczelSetTheory/CList/Basic.lean
+-- CList: pre-conjuntos hereditariamente finitos.
+-- Fase 2: constructor mk : PList CList → CList; cSize : CList → ℕ₀.
+
+import AczelSetTheory.PList
+
+open Peano
+
+/-- Pre-conjunto hereditariamente finito: árbol enraizado con hijos en PList. -/
 inductive CList : Type where
-  | mk : List CList → CList
+  | mk : PList CList → CList
   deriving Repr, Inhabited
 
 namespace CList
 
--- Función de tamaño personalizada (evita el _sizeOf_inst no compilable para inductivos anidados)
+-- ─────────────────────────────────────────────────────────────────
+-- Tamaño en ℕ₀
+-- ─────────────────────────────────────────────────────────────────
+
 mutual
-  def cSize : CList → Nat
-    | mk xs => 1 + cSizeList xs
-  def cSizeList : List CList → Nat
-    | [] => 0
-    | x :: xs => 1 + cSize x + cSizeList xs
+  def cSize : CList → ℕ₀
+    | mk xs => σ (cSizePList xs)
+  def cSizePList : PList CList → ℕ₀
+    | .nil      => 𝟘
+    | .cons x t => σ (add (cSize x) (cSizePList t))
 end
 
-theorem cSize_lt_of_mem {x : CList} {xs : List CList}
-  (h : x ∈ xs) :
-    cSize x < cSize (mk xs)
-      := by
+-- Ecuaciones @[simp] para controlar el desplegado en pruebas.
+@[simp] theorem cSize_mk (xs : PList CList) :
+    cSize (mk xs) = σ (cSizePList xs) := rfl
+
+@[simp] theorem cSizePList_nil :
+    cSizePList (.nil : PList CList) = 𝟘 := rfl
+
+@[simp] theorem cSizePList_cons (x : CList) (t : PList CList) :
+    cSizePList (.cons x t) = σ (add (cSize x) (cSizePList t)) := rfl
+
+theorem cSize_lt_of_mem {x : CList} {xs : PList CList}
+    (h : x ∈ xs) : cSize x < cSize (mk xs) := by
   induction xs with
-  | nil => simp at h
+  | nil => cases h
   | cons y ys ih =>
-    simp only [cSize, cSizeList]
-    rcases List.mem_cons.mp h with rfl | hys
-    · omega
-    · have := ih hys; simp [cSize] at this; omega
+    simp only [cSize_mk, cSizePList_cons]
+    cases h with
+    | head => omega₀
+    | tail hys =>
+        have hlt := ih hys
+        simp only [cSize_mk] at hlt
+        omega₀
 
 /-- El conjunto vacío computacional -/
-def empty : CList := mk []
+def empty : CList := mk .nil
 
--- 1. LÓGICA DE COMPARACIÓN BASE (Semántica de conjuntos)
+-- ─────────────────────────────────────────────────────────────────
+-- Motor de comparación (membresía, subconjunto, igualdad extensional)
+-- ─────────────────────────────────────────────────────────────────
 
 inductive CListOp
 | mem
@@ -46,140 +68,113 @@ inductive CListOp
 
 @[simp]
 def opWeight : CListOp → Nat
-| .mem => 0
+| .mem    => 0
 | .subset => 1
-| .eq => 2
+| .eq     => 2
 
 set_option linter.unusedSimpArgs false in
-/--
-Motor lógico para la igualdad extensional.
-Agrupamos estas tres para que Lean pueda verificar la terminación mutua.
--/
-def evalOp
-  (op : CListOp) (A B : CList) :
-    Bool
-      :=
+/-- Motor lógico para igualdad extensional.
+    Terminación por medida ponderada sobre sizeOf. -/
+def evalOp (op : CListOp) (A B : CList) : Bool :=
   match op, A, B with
-  | .mem, _, mk [] => false
-  | .mem, x, mk (y :: ys) =>
+  | .mem, _, mk .nil            => false
+  | .mem, x, mk (.cons y ys)   =>
       evalOp .eq x y || evalOp .mem x (mk ys)
 
-  | .subset, mk [], _ => true
-  | .subset, mk (x :: xs), B =>
+  | .subset, mk .nil, _             => true
+  | .subset, mk (.cons x xs), B    =>
       evalOp .mem x B && evalOp .subset (mk xs) B
 
   | .eq, A, B =>
       evalOp .subset A B && evalOp .subset B A
-termination_by (((sizeOf A + sizeOf B) * 3) + opWeight op)
+termination_by ((((sizeOf A + sizeOf B : Nat) * 3) + opWeight op) : Nat)
 decreasing_by
-  all_goals
-    simp_wf
-    try simp [opWeight, sizeOf]
-    try simp_arith
-    try omega
+  all_goals simp_wf
+  all_goals try simp [opWeight, sizeOf]
+  all_goals try simp_arith
+  all_goals try omega
 
-/-- Comprueba si un elemento mem a un conjunto. -/
-def mem (x A : CList) : Bool := evalOp .mem x A
-
-/-- Comprueba si A es subconjunto de B. -/
+def mem    (x A : CList) : Bool := evalOp .mem x A
 def subset (A B : CList) : Bool := evalOp .subset A B
-
-/-- Comprueba la igualdad extensional (mismos elementos). -/
-def extEq (A B : CList) : Bool := evalOp .eq A B
+def extEq  (A B : CList) : Bool := evalOp .eq A B
 
 instance : BEq CList where beq := extEq
 
--- 2. ORDEN TOTAL (Para la canonización)
+-- ─────────────────────────────────────────────────────────────────
+-- Orden total (para canonización)
+-- ─────────────────────────────────────────────────────────────────
 
-/-!
-Define un orden total independiente de la igualdad para poder
-ordenar las listas de forma única.
-Nota: Usamos el tamaño estructural directo para garantizar la terminación.
--/
 def lt (A B : CList) : Bool :=
   match A, B with
-  | mk [], mk [] => false
-  | mk [], mk (_::_) => true
-  | mk (_::_), mk [] => false
-  | mk (x::xs), mk (y::ys) =>
+  | mk .nil,         mk .nil          => false
+  | mk .nil,         mk (.cons _ _)   => true
+  | mk (.cons _ _),  mk .nil          => false
+  | mk (.cons x xs), mk (.cons y ys)  =>
       if lt x y then true
       else if lt y x then false
       else lt (mk xs) (mk ys)
-termination_by cSize A + cSize B
+termination_by (sizeOf A + sizeOf B : Nat)
 decreasing_by
   all_goals simp_wf
-  all_goals simp [cSize, cSizeList]
+  all_goals simp [sizeOf]
   all_goals omega
 
--- 3. ALGORITMO DE REDUCCIÓN (Limpieza estructural)
+-- ─────────────────────────────────────────────────────────────────
+-- Deduplicación
+-- ─────────────────────────────────────────────────────────────────
 
-/--
-Función auxiliar que mantiene una lista de elementos 'vistos'
-para ignorar las apariciones posteriores.
-Es estructuralmente recursiva (recorre `l` reduciéndola en 1),
-por lo que Lean la acepta instantáneamente sin pruebas matemáticas.
--/
-def dedupAux
-  (l : List CList) (vistos : List CList) :
-    List CList
-      :=
+def dedupAux (l vistos : PList CList) : PList CList :=
   match l with
-  | [] => []
-  | x :: xs =>
-      if vistos.any (fun y => extEq x y) then
-        -- Si ya lo vimos antes, lo ignoramos y seguimos
-        dedupAux xs vistos
+  | .nil      => .nil
+  | .cons x t =>
+      if PList.any (fun y => extEq x y) vistos then
+        dedupAux t vistos
       else
-        -- Si es nuevo, lo guardamos y lo añadimos a los 'vistos'
-        x :: dedupAux xs (x :: vistos)
+        .cons x (dedupAux t (.cons x vistos))
 
-/--
-Reduce los duplicados de una lista recorriéndola hacia adelante
-y conservando solo la primera aparición de cada elemento.
--/
-def dedup
-  (l : List CList) :
-    List CList
-      :=
-  dedupAux l []
+def dedup (l : PList CList) : PList CList := dedupAux l .nil
 
--- 4. CANONIZACIÓN (Forma normal)
+-- ─────────────────────────────────────────────────────────────────
+-- Insertion sort sobre PList CList
+-- ─────────────────────────────────────────────────────────────────
 
-def orderedInsert
-  (x : CList) :
-    List CList → List CList
-  | [] => [x]
-  | y :: ys =>
-      if lt x y then x :: y :: ys
-      else if extEq x y then y :: ys
-      else y :: orderedInsert x ys
+def orderedInsert (x : CList) : PList CList → PList CList
+  | .nil      => .cons x .nil
+  | .cons y ys =>
+      if lt x y then .cons x (.cons y ys)
+      else if extEq x y then .cons y ys
+      else .cons y (orderedInsert x ys)
 
-def insertionSort :
-  List CList → List CList
-  | [] => []
-  | x :: xs => orderedInsert x (insertionSort xs)
+def insertionSort : PList CList → PList CList
+  | .nil      => .nil
+  | .cons x t => orderedInsert x (insertionSort t)
 
-/--
-Normalización canónica:
-Aplica la normalización a los elementos, elimina duplicados y ordena.
--/
-def normalize : CList → CList
-  | mk xs =>
-      let hijosNorm := xs.map normalize
-      let sinDuplicados := dedup hijosNorm
-      mk (insertionSort sinDuplicados)
+-- ─────────────────────────────────────────────────────────────────
+-- Normalización canónica (mutual estructural)
+-- ─────────────────────────────────────────────────────────────────
 
--- PRUEBAS
+mutual
+  def normalize : CList → CList
+    | mk xs => mk (insertionSort (dedup (normalizePList xs)))
+  def normalizePList : PList CList → PList CList
+    | .nil      => .nil
+    | .cons x t => .cons (normalize x) (normalizePList t)
+end
+
+-- ─────────────────────────────────────────────────────────────────
+-- Constantes de prueba (von Neumann 0–9)
+-- ─────────────────────────────────────────────────────────────────
+
 def zero  := empty
-def one   := mk [zero]
-def two   := mk [zero, one]
-def three := mk [zero, one, two]
-def four  := mk [zero, one, two, three]
-def five  := mk [zero, one, two, three, four]
-def six   := mk [zero, one, two, three, four, five]
-def seven := mk [zero, one, two, three, four, five, six]
-def eight := mk [zero, one, two, three, four, five, six, seven]
-def nine  := mk [zero, one, two, three, four, five, six, seven, eight]
-def dirty := mk [one, two, zero, three, one, zero, zero, two, three, two]
+def one   := mk (.cons zero .nil)
+def two   := mk (.cons zero (.cons one .nil))
+def three := mk (.cons zero (.cons one (.cons two .nil)))
+def four  := mk (.cons zero (.cons one (.cons two (.cons three .nil))))
+def five  := mk (.cons zero (.cons one (.cons two (.cons three (.cons four .nil)))))
+def six   := mk (.cons zero (.cons one (.cons two (.cons three (.cons four (.cons five .nil))))))
+def seven := mk (.cons zero (.cons one (.cons two (.cons three (.cons four (.cons five (.cons six .nil)))))))
+def eight := mk (.cons zero (.cons one (.cons two (.cons three (.cons four (.cons five (.cons six (.cons seven .nil))))))))
+def nine  := mk (.cons zero (.cons one (.cons two (.cons three (.cons four (.cons five (.cons six (.cons seven (.cons eight .nil)))))))))
+def dirty := mk (PList.ofList [one, two, zero, three, one, zero, zero, two, three, two])
 
 end CList

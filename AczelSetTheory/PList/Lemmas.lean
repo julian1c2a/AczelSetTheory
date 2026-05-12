@@ -159,6 +159,20 @@ theorem not_mem_nil (x : α) : ¬ Mem x (nil : PList α) := by
   intro h; cases h
 
 -- ─────────────────────────────────────────────────────────────────
+-- any / all
+-- ─────────────────────────────────────────────────────────────────
+
+@[simp] theorem any_nil (p : α → Bool) : any p nil = false := rfl
+
+@[simp] theorem any_cons (p : α → Bool) (h : α) (t : PList α) :
+    any p (cons h t) = (p h || any p t) := rfl
+
+@[simp] theorem all_nil (p : α → Bool) : all p nil = true := rfl
+
+@[simp] theorem all_cons (p : α → Bool) (h : α) (t : PList α) :
+    all p (cons h t) = (p h && all p t) := rfl
+
+-- ─────────────────────────────────────────────────────────────────
 -- filter
 -- ─────────────────────────────────────────────────────────────────
 
