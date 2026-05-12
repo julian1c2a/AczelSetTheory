@@ -71,7 +71,7 @@ private theorem mem_normalizePList {y : CList} {xs : PList CList} :
 
 -- For PList (non-nested parameterized inductive), rfl holds.
 private theorem sizeOf_pcons_eq (x : CList) (xs : PList CList) :
-    sizeOf (PList.cons x xs : PList CList) = (1 + sizeOf x + sizeOf xs : Nat) := rfl
+    @Eq Nat (sizeOf (PList.cons x xs : PList CList)) (1 + sizeOf x + sizeOf xs) := by simp_wf
 
 private theorem sizeOf_pnil_eq :
     sizeOf (PList.nil : PList CList) = (1 : Nat) := rfl
@@ -87,17 +87,12 @@ private theorem sizeOf_mk_eq (xs : PList CList) :
 
 private theorem sizeOf_lt_of_mem {x : CList} {xs : PList CList}
     (h : PList.Mem x xs) : sizeOf x < sizeOf (mk xs) := by
-  rw [sizeOf_mk_eq]
-  induction xs with
-  | nil => cases h
-  | cons y ys ih =>
-    rw [sizeOf_pcons_eq]
-    cases h with
-    | head => omega
-    | tail hys =>
-        have := ih hys
-        rw [sizeOf_mk_eq] at this
-        omega
+  induction h with
+  | head => simp_wf; omega
+  | tail _ ih =>
+      simp only [sizeOf_mk_eq] at ih
+      simp_wf
+      omega
 
 private theorem sizeOf_orderedInsert_le (x : CList) (l : PList CList) :
     sizeOf (orderedInsert x l) ≤ sizeOf (PList.cons x l) := by
@@ -203,7 +198,7 @@ theorem dedup_id_of_nodup
       (∀ x ∈ l', PList.any (fun v => extEq x v) vistos = false) →
       dedupAux l' vistos = l' by
     unfold dedup
-    exact this l .nil h (fun _ hx => absurd hx (PList.not_mem_nil _))
+    exact this l .nil h (fun _ _ => rfl)
   intro l'
   induction l' with
   | nil => intros; rfl
@@ -265,11 +260,8 @@ mutual
         rw [normalizePList_fixed _ h_fixed,
             dedup_id_of_nodup _ h_nodup,
             insertionSort_id_of_sorted_nodup _ h_sorted h_nodup]
-  termination_by A => sizeOf A * 2
-  decreasing_by
-    all_goals simp_wf
-    all_goals simp [sizeOf]
-    all_goals omega
+  termination_by A => Nat.add (sizeOf A) (sizeOf A)
+  decreasing_by all_goals simp_wf; all_goals omega
 
   private theorem normalize_idem_plist :
     (xs : PList CList) → (y : CList) → PList.Mem y (normalizePList xs) → normalize y = y
@@ -279,11 +271,8 @@ mutual
         cases h with
         | head => exact normalize_idem x
         | tail hy => exact normalize_idem_plist rest y hy
-  termination_by xs _ _ => sizeOf xs * 2 + 1
-  decreasing_by
-    all_goals simp_wf
-    all_goals simp [sizeOf]
-    all_goals omega
+  termination_by xs _ _ => Nat.add (Nat.add (sizeOf xs) (sizeOf xs)) 1
+  decreasing_by all_goals simp_wf; all_goals omega
 end
 
 -- ==================================================================
@@ -388,9 +377,7 @@ theorem sorted_nodup_setEquiv_eq :
         fun a ha b hb hab =>
           hprop a (PList.Mem.tail ha) b (PList.Mem.tail hb) hab
       have htails := sorted_nodup_setEquiv_eq xs ys hs1' hs2' hn1' hn2' htail_equiv hprop'
-      congr 1
-      · exact hxy_eq
-      · exact htails
+      rw [hxy_eq, htails]
 
 theorem extEq_normalize
     (A : CList) :
@@ -422,8 +409,9 @@ theorem extEq_normalize
       · exact SetEquiv.symm (insertionSort_setEquiv _)
 termination_by sizeOf A
 decreasing_by
+  all_goals simp_wf
   all_goals have h := sizeOf_lt_of_mem hw
-  all_goals simp_wf at *
+  all_goals simp only [sizeOf_mk_eq] at h
   all_goals omega
 
 /-!
@@ -480,7 +468,7 @@ theorem normalize_eq_of_extEq {A B : CList}
       obtain ⟨yj, hyj_mem, rfl⟩ := mem_normalizePList.mp hb'
       have hIH := normalize_eq_of_extEq hab
       rwa [normalize_idem, normalize_idem] at hIH
-termination_by (sizeOf A + sizeOf B : Nat)
+termination_by Nat.add (sizeOf A) (sizeOf B)
 decreasing_by
   all_goals simp_wf
   all_goals (try { have h1 := normalize_sizeOf_le xi })
