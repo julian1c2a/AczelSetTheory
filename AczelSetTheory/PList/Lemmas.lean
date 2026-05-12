@@ -248,6 +248,19 @@ theorem any_eq_true (p : α → Bool) (l : PList α) :
       · exact Or.inl hpx
       · exact Or.inr (ih.mpr ⟨x, hx, hpx⟩)
 
+theorem all_eq_true (p : α → Bool) (l : PList α) :
+    all p l = true ↔ ∀ x, Mem x l → p x = true := by
+  induction l with
+  | nil => simp [not_mem_nil]
+  | cons h t ih =>
+    simp only [all_cons, Bool.and_eq_true, Mem_cons_iff]
+    constructor
+    · rintro ⟨hph, ht⟩ x (rfl | hx)
+      · exact hph
+      · exact (ih.mp ht) x hx
+    · intro hall
+      exact ⟨hall h (Or.inl rfl), ih.mpr (fun x hx => hall x (Or.inr hx))⟩
+
 -- ─────────────────────────────────────────────────────────────────
 -- filter
 -- ─────────────────────────────────────────────────────────────────

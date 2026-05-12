@@ -41,4 +41,17 @@ theorem mem_inter
   change CList.mem xc (interCList a b) = true ↔ CList.mem xc a = true ∧ CList.mem xc b = true
   exact mem_interCList_iff a b xc
 
+theorem mem_sInter (A x : HFSet) :
+    x ∈ sInter A ↔ (∃ y, y ∈ A) ∧ ∀ B, B ∈ A → x ∈ B := by
+  rcases Quotient.exists_rep A with ⟨a, rfl⟩
+  rcases Quotient.exists_rep x with ⟨xc, rfl⟩
+  rw [mem_sInterCList_iff]
+  constructor
+  · rintro ⟨⟨yc, hyc⟩, hall⟩
+    exact ⟨⟨Quotient.mk CList.Setoid yc, hyc⟩,
+           fun B hB => by rcases Quotient.exists_rep B with ⟨bc, rfl⟩; exact hall bc hB⟩
+  · rintro ⟨⟨y, hy⟩, hall⟩
+    rcases Quotient.exists_rep y with ⟨yc, rfl⟩
+    exact ⟨⟨yc, hy⟩, fun bc hbc => hall (Quotient.mk CList.Setoid bc) hbc⟩
+
 end HFSet

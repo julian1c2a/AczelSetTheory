@@ -1,6 +1,9 @@
 import AczelSetTheory.HFSets
+import AczelSetTheory.Operations.Intersection
 import AczelSetTheory.Operations.Pair
 import AczelSetTheory.Operations.Separation
+import AczelSetTheory.Operations.Setminus
+import AczelSetTheory.Operations.Union
 
 namespace HFSet
 
@@ -67,6 +70,16 @@ syntax "{[" term "," term "," term,* "]}" : term
 macro_rules
   | `({[$a, $b, $c]}) => `(insert $a {[$b, $c]})
   | `({[$a, $b, $c, $rest,*]}) => `(insert $a {[$b, $c, $rest,*]})
+
+-- ==================================================================
+-- Operadores infijos y prefijos de conjuntos
+-- ==================================================================
+
+infixl:65 " ∪ " => union
+infixl:70 " ∩ " => inter
+notation:65 A " \\ " B => setminus A B
+prefix:max "⋃" => sUnion
+prefix:max "⋂" => sInter
 
 -- ==================================================================
 -- Comprensión de Conjuntos: {[ x ∈ A | P(x) ]}
