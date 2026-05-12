@@ -161,6 +161,11 @@ mutual
     | .cons x t => .cons (normalize x) (normalizePList t)
 end
 
+/-- `CList.empty` is already in normal form. -/
+@[simp] theorem normalize_empty : normalize empty = empty := by
+  have h : normalizePList (.nil : PList CList) = .nil := by simp [normalizePList]
+  simp [normalize, empty, h, dedup, dedupAux, insertionSort]
+
 -- ─────────────────────────────────────────────────────────────────
 -- Constantes de prueba (von Neumann 0–9)
 -- ─────────────────────────────────────────────────────────────────

@@ -3,7 +3,7 @@ import AczelSetTheory.HFSets
 namespace HFSet
 
 /-- Construye el par {a, b} a nivel CList. -/
-def mkPair (a b : CList) : CList := CList.mk [a, b]
+def mkPair (a b : CList) : CList := CList.mk (.cons a (.cons b .nil))
 
 /-- El par {a, b} a nivel HFSet. -/
 def pair (a b : HFSet) : HFSet :=

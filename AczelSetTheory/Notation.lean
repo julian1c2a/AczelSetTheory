@@ -27,7 +27,7 @@ macro "{[" x:term "]}" : term => `(singleton $x)
 -- Insertar es simplemente añadir al frente
 def insertCList (x A : CList) : CList :=
   match A with
-  | CList.mk ys => CList.mk (x :: ys)
+  | CList.mk ys => CList.mk (.cons x ys)
 
 theorem mem_insertCList_right (x₁ x₂ A₂ : CList) (hx : CList.extEq x₁ x₂ = true) :
     CList.mem x₁ (insertCList x₂ A₂) = true := by

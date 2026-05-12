@@ -159,6 +159,67 @@ theorem not_mem_nil (x : α) : ¬ Mem x (nil : PList α) := by
   intro h; cases h
 
 -- ─────────────────────────────────────────────────────────────────
+-- append (cons case)
+-- ─────────────────────────────────────────────────────────────────
+
+@[simp] theorem cons_append (h : α) (t ys : PList α) :
+    cons h t ++ ys = cons h (t ++ ys) := rfl
+
+-- ─────────────────────────────────────────────────────────────────
+-- flatMap
+-- ─────────────────────────────────────────────────────────────────
+
+@[simp] theorem flatMap_nil (f : α → PList β) :
+    flatMap f (nil : PList α) = nil := rfl
+
+@[simp] theorem flatMap_cons (f : α → PList β) (h : α) (t : PList α) :
+    flatMap f (cons h t) = (f h) ++ flatMap f t := rfl
+
+-- ─────────────────────────────────────────────────────────────────
+-- Mem / append / map membership
+-- ─────────────────────────────────────────────────────────────────
+
+theorem Mem_append {α : Type} (x : α) (l₁ l₂ : PList α) :
+    Mem x (l₁ ++ l₂) ↔ Mem x l₁ ∨ Mem x l₂ := by
+  induction l₁ with
+  | nil =>
+    constructor
+    · intro h; exact Or.inr h
+    · rintro (h | h)
+      · exact absurd h (not_mem_nil _)
+      · exact h
+  | cons h t ih =>
+    simp only [cons_append, Mem_cons_iff]
+    constructor
+    · rintro (rfl | ht)
+      · exact Or.inl (Or.inl rfl)
+      · rcases ih.mp ht with h | h
+        · exact Or.inl (Or.inr h)
+        · exact Or.inr h
+    · rintro ((rfl | ht) | h)
+      · exact Or.inl rfl
+      · exact Or.inr (ih.mpr (Or.inl ht))
+      · exact Or.inr (ih.mpr (Or.inr h))
+
+theorem Mem_map {α β : Type} (f : α → β) (x : β) (l : PList α) :
+    Mem x (map f l) ↔ ∃ y, Mem y l ∧ f y = x := by
+  induction l with
+  | nil =>
+    constructor
+    · intro h; exact absurd h (not_mem_nil _)
+    · rintro ⟨y, hy, _⟩; exact absurd hy (not_mem_nil _)
+  | cons h t ih =>
+    simp only [map_cons, Mem_cons_iff]
+    constructor
+    · rintro (rfl | ht)
+      · exact ⟨h, Or.inl rfl, rfl⟩
+      · obtain ⟨y, hy, rfl⟩ := ih.mp ht
+        exact ⟨y, Or.inr hy, rfl⟩
+    · rintro ⟨y, (rfl | hy), rfl⟩
+      · exact Or.inl rfl
+      · exact Or.inr (ih.mpr ⟨y, hy, rfl⟩)
+
+-- ─────────────────────────────────────────────────────────────────
 -- any / all
 -- ─────────────────────────────────────────────────────────────────
 
@@ -171,6 +232,21 @@ theorem not_mem_nil (x : α) : ¬ Mem x (nil : PList α) := by
 
 @[simp] theorem all_cons (p : α → Bool) (h : α) (t : PList α) :
     all p (cons h t) = (p h && all p t) := rfl
+
+theorem any_eq_true (p : α → Bool) (l : PList α) :
+    any p l = true ↔ ∃ x, Mem x l ∧ p x = true := by
+  induction l with
+  | nil => simp [any_nil, not_mem_nil]
+  | cons h t ih =>
+    simp only [any_cons, Bool.or_eq_true, Mem_cons_iff]
+    constructor
+    · rintro (hp | ht)
+      · exact ⟨h, Or.inl rfl, hp⟩
+      · obtain ⟨x, hx, hpx⟩ := ih.mp ht
+        exact ⟨x, Or.inr hx, hpx⟩
+    · rintro ⟨x, rfl | hx, hpx⟩
+      · exact Or.inl hpx
+      · exact Or.inr (ih.mpr ⟨x, hx, hpx⟩)
 
 -- ─────────────────────────────────────────────────────────────────
 -- filter

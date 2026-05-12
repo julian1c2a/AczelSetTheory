@@ -15,32 +15,28 @@ open Classical
 
 /-- Si A ≠ ∅, entonces A tiene al menos un elemento. -/
 theorem nonempty_of_ne_empty
-  (A : HFSet) (h : A ≠ empty) :
-    ∃ x, x ∈ A
-      := by
+    (A : HFSet) (h : A ≠ empty) :
+    ∃ x, x ∈ A := by
   rcases Quotient.exists_rep A with ⟨ac, rfl⟩
   match ac with
-  | CList.mk [] => exact absurd rfl h
-  | CList.mk (x :: xs) =>
+  | CList.mk .nil => exact absurd rfl h
+  | CList.mk (.cons x xs) =>
     exact ⟨Quotient.mk CList.Setoid x,
-           CList.mem_of_list_mem x (x :: xs) List.mem_cons_self⟩
+           show CList.mem x (CList.mk (.cons x xs)) = true from
+             by simp [CList.mem_cons, CList.extEq_refl]⟩
 
 -- ==================================================================
 -- repr del vacío
 -- ==================================================================
 
 private theorem repr_empty_eq :
-    repr empty = CList.empty
-      := by
-  unfold repr empty
-  change CList.normalize CList.empty = CList.empty
-  unfold CList.normalize CList.empty
+    repr empty = CList.empty := by
+  change CList.mk (CList.insertionSort (CList.dedup .nil)) = CList.mk .nil
   simp [CList.dedup, CList.dedupAux, CList.insertionSort]
 
 private theorem repr_eq_empty_iff
-  (A : HFSet) :
-    A.repr = CList.empty → A = empty
-      := by
+    (A : HFSet) :
+    A.repr = CList.empty → A = empty := by
   intro h
   exact (canonicalEq_iff_eq A empty).mp (by unfold canonicalEq; rw [h, repr_empty_eq])
 
@@ -49,30 +45,22 @@ private theorem repr_eq_empty_iff
 -- ==================================================================
 
 /-- Extrae el head del representante canónico. Computable. -/
-private def reprHead
-  (c : CList) :
-    CList
-      :=
+private def reprHead (c : CList) : CList :=
   match c with
-  | CList.mk [] => CList.empty
-  | CList.mk (x :: _) => x
+  | CList.mk .nil         => CList.empty
+  | CList.mk (.cons x _)  => x
 
 /-- Función de elección computable: toma el primer elemento del representante
     canónico (normalizado y ordenado). -/
-def choose
-  (A : HFSet) (_ : A ≠ empty) :
-    HFSet
-      :=
+def choose (A : HFSet) (_ : A ≠ empty) : HFSet :=
   Quotient.mk CList.Setoid (reprHead A.repr)
 
 /-- El head del representante canónico de A pertenece a A. -/
 private theorem reprHead_mem_of_ne_empty
-  (ac : CList) (h : Quotient.mk CList.Setoid ac ≠ empty) :
-    CList.mem (reprHead (CList.normalize ac)) ac = true
-      := by
-  -- normalize ac no puede ser mk [] porque eso implicaría ac ~= empty
+    (ac : CList) (h : Quotient.mk CList.Setoid ac ≠ empty) :
+    CList.mem (reprHead (CList.normalize ac)) ac = true := by
   match hn : CList.normalize ac with
-  | CList.mk [] =>
+  | CList.mk .nil =>
     exfalso
     apply h
     apply (canonicalEq_iff_eq _ _).mp
@@ -82,12 +70,10 @@ private theorem reprHead_mem_of_ne_empty
     rw [hn]
     unfold CList.normalize CList.empty
     simp [CList.dedup, CList.dedupAux, CList.insertionSort]
-  | CList.mk (x :: _) =>
+  | CList.mk (.cons x _) =>
     unfold reprHead
-    -- x es miembro de normalize ac
     have hx_norm : CList.mem x (CList.normalize ac) = true := by
-      rw [hn]; exact CList.mem_of_list_mem x (x :: _) List.mem_cons_self
-    -- normalize ac es extEq a ac → subset (normalize ac) ac = true
+      rw [hn]; simp [CList.mem_cons, CList.extEq_refl]
     have h_ext : CList.extEq (CList.normalize ac) ac = true := by
       rw [CList.extEq_comm]; exact CList.extEq_normalize ac
     have h_sub : CList.subset (CList.normalize ac) ac = true := by
@@ -96,9 +82,8 @@ private theorem reprHead_mem_of_ne_empty
 
 /-- El elemento elegido pertenece al conjunto. -/
 theorem choose_mem
-  (A : HFSet) (h : A ≠ empty) :
-    choose A h ∈ A
-      := by
+    (A : HFSet) (h : A ≠ empty) :
+    choose A h ∈ A := by
   unfold choose
   rcases Quotient.exists_rep A with ⟨ac, rfl⟩
   show CList.mem (reprHead (CList.normalize ac)) ac = true
@@ -107,9 +92,8 @@ theorem choose_mem
 /-- Principio de elección (meta-nivel): para toda familia F de conjuntos no vacíos,
     existe una función que selecciona un elemento de cada miembro. -/
 theorem choice_principle
-  (F : HFSet) (hne : ∀ A, A ∈ F → A ≠ empty) :
-    ∃ f : HFSet → HFSet, ∀ A, A ∈ F → f A ∈ A
-      :=
+    (F : HFSet) (hne : ∀ A, A ∈ F → A ≠ empty) :
+    ∃ f : HFSet → HFSet, ∀ A, A ∈ F → f A ∈ A :=
   ⟨fun A => if h : A = empty then empty else choose A h,
    fun A hA => by
     show (if h : A = empty then empty else choose A h) ∈ A

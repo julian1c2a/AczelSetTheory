@@ -15,15 +15,14 @@ theorem mem_union (z a b : CList) :
   cases b with | mk ys =>
   induction xs with
   | nil =>
-    simp only [union, List.nil_append, mem_nil]
+    simp only [union, mem_nil]
     constructor
-    · intro h
-      exact Or.inr h
+    · intro h; exact Or.inr h
     · rintro (h1 | h2)
       · contradiction
       · exact h2
   | cons x xs ih =>
-    simp only [union, List.cons_append, mem_cons, Bool.or_eq_true]
+    simp only [union, PList.cons_append, mem_cons, Bool.or_eq_true]
     constructor
     · rintro (hx | hxs_ys)
       · exact Or.inl (Or.inl hx)
@@ -49,13 +48,13 @@ theorem mem_sUnion (z A : CList) :
   | mk xs =>
   induction xs with
   | nil =>
-    simp only [sUnion, List.flatMap_nil, mem_nil]
+    simp only [sUnion, PList.flatMap_nil, mem_nil]
     constructor
     · intro h; contradiction
     · rintro ⟨Y, hY, _⟩; contradiction
   | cons Y xs ih =>
     cases Y with | mk ys =>
-    simp only [sUnion, List.flatMap_cons, mem_cons, Bool.or_eq_true]
+    simp only [sUnion, PList.flatMap_cons, mem_cons, Bool.or_eq_true]
     -- mem z (mk (ys ++ xs.flatMap ...)) = true
     have h_union : mem z (mk (ys ++ xs.flatMap (fun x => match x with | mk zs => zs))) = true ↔
       mem z (mk ys) = true ∨ mem z (mk (xs.flatMap (fun x => match x with | mk zs => zs))) = true := by
