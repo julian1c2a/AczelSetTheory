@@ -71,8 +71,8 @@ private theorem mem_normalizePList {y : CList} {xs : PList CList} :
 
 -- For PList (non-nested parameterized inductive), rfl holds.
 private theorem sizeOf_pcons_eq (x : CList) (xs : PList CList) :
-    @Eq Nat (sizeOf (PList.cons x xs : PList CList)) (1 + @sizeOf CList _ x + sizeOf xs) := by
-  simp_wf
+    @Eq Nat (sizeOf (PList.cons x xs : PList CList)) (Nat.succ (sizeOf x + sizeOf xs)) := by
+  simp_wf; omega
 
 private theorem sizeOf_pnil_eq :
     sizeOf (PList.nil : PList CList) = (1 : Nat) := rfl
@@ -472,11 +472,11 @@ theorem normalize_eq_of_extEq {A B : CList}
 termination_by Nat.add (sizeOf A) (sizeOf B)
 decreasing_by
   all_goals simp_wf
-  all_goals (try { have h1 := normalize_sizeOf_le xi })
-  all_goals (try { have h2 := normalize_sizeOf_le yj })
   all_goals have h3 := sizeOf_lt_of_mem hxi_mem
   all_goals have h4 := sizeOf_lt_of_mem hyj_mem
-  all_goals simp only [sizeOf_mk_eq] at *
+  all_goals (try have h1 := normalize_sizeOf_le xi)
+  all_goals (try have h2 := normalize_sizeOf_le yj)
+  all_goals simp only [sizeOf_mk_eq] at h3 h4
   all_goals omega
 
 theorem extEq_iff_normalize_eq {A B : CList} :

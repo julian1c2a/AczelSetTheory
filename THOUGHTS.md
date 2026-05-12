@@ -834,28 +834,17 @@ $$V_\omega \subsetneq U_\omega \subsetneq L_{\omega_1^{CK}} \subsetneq L_{\omega
 
 #### Argumentos a favor de Nivel 1+ ($U_\omega$)
 
-1. **Completitud aritmética**: Captura todos los conjuntos definibles en aritmética
-   de primer orden — un universo natural desde el punto de vista de la lógica
-   computacional.
-2. **Powerset decidible iterado**: Cada nivel tiene powerset decidible. Muchas
-   construcciones de la matemática (espacios de funciones, topología puntual) solo
-   necesitan subconjuntos decidibles.
+1. **Completitud aritmética**: Captura todos los conjuntos definibles en aritmética de primer orden — un universo natural desde el punto de vista de la lógica computacional.
+2. **Powerset decidible iterado**: Cada nivel tiene powerset decidible. Muchas construcciones de la matemática (espacios de funciones, topología puntual) solo necesitan subconjuntos decidibles.
 3. **Jerarquía natural**: La indexación por $\mathbb{N}$ proporciona una estructura
    de "complejidad" que puede ser útil para razonar sobre definibilidad.
 
 #### Argumentos en contra
 
-1. **Complejidad de implementación alta**: Incluso con la Estrategia B (niveles
-   explícitos), cada nivel replica toda la infraestructura.
-2. **No se alcanza $U_\omega$ finitamente**: En Lean 4 solo podemos definir $U_n$
-   para $n$ concretos. El límite $U_\omega$ requeriría un tipo dependiente o
-   una codificación Tarski compleja.
-3. **Marginalidad**: Para la mayoría de las construcciones matemáticas interesantes
-   (análisis, topología, álgebra), se necesita $V_{\omega+1}$ completo o al menos
-   los conjuntos hiperaritméticos. $U_\omega$ es "demasiado" para conjuntos finitos
-   pero "insuficiente" para el análisis.
-4. **Igualdad no decidible**: A partir de $U_1$, la igualdad deja de ser decidible.
-   Se pierde el carácter computacional que hace especial a HFSet.
+1. **Complejidad de implementación alta**: Incluso con la Estrategia B (niveles explícitos), cada nivel replica toda la infraestructura.
+2. **No se alcanza $U_\omega$ finitamente**: En Lean 4 solo podemos definir $U_n$ para $n$ concretos. El límite $U_\omega$ requeriría un tipo dependiente o una codificación Tarski compleja.
+3. **Marginalidad**: Para la mayoría de las construcciones matemáticas interesantes (análisis, topología, álgebra), se necesita $V_{\omega+1}$ completo o al menos los conjuntos hiperaritméticos. $U_\omega$ es "demasiado" para conjuntos finitos pero "insuficiente" para el análisis.
+4. **Igualdad no decidible**: A partir de $U_1$, la igualdad deja de ser decidible. Se pierde el carácter computacional que hace especial a HFSet.
 
 ### 3.9. Comparación: Nivel 1 vs Nivel 1+
 
@@ -895,9 +884,7 @@ permite definir `ASet₂` y `ASet₃` sin tocar `ASet₁`.
 
 #### 3.11.1. Respuesta: separación/reemplazo sobre ω no llega a Nivel 2
 
-**Separación `{x ∈ ω | P(x)}` con P decidible**: ya está capturada por el constructor
-`inf : (HFSet → Bool) → CList₁` de Nivel 1. La codificación usa los ordinales de von
-Neumann ya presentes en el proyecto (`𝟘`–`𝟡`):
+**Separación `{x ∈ ω | P(x)}` con P decidible**: ya está capturada por el constructor `inf : (HFSet → Bool) → CList₁` de Nivel 1. La codificación usa los ordinales de von Neumann ya presentes en el proyecto (`𝟘`–`𝟡`):
 
 ```lean
 {x ∈ ω | P(x)}  ≅  inf (fun a => isVonNeumann a && P (toNat a))
@@ -905,9 +892,7 @@ Neumann ya presentes en el proyecto (`𝟘`–`𝟡`):
 
 No hay ganancia: la separación sobre ω con predicados decidibles no sale de Δ⁰₁.
 
-**Reemplazo `{F(x) | x ∈ ω}` con F : ℕ → HFSet computable**: la imagen de F es un
-conjunto computably-enumerable (Σ⁰₁). Hay conjuntos Σ⁰₁ \ Δ⁰₁ (p.ej. ∅′ = problema
-de la parada), así que el reemplazo sobre ω sí añade algo respecto a Nivel 1 puro.
+**Reemplazo `{F(x) | x ∈ ω}` con F : ℕ → HFSet computable**: la imagen de F es un conjunto computably-enumerable (Σ⁰₁). Hay conjuntos Σ⁰₁ \ Δ⁰₁ (p.ej. ∅′ = problema de la parada), así que el reemplazo sobre ω sí añade algo respecto a Nivel 1 puro.
 Pero Σ⁰₁ ⊊ Δ⁰₂, así que **no llegamos a Nivel 2**.
 
 **Para llegar a Nivel 2** se necesita `inf : (ASet₁ → Bool) → CList₂` — predicados
