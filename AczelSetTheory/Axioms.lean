@@ -11,6 +11,7 @@ License: MIT
 --             union_comm, inter_comm, ..., mem_image, choose, choose_mem, ...
 
 import AczelSetTheory.Axioms.BooleanAlgebra
+import AczelSetTheory.Axioms.Cardinal
 import AczelSetTheory.Axioms.BooleanRing
 import AczelSetTheory.Axioms.Choice
 import AczelSetTheory.Axioms.Decidable

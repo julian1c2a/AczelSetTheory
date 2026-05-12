@@ -211,4 +211,39 @@ theorem insertionSort_setEquiv (l : PList CList) : SetEquiv (insertionSort l) l 
       · exact Or.inl hzx
       · exact Or.inr ((ih z).mpr hzxs)
 
+theorem sorted_head_lt_of_mem {a b : CList} {l : PList CList}
+    (hs : Sorted (.cons a l)) (hm : PList.Mem b l) : lt a b = true :=
+  match l, hm with
+  | .cons _ _,    .head      => hs.1
+  | .cons c rest, .tail hrest =>
+      lt_trans a c b hs.1 (sorted_head_lt_of_mem hs.2 hrest)
+termination_by sizeOf l
+decreasing_by simp_wf; simp [sizeOf]; omega
+
+theorem length_orderedInsert_fresh (x : CList) (l : PList CList)
+    (hx : ∀ y, PList.Mem y l → extEq x y = false) :
+    PList.length (orderedInsert x l) = σ (PList.length l) := by
+  induction l with
+  | nil => rfl
+  | cons y ys ih =>
+    have hxy : extEq x y = false := hx y PList.Mem.head
+    simp only [orderedInsert]
+    by_cases hlt : lt x y = true
+    · rw [if_pos hlt]; rfl
+    · rw [if_neg hlt, if_neg (Bool.eq_false_iff.mp hxy)]
+      simp only [PList.length_cons]
+      congr 1
+      exact ih (fun z hz => hx z (PList.Mem.tail hz))
+
+theorem length_insertionSort_nodup (l : PList CList) (hn : Nodup l) :
+    PList.length (insertionSort l) = PList.length l := by
+  induction l with
+  | nil => simp [insertionSort]
+  | cons x xs ih =>
+    obtain ⟨hx_nd, hxs_nd⟩ := hn
+    simp only [insertionSort, PList.length_cons]
+    rw [length_orderedInsert_fresh x (insertionSort xs), ih hxs_nd]
+    intro y hy
+    exact hx_nd y (insertionSort_mem_subset y xs hy)
+
 end CList

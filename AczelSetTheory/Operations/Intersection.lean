@@ -130,7 +130,9 @@ theorem mem_sInterCList_iff (z F : CList) :
   cases xs with
   | nil =>
     constructor
-    · intro h; simp [sInterCList_nil, CList.mem_nil] at h
+    · intro h
+      simp only [sInterCList_nil, CList.empty, CList.mem_nil] at h
+      exact absurd h (by decide)
     · rintro ⟨⟨x, hx⟩, _⟩; simp [CList.mem_nil] at hx
   | cons x xs =>
     cases x with | mk ys =>

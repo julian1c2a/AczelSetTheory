@@ -490,4 +490,77 @@ theorem extEq_iff_normalize_eq {A B : CList} :
     have h1 : extEq A (normalize B) = true := by rw [h] at ha; exact ha
     exact extEq_trans A (normalize B) B h1 hb_symm
 
+-- ==================================================================
+-- Lemmas for Cardinal
+-- ==================================================================
+
+private theorem dedupAux_id_of_nodup_fresh_aux
+    (l : PList CList) (vistos : PList CList)
+    (hl : Nodup l)
+    (hfresh : ∀ z, PList.Mem z l → PList.any (fun v => extEq z v) vistos = false) :
+    dedupAux l vistos = l := by
+  induction l generalizing vistos with
+  | nil => rfl
+  | cons a as ih =>
+    obtain ⟨ha_nd, has_nd⟩ := hl
+    have ha_fresh : PList.any (fun v => extEq a v) vistos = false := hfresh a PList.Mem.head
+    simp only [dedupAux, if_neg (Bool.eq_false_iff.mp ha_fresh)]
+    congr 1
+    apply ih (.cons a vistos) has_nd
+    intro y hy
+    simp only [plist_any_cons, Bool.or_eq_false_iff]
+    exact ⟨by rw [extEq_comm]; exact ha_nd y hy, hfresh y (PList.Mem.tail hy)⟩
+
+theorem dedup_cons_fresh (x : CList) (l : PList CList)
+    (hl : Nodup l)
+    (hx : ∀ y, PList.Mem y l → extEq x y = false) :
+    dedup (.cons x l) = .cons x l := by
+  -- dedup (.cons x l) = .cons x (dedupAux l (.cons x .nil)) definitionally
+  show PList.cons x (dedupAux l (PList.cons x PList.nil)) = PList.cons x l
+  congr 1
+  apply dedupAux_id_of_nodup_fresh_aux l (.cons x .nil) hl
+  intro z hz
+  have hzx : extEq z x = false := by rw [extEq_comm]; exact hx z hz
+  simp [PList.any_nil, hzx]
+
+theorem normalize_cons_fresh
+    (xc : CList) (xs : PList CList)
+    (hx_norm : normalize xc = xc)
+    (hs : Sorted xs)
+    (hn : Nodup xs)
+    (hfresh : ∀ y, PList.Mem y xs → extEq xc y = false)
+    (hall : ∀ y, PList.Mem y xs → normalize y = y) :
+    normalize (CList.mk (.cons xc xs)) = CList.mk (orderedInsert xc xs) := by
+  show CList.mk (insertionSort (dedup (normalizePList (.cons xc xs)))) = CList.mk (orderedInsert xc xs)
+  congr 1
+  have h1 : normalizePList (.cons xc xs) = .cons xc xs :=
+    normalizePList_fixed (.cons xc xs) (fun y hy =>
+      match hy with
+      | .head    => hx_norm
+      | .tail hy' => hall y hy')
+  rw [h1, dedup_cons_fresh xc xs hn hfresh]
+  show insertionSort (.cons xc xs) = orderedInsert xc xs
+  change orderedInsert xc (insertionSort xs) = orderedInsert xc xs
+  rw [insertionSort_id_of_sorted_nodup xs hs hn]
+
+theorem normalize_fixed_of_mem_normalize
+    (A : CList) (xs : PList CList) (h : CList.normalize A = CList.mk xs)
+    (y : CList) (hy : PList.Mem y xs) :
+    CList.normalize y = y := by
+  cases A with | mk ys =>
+  simp only [normalize] at h
+  have h_eq : insertionSort (dedup (normalizePList ys)) = xs :=
+    congrArg (fun c => match c with | CList.mk l => l) h
+  rw [← h_eq] at hy
+  exact normalize_idem_plist ys y (mem_of_mem_dedup _ y (insertionSort_mem_subset y _ hy))
+
+theorem normalize_mk_of_normalized_sorted_nodup (xs : PList CList)
+    (hs : Sorted xs) (hn : Nodup xs)
+    (hall : ∀ y, PList.Mem y xs → normalize y = y) :
+    normalize (CList.mk xs) = CList.mk xs := by
+  show CList.mk (insertionSort (dedup (normalizePList xs))) = CList.mk xs
+  congr 1
+  rw [normalizePList_fixed xs hall, dedup_id_of_nodup xs hn,
+      insertionSort_id_of_sorted_nodup xs hs hn]
+
 end CList
