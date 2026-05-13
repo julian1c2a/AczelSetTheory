@@ -34,3 +34,4 @@ import AczelSetTheory.Axioms.Union
 import AczelSetTheory.Axioms.VonNeumann
 import AczelSetTheory.Axioms.Composition
 import AczelSetTheory.Axioms.Restriction
+import AczelSetTheory.Axioms.Bijection
