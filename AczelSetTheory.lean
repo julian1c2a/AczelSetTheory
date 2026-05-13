@@ -15,3 +15,4 @@ import AczelSetTheory.Operations
 import AczelSetTheory.HFSets
 import AczelSetTheory.HFList
 import AczelSetTheory.Notation
+import AczelSetTheory.VN

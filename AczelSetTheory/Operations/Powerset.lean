@@ -69,10 +69,10 @@ private theorem sublists_plist_mem {α : Type} (xs zs : PList α) (y : α)
   | cons x xs' ih =>
     simp only [sublists, PList.Mem_append, PList.Mem_map] at h_zs
     rcases h_zs with h_rest | ⟨ws, h_ws, rfl⟩
-    · exact PList.Mem.tail (ih xs' zs h_rest h_y)
+    · exact PList.Mem.tail (ih zs h_rest h_y)
     · cases h_y with
       | head => exact PList.Mem.head
-      | tail h_y' => exact PList.Mem.tail (ih xs' ws h_ws h_y')
+      | tail h_y' => exact PList.Mem.tail (ih ws h_ws h_y')
 
 private theorem plist_any_eq_false_of_all {α : Type} (p : α → Bool) (l : PList α)
     (h : ∀ x, PList.Mem x l → p x = false) : PList.any p l = false := by
@@ -100,7 +100,7 @@ private theorem cross_not_extEq (a : CList) (ws vs : PList CList)
   have ha_in_acons : CList.mem a (CList.mk (.cons a vs)) = true := by
     rw [mem_cons, Bool.or_eq_true]; exact Or.inl (extEq_refl a)
   have ha_in_ws : CList.mem a (CList.mk ws) = true :=
-    subset_iff_forall_mem_clist.mp h.2 a ha_in_acons
+    (HFSet.subset_iff_forall_mem_clist _ _).mp h.2 a ha_in_acons
   simp [ha_not_ws] at ha_in_ws
 
 private theorem nodup_append (l₁ l₂ : PList CList)
@@ -131,12 +131,11 @@ private theorem nodup_map_cons_a (a : CList) (as : PList CList)
     have hws_in := hl ws PList.Mem.head
     have ha_not_ws := a_not_mem_sublist a as ha ws hws_in
     refine ⟨fun z hz => ?_, ih (fun w hw => hl w (PList.Mem.tail hw)) hrest_nd⟩
-    rw [PList.Mem_map] at hz
-    obtain ⟨vs, hvs_rest, rfl⟩ := hz
+    obtain ⟨vs, hvs_rest, rfl⟩ := (PList.Mem_map _ z _).mp hz
     have hvs_in := hl vs (PList.Mem.tail hvs_rest)
     have ha_not_vs := a_not_mem_sublist a as ha vs hvs_in
     have hws_vs_false : CList.extEq (CList.mk ws) (CList.mk vs) = false :=
-      hws_nd (CList.mk vs) (PList.Mem_map.mpr ⟨vs, hvs_rest, rfl⟩)
+      hws_nd (CList.mk vs) ((PList.Mem_map _ (CList.mk vs) _).mpr ⟨vs, hvs_rest, rfl⟩)
     rw [Bool.eq_false_iff]
     intro h_extEq
     have h_sub : CList.extEq (CList.mk ws) (CList.mk vs) = true := by
@@ -144,18 +143,18 @@ private theorem nodup_map_cons_a (a : CList) (as : PList CList)
       rw [extEq_def, Bool.and_eq_true] at h_extEq
       obtain ⟨h12, h21⟩ := h_extEq
       constructor
-      · rw [subset_iff_forall_mem_clist]
+      · rw [HFSet.subset_iff_forall_mem_clist]
         intro z hz_ws
-        have hz_in := subset_iff_forall_mem_clist.mp h12 z
+        have hz_in := (HFSet.subset_iff_forall_mem_clist _ _).mp h12 z
           (by rw [mem_cons, Bool.or_eq_true]; exact Or.inr hz_ws)
         rw [mem_cons, Bool.or_eq_true] at hz_in
         rcases hz_in with heq_za | hmem
         · exact absurd (mem_of_extEq a z (CList.mk ws) (by rwa [extEq_comm]) hz_ws)
             (by simp [ha_not_ws])
         · exact hmem
-      · rw [subset_iff_forall_mem_clist]
+      · rw [HFSet.subset_iff_forall_mem_clist]
         intro z hz_vs
-        have hz_in := subset_iff_forall_mem_clist.mp h21 z
+        have hz_in := (HFSet.subset_iff_forall_mem_clist _ _).mp h21 z
           (by rw [mem_cons, Bool.or_eq_true]; exact Or.inr hz_vs)
         rw [mem_cons, Bool.or_eq_true] at hz_in
         rcases hz_in with heq_za | hmem
@@ -230,14 +229,33 @@ theorem sublists_nodup_mk (xs : PList CList) (hn : Nodup xs) :
   | cons a as ih =>
     obtain ⟨ha_nd, has_nd⟩ := hn
     have ih_nodup := ih has_nd
-    simp only [sublists, PList.map_append, PList.map_map]
+    -- map mk (map (cons a) l) = map (fun ws => mk (cons a ws)) l
+    have map_comp : ∀ (l : PList (PList CList)),
+        PList.map CList.mk (PList.map (PList.cons a ·) l) =
+        PList.map (fun ws => CList.mk (PList.cons a ws)) l := fun l => by
+      induction l with
+      | nil => rfl
+      | cons h t ih' => simp only [PList.map_cons, ih']
+    -- Split outer map over append, then fold composed map
+    have eq_goal : PList.map CList.mk (sublists as ++ (sublists as).map (PList.cons a ·)) =
+        PList.map CList.mk (sublists as) ++
+        PList.map (fun ws => CList.mk (PList.cons a ws)) (sublists as) := by
+      -- Prove map_append for ++ via induction (PList.map_append uses .append, not ++)
+      have map_app : ∀ (l₁ l₂ : PList (PList CList)),
+          PList.map CList.mk (l₁ ++ l₂) = PList.map CList.mk l₁ ++ PList.map CList.mk l₂ := by
+        intro l₁ l₂
+        induction l₁ with
+        | nil => rfl
+        | cons h t ih_t => simp only [PList.cons_append, PList.map_cons, ih_t]
+      rw [map_app]; congr 1; exact map_comp (sublists as)
+    simp only [sublists, eq_goal]
     apply nodup_append
     · exact ih_nodup
     · exact nodup_map_cons_a a as ha_nd (sublists as) (fun ws hw => hw) ih_nodup
     · intro x hx y hy
-      rw [PList.Mem_map] at hx hy
-      obtain ⟨ws, hws, rfl⟩ := hx
-      obtain ⟨vs, hvs, rfl⟩ := hy
+      obtain ⟨ws, hws, rfl⟩ := (PList.Mem_map CList.mk x (sublists as)).mp hx
+      obtain ⟨vs, hvs, rfl⟩ :=
+        (PList.Mem_map (fun ws => CList.mk (PList.cons a ws)) y (sublists as)).mp hy
       have ha_not_ws := a_not_mem_sublist a as ha_nd ws hws
       change CList.extEq (CList.mk ws) (CList.mk (PList.cons a vs)) = false
       exact cross_not_extEq a ws vs ha_not_ws

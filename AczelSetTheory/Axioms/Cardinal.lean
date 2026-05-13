@@ -18,7 +18,9 @@ namespace HFSet
 
 theorem card_empty : card empty = 𝟘 := by
   show cardCList CList.empty = 𝟘
-  simp [cardCList, CList.normalize_empty, CList.empty]
+  unfold cardCList
+  rw [CList.normalize_empty]
+  rfl
 
 -- ==================================================================
 -- Cardinalidad de insert: carta(insert x A) = σ(card A) when x ∉ A
@@ -52,11 +54,11 @@ theorem card_insert (x A : HFSet) (h : x ∉ A) : card (insert x A) = σ (card A
     have h_extEq_a_xs₀ : CList.extEq a (CList.mk xs₀) = true := by
       rw [← h_norm]; exact CList.extEq_normalize a
     have h_xc₀_in_a : CList.mem xc₀ a = true :=
-      CList.mem_resp_right xc₀ (CList.mk xs₀) a
+      mem_resp_right xc₀ (CList.mk xs₀) a
         (by rwa [CList.extEq_comm]) h_pos
     -- xc ∈ a (since extEq xc xc₀)
     have h_xc_in_a : CList.mem xc a = true :=
-      (CList.mem_resp_left xc xc₀ a (CList.extEq_normalize xc)).mpr h_xc₀_in_a
+      (mem_resp_left xc xc₀ a (CList.extEq_normalize xc)).mpr h_xc₀_in_a
     exact absurd h_xc_in_a (by simp [h_nm])
   -- Freshness: ∀ y ∈ xs₀, extEq xc₀ y = false
   have h_fresh : ∀ y, PList.Mem y xs₀ → CList.extEq xc₀ y = false := by
@@ -71,9 +73,10 @@ theorem card_insert (x A : HFSet) (h : x ∉ A) : card (insert x A) = σ (card A
   have h_ins_eq : CList.normalize (insertCList xc a) =
       CList.normalize (CList.mk (PList.cons xc₀ xs₀)) := by
     apply CList.normalize_eq_of_extEq
+    show CList.extEq (insertCList xc a) (insertCList xc₀ (CList.mk xs₀)) = true
     apply insertCList_extEq
     · exact CList.extEq_normalize xc
-    · rw [CList.extEq_comm, ← h_norm]; exact CList.extEq_normalize a
+    · rw [← h_norm]; exact CList.extEq_normalize a
   -- Apply normalize_cons_fresh
   simp only [cardCList, h_ins_eq,
     CList.normalize_cons_fresh xc₀ xs₀ hxc₀_norm h_sorted h_nodup h_fresh h_hall]

@@ -69,7 +69,7 @@ private theorem reprHead_mem_of_ne_empty
     change CList.normalize ac = CList.normalize CList.empty
     rw [hn]
     unfold CList.normalize CList.empty
-    simp [CList.dedup, CList.dedupAux, CList.insertionSort]
+    rfl
   | CList.mk (.cons x _) =>
     unfold reprHead
     have hx_norm : CList.mem x (CList.normalize ac) = true := by

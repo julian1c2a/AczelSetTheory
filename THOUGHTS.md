@@ -982,3 +982,46 @@ Estos quedan para el proyecto **ZFC**.
    teoría de clases más expresiva con el Axioma de Elección Contable.
 
 ---
+
+## [5.] Algunas ideas propuestas para pensar
+
+- En principio, tenemos la opciónd e tener formas más expresivas de lo que ya tenemos. Por ejemplo, podemos usar HFSet (cualquier tipo de contenido), HFList (cualquier tipo de contenido), HFGraph A -> B, HFFun A -> B, HFNat 45, HFTup A B C, y quizás algunos más. Me pregunto sic onseguiríamos una teoría más expresiva teniendo también un HFAlpha, esto es, un tipo alfabeto 'UNICODE' que contenga todos los caracteres posibles. Habría que distinguir los caracteres de las cifras numéricas, o los caracteres usadose en la propia codificación. Expreso a continuación mi idea. Habría que encontrar el tipo de conjunto que constituirían los caracteres, y luego definir un constructor `HFAlpha : (Char -> Bool) -> HFAlpha` que permita construir conjuntos de caracteres a partir de predicados decidibles sobre caracteres. En principio podríamos verlos como `HFAlpha : Fin (2^24)-1 -> HFAlpha` (asumiendo un alfabeto de 24 bits, creo, para `UNICODE`), pero esto no es tan flexible como permitir cualquier subconjunto decidible de caracteres. Si posteriormente queremos definir los caracteres LaTeX, podríamos usar algo más complejo, básicamente un `ASCII (7 bits) strings -> LaTeX sobre ASCII mínimo -> HFAlpha`, por ejemplo.
+
+```lean
+inductive Element : Type
+  | HFList : HFList -> Element
+  | HFFun : (A B : HFSet) -> (A -> B) -> Element
+  | HFGraph : (A B : HFSet) -> (A -> B) -> Element
+  | HFNat : Nat -> Element
+  | HFTup : (A B C : HFSet) -> (A × B × C) -> Element
+  | HFAlpha : (k : Nat) -> (h : k < (2^24)) -> (Char -> Bool) -> Element
+
+inductive EHFset : Type -- Las propiedades deben ser decidibles, es decir, `Prop` debe ser `Bool`, las funciones `computables`, etc. para que el conjunto resultante sea decidible.
+  | mk : HFSet -> EHFSet -- CONJUNTO HEREDITARIAMENTE FINITO NORMALIZADO
+  | mk : EHFSet -> Prop -> EHFSet -- SEPARACIÓN DADA EL CONJUNTO Y LA PROPIEDAD
+  | mk : HFFun -> EHFSet -> EHFSet -> EHFSet -- REEMPLAZO
+  | mk_pair : EHFSet -> EHFSet -> EHFSet -- PAR
+  | mk_union : EHFSet -> EHFSet -> EHFSet -- UNIÓN BINARIA (se podría flexibilizar con un constructor de n-aria unión)
+  | mk_bigunion : EHFSet -> EHFSet -- UNIÓN DE UN CONJUNTO
+  | mk_inter : EHFSet -> EHFSet -> EHFSet -- INTERSECCIÓN BINARIA (se podría flexibilizar con un constructor de n-aria intersección)
+  | mk_biginter : EHFSet -> EHFSet -- INTERSECCIÓN DE UN CONJUNTO
+  | mk_diff : EHFSet -> EHFSet -> EHFSet -- DIFERENCIA
+  | mk_symmdiff : EHFSet -> EHFSet -> EHFSet -- DIFERENCIA SIMÉTRICA
+  | mk_powset : EHFSet -> Prop -> EHFSet -- SEPARACIÓN DADA EL CONJUNTO Y LA PROPIEDAD PARA EL POWERSET
+  | mk_powset : Prop -> EHFSet -> EHFSet -- REEMPLAZO PARA EL POWERSET
+  | mk_powset : EHFSet -> EHFSet -- POWERSET
+  | mk_cart : EHFSet -> EHFSet -> EHFSet -- PRODUCTO CARTESIANO (se podría flexibilizar con un constructor de n-ario producto cartesiano)
+  | mk : EHFFun {A B : EHFSet} (A -> B) -> EHFSet -- CONJUNTO DE FUNCIONES ENTRE DOS CONJUNTOS
+  | mk : EHFGraph {A B : EHFSet} (A -> B) -> EHFSet -- CONJUNTO DE GRAFOS ENTRE DOS CONJUNTOS
+  | mk : HFFin n -> EHFSet -- CONJUNTO DE LOS N PRIMEROS NÚMEROS NATURALES
+  | ... -- Otros constructores posibles, como el de conjuntos de caracteres a partir de predicados decidibles sobre caracteres, y funciones computables entre EHFSet, etc.
+  | mkfromlist : HFList -> EHFSet
+  | mkfromfun : (f : EHFFun) (A B : EHFSet) -> EHFSet
+  | mkfromgraph : (f : EHFGraph) (A B : EHFSet) -> EHFSet
+  | mkfromnat : Nat -> EHFSet
+  | mkfromtup : (A B C : EHFSet) -> (A × B × C) -> EHFSet -- flexbilizar para un número cualquiera de componentes
+  | mkchar : (k : Nat) -> ((h : k < (2^24)) -> (Char -> Bool)) -> EHFSet -- El 24 es poi UNICODE, pero se podría flexibilizar para admitir cualquier alfabeto decidible de caracteres.
+  | mkstring : HFList EHFAlpha -> EHFSet
+  ```
+
+  En el tipo inductivo de `EHFSet`, cada cosa que nos ea EHFSet, podría ser un `Element`. La idea no es obtener un universo de conjuntos más grande, sino un universo de conjuntos más expresivo, que permita representar objetos matemáticos más complejos (funciones, grafos, tuplas, caracteres, etc.) como elementos de conjuntos. Esto podría facilitar la codificación de objetos matemáticos dentro de la teoría de conjuntos, y permitir una representación más directa de conceptos matemáticos comunes. Sin embargo, habría que asegurarse de que las propiedades decidibles y las funciones computables se mantengan para garantizar que el universo resultante siga siendo decidible.

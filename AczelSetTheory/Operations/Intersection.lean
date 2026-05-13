@@ -78,9 +78,8 @@ private theorem sInterPred_respects (xs : PList CList) :
   | nil => rfl
   | cons a t ih =>
     simp only [PList.all_cons]
-    have h1 : CList.mem z a = CList.mem z' a := by
-      cases h : CList.mem z a <;> cases h' : CList.mem z' a <;>
-        simp_all [mem_resp_left z z' a heq]
+    have h1 : CList.mem z a = CList.mem z' a :=
+      Bool.eq_iff_iff.mpr (mem_resp_left z z' a heq)
     congr 1
 
 private theorem mem_of_plist_mem_aux

@@ -45,13 +45,14 @@ theorem mem_sInter (A x : HFSet) :
     x ∈ sInter A ↔ (∃ y, y ∈ A) ∧ ∀ B, B ∈ A → x ∈ B := by
   rcases Quotient.exists_rep A with ⟨a, rfl⟩
   rcases Quotient.exists_rep x with ⟨xc, rfl⟩
-  rw [mem_sInterCList_iff]
   constructor
-  · rintro ⟨⟨yc, hyc⟩, hall⟩
+  · intro h
+    obtain ⟨⟨yc, hyc⟩, hall⟩ := (mem_sInterCList_iff xc a).mp h
     exact ⟨⟨Quotient.mk CList.Setoid yc, hyc⟩,
            fun B hB => by rcases Quotient.exists_rep B with ⟨bc, rfl⟩; exact hall bc hB⟩
   · rintro ⟨⟨y, hy⟩, hall⟩
     rcases Quotient.exists_rep y with ⟨yc, rfl⟩
-    exact ⟨⟨yc, hy⟩, fun bc hbc => hall (Quotient.mk CList.Setoid bc) hbc⟩
+    exact (mem_sInterCList_iff xc a).mpr
+      ⟨⟨yc, hy⟩, fun bc hbc => hall (Quotient.mk CList.Setoid bc) hbc⟩
 
 end HFSet
