@@ -20,3 +20,5 @@ import AczelSetTheory.Operations.Setminus
 import AczelSetTheory.Operations.SymDiff
 import AczelSetTheory.Operations.Cardinal
 import AczelSetTheory.Operations.Union
+import AczelSetTheory.Operations.Composition
+import AczelSetTheory.Operations.Restriction

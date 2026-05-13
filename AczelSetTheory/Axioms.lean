@@ -32,3 +32,5 @@ import AczelSetTheory.Axioms.Succ
 import AczelSetTheory.Axioms.SymDiff
 import AczelSetTheory.Axioms.Union
 import AczelSetTheory.Axioms.VonNeumann
+import AczelSetTheory.Axioms.Composition
+import AczelSetTheory.Axioms.Restriction

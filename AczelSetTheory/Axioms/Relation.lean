@@ -17,7 +17,7 @@ namespace HFSet
 -- ==================================================================
 
 /-- Si ⟪a, b⟫ ∈ R entonces a ∈ ⋃⋃R. -/
-private theorem fst_mem_sUnion_sUnion
+theorem fst_mem_sUnion_sUnion
   (a b R : HFSet) (h : ⟪a, b⟫ ∈ R) :
     a ∈ sUnion (sUnion R)
       := by
@@ -34,7 +34,7 @@ private theorem fst_mem_sUnion_sUnion
   exact (mem_sUnion a (sUnion R)).mpr ⟨singleton a, h_sa_sR, h_a_sa⟩
 
 /-- Si ⟪a, b⟫ ∈ R entonces b ∈ ⋃⋃R. -/
-private theorem snd_mem_sUnion_sUnion
+theorem snd_mem_sUnion_sUnion
   (a b R : HFSet) (h : ⟪a, b⟫ ∈ R) :
     b ∈ sUnion (sUnion R)
       := by
