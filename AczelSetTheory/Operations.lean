@@ -22,3 +22,4 @@ import AczelSetTheory.Operations.Cardinal
 import AczelSetTheory.Operations.Union
 import AczelSetTheory.Operations.Composition
 import AczelSetTheory.Operations.Restriction
+import AczelSetTheory.Operations.Inverse
