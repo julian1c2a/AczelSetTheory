@@ -3,3 +3,4 @@
 import AczelSetTheory.PList.Basic
 import AczelSetTheory.PList.Lemmas
 import AczelSetTheory.PList.Omega0
+import AczelSetTheory.PList.Fin0
