@@ -36,14 +36,14 @@ Below are the keys for reading and searching theorems.
 
 | # | File | Namespace | Status | Depends on | Depended on by |
 |---|------|-----------|--------|------------|----------------|
-| 1 | `AczelSetTheory/CList/Basic.lean` | `CList` | ✅ Complete | `Init.Data.List.Basic` | ExtEq, SetEquiv, Order, Sort, Normalize, Filter, HFSets, Main |
-| 2 | `AczelSetTheory/CList/ExtEq.lean` | `CList` | ✅ Complete | Basic | SetEquiv, Order, Filter |
-| 3 | `AczelSetTheory/CList/Filter.lean` | `CList` | ✅ Complete | ExtEq | Operations/Separation, Operations/Intersection, Operations/Setminus |
-| 4 | `AczelSetTheory/CList/SetEquiv.lean` | `CList` | ✅ Complete | ExtEq | Sort |
-| 5 | `AczelSetTheory/CList/Order.lean` | `CList` | ✅ Complete | ExtEq | Sort |
-| 6 | `AczelSetTheory/CList/Sort.lean` | `CList` | ✅ Complete | Order, SetEquiv | Normalize |
-| 7 | `AczelSetTheory/CList/Normalize.lean` | `CList` | ✅ Complete | Sort | (via CList root) |
-| 8 | `AczelSetTheory/CList.lean` | — | ✅ Complete | Basic, ExtEq, Filter, SetEquiv, Order, Sort, Normalize | HFSets |
+| 1 | [`AczelSetTheory/CList/Basic.lean`](doc/REFERENCE-CList.md) | `CList` | ✅ Complete | `Init.Data.List.Basic` | ExtEq, SetEquiv, Order, Sort, Normalize, Filter, HFSets, Main |
+| 2 | [`AczelSetTheory/CList/ExtEq.lean`](doc/REFERENCE-CList.md) | `CList` | ✅ Complete | Basic | SetEquiv, Order, Filter |
+| 3 | [`AczelSetTheory/CList/Filter.lean`](doc/REFERENCE-CList.md) | `CList` | ✅ Complete | ExtEq | Operations/Separation, Operations/Intersection, Operations/Setminus |
+| 4 | [`AczelSetTheory/CList/SetEquiv.lean`](doc/REFERENCE-CList.md) | `CList` | ✅ Complete | ExtEq | Sort |
+| 5 | [`AczelSetTheory/CList/Order.lean`](doc/REFERENCE-CList.md) | `CList` | ✅ Complete | ExtEq | Sort |
+| 6 | [`AczelSetTheory/CList/Sort.lean`](doc/REFERENCE-CList.md) | `CList` | ✅ Complete | Order, SetEquiv | Normalize |
+| 7 | [`AczelSetTheory/CList/Normalize.lean`](doc/REFERENCE-CList.md) | `CList` | ✅ Complete | Sort | (via CList root) |
+| 8 | [`AczelSetTheory/CList.lean`](doc/REFERENCE-CList.md) | — | ✅ Complete | Basic, ExtEq, Filter, SetEquiv, Order, Sort, Normalize | HFSets |
 | 9 | `AczelSetTheory/HFSets.lean` | `HFSet` | ✅ Complete | CList (all) | Operations/*, Axioms/*, Notation |
 | 10 | `AczelSetTheory/Operations/Union.lean` | `CList`, `HFSet` | ✅ Complete | CList/ExtEq, HFSets | Axioms/Union |
 | 11 | `AczelSetTheory/Operations/Intersection.lean` | `HFSet` | ✅ Complete | HFSets, CList/Filter | Axioms/Intersection |
@@ -68,6 +68,42 @@ Below are the keys for reading and searching theorems.
 | 30 | `AczelSetTheory/Axioms/Identity.lean` | `HFSet` | ✅ Complete | Operations/Identity, Axioms/Powerset, Axioms/Separation, Axioms/Pair, Axioms/Singleton, Axioms/OrderedPair, Axioms/FunctionComp, Axioms/Inverse | Axioms/Image |
 | 31 | `AczelSetTheory/Axioms/Product.lean` | `HFSet` | ✅ Complete | Operations/Product, Axioms/Powerset, Axioms/Separation, Axioms/Pair, Axioms/Singleton, Axioms/OrderedPair, Axioms/Union, Axioms/Relation, Axioms/Function | — |
 | 32 | `AczelSetTheory/Axioms/Image.lean` | `HFSet` | ✅ Complete | Axioms/Composition, Axioms/FunctionComp, Axioms/Identity, Axioms/Intersection, Axioms/Union | — |
+| 33 | `AczelSetTheory/Operations/OrderedPair.lean` | `HFSet` | ✅ Complete | Operations/Pair, Notation | Operations/Relation, Operations/Inverse, Operations/Restriction, Operations/Composition |
+| 34 | `AczelSetTheory/Operations/Relation.lean` | `HFSet` | ✅ Complete | Operations/OrderedPair, Operations/Union, Axioms/Decidable | Operations/Function, Operations/Inverse, Operations/Restriction, Operations/Composition, Operations/Replacement |
+| 35 | `AczelSetTheory/Operations/Function.lean` | `HFSet` | ✅ Complete | Operations/Relation | Axioms/Function |
+| 36 | `AczelSetTheory/Operations/Inverse.lean` | `HFSet` | ✅ Complete | Operations/Relation, Operations/OrderedPair, Operations/Powerset | Axioms/Inverse |
+| 37 | `AczelSetTheory/Operations/Restriction.lean` | `HFSet` | ✅ Complete | Operations/Relation | Axioms/Restriction |
+| 38 | `AczelSetTheory/Operations/Composition.lean` | `HFSet` | ✅ Complete | Operations/Relation, Operations/OrderedPair | Operations/FunctionComp, Axioms/Composition |
+| 39 | `AczelSetTheory/Operations/Replacement.lean` | `HFSet` | ✅ Complete | Operations/Relation, Operations/Separation | Axioms/Replacement |
+| 40 | `AczelSetTheory/Operations/SymDiff.lean` | `HFSet` | ✅ Complete | Operations/Setminus, Operations/Union | Axioms/SymDiff |
+| 41 | `AczelSetTheory/Operations/Cardinal.lean` | `HFSet` | ✅ Complete | HFSets, Peano.PeanoNat.Combinatorics.Pow | Axioms/Cardinal |
+| 42 | `AczelSetTheory/Axioms/Singleton.lean` | `HFSet` | ✅ Complete | Axioms/Pair, Notation | Axioms/OrderedPair, Axioms/Succ, Axioms/Relation, Axioms/Composition |
+| 43 | `AczelSetTheory/Axioms/Subset.lean` | `HFSet` | ✅ Complete | HFSets, Axioms/Union, Axioms/Intersection | Axioms/Succ, Axioms/Restriction, Axioms/Lattice |
+| 44 | `AczelSetTheory/Axioms/OrderedPair.lean` | `HFSet` | ✅ Complete | Operations/OrderedPair, Axioms/Pair, Axioms/Singleton | Axioms/Relation, Axioms/Inverse, Axioms/Composition, Axioms/Restriction |
+| 45 | `AczelSetTheory/Axioms/Foundation.lean` | `HFSet`, `CList` | ✅ Complete | Axioms/Intersection, HFSets | Axioms/Decidable, Axioms/Succ |
+| 46 | `AczelSetTheory/Axioms/Decidable.lean` | `HFSet` | ✅ Complete | HFSets, Axioms/Foundation | Operations/Relation, Axioms/BooleanAlgebra, Axioms/BooleanRing |
+| 47 | `AczelSetTheory/Axioms/Relation.lean` | `HFSet` | ✅ Complete | Operations/Relation, Axioms/Separation, Axioms/Union, Axioms/Pair, Axioms/Singleton, Axioms/OrderedPair | Axioms/Function, Axioms/Inverse, Axioms/Composition, Axioms/Restriction |
+| 48 | `AczelSetTheory/Axioms/Function.lean` | `HFSet` | ✅ Complete | Operations/Function, Axioms/Relation | Axioms/Bijection, Axioms/Inverse, Axioms/Restriction, Axioms/Replacement, Axioms/Choice |
+| 49 | `AczelSetTheory/Axioms/Bijection.lean` | `HFSet` | ✅ Complete | Axioms/Function, Axioms/Restriction | Axioms/Inverse, Axioms/FunctionComp, Axioms/Identity, Axioms/Product |
+| 50 | `AczelSetTheory/Axioms/Inverse.lean` | `HFSet` | ✅ Complete | Operations/Inverse, Axioms/Relation, Axioms/Powerset, Axioms/Separation, Axioms/Pair, Axioms/Singleton, Axioms/OrderedPair, Axioms/Bijection | Axioms/Identity |
+| 51 | `AczelSetTheory/Axioms/Composition.lean` | `HFSet` | ✅ Complete | Operations/Composition, Axioms/Relation, Axioms/Separation, Axioms/Union, Axioms/Pair, Axioms/Singleton, Axioms/OrderedPair | Axioms/FunctionComp, Axioms/Image |
+| 52 | `AczelSetTheory/Axioms/Restriction.lean` | `HFSet` | ✅ Complete | Operations/Restriction, Axioms/Composition, Axioms/Separation, Axioms/Subset, Axioms/OrderedPair | Axioms/Bijection, Axioms/Function |
+| 53 | `AczelSetTheory/Axioms/Replacement.lean` | `HFSet` | ✅ Complete | Operations/Replacement, Axioms/Function | — |
+| 54 | `AczelSetTheory/Axioms/Succ.lean` | `HFSet` | ✅ Complete | Axioms/Union, Axioms/Singleton, Axioms/Foundation, Axioms/Subset | Axioms/VonNeumann, VN/Basic |
+| 55 | `AczelSetTheory/Axioms/SymDiff.lean` | `HFSet` | ✅ Complete | Operations/SymDiff, Axioms/Setminus, Axioms/Union | Axioms/BooleanRing |
+| 56 | `AczelSetTheory/Axioms/Lattice.lean` | `HFSet` | ✅ Complete | Axioms/Union, Axioms/Intersection, Axioms/Setminus, Axioms/Subset | Axioms/BooleanAlgebra, Axioms/BooleanRing |
+| 57 | `AczelSetTheory/Axioms/BooleanAlgebra.lean` | `HFSet` | ✅ Complete | Axioms/Decidable, Axioms/Subset, Axioms/Lattice, Axioms/Setminus | Axioms/BooleanRing |
+| 58 | `AczelSetTheory/Axioms/BooleanRing.lean` | `HFSet` | ✅ Complete | Axioms/Decidable, Axioms/Lattice, Axioms/BooleanAlgebra, Axioms/SymDiff | — |
+| 59 | `AczelSetTheory/Axioms/VonNeumann.lean` | `HFSet` | ✅ Complete | Axioms/Succ | VN/Basic, VN/IsNat |
+| 60 | `AczelSetTheory/Axioms/Choice.lean` | `HFSet` | ✅ Complete | Axioms/Function | — |
+| 61 | `AczelSetTheory/Axioms/Cardinal.lean` | `HFSet` | ✅ Complete | Operations/Cardinal, Operations/Powerset, Notation | — |
+| 62 | `AczelSetTheory/PList/Fin0.lean` | `Fin₀`, `PList` | ✅ Complete | PList/Omega0, Peano.PeanoNat.{StrictOrder,Order,Axioms} | HFList |
+| 63 | `AczelSetTheory/HFList.lean` | `HFList`, `FinList` | ✅ Complete | HFSets, PList/Fin0 | — |
+| 64 | `AczelSetTheory/VN/Basic.lean` | `VN` | ✅ Complete | Axioms | VN/Injective, VN/IsNat, VN/Arithmetic |
+| 65 | `AczelSetTheory/VN/Injective.lean` | `VN` | ✅ Complete | VN/Basic | VN/Arithmetic |
+| 66 | `AczelSetTheory/VN/IsNat.lean` | `VN` | ✅ Complete | VN/Basic | — |
+| 67 | `AczelSetTheory/VN/Arithmetic.lean` | `VN` | ✅ Complete | VN/Injective, PList/Omega0 | — |
+| — | `AczelSetTheory/VN.lean` | — | ✅ Complete | VN/{Basic,Injective,IsNat,Arithmetic} | AczelSetTheory.lean |
 | — | `AczelSetTheory/PList.lean` | — | ✅ Complete | PList/{Basic,Lemmas,Omega0} | AczelSetTheory.lean |
 | — | `AczelSetTheory.lean` | — | ✅ Complete | PList, CList, HFSets, Operations/*, Axioms/*, Notation | Main |
 | — | `Main.lean` | — | ✅ Complete | CList.Basic | — |
@@ -121,190 +157,9 @@ CList.lean (root) ── imports all 7 sub-modules
 
 ## 4. Definitions
 
-### 4.1 CList/Basic.lean — `namespace CList`
+### 4.1–4.7 CList modules
 
-#### 4.1.1 Core Type
-
-```lean
-inductive CList : Type where
-  | mk : List CList → CList
-  deriving Repr, Inhabited
-```
-
-- **Math**: A ≔ {a₁, a₂, …, aₙ} where each aᵢ is itself a CList
-- Computable. No termination proof needed (structural).
-
-#### 4.1.2 Size Functions (mutual)
-
-```lean
-mutual
-  def cSize : CList → Nat
-    | mk xs => 1 + cSizeList xs
-  def cSizeList : List CList → Nat
-    | [] => 0
-    | x :: xs => 1 + cSize x + cSizeList xs
-end
-```
-
-- **Math**: |A| ≔ 1 + Σᵢ (1 + |aᵢ|)
-- Computable. Structural recursion.
-
-#### 4.1.3 `empty`
-
-```lean
-def empty : CList := mk []
-```
-
-- **Math**: ∅ ≔ {}
-- Computable.
-
-#### 4.1.4 Comparison Engine
-
-```lean
-inductive CListOp | mem | subset | eq
-
-def evalOp (op : CListOp) (A B : CList) : Bool
-```
-
-- **Math**: Dispatches membership (∈), subset (⊆), extensional equality (=ₑ)
-- Computable. *Terminated by* `(sizeOf A + sizeOf B) * 3 + opWeight op`.
-
-```lean
-def mem (x A : CList) : Bool := evalOp .mem x A
-def subset (A B : CList) : Bool := evalOp .subset A B
-def extEq (A B : CList) : Bool := evalOp .eq A B
-```
-
-- `mem x (mk ys)` = `∃ y ∈ ys, extEq x y`
-- `subset (mk xs) B` = `∀ x ∈ xs, mem x B`
-- `extEq A B` = `subset A B ∧ subset B A`
-
-#### 4.1.5 BEq Instance
-
-```lean
-instance : BEq CList where beq := extEq
-```
-
-#### 4.1.6 Total Order
-
-```lean
-def lt (A B : CList) : Bool
-```
-
-- **Math**: Lexicographic order on the tree structure.
-- Computable. *Terminated by* `cSize A + cSize B`.
-
-#### 4.1.7 Deduplication
-
-```lean
-def dedupAux (l : List CList) (vistos : List CList) : List CList
-def dedup (l : List CList) : List CList := dedupAux l []
-```
-
-- **Math**: Remove extensional duplicates, keeping first occurrence.
-- Computable. Structural recursion on `l`.
-
-#### 4.1.8 Insertion Sort
-
-```lean
-def orderedInsert (x : CList) : List CList → List CList
-def insertionSort : List CList → List CList
-```
-
-- **Math**: Insertion sort using `lt` with extensional duplicate removal.
-- Computable. Structural recursion.
-
-#### 4.1.9 Normalization
-
-```lean
-def normalize : CList → CList
-  | mk xs => mk (insertionSort (dedup (xs.map normalize)))
-```
-
-- **Math**: norm(A) ≔ sort(dedup(map(norm, children(A))))
-- Computable. Termination by well-founded recursion on the tree structure.
-
-#### 4.1.10 Test Definitions
-
-```lean
-def zero  := empty                                    -- ∅
-def one   := mk [zero]                                -- {∅}
-def two   := mk [zero, one]                           -- {∅, {∅}}
-def three := mk [zero, one, two]                      -- {∅, {∅}, {∅, {∅}}}
-def dirty := mk [one, two, zero, three, one, zero, zero, two, three, two]
-```
-
----
-
-### 4.2 CList/ExtEq.lean — `namespace CList`
-
-No new definitions. Only theorems (see §6.2).
-
----
-
-### 4.3 CList/Filter.lean — `namespace CList`
-
-#### 4.3.1 `P_respects`
-
-```lean
-def P_respects (P : CList → Bool) : Prop :=
-  ∀ (x y : CList), extEq x y = true → P x = P y
-```
-
-- **Math**: P respects extensional equality: A =ₑ B → P(A) = P(B).
-- Noncomputable (Prop with universal quantifier).
-
----
-
-### 4.4 CList/SetEquiv.lean — `namespace CList`
-
-#### 4.4.1 `Nodup`
-
-```lean
-def Nodup (l : List CList) : Prop :=
-  l.Pairwise (fun a b => extEq a b = false)
-```
-
-- **Math**: No two distinct positions i < j satisfy aᵢ =ₑ aⱼ.
-- Noncomputable (Prop). Decidable via `extEq`.
-
-#### 4.4.2 `SetEquiv`
-
-```lean
-def SetEquiv (l₁ l₂ : List CList) : Prop :=
-  ∀ x, (l₁.any (extEq x) = true) ↔ (l₂.any (extEq x) = true)
-```
-
-- **Math**: l₁ ≡ l₂ ⟺ ∀ x, (∃ a ∈ l₁, a =ₑ x) ↔ (∃ b ∈ l₂, b =ₑ x)
-- Noncomputable (Prop with universal quantifier over CList).
-
----
-
-### 4.5 CList/Order.lean — `namespace CList`
-
-No new definitions. Only theorems (see §6.5).
-
----
-
-### 4.6 CList/Sort.lean — `namespace CList`
-
-#### 4.6.1 `Sorted`
-
-```lean
-def Sorted : List CList → Prop
-  | []               => True
-  | [_]              => True
-  | a :: b :: rest   => lt a b = true ∧ Sorted (b :: rest)
-```
-
-- **Math**: Strictly sorted by `lt`.
-- Noncomputable (Prop).
-
----
-
-### 4.7 CList/Normalize.lean — `namespace CList`
-
-No new definitions. Only theorems (see §6.7).
+> Definitions moved to [doc/REFERENCE-CList.md](doc/REFERENCE-CList.md#4-definitions).
 
 ---
 
@@ -800,6 +655,294 @@ No new definitions. Only theorems (see §6.21).
 
 ---
 
+### 4.26 Operations/OrderedPair.lean — `namespace HFSet`
+
+#### 4.26.1 `HFSet.orderedPair`
+
+```lean
+def HFSet.orderedPair (a b : HFSet) : HFSet := pair (singleton a) (pair a b)
+```
+
+- **Math**: ⟪a, b⟫ ≔ {{a}, {a, b}} (Kuratowski encoding). Notation: `notation "⟪" a ", " b "⟫"`.
+
+#### 4.26.2 `HFSet.fst` / `HFSet.snd`
+
+```lean
+noncomputable def HFSet.fst (p : HFSet) (h : ∃ a b, p = ⟪a, b⟫) : HFSet
+noncomputable def HFSet.snd (p : HFSet) (h : ∃ a b, p = ⟪a, b⟫) : HFSet
+```
+
+- **Math**: projections of an ordered pair; noncomputable, require existence proof.
+
+---
+
+### 4.27 Operations/Relation.lean — `namespace HFSet`
+
+#### 4.27.1 `HFSet.isRelation`
+
+```lean
+def HFSet.isRelation (R : HFSet) : Prop := ∀ p, p ∈ R → ∃ a b, p = ⟪a, b⟫
+```
+
+- **Math**: R is a relation iff every element is an ordered pair.
+
+#### 4.27.2 `HFSet.domain` / `HFSet.range`
+
+```lean
+noncomputable def HFSet.domain (R : HFSet) : HFSet
+noncomputable def HFSet.range  (R : HFSet) : HFSet
+```
+
+- **Math**: dom(R) = {a | ∃ b, ⟪a, b⟫ ∈ R};  ran(R) = {b | ∃ a, ⟪a, b⟫ ∈ R}.
+
+---
+
+### 4.28 Operations/Function.lean — `namespace HFSet`
+
+#### 4.28.1 `HFSet.isFunction`
+
+```lean
+def HFSet.isFunction (f : HFSet) : Prop :=
+  isRelation f ∧ ∀ a b₁ b₂, ⟪a, b₁⟫ ∈ f → ⟪a, b₂⟫ ∈ f → b₁ = b₂
+```
+
+- **Math**: f is a function iff it is a relation and right-unique.
+
+#### 4.28.2 `HFSet.isTotalFunction`
+
+```lean
+def HFSet.isTotalFunction (f A B : HFSet) : Prop :=
+  isFunction f ∧ domain f = A ∧ ∀ b, b ∈ range f → b ∈ B
+```
+
+- **Math**: f : A → B total function (domain = A, range ⊆ B).
+
+#### 4.28.3 `HFSet.apply`
+
+```lean
+noncomputable def HFSet.apply (f a : HFSet) (h : ∃ b, ⟪a, b⟫ ∈ f) : HFSet
+```
+
+- **Math**: f(a) — function application; noncomputable via `Classical.choose`.
+
+---
+
+### 4.29 Operations/Inverse.lean — `namespace HFSet`
+
+#### 4.29.1 `HFSet.relInv`
+
+```lean
+open Classical in
+noncomputable def HFSet.relInv (R : HFSet) : HFSet
+```
+
+- **Math**: R⁻¹ ≔ {⟪b, a⟫ | ⟪a, b⟫ ∈ R}. Notation: `postfix:75 "⁻¹ᵣ"`.
+
+---
+
+### 4.30 Operations/Restriction.lean — `namespace HFSet`
+
+#### 4.30.1 `HFSet.restrict` / `HFSet.preimage`
+
+```lean
+open Classical in noncomputable def HFSet.restrict (R A : HFSet) : HFSet
+open Classical in noncomputable def HFSet.preimage (R B : HFSet) : HFSet
+```
+
+- **Math**: R ↾ A ≔ {⟪a, b⟫ ∈ R | a ∈ A}. Notation: `notation:80 R " ↾ " A`.
+- preimage R B ≔ {a | ∃ b ∈ B, ⟪a, b⟫ ∈ R}.
+
+---
+
+### 4.31 Operations/Composition.lean — `namespace HFSet`
+
+#### 4.31.1 `HFSet.relComp`
+
+```lean
+open Classical in noncomputable def HFSet.relComp (S R : HFSet) : HFSet
+```
+
+- **Math**: S ∘ᵣ R ≔ {⟪a, c⟫ | ∃ b, ⟪a, b⟫ ∈ R ∧ ⟪b, c⟫ ∈ S}. Notation: `infixl:90 " ∘ᵣ "`.
+
+#### 4.31.2 `HFSet.imageRel`
+
+```lean
+open Classical in noncomputable def HFSet.imageRel (R A : HFSet) : HFSet
+```
+
+- **Math**: R[A] ≔ {b | ∃ a ∈ A, ⟪a, b⟫ ∈ R} — relational image of A under R.
+
+---
+
+### 4.32 Operations/Replacement.lean — `namespace HFSet`
+
+#### 4.32.1 `HFSet.image`
+
+```lean
+noncomputable def HFSet.image (f A : HFSet) : HFSet
+```
+
+- **Math**: f[A] ≔ {y | ∃ x ∈ A, ⟪x, y⟫ ∈ f} — image of A under function f.
+
+---
+
+### 4.33 Operations/SymDiff.lean — `namespace HFSet`
+
+#### 4.33.1 `HFSet.symDiff`
+
+```lean
+def HFSet.symDiff (A B : HFSet) : HFSet
+```
+
+- **Math**: A △ B ≔ (A \ B) ∪ (B \ A). Defined via `symDiffCList` on the underlying lists.
+
+---
+
+### 4.34 Operations/Cardinal.lean — `namespace HFSet`
+
+#### 4.34.1 `HFSet.card`
+
+```lean
+def HFSet.cardCList (a : CList) : ℕ₀
+def HFSet.card (A : HFSet) : ℕ₀
+```
+
+- **Math**: |A| — cardinality of a hereditarily finite set as a Peano natural number ℕ₀.
+
+---
+
+### 4.35 Axioms/Function.lean — `namespace HFSet` (new predicates)
+
+#### 4.35.1 `HFSet.isInjective` / `isSurjective` / `isBijective`
+
+```lean
+def HFSet.isInjective (f : HFSet) : Prop :=
+  ∀ a₁ a₂ b, ⟪a₁, b⟫ ∈ f → ⟪a₂, b⟫ ∈ f → a₁ = a₂
+def HFSet.isSurjective (f B : HFSet) : Prop := range f = B
+def HFSet.isBijective  (f A B : HFSet) : Prop :=
+  isTotalFunction f A B ∧ isInjective f ∧ isSurjective f B
+```
+
+- **Math**: standard injectivity / surjectivity / bijectivity.
+
+---
+
+### 4.36 Axioms/BooleanAlgebra.lean — `namespace HFSet`
+
+#### 4.36.1 `HFSet.compl`
+
+```lean
+def HFSet.compl (U X : HFSet) : HFSet := setminus U X
+```
+
+- **Math**: complement of X in universe U — Uᶜ(X) ≔ U \ X.
+
+---
+
+### 4.37 Axioms/Succ.lean — `namespace HFSet`
+
+#### 4.37.1 `HFSet.succ`
+
+```lean
+def HFSet.succ (A : HFSet) : HFSet := union A (singleton A)
+```
+
+- **Math**: von Neumann successor σ(A) ≔ A ∪ {A}.
+
+---
+
+### 4.38 Axioms/VonNeumann.lean — `namespace HFSet`
+
+#### 4.38.1 `HFSet.isTransitive`
+
+```lean
+def HFSet.isTransitive (A : HFSet) : Prop := ∀ x, x ∈ A → x ⊆ A
+```
+
+- **Math**: A is a transitive set iff every element of A is also a subset of A.
+
+#### 4.38.2 `HFSet.isNat` (inductive)
+
+```lean
+inductive HFSet.isNat : HFSet → Prop where
+  | zero : isNat empty
+  | succ {n : HFSet} : isNat n → isNat (succ n)
+```
+
+- **Math**: n is a von Neumann natural number iff it is ∅ or the successor of a natural number.
+
+---
+
+### 4.39 Axioms/Choice.lean — `namespace HFSet`
+
+#### 4.39.1 `HFSet.choose`
+
+```lean
+noncomputable def HFSet.choose (A : HFSet) (_ : A ≠ empty) : HFSet
+```
+
+- **Math**: choice function — selects an element from any nonempty set.
+
+---
+
+### 4.40 PList/Fin0.lean — `namespace Fin₀`, `namespace PList`
+
+#### 4.40.1 `Fin₀`
+
+```lean
+structure Fin₀ (n : ℕ₀) : Type where
+  val  : ℕ₀
+  isLt : val < n
+```
+
+- **Math**: Peano-indexed bounded natural — analogous to `Fin n` but over ℕ₀.
+- Constructor helpers: `Fin₀.zero n`, `Fin₀.succ i`, `Fin₀.last n`.
+- Instances: `DecidableEq (Fin₀ n)`, `LT (Fin₀ n)`, `LE (Fin₀ n)`.
+
+#### 4.40.2 `PList.get`
+
+```lean
+def PList.get : (l : PList α) → Fin₀ (l.length) → α
+```
+
+- **Math**: safe indexing of a `PList` by a bounded Peano index.
+
+---
+
+### 4.41 HFList.lean — `namespace HFList`, `namespace FinList`
+
+#### 4.41.1 `HFList`
+
+```lean
+abbrev HFList := PList HFSet
+```
+
+- **Math**: an ordered sequence of HF sets (with order, with repetition). Inherits all `PList` operations.
+
+#### 4.41.2 `FinList`
+
+```lean
+def FinList (n : ℕ₀) : Type := { l : HFList // l.length = n }
+```
+
+- **Math**: an HFList of a fixed Peano length n. Constructor helpers: `FinList.empty`, `FinList.singleton`, `FinList.cons`.
+
+---
+
+### 4.42 VN/Basic.lean — `namespace VN`
+
+#### 4.42.1 `VN.vN`
+
+```lean
+def VN.vN : ℕ₀ → HFSet
+  | 𝟘   => HFSet.empty
+  | σ n => HFSet.succ (vN n)
+```
+
+- **Math**: vN(0) = ∅; vN(n+1) = σ(vN(n)). Maps each Peano natural to its von Neumann representative.
+
+---
+
 None. This project builds constructively from Lean 4 without additional axioms.
 
 ---
@@ -808,93 +951,9 @@ None. This project builds constructively from Lean 4 without additional axioms.
 
 > Only fully proven theorems appear here. No `sorry` remains.
 
-### 6.1 CList/Basic.lean
+### 6.1–6.7 CList theorems
 
-| # | Theorem | Lean signature | Math | Terminated by |
-|---|---------|---------------|------|---------------|
-| 1 | `cSize_lt_of_mem` | `{x : CList} {xs : List CList} (h : x ∈ xs) : cSize x < cSize (mk xs)` | x ∈ xs → \|x\| < \|{xs}\| | structural |
-
-### 6.2 CList/ExtEq.lean
-
-| # | Theorem | Lean signature | Terminated by |
-|---|---------|---------------|---------------|
-| 1 | `subset_mono` | `(xs : List CList) (y : CList) (ys : List CList) (h : evalOp .subset (mk xs) (mk ys) = true) : evalOp .subset (mk xs) (mk (y :: ys)) = true` | — |
-| 2 | `subset_refl` | `(A : CList) : subset A A = true` | `cSize A` |
-| 3 | `extEq_refl` | `(A : CList) : extEq A A = true` | — (uses `subset_refl`) |
-| 4 | `extEq_def` | `(A B : CList) : extEq A B = (subset A B && subset B A)` | — |
-| 5 | `subset_nil` | `(B : CList) : subset (mk []) B = true` | — |
-| 6 | `subset_cons` | `(x : CList) (xs : List CList) (B : CList) : subset (mk (x :: xs)) B = (mem x B && subset (mk xs) B)` | — |
-| 7 | `mem_nil` | `(x : CList) : mem x (mk []) = false` | — |
-| 8 | `mem_cons` | `(x y : CList) (ys : List CList) : mem x (mk (y :: ys)) = (extEq x y \|\| mem x (mk ys))` | — |
-
-**Mutual block** (*terminated by* weighted sum of `cSize` arguments):
-
-| # | Theorem | Lean signature |
-|---|---------|---------------|
-| 9 | `extEq_trans` | `(A B C : CList) (h1 : extEq A B = true) (h2 : extEq B C = true) : extEq A C = true` |
-| 10 | `subset_trans` | `(A B C : CList) (h1 : subset A B = true) (h2 : subset B C = true) : subset A C = true` |
-| 11 | `mem_subset` | `(x B C : CList) (h1 : mem x B = true) (h2 : subset B C = true) : mem x C = true` |
-| 12 | `mem_of_extEq` | `(x y C : CList) (h1 : extEq x y = true) (h2 : mem y C = true) : mem x C = true` |
-
-| # | Theorem | Lean signature |
-|---|---------|---------------|
-| 13 | `extEq_comm` | `(A B : CList) : extEq A B = extEq B A` |
-
-### 6.3 CList/Filter.lean
-
-| # | Theorem | Lean signature |
-|---|---------|---------------|
-| 1 | `subset_filter` | `(P : CList → Bool) (xs : List CList) : subset (mk (xs.filter P)) (mk xs) = true` |
-| 2 | `mem_filter_of_mem` | `(P : CList → Bool) (hP_resp : P_respects P) (x : CList) (xs : List CList) (hx : mem x (mk xs) = true) (hPx : P x = true) : mem x (mk (xs.filter P)) = true` |
-| 3 | `filter_subset_filter` | `(P : CList → Bool) (hP_resp : P_respects P) (xs ys : List CList) (hsub : subset (mk xs) (mk ys) = true) : subset (mk (xs.filter P)) (mk (ys.filter P)) = true` |
-| 4 | `extEq_filter` | `(P : CList → Bool) (hP_resp : P_respects P) (xs ys : List CList) (heq : extEq (mk xs) (mk ys) = true) : extEq (mk (xs.filter P)) (mk (ys.filter P)) = true` |
-| 5 | `P_of_mem_filter` | `(P : CList → Bool) (hP_resp : P_respects P) (x : CList) (xs : List CList) (hx : mem x (mk (xs.filter P)) = true) : P x = true` |
-
-### 6.4 CList/SetEquiv.lean
-
-| # | Theorem | Lean signature |
-|---|---------|---------------|
-| 1 | `dedup_nodup` | `(l : List CList) : Nodup (dedup l)` |
-| 2 | `SetEquiv.refl` | `(l : List CList) : SetEquiv l l` |
-| 3 | `SetEquiv.symm` | `{l₁ l₂ : List CList} (h : SetEquiv l₁ l₂) : SetEquiv l₂ l₁` |
-| 4 | `SetEquiv.trans` | `{l₁ l₂ l₃ : List CList} (h₁ : SetEquiv l₁ l₂) (h₂ : SetEquiv l₂ l₃) : SetEquiv l₁ l₃` |
-| 5 | `mem_eq_any` | `(x : CList) (l : List CList) : mem x (mk l) = l.any (extEq x)` |
-| 6 | `extEq_mk_iff_setEquiv` | `(xs ys : List CList) : extEq (mk xs) (mk ys) = true ↔ SetEquiv xs ys` |
-| 7 | `dedup_setEquiv_self` | `(l : List CList) : SetEquiv (dedup l) l` |
-
-### 6.5 CList/Order.lean
-
-| # | Theorem | Lean signature | Terminated by |
-|---|---------|---------------|---------------|
-| 1 | `lt_irrefl` | `(A : CList) : lt A A = false` | `cSize A` |
-| 2 | `lt_antisymm` | `(A B : CList) (h1 : lt A B = false) (h2 : lt B A = false) : A = B` | `cSize A + cSize B` |
-| 3 | `lt_asymm` | `(A B : CList) (h : lt A B = true) : lt B A = false` | `cSize A + cSize B` |
-| 4 | `lt_total` | `(A B : CList) : A ≠ B → lt A B = true ∨ lt B A = true` | `cSize A + cSize B` |
-| 5 | `lt_total_extEq` | `(A B : CList) : extEq A B = false → lt A B = true ∨ lt B A = true` | — (uses `lt_total`) |
-| 6 | `lt_trans` | `(A B C : CList) (h1 : lt A B = true) (h2 : lt B C = true) : lt A C = true` | `cSize A + cSize B + cSize C` |
-
-### 6.6 CList/Sort.lean
-
-| # | Theorem | Lean signature | Dependencies |
-|---|---------|---------------|--------------|
-| 1 | `insertionSort_sorted` | `(l : List CList) : Sorted (insertionSort l)` | `orderedInsert_sorted` (private) |
-| 2 | `insertionSort_mem_subset` | `(z : CList) (l : List CList) : z ∈ insertionSort l → z ∈ l` | `mem_of_mem_orderedInsert` (private) |
-| 3 | `insertionSort_nodup` | `(l : List CList) (hl : Nodup l) : Nodup (insertionSort l)` | `orderedInsert_nodup` (private) |
-| 4 | `insertionSort_setEquiv` | `(l : List CList) : SetEquiv (insertionSort l) l` | `orderedInsert_setEquiv` (private) |
-
-### 6.7 CList/Normalize.lean
-
-| # | Theorem | Lean signature | Terminated by |
-|---|---------|---------------|---------------|
-| 1 | `cSizeList_dedup_le` | `(l : List CList) : cSizeList (dedup l) ≤ cSizeList l` | — |
-| 2 | `cSizeList_insertionSort_le` | `(l : List CList) : cSizeList (insertionSort l) ≤ cSizeList l` | — |
-| 3 | `normalize_cSize_le` | `(A : CList) : cSize (normalize A) ≤ cSize A` | `cSize A * 2` (mutual with `normalize_cSizeList_le`) |
-| 4 | `dedup_id_of_nodup` | `(l : List CList) (h : Nodup l) : dedup l = l` | — |
-| 5 | `insertionSort_id_of_sorted_nodup` | `(l : List CList) (hs : Sorted l) (hn : Nodup l) : insertionSort l = l` | — |
-| 6 | `normalize_idem` | `(A : CList) : normalize (normalize A) = normalize A` | `cSize A * 2` (mutual with `normalize_idem_list`) |
-| 7 | `mem_of_mem_dedup` | `(l : List CList) (y : CList) (h : y ∈ dedup l) : y ∈ l` | — |
-| 8 | `sorted_nodup_setEquiv_eq` | `(l₁ l₂ : List CList) : Sorted l₁ → Sorted l₂ → Nodup l₁ → Nodup l₂ → SetEquiv l₁ l₂ → (∀ a ∈ l₁, ∀ b ∈ l₂, extEq a b = true → a = b) → l₁ = l₂` | structural on `l₁`, `l₂` |
-| 9 | `normalize_eq_of_extEq` | `{A B : CList} (h : CList.extEq A B = true) : CList.normalize A = CList.normalize B` | `CList.cSize A + CList.cSize B` |
+> Theorems moved to [doc/REFERENCE-CList.md](doc/REFERENCE-CList.md#6-theorems).
 
 ### 6.8 HFSets.lean — `namespace HFSet`
 
@@ -1107,33 +1166,305 @@ Bridge lemmas: see §4.18.1. No additional theorems beyond the 6 bridge lemmas a
 | 6 | `imageRel_funComp` | `{f g A : HFSet} : imageRel (f ∘f g) A = imageRel f (imageRel g A)` |
 | 7 | `imageRel_idFunc` | `{A B : HFSet} : imageRel (idFunc A) B = inter B A` |
 
+### 6.22 Operations/SymDiff.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `symDiffCList_extEq` | `(a₁ a₂ b₁ b₂ : CList) → (ha : CList.extEq a₁ a₂ = true) → (hb : CList.extEq b₁ b₂ = true) → CList.extEq (symDiffCList a₁ b₁) (symDiffCList a₂ b₂) = true` |
+
+### 6.23 Axioms/Singleton.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `mem_singleton` | `(x a : HFSet) : x ∈ singleton a ↔ x = a` |
+
+### 6.24 Axioms/Subset.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `subset_iff` | `(A B : HFSet) : A ⊆ B ↔ ∀ x, x ∈ A → x ∈ B` |
+| 2 | `subset_refl` | `(A : HFSet) : A ⊆ A` |
+| 3 | `subset_trans` | `(A B C : HFSet) (h1 : A ⊆ B) (h2 : B ⊆ C) : A ⊆ C` |
+| 4 | `subset_antisymm` | `(A B : HFSet) (h1 : A ⊆ B) (h2 : B ⊆ A) : A = B` |
+| 5 | `empty_subset` | `(A : HFSet) : empty ⊆ A` |
+| 6 | `subset_union_left` | `(A B : HFSet) : A ⊆ union A B` |
+| 7 | `subset_union_right` | `(A B : HFSet) : B ⊆ union A B` |
+| 8 | `inter_subset_left` | `(A B : HFSet) : inter A B ⊆ A` |
+| 9 | `inter_subset_right` | `(A B : HFSet) : inter A B ⊆ B` |
+| 10 | `subset_inter` | `(A B C : HFSet) (h1 : A ⊆ B) (h2 : A ⊆ C) : A ⊆ inter B C` |
+
+### 6.25 Axioms/OrderedPair.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `orderedPair_eq_iff` | `(a b c d : HFSet) : orderedPair a b = orderedPair c d ↔ a = c ∧ b = d` |
+
+### 6.26 Axioms/Foundation.lean — `namespace HFSet`, `namespace CList`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `CList.mem_exists_plist_mem` | `(x : CList) (xs : PList CList) (h : mem x (mk xs) = true) : ∃ y, PList.Mem y xs ∧ extEq x y = true` |
+| 2 | `CList.mem_of_plist_mem` | `(y : CList) (xs : PList CList) (h : PList.Mem y xs) : mem y (mk xs) = true` |
+| 3 | `foundation` | `(A : HFSet) (hne : A ≠ empty) : ∃ x : HFSet, x ∈ A ∧ ∀ y : HFSet, y ∈ x → ¬ y ∈ A` |
+
+### 6.27 Axioms/Decidable.lean — `namespace HFSet`
+
+| # | Instance | Type |
+|---|----------|------|
+| 1 | `mem_decidable` | `(x A : HFSet) → Decidable (x ∈ A)` |
+| 2 | `existsMem_decidable` | `(A : HFSet) → (P : HFSet → Prop) → [DecidablePred P] → Decidable (∃ x, x ∈ A ∧ P x)` |
+
+### 6.28 Axioms/Relation.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `fst_mem_sUnion_sUnion` | `(a b R : HFSet) (h : ⟪a, b⟫ ∈ R) : a ∈ sUnion (sUnion R)` |
+| 2 | `snd_mem_sUnion_sUnion` | `(a b R : HFSet) (h : ⟪a, b⟫ ∈ R) : b ∈ sUnion (sUnion R)` |
+| 3 | `mem_domain_iff` | `(R a : HFSet) : a ∈ domain R ↔ ∃ b, ⟪a, b⟫ ∈ R` |
+| 4 | `mem_range_iff` | `(R b : HFSet) : b ∈ range R ↔ ∃ a, ⟪a, b⟫ ∈ R` |
+| 5 | `domain_empty` | `domain empty = empty` |
+| 6 | `range_empty` | `range empty = empty` |
+| 7 | `isRelation_empty` | `isRelation empty` |
+
+### 6.29 Axioms/Function.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `apply_mem` | `(f a : HFSet) (h : ∃ b, ⟪a, b⟫ ∈ f) : ⟪a, apply f a h⟫ ∈ f` |
+| 2 | `apply_eq_of_mem` | `(f a b : HFSet) (hf : isFunction f) (hab : ⟪a, b⟫ ∈ f) : apply f a ⟨b, hab⟩ = b` |
+| 3 | `totalFunction_apply_mem` | `(f A B a : HFSet) (hf : isTotalFunction f A B) (ha : a ∈ A) : ⟪a, apply f a ...⟫ ∈ f` |
+| 4 | `isFunction_empty` | `isFunction empty` |
+| 5 | `isFunction_unique` | `(f a b₁ b₂ : HFSet) (hf : isFunction f) (h₁ : ⟪a, b₁⟫ ∈ f) (h₂ : ⟪a, b₂⟫ ∈ f) : b₁ = b₂` |
+| 6 | `mem_domain_of_mem` | `(f a b : HFSet) (h : ⟪a, b⟫ ∈ f) : a ∈ domain f` |
+| 7 | `mem_range_of_mem` | `(f a b : HFSet) (h : ⟪a, b⟫ ∈ f) : b ∈ range f` |
+
+### 6.30 Axioms/Bijection.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `isInjective_empty` | `isInjective empty` |
+| 2 | `isInjective_restrict` | `{f A : HFSet} → (hf : isInjective f) → isInjective (f ↾ A)` |
+| 3 | `isSurjective_empty_codomain` | `(f : HFSet) → isSurjective f empty` |
+| 4 | `isSurjective_range` | `(f : HFSet) → isSurjective f (range f)` |
+| 5 | `isSurjective_iff_range_eq` | `{f A B : HFSet} → (hf : isTotalFunction f A B) → (isSurjective f B ↔ range f = B)` |
+| 6 | `isBijective_intro` | `{f A B : HFSet} → (hf : isTotalFunction f A B) → (hi : isInjective f) → (hs : isSurjective f B) → isBijective f A B` |
+| 7 | `isBijective_isTotalFunction` | `{f A B : HFSet} → (hf : isBijective f A B) → isTotalFunction f A B` |
+| 8 | `isBijective_isFunction` | `{f A B : HFSet} → (hf : isBijective f A B) → isFunction f` |
+| 9 | `isBijective_isInjective` | `{f A B : HFSet} → (hf : isBijective f A B) → isInjective f` |
+| 10 | `isBijective_isSurjective` | `{f A B : HFSet} → (hf : isBijective f A B) → isSurjective f B` |
+| 11 | `isBijective_domain_eq` | `{f A B : HFSet} → (hf : isBijective f A B) → domain f = A` |
+| 12 | `isBijective_range_eq` | `{f A B : HFSet} → (hf : isBijective f A B) → range f = B` |
+| 13 | `isBijective_empty` | `isBijective empty empty empty` |
+
+### 6.31 Axioms/Inverse.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `mem_relInv` | `{R p : HFSet} : p ∈ R⁻¹ᵣ ↔ ∃ a b, ⟪a, b⟫ ∈ R ∧ p = ⟪b, a⟫` |
+| 2 | `mem_relInv_pair` | `{R a b : HFSet} : ⟪b, a⟫ ∈ R⁻¹ᵣ ↔ ⟪a, b⟫ ∈ R` |
+| 3 | `relInv_isRelation` | `{R : HFSet} : isRelation (R⁻¹ᵣ)` |
+| 4 | `domain_relInv` | `{R : HFSet} : domain (R⁻¹ᵣ) = range R` |
+| 5 | `range_relInv` | `{R : HFSet} : range (R⁻¹ᵣ) = domain R` |
+| 6 | `relInv_relInv` | `{R : HFSet} (hR : isRelation R) : (R⁻¹ᵣ)⁻¹ᵣ = R` |
+| 7 | `isFunction_relInv` | `{f : HFSet} (hi : isInjective f) : isFunction (f⁻¹ᵣ)` |
+| 8 | `isInjective_relInv` | `{f : HFSet} (hf : isFunction f) : isInjective (f⁻¹ᵣ)` |
+| 9 | `isSurjective_relInv` | `{f A : HFSet} (hdom : domain f = A) : isSurjective (f⁻¹ᵣ) A` |
+| 10 | `isBijective_relInv` | `{f A B : HFSet} (hf : isBijective f A B) : isBijective (f⁻¹ᵣ) B A` |
+
+### 6.32 Axioms/Composition.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `mem_imageRel` | `{R A b : HFSet} : b ∈ imageRel R A ↔ ∃ a, a ∈ A ∧ ⟪a, b⟫ ∈ R` |
+| 2 | `imageRel_empty_rel` | `{A : HFSet} : imageRel empty A = empty` |
+| 3 | `imageRel_empty_set` | `{R : HFSet} : imageRel R empty = empty` |
+| 4 | `mem_relComp` | `{R S c : HFSet} : c ∈ S ∘ᵣ R ↔ ∃ a b, ⟪a, b⟫ ∈ R ∧ ⟪b, c⟫ ∈ S` |
+| 5 | `relComp_empty_left` | `{R : HFSet} : empty ∘ᵣ R = empty` |
+| 6 | `relComp_empty_right` | `{S : HFSet} : S ∘ᵣ empty = empty` |
+
+### 6.33 Axioms/Restriction.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `mem_restrict` | `{R A p : HFSet} : p ∈ (R ↾ A) ↔ p ∈ R ∧ ∃ a b, p = ⟪a, b⟫ ∧ a ∈ A` |
+| 2 | `restrict_subset` | `{R A : HFSet} : (R ↾ A) ⊆ R` |
+| 3 | `restrict_isRelation` | `{R A : HFSet} (hR : isRelation R) : isRelation (R ↾ A)` |
+| 4 | `mem_restrict_pair` | `{R A a b : HFSet} : ⟪a, b⟫ ∈ (R ↾ A) ↔ ⟪a, b⟫ ∈ R ∧ a ∈ A` |
+| 5 | `mem_preimage` | `{R B a : HFSet} : a ∈ preimage R B ↔ ∃ b, b ∈ B ∧ ⟪a, b⟫ ∈ R` |
+| 6 | `preimage_empty_set` | `{R : HFSet} : preimage R empty = empty` |
+
+### 6.34 Axioms/Replacement.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `mem_image` | `(f A y : HFSet) : y ∈ image f A ↔ ∃ x, x ∈ A ∧ ⟪x, y⟫ ∈ f` |
+| 2 | `image_empty` | `(f : HFSet) : image f empty = empty` |
+| 3 | `image_of_empty` | `(A : HFSet) : image empty A = empty` |
+| 4 | `image_subset_range` | `(f A y : HFSet) (h : y ∈ image f A) : y ∈ range f` |
+| 5 | `apply_mem_image` | `(f A x : HFSet) (_hf : isFunction f) (hxA : x ∈ A) (hx : ∃ b, ⟪x, b⟫ ∈ f) : apply f x hx ∈ image f A` |
+| 6 | `image_totalFunction_subset` | `(f A B y : HFSet) (hf : isTotalFunction f A B) (hy : y ∈ image f A) : y ∈ B` |
+
+### 6.35 Axioms/Succ.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `mem_succ` | `(x A : HFSet) : x ∈ succ A ↔ x ∈ A ∨ x = A` |
+| 2 | `A_mem_succ_A` | `(A : HFSet) : A ∈ succ A` |
+| 3 | `mem_succ_of_mem` | `(x A : HFSet) (h : x ∈ A) : x ∈ succ A` |
+| 4 | `A_subset_succ_A` | `(A : HFSet) : A ⊆ succ A` |
+| 5 | `succ_ne_empty` | `(A : HFSet) : succ A ≠ empty` |
+| 6 | `not_mem_self` | `(A : HFSet) : ¬ (A ∈ A)` |
+| 7 | `no_mem_cycle2` | `(A B : HFSet) (hAB : A ∈ B) (hBA : B ∈ A) : False` |
+| 8 | `succ_injective` | `(A B : HFSet) (h : succ A = succ B) : A = B` |
+
+### 6.36 Axioms/SymDiff.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `mem_symDiff` | `(A B x : HFSet) : x ∈ symDiff A B ↔ (x ∈ A ∧ ¬ x ∈ B) ∨ (x ∈ B ∧ ¬ x ∈ A)` |
+
+### 6.37 Axioms/Lattice.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `union_comm` | `(A B : HFSet) : union A B = union B A` |
+| 2 | `inter_comm` | `(A B : HFSet) : inter A B = inter B A` |
+| 3 | `union_assoc` | `(A B C : HFSet) : union (union A B) C = union A (union B C)` |
+| 4 | `inter_assoc` | `(A B C : HFSet) : inter (inter A B) C = inter A (inter B C)` |
+| 5 | `union_idem` | `(A : HFSet) : union A A = A` |
+| 6 | `inter_idem` | `(A : HFSet) : inter A A = A` |
+| 7 | `union_inter_absorb` | `(A B : HFSet) : union A (inter A B) = A` |
+| 8 | `inter_union_absorb` | `(A B : HFSet) : inter A (union A B) = A` |
+| 9 | `union_inter_distrib` | `(A B C : HFSet) : union A (inter B C) = inter (union A B) (union A C)` |
+| 10 | `inter_union_distrib` | `(A B C : HFSet) : inter A (union B C) = union (inter A B) (inter A C)` |
+| 11 | `union_empty` | `(A : HFSet) : union A empty = A` |
+| 12 | `empty_union` | `(A : HFSet) : union empty A = A` |
+| 13 | `inter_empty` | `(A : HFSet) : inter A empty = empty` |
+| 14 | `empty_inter` | `(A : HFSet) : inter empty A = empty` |
+| 15 | `setminus_self` | `(A : HFSet) : setminus A A = empty` |
+| 16 | `setminus_empty` | `(A : HFSet) : setminus A empty = A` |
+| 17 | `empty_setminus` | `(A : HFSet) : setminus empty A = empty` |
+
+### 6.38 Axioms/BooleanAlgebra.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `mem_compl` | `(U X x : HFSet) : x ∈ compl U X ↔ x ∈ U ∧ ¬ x ∈ X` |
+| 2 | `inter_full` | `(U A : HFSet) (hA : A ⊆ U) : inter A U = A` |
+| 3 | `full_inter` | `(U A : HFSet) (hA : A ⊆ U) : inter U A = A` |
+| 4 | `compl_mem_powerset` | `(U X : HFSet) (_ : X ⊆ U) : compl U X ⊆ U` |
+| 5 | `union_compl` | `(U X : HFSet) (hX : X ⊆ U) : union X (compl U X) = U` |
+| 6 | `inter_compl` | `(U X : HFSet) (_ : X ⊆ U) : inter X (compl U X) = empty` |
+| 7 | `compl_compl` | `(U X : HFSet) (hX : X ⊆ U) : compl U (compl U X) = X` |
+| 8 | `compl_empty` | `(U : HFSet) : compl U empty = U` |
+| 9 | `compl_self` | `(U : HFSet) : compl U U = empty` |
+| 10 | `compl_union` | `(U A B : HFSet) (_ : A ⊆ U) (_ : B ⊆ U) : compl U (union A B) = inter (compl U A) (compl U B)` |
+| 11 | `compl_inter` | `(U A B : HFSet) (_ : A ⊆ U) (_ : B ⊆ U) : compl U (inter A B) = union (compl U A) (compl U B)` |
+| 12 | `compl_subset_swap` | `(U A B : HFSet) (hA : A ⊆ U) (_ : B ⊆ U) : (A ⊆ B ↔ compl U B ⊆ compl U A)` |
+| 13 | `union_compl_inter` | `(U A B : HFSet) (hA : A ⊆ U) (hB : B ⊆ U) : union (inter A B) (inter A (compl U B)) = A` |
+
+### 6.39 Axioms/BooleanRing.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `symDiff_comm` | `(A B : HFSet) : symDiff A B = symDiff B A` |
+| 2 | `symDiff_assoc` | `(A B C : HFSet) : symDiff (symDiff A B) C = symDiff A (symDiff B C)` |
+| 3 | `symDiff_empty` | `(A : HFSet) : symDiff A empty = A` |
+| 4 | `empty_symDiff` | `(A : HFSet) : symDiff empty A = A` |
+| 5 | `symDiff_self` | `(A : HFSet) : symDiff A A = empty` |
+| 6 | `inter_symDiff_distrib` | `(A B C : HFSet) : inter A (symDiff B C) = symDiff (inter A B) (inter A C)` |
+| 7 | `symDiff_eq_union_setminus` | `(A B : HFSet) : symDiff A B = setminus (union A B) (inter A B)` |
+| 8 | `symDiff_via_compl` | `(U A B : HFSet) (hA : A ⊆ U) (hB : B ⊆ U) : symDiff A B = union (inter A (compl U B)) (inter B (compl U A))` |
+
+### 6.40 Axioms/VonNeumann.lean — `namespace HFSet`
+
+| # | Theorem / Def | Lean signature |
+|---|--------------|---------------|
+| 1 | `isTransitive_empty` | `isTransitive empty` |
+| 2 | `isTransitive_succ` | `(A : HFSet) (hT : isTransitive A) : isTransitive (succ A)` |
+| 3 | `isNat_zero` | `isNat empty` |
+| 4 | `isNat_succ` | `{n : HFSet} (h : isNat n) : isNat (succ n)` |
+| 5 | `isNat_zero_or_succ` | `{n : HFSet} (hn : isNat n) : n = empty ∨ ∃ m, isNat m ∧ n = succ m` |
+| 6 | `isNat_isTransitive` | `{n : HFSet} (hn : isNat n) : isTransitive n` |
+| 7 | `isNat_mem_isNat` | `{n m : HFSet} (hn : isNat n) (hm : m ∈ n) : isNat m` |
+| 8 | `isNat_pred` | `{n : HFSet} (hn : isNat (succ n)) : isNat n` |
+| 9 | `isNat_induction` | `{n : HFSet} (P : HFSet → Prop) (h0 : P empty) (hs : ∀ k, isNat k → P k → P (succ k)) (hn : isNat n) : P n` |
+
+### 6.41 Axioms/Choice.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `nonempty_of_ne_empty` | `(A : HFSet) (h : A ≠ empty) : ∃ x, x ∈ A` |
+| 2 | `choose_mem` | `(A : HFSet) (h : A ≠ empty) : choose A h ∈ A` |
+| 3 | `choice_principle` | `(F : HFSet) (hne : ∀ A, A ∈ F → A ≠ empty) : ∃ f : HFSet → HFSet, ∀ A, A ∈ F → f A ∈ A` |
+
+### 6.42 Axioms/Cardinal.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `card_empty` | `card empty = 𝟘` |
+| 2 | `card_insert` | `(x A : HFSet) (h : x ∉ A) : card (insert x A) = σ (card A)` |
+| 3 | `card_powerset` | `(A : HFSet) : card (powerset A) = pow 𝟚 (card A)` |
+
+### 6.43 PList/Fin0.lean — `namespace Fin₀`, `namespace PList`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `Fin₀.elim_zero` | `(i : Fin₀ 𝟘) → False` |
+| 2 | `Fin₀.val_lt_bound` | `(i : Fin₀ n) → i.val < n` |
+| 3 | `Fin₀.val_le_bound_pred` | `(i : Fin₀ n) → {k : ℕ₀} → (hk : n = σ k) → i.val ≤ k` |
+| 4 | `PList.get_eq_get?` | `(l : PList α) → (i : Fin₀ (l.length)) → l.get? i.val = some (l.get i)` |
+
+### 6.44 HFList.lean — `namespace HFList`, `namespace FinList`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `HFList.length_nil` | `length PList.nil = 𝟘` |
+| 2 | `HFList.length_cons` | `(h : HFSet) → (t : HFList) → length (PList.cons h t) = σ (length t)` |
+| 3 | `HFList.length_append` | `(l₁ l₂ : HFList) → length (l₁ ++ l₂) = add (length l₁) (length l₂)` |
+| 4 | `FinList.length_eq` | `(t : FinList n) → t.val.length = n` |
+| 5 | `FinList.ext` | `{t s : FinList n} → (h : t.val = s.val) → t = s` |
+
+### 6.45 VN/Basic.lean — `namespace VN`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `vN_zero` | `vN 𝟘 = HFSet.empty` |
+| 2 | `vN_succ` | `(n : ℕ₀) → vN (σ n) = HFSet.succ (vN n)` |
+| 3 | `vN_succ_ne_empty` | `(n : ℕ₀) → vN (σ n) ≠ HFSet.empty` |
+| 4 | `mem_vN_succ` | `(x : HFSet) → (n : ℕ₀) → (x ∈ vN (σ n) ↔ x ∈ vN n ∨ x = vN n)` |
+| 5 | `vN_mem_vN_succ` | `(n : ℕ₀) → vN n ∈ vN (σ n)` |
+| 6 | `vN_subset_vN_succ` | `(n : ℕ₀) → vN n ⊆ vN (σ n)` |
+
+### 6.46 VN/Injective.lean — `namespace VN`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `vN_injective` | `Function.Injective vN` |
+
+### 6.47 VN/IsNat.lean — `namespace VN`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `isNat_vN` | `(n : ℕ₀) → HFSet.isNat (vN n)` |
+| 2 | `vN_mem_range` | `{A : HFSet} → (h : HFSet.isNat A) → ∃ n : ℕ₀, vN n = A` |
+| 3 | `isNat_iff_range` | `(A : HFSet) → (HFSet.isNat A ↔ ∃ n : ℕ₀, vN n = A)` |
+
+### 6.48 VN/Arithmetic.lean — `namespace VN`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `mem_vN_iff_lt` | `(m n : ℕ₀) → (vN m ∈ vN n ↔ m < n)` |
+| 2 | `vN_mono` | `(m n : ℕ₀) → (h : m ≤ n) → vN m ⊆ vN n` |
+| 3 | `vN_le_iff_subset` | `(m n : ℕ₀) → (m ≤ n ↔ vN m ⊆ vN n)` |
+
 ---
 
 ## 7. Exports per Module
 
-### CList/Basic.lean
+### CList modules (Basic, ExtEq, SetEquiv, Order, Sort, Normalize)
 
-`CList`, `CList.mk`, `CList.cSize`, `CList.cSizeList`, `CList.cSize_lt_of_mem`, `CList.empty`, `CListOp`, `CList.evalOp`, `CList.mem`, `CList.subset`, `CList.extEq`, `BEq CList`, `CList.lt`, `CList.dedupAux`, `CList.dedup`, `CList.orderedInsert`, `CList.insertionSort`, `CList.normalize`, `CList.zero`, `CList.one`, `CList.two`, `CList.three`, `CList.dirty`
-
-### CList/ExtEq.lean
-
-`CList.subset_mono`, `CList.subset_refl`, `CList.extEq_refl`, `CList.extEq_def`, `CList.subset_nil`, `CList.subset_cons`, `CList.mem_nil`, `CList.mem_cons`, `CList.extEq_trans`, `CList.subset_trans`, `CList.mem_subset`, `CList.mem_of_extEq`, `CList.extEq_comm`
-
-### CList/SetEquiv.lean
-
-`CList.Nodup`, `CList.dedup_nodup`, `CList.SetEquiv`, `CList.SetEquiv.refl`, `CList.SetEquiv.symm`, `CList.SetEquiv.trans`, `CList.mem_eq_any`, `CList.extEq_mk_iff_setEquiv`, `CList.dedup_setEquiv_self`
-
-### CList/Order.lean
-
-`CList.lt_irrefl`, `CList.lt_antisymm`, `CList.lt_asymm`, `CList.lt_total`, `CList.lt_total_extEq`, `CList.lt_trans`
-
-### CList/Sort.lean
-
-`CList.Sorted`, `CList.insertionSort_sorted`, `CList.insertionSort_mem_subset`, `CList.insertionSort_nodup`, `CList.insertionSort_setEquiv`
-
-### CList/Normalize.lean
-
-`CList.cSizeList_dedup_le`, `CList.cSizeList_insertionSort_le`, `CList.normalize_cSize_le`, `CList.dedup_id_of_nodup`, `CList.insertionSort_id_of_sorted_nodup`, `CList.normalize_idem`, `CList.mem_of_mem_dedup`, `CList.sorted_nodup_setEquiv_eq`, `CList.normalize_eq_of_extEq`
+> Exports moved to [doc/REFERENCE-CList.md](doc/REFERENCE-CList.md#7-exports-per-module).
 
 ### HFSets.lean
 
@@ -1141,7 +1472,7 @@ Bridge lemmas: see §4.18.1. No additional theorems beyond the 6 bridge lemmas a
 
 ### CList/Filter.lean
 
-`CList.P_respects`, `CList.subset_filter`, `CList.mem_filter_of_mem`, `CList.filter_subset_filter`, `CList.extEq_filter`, `CList.P_of_mem_filter`
+> Exports moved to [doc/REFERENCE-CList.md](doc/REFERENCE-CList.md#7-exports-per-module).
 
 ### Operations/Union.lean
 
@@ -1235,6 +1566,146 @@ Bridge lemmas: see §4.18.1. No additional theorems beyond the 6 bridge lemmas a
 
 `HFSet.imageRel_subset_range`, `HFSet.imageRel_mono`, `HFSet.imageRel_union`, `HFSet.imageRel_domain_eq_range`, `HFSet.imageRel_codomain`, `HFSet.imageRel_funComp`, `HFSet.imageRel_idFunc`
 
+### Operations/OrderedPair.lean
+
+`HFSet.orderedPair`, `HFSet.fst`, `HFSet.snd`, notation `⟪a, b⟫`
+
+### Operations/Relation.lean
+
+`HFSet.isRelation`, `HFSet.domain`, `HFSet.range`
+
+### Operations/Function.lean
+
+`HFSet.isFunction`, `HFSet.isTotalFunction`, `HFSet.apply`
+
+### Operations/Inverse.lean
+
+`HFSet.relInv`, notation `⁻¹ᵣ`
+
+### Operations/Restriction.lean
+
+`HFSet.restrict`, `HFSet.preimage`, notation `↾`
+
+### Operations/Composition.lean
+
+`HFSet.relComp`, `HFSet.imageRel`, notation `∘ᵣ`
+
+### Operations/Replacement.lean
+
+`HFSet.image`
+
+### Operations/SymDiff.lean
+
+`HFSet.symDiffCList`, `HFSet.symDiff`, `HFSet.symDiffCList_extEq`
+
+### Operations/Cardinal.lean
+
+`HFSet.cardCList`, `HFSet.card`, `HFSet.cardCList_congr`
+
+### Axioms/Singleton.lean
+
+`HFSet.mem_singleton`
+
+### Axioms/Subset.lean
+
+`HFSet.subset_iff`, `HFSet.subset_refl`, `HFSet.subset_trans`, `HFSet.subset_antisymm`, `HFSet.empty_subset`, `HFSet.subset_union_left`, `HFSet.subset_union_right`, `HFSet.inter_subset_left`, `HFSet.inter_subset_right`, `HFSet.subset_inter`
+
+### Axioms/OrderedPair.lean
+
+`HFSet.orderedPair_eq_iff`
+
+### Axioms/Foundation.lean
+
+`CList.mem_exists_plist_mem`, `CList.mem_of_plist_mem`, `HFSet.foundation`
+
+### Axioms/Decidable.lean
+
+`HFSet.mem_decidable`, `HFSet.existsMem_decidable`
+
+### Axioms/Relation.lean
+
+`HFSet.fst_mem_sUnion_sUnion`, `HFSet.snd_mem_sUnion_sUnion`, `HFSet.mem_domain_iff`, `HFSet.mem_range_iff`, `HFSet.domain_empty`, `HFSet.range_empty`, `HFSet.isRelation_empty`
+
+### Axioms/Function.lean
+
+`HFSet.isInjective`, `HFSet.isSurjective`, `HFSet.isBijective`, `HFSet.apply_mem`, `HFSet.apply_eq_of_mem`, `HFSet.totalFunction_apply_mem`, `HFSet.isFunction_empty`, `HFSet.isFunction_unique`, `HFSet.mem_domain_of_mem`, `HFSet.mem_range_of_mem`
+
+### Axioms/Bijection.lean
+
+`HFSet.isInjective_empty`, `HFSet.isInjective_restrict`, `HFSet.isSurjective_empty_codomain`, `HFSet.isSurjective_range`, `HFSet.isSurjective_iff_range_eq`, `HFSet.isBijective_intro`, `HFSet.isBijective_isTotalFunction`, `HFSet.isBijective_isFunction`, `HFSet.isBijective_isInjective`, `HFSet.isBijective_isSurjective`, `HFSet.isBijective_domain_eq`, `HFSet.isBijective_range_eq`, `HFSet.isBijective_empty`
+
+### Axioms/Inverse.lean
+
+`HFSet.mem_relInv`, `HFSet.mem_relInv_pair`, `HFSet.relInv_isRelation`, `HFSet.domain_relInv`, `HFSet.range_relInv`, `HFSet.relInv_relInv`, `HFSet.isFunction_relInv`, `HFSet.isInjective_relInv`, `HFSet.isSurjective_relInv`, `HFSet.isBijective_relInv`
+
+### Axioms/Composition.lean
+
+`HFSet.mem_imageRel`, `HFSet.imageRel_empty_rel`, `HFSet.imageRel_empty_set`, `HFSet.mem_relComp`, `HFSet.relComp_empty_left`, `HFSet.relComp_empty_right`
+
+### Axioms/Restriction.lean
+
+`HFSet.mem_restrict`, `HFSet.restrict_subset`, `HFSet.restrict_isRelation`, `HFSet.mem_restrict_pair`, `HFSet.mem_preimage`, `HFSet.preimage_empty_set`
+
+### Axioms/Replacement.lean
+
+`HFSet.mem_image`, `HFSet.image_empty`, `HFSet.image_of_empty`, `HFSet.image_subset_range`, `HFSet.apply_mem_image`, `HFSet.image_totalFunction_subset`
+
+### Axioms/Succ.lean
+
+`HFSet.succ`, `HFSet.mem_succ`, `HFSet.A_mem_succ_A`, `HFSet.mem_succ_of_mem`, `HFSet.A_subset_succ_A`, `HFSet.succ_ne_empty`, `HFSet.not_mem_self`, `HFSet.no_mem_cycle2`, `HFSet.succ_injective`
+
+### Axioms/SymDiff.lean
+
+`HFSet.mem_symDiff`
+
+### Axioms/Lattice.lean
+
+`HFSet.union_comm`, `HFSet.inter_comm`, `HFSet.union_assoc`, `HFSet.inter_assoc`, `HFSet.union_idem`, `HFSet.inter_idem`, `HFSet.union_inter_absorb`, `HFSet.inter_union_absorb`, `HFSet.union_inter_distrib`, `HFSet.inter_union_distrib`, `HFSet.union_empty`, `HFSet.empty_union`, `HFSet.inter_empty`, `HFSet.empty_inter`, `HFSet.setminus_self`, `HFSet.setminus_empty`, `HFSet.empty_setminus`
+
+### Axioms/BooleanAlgebra.lean
+
+`HFSet.compl`, `HFSet.mem_compl`, `HFSet.inter_full`, `HFSet.full_inter`, `HFSet.compl_mem_powerset`, `HFSet.union_compl`, `HFSet.inter_compl`, `HFSet.compl_compl`, `HFSet.compl_empty`, `HFSet.compl_self`, `HFSet.compl_union`, `HFSet.compl_inter`, `HFSet.compl_subset_swap`, `HFSet.union_compl_inter`
+
+### Axioms/BooleanRing.lean
+
+`HFSet.symDiff_comm`, `HFSet.symDiff_assoc`, `HFSet.symDiff_empty`, `HFSet.empty_symDiff`, `HFSet.symDiff_self`, `HFSet.inter_symDiff_distrib`, `HFSet.symDiff_eq_union_setminus`, `HFSet.symDiff_via_compl`
+
+### Axioms/VonNeumann.lean
+
+`HFSet.isTransitive`, `HFSet.isNat`, `HFSet.isTransitive_empty`, `HFSet.isTransitive_succ`, `HFSet.isNat_zero`, `HFSet.isNat_succ`, `HFSet.isNat_zero_or_succ`, `HFSet.isNat_isTransitive`, `HFSet.isNat_mem_isNat`, `HFSet.isNat_pred`, `HFSet.isNat_induction`
+
+### Axioms/Choice.lean
+
+`HFSet.choose`, `HFSet.nonempty_of_ne_empty`, `HFSet.choose_mem`, `HFSet.choice_principle`
+
+### Axioms/Cardinal.lean
+
+`HFSet.card_empty`, `HFSet.card_insert`, `HFSet.card_powerset`
+
+### PList/Fin0.lean
+
+`Fin₀`, `Fin₀.zero`, `Fin₀.succ`, `Fin₀.last`, `Fin₀.ext`, `Fin₀.toFin`, `Fin₀.ofFin`, `Fin₀.elim_zero`, `Fin₀.val_lt_bound`, `Fin₀.val_le_bound_pred`, `PList.get`, `PList.get_eq_get?`
+
+### HFList.lean
+
+`HFList`, `FinList`, `HFList.length_nil`, `HFList.length_cons`, `HFList.length_append`, `FinList.empty`, `FinList.singleton`, `FinList.cons`, `FinList.toHFList`, `FinList.get`, `FinList.length_eq`, `FinList.ext`
+
+### VN/Basic.lean
+
+`VN.vN`, `VN.vN_zero`, `VN.vN_succ`, `VN.vN_succ_ne_empty`, `VN.mem_vN_succ`, `VN.vN_mem_vN_succ`, `VN.vN_subset_vN_succ`
+
+### VN/Injective.lean
+
+`VN.vN_injective`
+
+### VN/IsNat.lean
+
+`VN.isNat_vN`, `VN.vN_mem_range`, `VN.isNat_iff_range`
+
+### VN/Arithmetic.lean
+
+`VN.mem_vN_iff_lt`, `VN.vN_mono`, `VN.vN_le_iff_subset`
+
 ---
 
 ## 8. Notations
@@ -1251,6 +1722,10 @@ Bridge lemmas: see §4.18.1. No additional theorems beyond the 6 bridge lemmas a
 | `0` … `9` | `OfNat HFSet n` instances | Notation | Von Neumann numerals |
 | `∘f` | `infixl:90 " ∘f " => HFSet.funComp` | Operations/FunctionComp | Functional composition of relations |
 | `×ₛ` | `infixl:80 " ×ₛ " => HFSet.prodHF` | Operations/Product | Cartesian product of HF sets |
+| `⟪a, b⟫` | `notation "⟪" a ", " b "⟫" => HFSet.orderedPair a b` | Operations/OrderedPair | Kuratowski ordered pair |
+| `⁻¹ᵣ` | `postfix:75 "⁻¹ᵣ" => HFSet.relInv` | Operations/Inverse | Relational inverse |
+| `↾` | `notation:80 R " ↾ " A => HFSet.restrict R A` | Operations/Restriction | Relation restriction to domain A |
+| `∘ᵣ` | `infixl:90 " ∘ᵣ " => HFSet.relComp` | Operations/Composition | Relational composition |
 
 ---
 
@@ -1264,5 +1739,6 @@ Bridge lemmas: see §4.18.1. No additional theorems beyond the 6 bridge lemmas a
 | 2026-04-10 | CList/Filter, Operations/{Union,Intersection,Setminus,Separation,Pair,Powerset}, Axioms/{Union,Intersection,Setminus,Separation,Pair,Powerset}, Notation | Claude (AI assistant) |
 | 2026-05-11 | PList/{Basic,Lemmas,Omega0} — Phase 1 Peano integration | Claude (AI assistant) |
 | 2026-05-14 | Operations/{FunctionComp,Identity,Product}, Axioms/{FunctionComp,Identity,Product,Image} — function composition, identity function, cartesian product, image of a set | Claude (AI assistant) |
+| 2026-05-14 | Operations/{OrderedPair,Relation,Function,Inverse,Restriction,Composition,Replacement,SymDiff,Cardinal}, Axioms/{Singleton,Subset,OrderedPair,Foundation,Decidable,Relation,Function,Bijection,Inverse,Composition,Restriction,Replacement,Succ,SymDiff,Lattice,BooleanAlgebra,BooleanRing,VonNeumann,Choice,Cardinal}, PList/Fin0, HFList, VN/{Basic,Injective,IsNat,Arithmetic} — mass projection (REVISA_Y_PROYECTA) | Claude (AI assistant) |
 
 > To project a file: read it fully, then update sections 1–8 above following AI-GUIDE.md §4–14.
