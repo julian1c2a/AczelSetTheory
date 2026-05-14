@@ -4,6 +4,31 @@ All notable changes to this project are documented here.
 
 ---
 
+## [2026-05-14] — Function composition, identity, product & image — 32 projected modules, 0 sorry
+
+### Added — Operations layer
+
+- **Operations/FunctionComp.lean**: `HFSet.funComp (f g : HFSet) : HFSet` — functional composition of two relations as HFSets. Universe: `𝒫(𝒫(⋃⋃f ∪ ⋃⋃g))`. Notation `infixl:90 " ∘f "`.
+- **Operations/Identity.lean**: `HFSet.idFunc (A : HFSet) : HFSet` — identity function on a set.  Separates ordered pairs `⟪a, a⟫` from `𝒫(𝒫(A))`.
+- **Operations/Product.lean**: `HFSet.prodHF (A B : HFSet) : HFSet` — Cartesian product. Separates pairs `⟪a, b⟫` with `a ∈ A`, `b ∈ B`. Notation `infixl:80 " ×ₛ "`.
+
+### Added — Axioms layer
+
+- **Axioms/FunctionComp.lean**: 10 theorems: `mem_funComp`, `mem_funComp_pair`, `funComp_isRelation`, `isFunction_funComp`, `mem_domain_funComp`, `mem_range_funComp`, `isInjective_funComp`, `isSurjective_funComp`, `isTotalFunction_funComp`, `isBijective_funComp`.
+- **Axioms/Identity.lean**: 15 theorems including identity laws `funComp_idFunc_eq`, `idFunc_funComp_eq` and `relInv_idFunc`.
+- **Axioms/Product.lean**: 8 theorems: membership, relation, projection, empty product lemmas, and `isTotalFunction_subset_prodHF`.
+- **Axioms/Image.lean**: 7 theorems: `imageRel_subset_range`, `imageRel_mono`, `imageRel_union`, `imageRel_domain_eq_range`, `imageRel_codomain`, `imageRel_funComp`, `imageRel_idFunc`.
+
+### Updated
+
+- **Operations.lean** barrel: now ends with `import AczelSetTheory.Operations.Product`.
+- **Axioms.lean** barrel: now ends with `import AczelSetTheory.Axioms.Image`.
+- **REFERENCE.md**: projected all 7 new modules (§1, §4.19–4.25, §6.18–6.21, §7, §8, Projection Log).
+
+**Project status: 0 sorry, 0 errors, 0 warnings. 66 leaf modules.**
+
+---
+
 ## [2026-05-11] — Phase 1 complete: Peano integration (PList + omega₀) — 25 modules, 0 sorry
 
 ### Added — PList: polymorphic list type with ℕ₀ indexing

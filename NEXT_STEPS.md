@@ -1,10 +1,22 @@
 # Next Steps
 
-**Last updated:** 2026-05-11
+**Last updated:** 2026-05-14
 
-The project compiles on Lean 4.29.0 with **0 sorry, 22 modules**.
-Full Zermelo axioms derived. Architecture split: Operations/ + Axioms/.
+The project compiles on Lean 4.29.0 with **0 sorry, 66 modules**.
+Full Zermelo axioms derived. Architecture: CList/ + Operations/ + Axioms/ + PList/ + VN/.
 See PLANNING.md for the full long-term roadmap.
+
+---
+
+## ✅ COMPLETED (2026-05-14) — Function composition, identity, product, image
+
+- **Operations/FunctionComp.lean**: `funComp`, notation `∘f` (infixl:90)
+- **Operations/Identity.lean**: `idFunc`
+- **Operations/Product.lean**: `prodHF`, notation `×ₛ` (infixl:80)
+- **Axioms/FunctionComp.lean**: 10 theorems (composition preserves functions, injectivity, surjectivity, bijectivity)
+- **Axioms/Identity.lean**: 15 theorems (identity laws, `funComp_idFunc_eq`, `idFunc_funComp_eq`, `relInv_idFunc`)
+- **Axioms/Product.lean**: 8 theorems (membership, projections, empty product)
+- **Axioms/Image.lean**: 7 theorems (`imageRel_funComp`, `imageRel_idFunc`, monotonicity, union)
 
 ---
 
@@ -74,6 +86,16 @@ import AczelSetTheory.PList
 ```
 
 ---
+
+## ✅ COMPLETED (earlier sessions) — Fase 3: vN embedding
+
+- **VN/Basic.lean**: `vN : ℕ₀ → HFSet`, `vN_zero`, `vN_succ`
+- **VN/Injective.lean**: `vN_injective`
+- **VN/IsNat.lean**: `VN.IsVNNat` predicate, membership in range
+- **VN/Arithmetic.lean**: `vN_add`, `vN_le_iff`, arithmetic transport
+- **VN.lean**: barrel
+
+Además: HFList.lean, PList/Fin0.lean, Axioms/VonNeumann.lean, Axioms/Succ.lean, Axioms/Singleton.lean, Axioms/Subset.lean, Axioms/Foundation.lean, Axioms/Relation.lean, Axioms/Function.lean, Axioms/Inverse.lean, Axioms/Composition.lean, Axioms/Bijection.lean, Axioms/Restriction.lean, Axioms/Decidable.lean, Axioms/BooleanAlgebra.lean, Axioms/BooleanRing.lean, Axioms/Cardinal.lean, Axioms/Lattice.lean, Axioms/SymDiff.lean, Axioms/OrderedPair.lean.
 
 ## NEXT — Fase 2: Refactorización de CList
 

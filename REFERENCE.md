@@ -1,6 +1,6 @@
 # Technical Reference — AczelSetTheory
 
-**Last updated:** 2026-05-11 00:00
+**Last updated:** 2026-05-14 00:00
 **Author**: Julián Calderón Almendros
 **Lean version**: v4.29.0
 
@@ -61,6 +61,13 @@ Below are the keys for reading and searching theorems.
 | 23 | `AczelSetTheory/PList/Basic.lean` | `PList` | ✅ Complete | `Peano.PeanoNat`, `Peano.PeanoNat.Add` | PList/Lemmas |
 | 24 | `AczelSetTheory/PList/Lemmas.lean` | `PList` | ✅ Complete | PList/Basic, `Peano.PeanoNat.{Add,Axioms,Order}` | PList/Omega0 |
 | 25 | `AczelSetTheory/PList/Omega0.lean` | `PList.Omega0` | ✅ Complete | PList/Lemmas, `Peano.PeanoNat.{Add,Axioms,Order,StrictOrder}` | — |
+| 26 | `AczelSetTheory/Operations/FunctionComp.lean` | `HFSet` | ✅ Complete | Operations/Composition, Operations/Powerset | Axioms/FunctionComp, Axioms/Identity |
+| 27 | `AczelSetTheory/Operations/Identity.lean` | `HFSet` | ✅ Complete | Operations/OrderedPair, Operations/Powerset | Axioms/Identity |
+| 28 | `AczelSetTheory/Operations/Product.lean` | `HFSet` | ✅ Complete | Operations/OrderedPair, Operations/Powerset, Operations/Union | Axioms/Product |
+| 29 | `AczelSetTheory/Axioms/FunctionComp.lean` | `HFSet` | ✅ Complete | Operations/FunctionComp, Axioms/Powerset, Axioms/Separation, Axioms/Union, Axioms/Pair, Axioms/Singleton, Axioms/OrderedPair, Axioms/Bijection, Axioms/Inverse | Axioms/Identity |
+| 30 | `AczelSetTheory/Axioms/Identity.lean` | `HFSet` | ✅ Complete | Operations/Identity, Axioms/Powerset, Axioms/Separation, Axioms/Pair, Axioms/Singleton, Axioms/OrderedPair, Axioms/FunctionComp, Axioms/Inverse | Axioms/Image |
+| 31 | `AczelSetTheory/Axioms/Product.lean` | `HFSet` | ✅ Complete | Operations/Product, Axioms/Powerset, Axioms/Separation, Axioms/Pair, Axioms/Singleton, Axioms/OrderedPair, Axioms/Union, Axioms/Relation, Axioms/Function | — |
+| 32 | `AczelSetTheory/Axioms/Image.lean` | `HFSet` | ✅ Complete | Axioms/Composition, Axioms/FunctionComp, Axioms/Identity, Axioms/Intersection, Axioms/Union | — |
 | — | `AczelSetTheory/PList.lean` | — | ✅ Complete | PList/{Basic,Lemmas,Omega0} | AczelSetTheory.lean |
 | — | `AczelSetTheory.lean` | — | ✅ Complete | PList, CList, HFSets, Operations/*, Axioms/*, Notation | Main |
 | — | `Main.lean` | — | ✅ Complete | CList.Basic | — |
@@ -713,7 +720,85 @@ macro "omega₀" : tactic =>
 
 ---
 
-## 5. Axioms
+### 4.19 Operations/FunctionComp.lean — `namespace HFSet`
+
+#### 4.19.1 `HFSet.funComp`
+
+```lean
+open Classical in
+noncomputable def HFSet.funComp (f g : HFSet) : HFSet :=
+  HFSet.sep
+    (HFSet.powerset (HFSet.powerset
+      (HFSet.union (HFSet.sUnion (HFSet.sUnion f)) (HFSet.sUnion (HFSet.sUnion g)))))
+    (fun p => ∃ a b c, p = ⟪a, c⟫ ∧ ⟪a, b⟫ ∈ g ∧ ⟪b, c⟫ ∈ f)
+```
+
+- **Math**: f ∘f g ≔ {⟪a, c⟫ | ∃ b, ⟪a, b⟫ ∈ g ∧ ⟪b, c⟫ ∈ f}
+- Universe: 𝒫(𝒫(⋃⋃f ∪ ⋃⋃g)) — first and second components lie in ⋃⋃f ∪ ⋃⋃g.
+- Distinct from `relComp` (which uses a different universe).
+- Noncomputable. Notation: `infixl:90 " ∘f "`.
+
+---
+
+### 4.20 Operations/Identity.lean — `namespace HFSet`
+
+#### 4.20.1 `HFSet.idFunc`
+
+```lean
+open Classical in
+noncomputable def HFSet.idFunc (A : HFSet) : HFSet :=
+  HFSet.sep
+    (HFSet.powerset (HFSet.powerset A))
+    (fun p => ∃ a, a ∈ A ∧ p = HFSet.orderedPair a a)
+```
+
+- **Math**: id_A ≔ {⟪a, a⟫ | a ∈ A}
+- Universe: 𝒫(𝒫(A)) — because ⟪a, a⟫ = {{a}, {a,a}} and both {a}, {a,a} ⊆ A for any a ∈ A.
+- Noncomputable.
+
+---
+
+### 4.21 Operations/Product.lean — `namespace HFSet`
+
+#### 4.21.1 `HFSet.prodHF`
+
+```lean
+open Classical in
+noncomputable def HFSet.prodHF (A B : HFSet) : HFSet :=
+  HFSet.sep
+    (HFSet.powerset (HFSet.powerset (HFSet.union A B)))
+    (fun p => ∃ a b, a ∈ A ∧ b ∈ B ∧ p = HFSet.orderedPair a b)
+```
+
+- **Math**: A × B ≔ {⟪a, b⟫ | a ∈ A ∧ b ∈ B}
+- Universe: 𝒫(𝒫(A ∪ B)) — because ⟪a, b⟫ = {{a},{a,b}} and {a},{a,b} ⊆ A ∪ B when a ∈ A, b ∈ B.
+- Noncomputable. Notation: `infixl:80 " ×ₛ "`.
+
+---
+
+### 4.22 Axioms/FunctionComp.lean — `namespace HFSet`
+
+No new definitions. Only theorems (see §6.18).
+
+---
+
+### 4.23 Axioms/Identity.lean — `namespace HFSet`
+
+No new definitions. Only theorems (see §6.19).
+
+---
+
+### 4.24 Axioms/Product.lean — `namespace HFSet`
+
+No new definitions. Only theorems (see §6.20).
+
+---
+
+### 4.25 Axioms/Image.lean — `namespace HFSet`
+
+No new definitions. Only theorems (see §6.21).
+
+---
 
 None. This project builds constructively from Lean 4 without additional axioms.
 
@@ -962,6 +1047,66 @@ All **Zermelo axioms** are proven as theorems (not postulated):
 
 Bridge lemmas: see §4.18.1. No additional theorems beyond the 6 bridge lemmas and the `omega₀` tactic macro.
 
+### 6.18 Axioms/FunctionComp.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `mem_funComp` | `{f g p : HFSet} : p ∈ f ∘f g ↔ ∃ a b c, p = ⟪a, c⟫ ∧ ⟪a, b⟫ ∈ g ∧ ⟪b, c⟫ ∈ f` |
+| 2 | `mem_funComp_pair` | `{f g a c : HFSet} : ⟪a, c⟫ ∈ f ∘f g ↔ ∃ b, ⟪a, b⟫ ∈ g ∧ ⟪b, c⟫ ∈ f` |
+| 3 | `funComp_isRelation` | `{f g : HFSet} : isRelation (f ∘f g)` |
+| 4 | `isFunction_funComp` | `{f g : HFSet} (hf : isFunction f) (hg : isFunction g) : isFunction (f ∘f g)` |
+| 5 | `mem_domain_funComp` | `{f g a : HFSet} : a ∈ domain (f ∘f g) ↔ ∃ b, ⟪a, b⟫ ∈ g ∧ ∃ c, ⟪b, c⟫ ∈ f` |
+| 6 | `mem_range_funComp` | `{f g c : HFSet} : c ∈ range (f ∘f g) ↔ ∃ b, b ∈ range g ∧ ⟪b, c⟫ ∈ f` |
+| 7 | `isInjective_funComp` | `{f g : HFSet} (hf : isInjective f) (hg : isInjective g) : isInjective (f ∘f g)` |
+| 8 | `isSurjective_funComp` | `{f g C : HFSet} (hf : isSurjective f C) (hg : isSurjective g (domain f)) : isSurjective (f ∘f g) C` |
+| 9 | `isTotalFunction_funComp` | `{f g A B C : HFSet} (hf : isTotalFunction f B C) (hg : isTotalFunction g A B) : isTotalFunction (f ∘f g) A C` |
+| 10 | `isBijective_funComp` | `{f g A B C : HFSet} (hf : isBijective f B C) (hg : isBijective g A B) : isBijective (f ∘f g) A C` |
+
+### 6.19 Axioms/Identity.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `mem_idFunc` | `{A p : HFSet} : p ∈ idFunc A ↔ ∃ a, a ∈ A ∧ p = ⟪a, a⟫` |
+| 2 | `mem_idFunc_pair` | `{A a b : HFSet} : ⟪a, b⟫ ∈ idFunc A ↔ a = b ∧ a ∈ A` |
+| 3 | `idFunc_isRelation` | `{A : HFSet} : isRelation (idFunc A)` |
+| 4 | `isFunction_idFunc` | `{A : HFSet} : isFunction (idFunc A)` |
+| 5 | `domain_idFunc` | `{A : HFSet} : domain (idFunc A) = A` |
+| 6 | `range_idFunc` | `{A : HFSet} : range (idFunc A) = A` |
+| 7 | `isTotalFunction_idFunc` | `{A : HFSet} : isTotalFunction (idFunc A) A A` |
+| 8 | `isInjective_idFunc` | `{A : HFSet} : isInjective (idFunc A)` |
+| 9 | `isSurjective_idFunc` | `{A : HFSet} : isSurjective (idFunc A) A` |
+| 10 | `isBijective_idFunc` | `{A : HFSet} : isBijective (idFunc A) A A` |
+| 11 | `mem_funComp_idFunc` | `{f A a c : HFSet} : ⟪a, c⟫ ∈ f ∘f idFunc A ↔ a ∈ A ∧ ⟪a, c⟫ ∈ f` |
+| 12 | `mem_idFunc_funComp` | `{f B a c : HFSet} : ⟪a, c⟫ ∈ idFunc B ∘f f ↔ ⟪a, c⟫ ∈ f ∧ c ∈ B` |
+| 13 | `funComp_idFunc_eq` | `{f A B : HFSet} (hf : isTotalFunction f A B) : f ∘f idFunc A = f` |
+| 14 | `idFunc_funComp_eq` | `{f A B : HFSet} (hf : isTotalFunction f A B) : idFunc B ∘f f = f` |
+| 15 | `relInv_idFunc` | `{A : HFSet} : (idFunc A)⁻¹ᵣ = idFunc A` |
+
+### 6.20 Axioms/Product.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `mem_prodHF` | `{A B p : HFSet} : p ∈ A ×ₛ B ↔ ∃ a b, a ∈ A ∧ b ∈ B ∧ p = ⟪a, b⟫` |
+| 2 | `mem_prodHF_pair` | `{A B a b : HFSet} : ⟪a, b⟫ ∈ A ×ₛ B ↔ a ∈ A ∧ b ∈ B` |
+| 3 | `prodHF_isRelation` | `{A B : HFSet} : isRelation (A ×ₛ B)` |
+| 4 | `fst_of_mem_prodHF` | `{A B a b : HFSet} (h : ⟪a, b⟫ ∈ A ×ₛ B) : a ∈ A` |
+| 5 | `snd_of_mem_prodHF` | `{A B a b : HFSet} (h : ⟪a, b⟫ ∈ A ×ₛ B) : b ∈ B` |
+| 6 | `prodHF_empty_left` | `{B : HFSet} : empty ×ₛ B = empty` |
+| 7 | `prodHF_empty_right` | `{A : HFSet} : A ×ₛ empty = empty` |
+| 8 | `isTotalFunction_subset_prodHF` | `{f A B : HFSet} (hf : isTotalFunction f A B) : ∀ p, p ∈ f → p ∈ A ×ₛ B` |
+
+### 6.21 Axioms/Image.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `imageRel_subset_range` | `{f A : HFSet} : imageRel f A ⊆ range f` |
+| 2 | `imageRel_mono` | `{f A B : HFSet} (h : A ⊆ B) : imageRel f A ⊆ imageRel f B` |
+| 3 | `imageRel_union` | `{f A B : HFSet} : imageRel f (union A B) = union (imageRel f A) (imageRel f B)` |
+| 4 | `imageRel_domain_eq_range` | `{f : HFSet} : imageRel f (domain f) = range f` |
+| 5 | `imageRel_codomain` | `{f dom cod : HFSet} (hf : isTotalFunction f dom cod) (A : HFSet) : imageRel f A ⊆ cod` |
+| 6 | `imageRel_funComp` | `{f g A : HFSet} : imageRel (f ∘f g) A = imageRel f (imageRel g A)` |
+| 7 | `imageRel_idFunc` | `{A B : HFSet} : imageRel (idFunc A) B = inter B A` |
+
 ---
 
 ## 7. Exports per Module
@@ -1062,6 +1207,34 @@ Bridge lemmas: see §4.18.1. No additional theorems beyond the 6 bridge lemmas a
 
 `PList.Omega0.ψ_eq_iff`, `PList.Omega0.ψ_le_iff`, `PList.Omega0.ψ_lt_iff`, `PList.Omega0.ψ_zero`, `PList.Omega0.ψ_succ`, `PList.Omega0.ψ_add`, tactic macro `omega₀`
 
+### Operations/FunctionComp.lean
+
+`HFSet.funComp`, notation `∘f` (infixl:90)
+
+### Operations/Identity.lean
+
+`HFSet.idFunc`
+
+### Operations/Product.lean
+
+`HFSet.prodHF`, notation `×ₛ` (infixl:80)
+
+### Axioms/FunctionComp.lean
+
+`HFSet.mem_funComp`, `HFSet.mem_funComp_pair`, `HFSet.funComp_isRelation`, `HFSet.isFunction_funComp`, `HFSet.mem_domain_funComp`, `HFSet.mem_range_funComp`, `HFSet.isInjective_funComp`, `HFSet.isSurjective_funComp`, `HFSet.isTotalFunction_funComp`, `HFSet.isBijective_funComp`
+
+### Axioms/Identity.lean
+
+`HFSet.mem_idFunc`, `HFSet.mem_idFunc_pair`, `HFSet.idFunc_isRelation`, `HFSet.isFunction_idFunc`, `HFSet.domain_idFunc`, `HFSet.range_idFunc`, `HFSet.isTotalFunction_idFunc`, `HFSet.isInjective_idFunc`, `HFSet.isSurjective_idFunc`, `HFSet.isBijective_idFunc`, `HFSet.mem_funComp_idFunc`, `HFSet.mem_idFunc_funComp`, `HFSet.funComp_idFunc_eq`, `HFSet.idFunc_funComp_eq`, `HFSet.relInv_idFunc`
+
+### Axioms/Product.lean
+
+`HFSet.mem_prodHF`, `HFSet.mem_prodHF_pair`, `HFSet.prodHF_isRelation`, `HFSet.fst_of_mem_prodHF`, `HFSet.snd_of_mem_prodHF`, `HFSet.prodHF_empty_left`, `HFSet.prodHF_empty_right`, `HFSet.isTotalFunction_subset_prodHF`
+
+### Axioms/Image.lean
+
+`HFSet.imageRel_subset_range`, `HFSet.imageRel_mono`, `HFSet.imageRel_union`, `HFSet.imageRel_domain_eq_range`, `HFSet.imageRel_codomain`, `HFSet.imageRel_funComp`, `HFSet.imageRel_idFunc`
+
 ---
 
 ## 8. Notations
@@ -1076,6 +1249,8 @@ Bridge lemmas: see §4.18.1. No additional theorems beyond the 6 bridge lemmas a
 | `{[a, b, c, ...]}` | `macro_rules` → `insert a {[b, c, ...]}` | Notation | Finite set (3+ elements, recursive) |
 | `{[x ∈ A <\|> P]}` | `macro_rules` → `sep A (fun x => P)` | Notation | Separation / comprehension |
 | `0` … `9` | `OfNat HFSet n` instances | Notation | Von Neumann numerals |
+| `∘f` | `infixl:90 " ∘f " => HFSet.funComp` | Operations/FunctionComp | Functional composition of relations |
+| `×ₛ` | `infixl:80 " ×ₛ " => HFSet.prodHF` | Operations/Product | Cartesian product of HF sets |
 
 ---
 
@@ -1088,5 +1263,6 @@ Bridge lemmas: see §4.18.1. No additional theorems beyond the 6 bridge lemmas a
 | 2026-04-09 | HFSets.lean (Mem, pair, Zermelo axioms) | Claude (AI assistant) |
 | 2026-04-10 | CList/Filter, Operations/{Union,Intersection,Setminus,Separation,Pair,Powerset}, Axioms/{Union,Intersection,Setminus,Separation,Pair,Powerset}, Notation | Claude (AI assistant) |
 | 2026-05-11 | PList/{Basic,Lemmas,Omega0} — Phase 1 Peano integration | Claude (AI assistant) |
+| 2026-05-14 | Operations/{FunctionComp,Identity,Product}, Axioms/{FunctionComp,Identity,Product,Image} — function composition, identity function, cartesian product, image of a set | Claude (AI assistant) |
 
 > To project a file: read it fully, then update sections 1–8 above following AI-GUIDE.md §4–14.
