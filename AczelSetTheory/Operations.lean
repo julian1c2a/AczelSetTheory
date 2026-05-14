@@ -23,3 +23,5 @@ import AczelSetTheory.Operations.Union
 import AczelSetTheory.Operations.Composition
 import AczelSetTheory.Operations.Restriction
 import AczelSetTheory.Operations.Inverse
+import AczelSetTheory.Operations.FunctionComp
+import AczelSetTheory.Operations.Identity

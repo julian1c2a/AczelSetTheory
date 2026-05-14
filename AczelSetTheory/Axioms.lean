@@ -36,3 +36,5 @@ import AczelSetTheory.Axioms.Composition
 import AczelSetTheory.Axioms.Restriction
 import AczelSetTheory.Axioms.Bijection
 import AczelSetTheory.Axioms.Inverse
+import AczelSetTheory.Axioms.FunctionComp
+import AczelSetTheory.Axioms.Identity
