@@ -25,3 +25,4 @@ import AczelSetTheory.Operations.Restriction
 import AczelSetTheory.Operations.Inverse
 import AczelSetTheory.Operations.FunctionComp
 import AczelSetTheory.Operations.Identity
+import AczelSetTheory.Operations.Product

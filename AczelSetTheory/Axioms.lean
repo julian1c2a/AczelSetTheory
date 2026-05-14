@@ -38,3 +38,5 @@ import AczelSetTheory.Axioms.Bijection
 import AczelSetTheory.Axioms.Inverse
 import AczelSetTheory.Axioms.FunctionComp
 import AczelSetTheory.Axioms.Identity
+import AczelSetTheory.Axioms.Product
+import AczelSetTheory.Axioms.Image
