@@ -40,3 +40,5 @@ import AczelSetTheory.Axioms.FunctionComp
 import AczelSetTheory.Axioms.Identity
 import AczelSetTheory.Axioms.Product
 import AczelSetTheory.Axioms.Image
+import AczelSetTheory.Axioms.Adjunction
+import AczelSetTheory.Axioms.Induction
