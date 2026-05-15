@@ -1,6 +1,6 @@
 # Technical Reference — Algebra, Lattice & Structural Axioms
 
-**Last updated:** 2026-05-14
+**Last updated:** 2026-05-16
 **Parent:** [../REFERENCE.md](../REFERENCE.md)
 **Related:** [REFERENCE-HFSets.md](REFERENCE-HFSets.md) | [REFERENCE-Relations.md](REFERENCE-Relations.md) | [REFERENCE-VN.md](REFERENCE-VN.md)
 
@@ -34,6 +34,8 @@ foundation, decidability).
 | 59 | `AczelSetTheory/Axioms/VonNeumann.lean` | ✅ Complete |
 | 60 | `AczelSetTheory/Axioms/Choice.lean` | ✅ Complete |
 | 61 | `AczelSetTheory/Axioms/Cardinal.lean` | ✅ Complete |
+| 71 | `AczelSetTheory/Axioms/Adjunction.lean` | ✅ Complete |
+| 72 | `AczelSetTheory/Axioms/Induction.lean` | ✅ Complete |
 
 ---
 
@@ -133,6 +135,12 @@ noncomputable def HFSet.choose (A : HFSet) (_ : A ≠ empty) : HFSet
 ```
 
 - **Math**: ε(A) — some element of A, chosen noncomputably via `Classical.choice`.
+
+---
+
+### 4.43 Axioms/Adjunction.lean + Axioms/Induction.lean — `namespace HFSet`
+
+> No new computable definitions. Both files export theorems only (see §6.52, §6.53).
 
 ---
 
@@ -281,7 +289,20 @@ noncomputable def HFSet.choose (A : HFSet) (_ : A ≠ empty) : HFSet
 | 1 | `card_empty` | `card empty = 𝟘` |
 | 2 | `card_insert` | `(x A : HFSet) (h : x ∉ A) : card (insert x A) = σ (card A)` |
 | 3 | `card_powerset` | `(A : HFSet) : card (powerset A) = pow 𝟚 (card A)` |
+### 6.52 Axioms/Adjunction.lean — `namespace HFSet`
 
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `mem_insert` | `(x b A : HFSet) : x ∈ insert b A ↔ x = b ∨ x ∈ A` |
+| 2 | `mem_insert_self` | `(b A : HFSet) : b ∈ insert b A` |
+| 3 | `insert_ne_empty` | `(b A : HFSet) : insert b A ≠ empty` |
+
+### 6.53 Axioms/Induction.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `eps_induction` | `(P : HFSet → Prop) (h_empty : P empty) (h_adj : ∀ A b, P A → P (insert b A)) : ∀ A, P A` |
+| 2 | `strong_eps_induction` | `(P : HFSet → Prop) (h : ∀ A, (∀ x, x ∈ A → P x) → P A) : ∀ A, P A` |
 ---
 
 ## 7. Exports per Module
@@ -341,3 +362,11 @@ noncomputable def HFSet.choose (A : HFSet) (_ : A ≠ empty) : HFSet
 ### Axioms/Cardinal.lean
 
 `HFSet.card_empty`, `HFSet.card_insert`, `HFSet.card_powerset`
+
+### Axioms/Adjunction.lean
+
+`HFSet.mem_insert`, `HFSet.mem_insert_self`, `HFSet.insert_ne_empty`
+
+### Axioms/Induction.lean
+
+`HFSet.eps_induction`, `HFSet.strong_eps_induction`

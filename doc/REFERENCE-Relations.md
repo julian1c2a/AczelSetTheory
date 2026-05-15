@@ -1,6 +1,6 @@
 # Technical Reference — Relations, Functions & Products
 
-**Last updated:** 2026-05-14
+**Last updated:** 2026-05-16
 **Parent:** [../REFERENCE.md](../REFERENCE.md)
 **Related:** [REFERENCE-HFSets.md](REFERENCE-HFSets.md) | [REFERENCE-Algebra.md](REFERENCE-Algebra.md)
 
@@ -41,6 +41,8 @@ inverse, restriction, replacement, and cartesian products.
 | 51 | `AczelSetTheory/Axioms/Composition.lean` | ✅ Complete |
 | 52 | `AczelSetTheory/Axioms/Restriction.lean` | ✅ Complete |
 | 53 | `AczelSetTheory/Axioms/Replacement.lean` | ✅ Complete |
+| 73 | `AczelSetTheory/Operations/CartProd.lean` | ✅ Complete |
+| 74 | `AczelSetTheory/Axioms/CartProd.lean` | ✅ Complete |
 
 ---
 
@@ -257,6 +259,56 @@ noncomputable def HFSet.image (f A : HFSet) : HFSet
 
 ---
 
+### 4.44 Operations/CartProd.lean — `namespace HFSet`
+
+#### 4.44.1 `HFSet.mkOrderedPairCList`
+
+```lean
+def HFSet.mkOrderedPairCList (a b : CList) : CList :=
+  mkPair (mkPair a a) (mkPair a b)
+```
+
+- **Math**: ⟨a,b⟩ᵂ ≔ {{a},{a,b}} — Kuratowski ordered pair at CList level.
+- Computable.
+
+---
+
+#### 4.44.2 `HFSet.cartProdCList`
+
+```lean
+def HFSet.cartProdCList (A B : CList) : CList :=
+  match A, B with
+  | CList.mk as, CList.mk bs =>
+    CList.mk (as.flatMap (fun a => bs.map (fun b => mkOrderedPairCList a b)))
+```
+
+- **Math**: A ×_CList B — computable Cartesian product at CList level via `flatMap` and `map`.
+- Computable.
+
+---
+
+#### 4.44.3 `HFSet.cartProd`
+
+```lean
+def HFSet.cartProd (A B : HFSet) : HFSet :=
+  Quotient.liftOn₂ A B
+    (fun a b => Quotient.mk CList.Setoid (cartProdCList a b))
+    (fun a₁ b₁ a₂ b₂ ha hb =>
+      Quotient.sound (cartProdCList_extEq a₁ b₁ a₂ b₂ ha hb))
+```
+
+- **Math**: A ×ₕ B — Cartesian product lifted to HFSet quotient.
+- Computable. Notation: `infixl:70 " ×ₕ "`.
+- Well-defined by internal lemma `cartProdCList_extEq`.
+
+---
+
+### 4.45 Axioms/CartProd.lean — `namespace HFSet`
+
+> No new computable definitions. Exports theorems only (see §6.55).
+
+---
+
 ## 6. Theorems
 
 ### 6.18 Axioms/FunctionComp.lean — `namespace HFSet`
@@ -415,6 +467,23 @@ noncomputable def HFSet.image (f A : HFSet) : HFSet
 | 5 | `apply_mem_image` | `(f A x : HFSet) (_hf : isFunction f) (hxA : x ∈ A) (hx : ∃ b, ⟪x, b⟫ ∈ f) : apply f x hx ∈ image f A` |
 | 6 | `image_totalFunction_subset` | `(f A B y : HFSet) (hf : isTotalFunction f A B) (hy : y ∈ image f A) : y ∈ B` |
 
+### 6.54 Operations/CartProd.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `orderedPair_eq_mk` | `(a b : CList) : ⟪Quotient.mk CList.Setoid a, Quotient.mk CList.Setoid b⟫ = Quotient.mk CList.Setoid (mkOrderedPairCList a b)` |
+| 2 | `mem_cartProdCList_iff` | `(z : CList) (as bs : PList CList) : CList.mem z (cartProdCList (CList.mk as) (CList.mk bs)) = true ↔ ∃ a b : CList, CList.mem a (CList.mk as) = true ∧ CList.mem b (CList.mk bs) = true ∧ CList.extEq z (mkOrderedPairCList a b) = true` |
+
+### 6.55 Axioms/CartProd.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `mem_cartProd` | `(z A B : HFSet) : z ∈ A ×ₕ B ↔ ∃ a b, a ∈ A ∧ b ∈ B ∧ z = ⟪a, b⟫` |
+| 2 | `mem_cartProd_pair` | `(a b A B : HFSet) (ha : a ∈ A) (hb : b ∈ B) : ⟪a, b⟫ ∈ A ×ₕ B` |
+| 3 | `cartProd_empty_left` | `(B : HFSet) : empty ×ₕ B = empty` |
+| 4 | `cartProd_empty_right` | `(A : HFSet) : A ×ₕ empty = empty` |
+| 5 | `cartProd_isRelation` | `(A B : HFSet) : ∀ z, z ∈ A ×ₕ B → ∃ a b, z = ⟪a, b⟫` |
+
 ---
 
 ## 7. Exports per Module
@@ -506,3 +575,11 @@ noncomputable def HFSet.image (f A : HFSet) : HFSet
 ### Axioms/Replacement.lean
 
 `HFSet.mem_image`, `HFSet.image_empty`, `HFSet.image_of_empty`, `HFSet.image_subset_range`, `HFSet.apply_mem_image`, `HFSet.image_totalFunction_subset`
+
+### Operations/CartProd.lean
+
+`HFSet.mkOrderedPairCList`, `HFSet.cartProdCList`, `HFSet.cartProd`, `HFSet.orderedPair_eq_mk`, `HFSet.mem_cartProdCList_iff`, notation `×ₕ` (infixl:70)
+
+### Axioms/CartProd.lean
+
+`HFSet.mem_cartProd`, `HFSet.mem_cartProd_pair`, `HFSet.cartProd_empty_left`, `HFSet.cartProd_empty_right`, `HFSet.cartProd_isRelation`

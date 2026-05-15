@@ -1,6 +1,6 @@
 # Technical Reference — AczelSetTheory
 
-**Last updated:** 2026-05-15 00:00
+**Last updated:** 2026-05-16 00:00
 **Author**: Julián Calderón Almendros
 **Lean version**: v4.29.0
 
@@ -106,6 +106,10 @@ Below are the keys for reading and searching theorems.
 | 68 | `AczelSetTheory/VN/FSet.lean` | `VN` | ✅ Complete | VN/Injective, VN/IsNat, `Peano.PeanoNat.ListsAndSets.FSet` | — |
 | 69 | `AczelSetTheory/VN/PeanoAxioms.lean` | `VN` | ✅ Complete | VN/Injective, VN/IsNat | VN/PeanoArith |
 | 70 | `AczelSetTheory/VN/PeanoArith.lean` | `VN` | ✅ Complete | VN/Arithmetic, VN/PeanoAxioms | — |
+| 71 | `AczelSetTheory/Axioms/Adjunction.lean` | `HFSet` | ✅ Complete | Notation | Axioms/Induction |
+| 72 | `AczelSetTheory/Axioms/Induction.lean` | `HFSet` | ✅ Complete | Axioms/Adjunction, Axioms/Foundation | — |
+| 73 | `AczelSetTheory/Operations/CartProd.lean` | `HFSet` | ✅ Complete | Operations/OrderedPair | Axioms/CartProd |
+| 74 | `AczelSetTheory/Axioms/CartProd.lean` | `HFSet` | ✅ Complete | Operations/CartProd, Axioms/OrderedPair | — |
 | — | `AczelSetTheory/VN.lean` | — | ✅ Complete | VN/{Basic,Injective,IsNat,Arithmetic,FSet,PeanoAxioms,PeanoArith} | AczelSetTheory.lean |
 | — | `AczelSetTheory/PList.lean` | — | ✅ Complete | PList/{Basic,Lemmas,Omega0} | AczelSetTheory.lean |
 | — | `AczelSetTheory.lean` | — | ✅ Complete | PList, CList, HFSets, Operations/*, Axioms/*, Notation | Main |
@@ -208,6 +212,18 @@ CList.lean (root) ── imports all 7 sub-modules
 
 ---
 
+### 4.43 Axioms/Adjunction.lean + Axioms/Induction.lean (Phase 7a, 7b)
+
+> Definitions moved to [doc/REFERENCE-Algebra.md](doc/REFERENCE-Algebra.md#4-definitions).
+
+---
+
+### 4.44 Operations/CartProd.lean + Axioms/CartProd.lean (Phase 7c)
+
+> Definitions moved to [doc/REFERENCE-Relations.md](doc/REFERENCE-Relations.md#4-definitions).
+
+---
+
 None. This project builds constructively from Lean 4 without additional axioms.
 
 ---
@@ -264,6 +280,14 @@ None. This project builds constructively from Lean 4 without additional axioms.
 
 > Theorems moved to [doc/REFERENCE-VN.md](doc/REFERENCE-VN.md#6-theorems).
 
+### 6.52–6.53 Axioms/Adjunction + Axioms/Induction (Phase 7a, 7b)
+
+> Theorems moved to [doc/REFERENCE-Algebra.md](doc/REFERENCE-Algebra.md#6-theorems).
+
+### 6.54–6.55 Operations/CartProd + Axioms/CartProd (Phase 7c)
+
+> Theorems moved to [doc/REFERENCE-Relations.md](doc/REFERENCE-Relations.md#6-theorems).
+
 ## 7. Exports per Module
 
 ### CList modules (Basic, ExtEq, SetEquiv, Order, Sort, Normalize)
@@ -302,6 +326,14 @@ None. This project builds constructively from Lean 4 without additional axioms.
 
 > Exports moved to [doc/REFERENCE-VN.md](doc/REFERENCE-VN.md#7-exports-per-module).
 
+### Axioms/Adjunction.lean + Axioms/Induction.lean (Phase 7a, 7b)
+
+> Exports moved to [doc/REFERENCE-Algebra.md](doc/REFERENCE-Algebra.md#7-exports-per-module).
+
+### Operations/CartProd.lean + Axioms/CartProd.lean (Phase 7c)
+
+> Exports moved to [doc/REFERENCE-Relations.md](doc/REFERENCE-Relations.md#7-exports-per-module).
+
 ---
 
 ## 8. Notations
@@ -322,6 +354,7 @@ None. This project builds constructively from Lean 4 without additional axioms.
 | `⁻¹ᵣ` | `postfix:75 "⁻¹ᵣ" => HFSet.relInv` | Operations/Inverse | Relational inverse |
 | `↾` | `notation:80 R " ↾ " A => HFSet.restrict R A` | Operations/Restriction | Relation restriction to domain A |
 | `∘ᵣ` | `infixl:90 " ∘ᵣ " => HFSet.relComp` | Operations/Composition | Relational composition |
+| `×ₕ` | `infixl:70 " ×ₕ " => HFSet.cartProd` | Operations/CartProd | Computable Cartesian product (CList flatMap/map) |
 
 ---
 
@@ -337,5 +370,6 @@ None. This project builds constructively from Lean 4 without additional axioms.
 | 2026-05-14 | Operations/{FunctionComp,Identity,Product}, Axioms/{FunctionComp,Identity,Product,Image} — function composition, identity function, cartesian product, image of a set | Claude (AI assistant) |
 | 2026-05-14 | Operations/{OrderedPair,Relation,Function,Inverse,Restriction,Composition,Replacement,SymDiff,Cardinal}, Axioms/{Singleton,Subset,OrderedPair,Foundation,Decidable,Relation,Function,Bijection,Inverse,Composition,Restriction,Replacement,Succ,SymDiff,Lattice,BooleanAlgebra,BooleanRing,VonNeumann,Choice,Cardinal}, PList/Fin0, HFList, VN/{Basic,Injective,IsNat,Arithmetic} — mass projection (REVISA_Y_PROYECTA) | Claude (AI assistant) |
 | 2026-05-15 | VN/{FSet,PeanoAxioms,PeanoArith} — Fases 4+5: FSet embedding, Peano axioms bridge, arithmetic transport | Claude (AI assistant) |
+| 2026-05-16 | Axioms/Adjunction, Axioms/Induction (Phase 7a/7b: adjunction axiom, ε-induction), Operations/CartProd, Axioms/CartProd (Phase 7c: computable Cartesian product ×ₕ) | Claude (AI assistant) |
 
 > To project a file: read it fully, then update sections 1–8 above following AI-GUIDE.md §4–14.

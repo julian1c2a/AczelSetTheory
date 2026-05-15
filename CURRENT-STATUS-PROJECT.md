@@ -1,6 +1,6 @@
 # Current Project Status — AczelSetTheory
 
-**Last updated:** 2026-05-15 00:00
+**Last updated:** 2026-05-16 00:00
 **Author**: Julián Calderón Almendros
 
 ---
@@ -9,8 +9,8 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | 69 |
-| Modules with 0 sorry | 69 / 69 |
+| Total modules | 73 |
+| Modules with 0 sorry | 73 / 73 |
 | Total sorry | 0 |
 | Build status | ✅ Passing — 0 errors, 0 warnings |
 | Lean version | v4.29.0 |
@@ -91,6 +91,10 @@
 | AczelSetTheory/VN/FSet.lean | 0 | ✅ Complete |
 | AczelSetTheory/VN/PeanoAxioms.lean | 0 | ✅ Complete |
 | AczelSetTheory/VN/PeanoArith.lean | 0 | ✅ Complete |
+| AczelSetTheory/Axioms/Adjunction.lean | 0 | ✅ Complete |
+| AczelSetTheory/Axioms/Induction.lean | 0 | ✅ Complete |
+| AczelSetTheory/Operations/CartProd.lean | 0 | ✅ Complete |
+| AczelSetTheory/Axioms/CartProd.lean | 0 | ✅ Complete |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
@@ -121,13 +125,14 @@ None — 0 sorry across the entire project.
 - ✅ HFList (ordered sequences of HFSets) + PList/Fin0.
 - ✅ **Fase 4**: `VN/FSet.lean` — embedding `fsetToHFSet : ℕ₀FSet → HFSet` (injective, with membership iff via vN).
 - ✅ **Fase 5**: `VN/PeanoAxioms.lean` — PA1/PA2/PA3 as pure HFSet theorems + vN bridge; `VN/PeanoArith.lean` — `addVN` (set-theoretic iteration of succ), transport of all arithmetic laws.
+- ✅ **Phase 7a/7b**: `Axioms/Adjunction.lean` — `mem_insert`, `mem_insert_self`, `insert_ne_empty`; `Axioms/Induction.lean` — `eps_induction`, `strong_eps_induction` (structural ε-induction on HFSets).
+- ✅ **Phase 7c**: `Operations/CartProd.lean` — computable Cartesian product `×ₕ` via CList flatMap/map, lifted to HFSet quotient; `Axioms/CartProd.lean` — `mem_cartProd`, `cartProd_empty_left/right`, `cartProd_isRelation`.
 
 ---
 
 ## Pending Work
 
-- [ ] Phase 7: Adjunction, ε-induction
-- [ ] REFERENCE.md projection: ~34 modules added since last projection (VN/, Bijection, BooleanRing, Cardinal, Composition, Decidable, Foundation, Inverse, Lattice, Restriction, Singleton, Subset, Succ, SymDiff, HFList, PList/Fin0, VonNeumann, …)
+- [ ] REFERENCE.md projection: fully up-to-date (projected 2026-05-16, 73 modules).
 
 ---
 
@@ -159,13 +164,14 @@ AczelSetTheory/
 | Phase 6: Relations and functions | Ordered pair, relation, function, injection, surjection, bijection, composition, identity | ✅ Complete |
 | Phase 6b: Cartesian product & image | `prodHF`, `imageRel` with full theorem coverage | ✅ Complete |
 | Phase 6c: Von Neumann embedding | `vN : ℕ₀ → HFSet`, injectivity, IsNat, arithmetic | ✅ Complete |
-| Phase 7: Adjunction, ε-induction | Adjunction axiom, strong ε-induction | ❌ Pending |
+| Phase 7: Adjunction, ε-induction | Adjunction axiom, strong ε-induction | ✅ Complete |
+| Phase 7c: Cartesian product | Computable `×ₕ` via CList flatMap/map, lifted to HFSet | ✅ Complete |
 
 > See [NEXT_STEPS.md](NEXT_STEPS.md) for detailed planning.
 
 ---
 
 **Author**: Julián Calderón Almendros
-*Last updated: 2026-05-14 00:00*
+*Last updated: 2026-05-16 00:00*
 
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
