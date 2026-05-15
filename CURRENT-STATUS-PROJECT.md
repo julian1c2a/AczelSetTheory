@@ -104,6 +104,7 @@ None — 0 sorry across the entire project.
 
 ## Recent Achievements
 
+- ✅ **Fase 2** (CList refactoring): `mk : PList CList → CList`, `cSize : CList → ℕ₀`, sin dependencias de `Init.Data.List` (2026-05-15).
 - ✅ Phase 1 (Peano integration): PList + omega₀ tactic (2026-05-11).
 - ✅ All 8 Zermelo axioms derived as theorems (not postulated).
 - ✅ Powerset axiom proof completed (Phase 5).
@@ -125,7 +126,6 @@ None — 0 sorry across the entire project.
 
 ## Pending Work
 
-- [ ] Phase 2: CList refactor — `mk : PList CList → CList`, `cSize : CList → ℕ₀`
 - [ ] Phase 7: Adjunction, ε-induction
 - [ ] REFERENCE.md projection: ~34 modules added since last projection (VN/, Bijection, BooleanRing, Cardinal, Composition, Decidable, Foundation, Inverse, Lattice, Restriction, Singleton, Subset, Succ, SymDiff, HFList, PList/Fin0, VonNeumann, …)
 

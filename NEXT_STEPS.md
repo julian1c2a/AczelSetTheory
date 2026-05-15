@@ -17,6 +17,14 @@ See PLANNING.md for the full long-term roadmap.
 
 ---
 
+## ✅ COMPLETED (2026-05-15) — Fase 2: Refactorización de CList
+
+- **CList/Basic.lean**: `mk : PList CList → CList` (antes `List`), `cSize : CList → ℕ₀` (antes `Nat`)
+- Todos los submódulos (ExtEq, Order, SetEquiv, Sort, Normalize, Filter): sin `Init.Data.List.Basic`, sin uso de `List.*`
+- `Nat` residual en `termination_by`/`decreasing_by` es inevitable: `sizeOf` de Lean 4 siempre retorna `Nat`
+
+---
+
 ## ✅ COMPLETED (2026-05-14) — Function composition, identity, product, image
 
 - **Operations/FunctionComp.lean**: `funComp`, notation `∘f` (infixl:90)
@@ -108,53 +116,6 @@ import AczelSetTheory.PList
 - **VN.lean**: barrel (7 modules)
 
 Además: HFList.lean, PList/Fin0.lean, Axioms/VonNeumann.lean, Axioms/Succ.lean, Axioms/Singleton.lean, Axioms/Subset.lean, Axioms/Foundation.lean, Axioms/Relation.lean, Axioms/Function.lean, Axioms/Inverse.lean, Axioms/Composition.lean, Axioms/Bijection.lean, Axioms/Restriction.lean, Axioms/Decidable.lean, Axioms/BooleanAlgebra.lean, Axioms/BooleanRing.lean, Axioms/Cardinal.lean, Axioms/Lattice.lean, Axioms/SymDiff.lean, Axioms/OrderedPair.lean.
-
-## NEXT — Fase 2: Refactorización de CList
-
-> **Prerrequisito:** Fase 1 completa y compilando.
-> No empezar hasta que `omega₀` esté verificado en al menos un ejemplo.
-
-### 2.0 Cambio central en CList/Basic.lean
-
-```text
-mk : List CList → CList    →    mk : PList CList → CList
-cSize : CList → Nat        →    cSize : CList → ℕ₀
-```
-
-Orden de ataque:
-
-1. `CList/Basic.lean` — cambio de tipo + funciones + pruebas de terminación
-2. `CList/ExtEq.lean` — adaptar lemas de membresía
-3. `CList/Order.lean` — adaptar orden (usa `cSize`)
-4. `CList/SetEquiv.lean` — adaptar Nodup/SetEquiv
-5. `CList/Sort.lean` — adaptar insertionSort
-6. `CList/Normalize.lean` — adaptar normalize
-7. `CList/Filter.lean` — adaptar filter
-
-**Regla:** completar cada sub-módulo con 0 sorry antes de pasar al siguiente.
-
----
-
-## NEXT — Fase 3: vN embedding
-
-> **Prerrequisito:** Fase 1 (Peano dep) + HFSets.lean estable.
-> Puede hacerse en paralelo con Fase 2 si se trabaja sobre los archivos
-> de HFSet sin tocar CList.
-
-### Archivos a crear
-
-| Archivo | Contenido |
-| --- | --- |
-| `AczelSetTheory/VN/Basic.lean` | `vN : ℕ₀ → HFSet`, `vN_zero`, `vN_succ`, `mem_vN_succ` |
-| `AczelSetTheory/VN/Injective.lean` | `vN_injective` |
-| `AczelSetTheory/VN/IsNat.lean` | `VN.IsVNNat`, `mem_range_iff` |
-| `AczelSetTheory/VN/Arithmetic.lean` | `vN_add`, `vN_le_iff`, `mem_vN_iff_lt` |
-| `AczelSetTheory/VN/FSet.lean` | `fsetToHFSet`, `mem_fsetToHFSet` |
-| `AczelSetTheory/VN/PeanoAxioms.lean` | Axiomas de Peano como teoremas sobre vN |
-| `AczelSetTheory/VN/PeanoArith.lean` | Transporte add_comm, mul_assoc, etc. |
-| `AczelSetTheory/VN.lean` | Barrel |
-
----
 
 ## Fases 7–11 (HFSet puro, diferidas)
 
