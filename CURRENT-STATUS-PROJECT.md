@@ -1,6 +1,6 @@
 # Current Project Status — AczelSetTheory
 
-**Last updated:** 2026-05-14 00:00
+**Last updated:** 2026-05-15 00:00
 **Author**: Julián Calderón Almendros
 
 ---
@@ -9,8 +9,8 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | 66 |
-| Modules with 0 sorry | 66 / 66 |
+| Total modules | 69 |
+| Modules with 0 sorry | 69 / 69 |
 | Total sorry | 0 |
 | Build status | ✅ Passing — 0 errors, 0 warnings |
 | Lean version | v4.29.0 |
@@ -88,6 +88,9 @@
 | AczelSetTheory/VN/Injective.lean | 0 | ✅ Complete |
 | AczelSetTheory/VN/IsNat.lean | 0 | ✅ Complete |
 | AczelSetTheory/VN/Arithmetic.lean | 0 | ✅ Complete |
+| AczelSetTheory/VN/FSet.lean | 0 | ✅ Complete |
+| AczelSetTheory/VN/PeanoAxioms.lean | 0 | ✅ Complete |
+| AczelSetTheory/VN/PeanoArith.lean | 0 | ✅ Complete |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
@@ -115,6 +118,8 @@ None — 0 sorry across the entire project.
 - ✅ Image of a set under a relation `imageRel` (2026-05-14).
 - ✅ Von Neumann embedding `vN : ℕ₀ → HFSet` with injectivity, IsNat, arithmetic (VN/).
 - ✅ HFList (ordered sequences of HFSets) + PList/Fin0.
+- ✅ **Fase 4**: `VN/FSet.lean` — embedding `fsetToHFSet : ℕ₀FSet → HFSet` (injective, with membership iff via vN).
+- ✅ **Fase 5**: `VN/PeanoAxioms.lean` — PA1/PA2/PA3 as pure HFSet theorems + vN bridge; `VN/PeanoArith.lean` — `addVN` (set-theoretic iteration of succ), transport of all arithmetic laws.
 
 ---
 

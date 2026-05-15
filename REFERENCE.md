@@ -1,6 +1,6 @@
 # Technical Reference — AczelSetTheory
 
-**Last updated:** 2026-05-14 00:00
+**Last updated:** 2026-05-15 00:00
 **Author**: Julián Calderón Almendros
 **Lean version**: v4.29.0
 
@@ -100,10 +100,13 @@ Below are the keys for reading and searching theorems.
 | 62 | `AczelSetTheory/PList/Fin0.lean` | `Fin₀`, `PList` | ✅ Complete | PList/Omega0, Peano.PeanoNat.{StrictOrder,Order,Axioms} | HFList |
 | 63 | `AczelSetTheory/HFList.lean` | `HFList`, `FinList` | ✅ Complete | HFSets, PList/Fin0 | — |
 | 64 | `AczelSetTheory/VN/Basic.lean` | `VN` | ✅ Complete | Axioms | VN/Injective, VN/IsNat, VN/Arithmetic |
-| 65 | `AczelSetTheory/VN/Injective.lean` | `VN` | ✅ Complete | VN/Basic | VN/Arithmetic |
-| 66 | `AczelSetTheory/VN/IsNat.lean` | `VN` | ✅ Complete | VN/Basic | — |
-| 67 | `AczelSetTheory/VN/Arithmetic.lean` | `VN` | ✅ Complete | VN/Injective, PList/Omega0 | — |
-| — | `AczelSetTheory/VN.lean` | — | ✅ Complete | VN/{Basic,Injective,IsNat,Arithmetic} | AczelSetTheory.lean |
+| 65 | `AczelSetTheory/VN/Injective.lean` | `VN` | ✅ Complete | VN/Basic | VN/Arithmetic, VN/FSet |
+| 66 | `AczelSetTheory/VN/IsNat.lean` | `VN` | ✅ Complete | VN/Basic | VN/FSet, VN/PeanoAxioms |
+| 67 | `AczelSetTheory/VN/Arithmetic.lean` | `VN` | ✅ Complete | VN/Injective, PList/Omega0 | VN/PeanoArith |
+| 68 | `AczelSetTheory/VN/FSet.lean` | `VN` | ✅ Complete | VN/Injective, VN/IsNat, `Peano.PeanoNat.ListsAndSets.FSet` | — |
+| 69 | `AczelSetTheory/VN/PeanoAxioms.lean` | `VN` | ✅ Complete | VN/Injective, VN/IsNat | VN/PeanoArith |
+| 70 | `AczelSetTheory/VN/PeanoArith.lean` | `VN` | ✅ Complete | VN/Arithmetic, VN/PeanoAxioms | — |
+| — | `AczelSetTheory/VN.lean` | — | ✅ Complete | VN/{Basic,Injective,IsNat,Arithmetic,FSet,PeanoAxioms,PeanoArith} | AczelSetTheory.lean |
 | — | `AczelSetTheory/PList.lean` | — | ✅ Complete | PList/{Basic,Lemmas,Omega0} | AczelSetTheory.lean |
 | — | `AczelSetTheory.lean` | — | ✅ Complete | PList, CList, HFSets, Operations/*, Axioms/*, Notation | Main |
 | — | `Main.lean` | — | ✅ Complete | CList.Basic | — |
@@ -257,7 +260,7 @@ None. This project builds constructively from Lean 4 without additional axioms.
 
 > Theorems moved to [doc/REFERENCE-HFList.md](doc/REFERENCE-HFList.md#6-theorems).
 
-### 6.45–6.48 VN modules
+### 6.45–6.51 VN modules
 
 > Theorems moved to [doc/REFERENCE-VN.md](doc/REFERENCE-VN.md#6-theorems).
 
@@ -295,7 +298,7 @@ None. This project builds constructively from Lean 4 without additional axioms.
 
 > Exports moved to [doc/REFERENCE-HFList.md](doc/REFERENCE-HFList.md#7-exports-per-module).
 
-### VN modules (VN/Basic, Injective, IsNat, Arithmetic)
+### VN modules (VN/Basic, Injective, IsNat, Arithmetic, FSet, PeanoAxioms, PeanoArith)
 
 > Exports moved to [doc/REFERENCE-VN.md](doc/REFERENCE-VN.md#7-exports-per-module).
 
@@ -333,5 +336,6 @@ None. This project builds constructively from Lean 4 without additional axioms.
 | 2026-05-11 | PList/{Basic,Lemmas,Omega0} — Phase 1 Peano integration | Claude (AI assistant) |
 | 2026-05-14 | Operations/{FunctionComp,Identity,Product}, Axioms/{FunctionComp,Identity,Product,Image} — function composition, identity function, cartesian product, image of a set | Claude (AI assistant) |
 | 2026-05-14 | Operations/{OrderedPair,Relation,Function,Inverse,Restriction,Composition,Replacement,SymDiff,Cardinal}, Axioms/{Singleton,Subset,OrderedPair,Foundation,Decidable,Relation,Function,Bijection,Inverse,Composition,Restriction,Replacement,Succ,SymDiff,Lattice,BooleanAlgebra,BooleanRing,VonNeumann,Choice,Cardinal}, PList/Fin0, HFList, VN/{Basic,Injective,IsNat,Arithmetic} — mass projection (REVISA_Y_PROYECTA) | Claude (AI assistant) |
+| 2026-05-15 | VN/{FSet,PeanoAxioms,PeanoArith} — Fases 4+5: FSet embedding, Peano axioms bridge, arithmetic transport | Claude (AI assistant) |
 
 > To project a file: read it fully, then update sections 1–8 above following AI-GUIDE.md §4–14.

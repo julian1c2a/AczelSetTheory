@@ -1,10 +1,19 @@
 # Next Steps
 
-**Last updated:** 2026-05-14
+**Last updated:** 2026-05-15
 
-The project compiles on Lean 4.29.0 with **0 sorry, 66 modules**.
+The project compiles on Lean 4.29.0 with **0 sorry, 69 modules**.
 Full Zermelo axioms derived. Architecture: CList/ + Operations/ + Axioms/ + PList/ + VN/.
 See PLANNING.md for the full long-term roadmap.
+
+---
+
+## ✅ COMPLETED (2026-05-15) — Fase 4 + Fase 5: FSet embedding + Peano Axioms/Arith
+
+- **VN/FSet.lean**: `fsetToHFSet : ℕ₀FSet → HFSet`, `mem_fsetToHFSet`, `vN_mem_fsetToHFSet_iff`, `fsetToHFSet_injective`
+- **VN/PeanoAxioms.lean**: PA1/PA2/PA3 as pure HFSet theorems + vN bridge (`vN_zero_ne_succ`, `vN_succ_injective_vN`, `vN_induction`)
+- **VN/PeanoArith.lean**: `addVN` (set-theoretic iteration of succ), `vN_add` transport theorem, all arithmetic laws via `congrArg vN`
+- **VN.lean**: barrel updated (7 modules total)
 
 ---
 
@@ -87,13 +96,16 @@ import AczelSetTheory.PList
 
 ---
 
-## ✅ COMPLETED (earlier sessions) — Fase 3: vN embedding
+## ✅ COMPLETED — Fase 3 + Fase 4 + Fase 5: vN embedding + FSet + Peano
 
 - **VN/Basic.lean**: `vN : ℕ₀ → HFSet`, `vN_zero`, `vN_succ`
 - **VN/Injective.lean**: `vN_injective`
-- **VN/IsNat.lean**: `VN.IsVNNat` predicate, membership in range
-- **VN/Arithmetic.lean**: `vN_add`, `vN_le_iff`, arithmetic transport
-- **VN.lean**: barrel
+- **VN/IsNat.lean**: `isNat_iff_range`
+- **VN/Arithmetic.lean**: `mem_vN_iff_lt`, `vN_mono`, `vN_le_iff_subset`
+- **VN/FSet.lean**: `fsetToHFSet`, `mem_fsetToHFSet`, `fsetToHFSet_injective` ✅
+- **VN/PeanoAxioms.lean**: PA1/PA2/PA3 pure HFSet + vN bridge ✅
+- **VN/PeanoArith.lean**: `addVN`, `vN_add`, full arithmetic transport ✅
+- **VN.lean**: barrel (7 modules)
 
 Además: HFList.lean, PList/Fin0.lean, Axioms/VonNeumann.lean, Axioms/Succ.lean, Axioms/Singleton.lean, Axioms/Subset.lean, Axioms/Foundation.lean, Axioms/Relation.lean, Axioms/Function.lean, Axioms/Inverse.lean, Axioms/Composition.lean, Axioms/Bijection.lean, Axioms/Restriction.lean, Axioms/Decidable.lean, Axioms/BooleanAlgebra.lean, Axioms/BooleanRing.lean, Axioms/Cardinal.lean, Axioms/Lattice.lean, Axioms/SymDiff.lean, Axioms/OrderedPair.lean.
 
