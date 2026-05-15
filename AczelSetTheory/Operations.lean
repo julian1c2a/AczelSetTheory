@@ -26,3 +26,4 @@ import AczelSetTheory.Operations.Inverse
 import AczelSetTheory.Operations.FunctionComp
 import AczelSetTheory.Operations.Identity
 import AczelSetTheory.Operations.Product
+import AczelSetTheory.Operations.CartProd
