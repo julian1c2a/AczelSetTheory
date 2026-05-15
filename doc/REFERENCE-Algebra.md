@@ -289,6 +289,7 @@ noncomputable def HFSet.choose (A : HFSet) (_ : A ≠ empty) : HFSet
 | 1 | `card_empty` | `card empty = 𝟘` |
 | 2 | `card_insert` | `(x A : HFSet) (h : x ∉ A) : card (insert x A) = σ (card A)` |
 | 3 | `card_powerset` | `(A : HFSet) : card (powerset A) = pow 𝟚 (card A)` |
+
 ### 6.52 Axioms/Adjunction.lean — `namespace HFSet`
 
 | # | Theorem | Lean signature |
@@ -303,6 +304,7 @@ noncomputable def HFSet.choose (A : HFSet) (_ : A ≠ empty) : HFSet
 |---|---------|---------------|
 | 1 | `eps_induction` | `(P : HFSet → Prop) (h_empty : P empty) (h_adj : ∀ A b, P A → P (insert b A)) : ∀ A, P A` |
 | 2 | `strong_eps_induction` | `(P : HFSet → Prop) (h : ∀ A, (∀ x, x ∈ A → P x) → P A) : ∀ A, P A` |
+
 ---
 
 ## 7. Exports per Module
