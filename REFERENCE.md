@@ -371,5 +371,6 @@ None. This project builds constructively from Lean 4 without additional axioms.
 | 2026-05-14 | Operations/{OrderedPair,Relation,Function,Inverse,Restriction,Composition,Replacement,SymDiff,Cardinal}, Axioms/{Singleton,Subset,OrderedPair,Foundation,Decidable,Relation,Function,Bijection,Inverse,Composition,Restriction,Replacement,Succ,SymDiff,Lattice,BooleanAlgebra,BooleanRing,VonNeumann,Choice,Cardinal}, PList/Fin0, HFList, VN/{Basic,Injective,IsNat,Arithmetic} — mass projection (REVISA_Y_PROYECTA) | Claude (AI assistant) |
 | 2026-05-15 | VN/{FSet,PeanoAxioms,PeanoArith} — Fases 4+5: FSet embedding, Peano axioms bridge, arithmetic transport | Claude (AI assistant) |
 | 2026-05-16 | Axioms/Adjunction, Axioms/Induction (Phase 7a/7b: adjunction axiom, ε-induction), Operations/CartProd, Axioms/CartProd (Phase 7c: computable Cartesian product ×ₕ) | Claude (AI assistant) |
+| 2026-05-16 | Axioms/VonNeumann — re-proyección: `isTransitive`, `isNat`, 9 teoremas (`isTransitive_empty`, `isTransitive_succ`, `isNat_zero`, `isNat_succ`, `isNat_zero_or_succ`, `isNat_isTransitive`, `isNat_mem_isNat`, `isNat_pred`, `isNat_induction`) | Claude (AI assistant) |
 
 > To project a file: read it fully, then update sections 1–8 above following AI-GUIDE.md §4–14.

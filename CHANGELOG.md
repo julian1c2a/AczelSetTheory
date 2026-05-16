@@ -4,6 +4,21 @@ All notable changes to this project are documented here.
 
 ---
 
+## [2026-05-16] — Re-proyección Axioms/VonNeumann — documentación auditada, 0 sorry
+
+### Verified
+
+- **Axioms/VonNeumann.lean**: Re-proyección completa. Definiciones `isTransitive`, `isNat`
+  (inductivo con constructores `zero` y `succ`) y 9 teoremas verificados y documentados en
+  `doc/REFERENCE-Algebra.md §4.38` y `§6.40`:
+  `isTransitive_empty`, `isTransitive_succ`, `isNat_zero`, `isNat_succ`,
+  `isNat_zero_or_succ`, `isNat_isTransitive`, `isNat_mem_isNat`, `isNat_pred`,
+  `isNat_induction`.
+
+**Project status: 0 sorry, 0 errors, 0 warnings. 73 modules.**
+
+---
+
 ## [2026-05-14] — Function composition, identity, product & image — 32 projected modules, 0 sorry
 
 ### Added — Operations layer

@@ -123,4 +123,28 @@ theorem card_powerset (A : HFSet) : card (powerset A) = pow 𝟚 (card A) := by
   simp only [l, PList.length_map]
   exact CList.length_sublists xs₀
 
+-- ==================================================================
+-- Cardinalidad cero: card A = 0 ↔ A = ∅
+-- ==================================================================
+
+theorem card_eq_zero_iff {A : HFSet} : card A = 𝟘 ↔ A = empty := by
+  constructor
+  · intro h
+    rcases Quotient.exists_rep A with ⟨a, rfl⟩
+    apply Quotient.sound
+    show CList.extEq a CList.empty = true
+    -- Reducir a normalize a = normalize empty
+    rw [CList.extEq_iff_normalize_eq, CList.normalize_empty]
+    -- Goal: CList.normalize a = CList.empty
+    cases h_norm : CList.normalize a with | mk xs =>
+    have h_len : PList.length xs = 𝟘 := by
+      have : cardCList a = PList.length xs := by simp only [cardCList, h_norm]
+      exact this ▸ h
+    have xs_nil : xs = PList.nil := (PList.length_eq_zero_iff_nil xs).mp h_len
+    subst xs_nil
+    -- CList.normalize a = CList.mk PList.nil = CList.empty definitionally
+    rfl
+  · intro h
+    rw [h, card_empty]
+
 end HFSet
