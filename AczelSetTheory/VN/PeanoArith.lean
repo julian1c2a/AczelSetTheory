@@ -123,4 +123,25 @@ theorem vN_add_mul (m n k : ℕ₀) :
     vN (mul (add m n) k) = vN (add (mul m k) (mul n k)) :=
   congrArg vN (add_mul m n k)
 
+-- ─────────────────────────────────────────────────────────────────
+-- Multiplicación set-teorética: n copias de vN m acumuladas
+-- ─────────────────────────────────────────────────────────────────
+
+/-- Multiplicación set-teorética: `mulVN m n` = `n` copias de `addVN` desde vacío. -/
+def mulVN (m : ℕ₀) : ℕ₀ → HFSet
+  | .zero   => HFSet.empty
+  | .succ n => addVN (mulVN m n) m
+
+@[simp]
+theorem mulVN_zero (m : ℕ₀) : mulVN m 𝟘 = HFSet.empty := rfl
+
+@[simp]
+theorem mulVN_succ (m n : ℕ₀) : mulVN m (σ n) = addVN (mulVN m n) m := rfl
+
+/-- Transporte: la multiplicación de Peano corresponde a `n` iteraciones de `addVN`. -/
+theorem vN_mul (m n : ℕ₀) : vN (mul m n) = mulVN m n := by
+  induction n with
+  | zero    => simp [mul_zero, vN_zero]
+  | succ k ih => rw [mul_succ, vN_add, mulVN_succ, ih]
+
 end VN

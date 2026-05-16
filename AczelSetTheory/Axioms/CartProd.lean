@@ -9,6 +9,7 @@ License: MIT
 
 import AczelSetTheory.Operations.CartProd
 import AczelSetTheory.Axioms.OrderedPair
+import AczelSetTheory.Axioms.Adjunction
 
 namespace HFSet
 
@@ -83,5 +84,27 @@ theorem cartProd_isRelation (A B : HFSet) :
   rw [mem_cartProd] at hz
   obtain ⟨a, b, _, _, hz_eq⟩ := hz
   exact ⟨a, b, hz_eq⟩
+
+-- ─────────────────────────────────────────────────────────────────
+-- Descomposición de cartProd con insert
+-- ─────────────────────────────────────────────────────────────────
+
+/-- Si b ∉ A, entonces (insert b A) ×ₕ B y A ×ₕ B son disjuntos
+    con respecto a la primera componente. Más útil es:
+    z ∈ (insert a A) ×ₕ B ↔ (∃ y, y ∈ B ∧ z = ⟪a, y⟫) ∨ z ∈ A ×ₕ B -/
+theorem mem_cartProd_insert (z a A B : HFSet) :
+    z ∈ (insert a A) ×ₕ B ↔ (∃ y, y ∈ B ∧ z = ⟪a, y⟫) ∨ z ∈ A ×ₕ B := by
+  rw [mem_cartProd]
+  constructor
+  · rintro ⟨x, y, hx, hy, hz⟩
+    rw [mem_insert] at hx
+    rcases hx with rfl | hxA
+    · exact Or.inl ⟨y, hy, hz⟩
+    · exact Or.inr ((mem_cartProd z A B).mpr ⟨x, y, hxA, hy, hz⟩)
+  · rintro (⟨y, hy, hz⟩ | h)
+    · exact ⟨a, y, (mem_insert a a A).mpr (Or.inl rfl), hy, hz⟩
+    · rw [mem_cartProd] at h
+      obtain ⟨x, y, hxA, hy, hz⟩ := h
+      exact ⟨x, y, (mem_insert x a A).mpr (Or.inr hxA), hy, hz⟩
 
 end HFSet

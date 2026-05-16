@@ -4,6 +4,23 @@ All notable changes to this project are documented here.
 
 ---
 
+## [2026-05-16] — Axioms/Fintype: tipos finitos scratch-built (F1+F2), 0 sorry
+
+### Added
+
+- **Axioms/Fintype.lean** (nuevo módulo #78): `Finset α` (estructura `val : List α` + `nodup`),
+  `Fintype α` (clase con `elems + complete`), `HFSet.toList` (lista canónica de elementos vía
+  representante normalizado), `HFSet.toFinset`, `HFSet.membership_fintype` (instancia
+  `Fintype {x // x ∈ A}`). Implementación sin Mathlib usando `Quotient.exists_rep` y
+  `List.filterMap`. Teoremas: `mem_toList`, `nodup_toList`, `mem_toFinset`.
+- **Axioms.lean** barrel: añadido `import AczelSetTheory.Axioms.Fintype`.
+- **Documentación**: proyectado en `doc/REFERENCE-HFSets.md` §4.16, §6.16, §7;
+  `REFERENCE.md` módulo #78, §4.8–4.16, §4.47, §6.8–6.16, log de proyección.
+
+**Project status: 0 sorry, 0 errors. 78 modules.**
+
+---
+
 ## [2026-05-16] — Re-proyección Axioms/VonNeumann — documentación auditada, 0 sorry
 
 ### Verified

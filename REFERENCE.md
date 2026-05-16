@@ -113,6 +113,7 @@ Below are the keys for reading and searching theorems.
 | 75 | `AczelSetTheory/Axioms/Ordinal.lean` | `HFSet` | ✅ Complete | Axioms/VonNeumann, Axioms/Induction | Axioms/OrdinalNat |
 | 76 | `AczelSetTheory/VN/CardVN.lean` | `VN` | ✅ Complete | VN/IsNat, Axioms/Cardinal | — |
 | 77 | `AczelSetTheory/Axioms/OrdinalNat.lean` | `HFSet` | ✅ Complete | Axioms/Ordinal, Axioms/Cardinal, Axioms/Separation, Axioms/Decidable, Axioms/Setminus, PList/Omega0 | — |
+| 78 | `AczelSetTheory/Axioms/Fintype.lean` | top-level + `HFSet` | ✅ Complete | Axioms/OrdinalNat, PList/Lemmas | — |
 | — | `AczelSetTheory/VN.lean` | — | ✅ Complete | VN/{Basic,Injective,IsNat,Arithmetic,FSet,PeanoAxioms,PeanoArith} | AczelSetTheory.lean |
 | — | `AczelSetTheory/PList.lean` | — | ✅ Complete | PList/{Basic,Lemmas,Omega0} | AczelSetTheory.lean |
 | — | `AczelSetTheory.lean` | — | ✅ Complete | PList, CList, HFSets, Operations/*, Axioms/*, Notation | Main |
@@ -173,7 +174,7 @@ CList.lean (root) ── imports all 7 sub-modules
 
 ---
 
-### 4.8–4.15 HFSets and core operations
+### 4.8–4.16 HFSets and core operations
 
 > Definitions moved to [doc/REFERENCE-HFSets.md](doc/REFERENCE-HFSets.md#4-definitions).
 
@@ -239,6 +240,12 @@ CList.lean (root) ── imports all 7 sub-modules
 
 ---
 
+### 4.47 Axioms/Fintype.lean (Phase F1+F2)
+
+> Definitions moved to [doc/REFERENCE-HFSets.md](doc/REFERENCE-HFSets.md#4-definitions).
+
+---
+
 None. This project builds constructively from Lean 4 without additional axioms.
 
 ---
@@ -251,7 +258,7 @@ None. This project builds constructively from Lean 4 without additional axioms.
 
 > Theorems moved to [doc/REFERENCE-CList.md](doc/REFERENCE-CList.md#6-theorems).
 
-### 6.8–6.15 HFSets and core operations
+### 6.8–6.16 HFSets and core operations
 
 > Theorems moved to [doc/REFERENCE-HFSets.md](doc/REFERENCE-HFSets.md#6-theorems).
 
@@ -317,7 +324,7 @@ None. This project builds constructively from Lean 4 without additional axioms.
 
 > Exports moved to [doc/REFERENCE-CList.md](doc/REFERENCE-CList.md#7-exports-per-module).
 
-### HFSets operations (Operations/Union–Powerset, Axioms/Union–Powerset, Notation.lean)
+### HFSets operations (Operations/Union–Powerset, Axioms/Union–Powerset, Notation.lean, Axioms/Fintype.lean)
 
 > Exports moved to [doc/REFERENCE-HFSets.md](doc/REFERENCE-HFSets.md#7-exports-per-module).
 
@@ -397,5 +404,6 @@ None. This project builds constructively from Lean 4 without additional axioms.
 | 2026-05-16 | Axioms/VonNeumann — re-proyección: `isTransitive`, `isNat`, 9 teoremas (`isTransitive_empty`, `isTransitive_succ`, `isNat_zero`, `isNat_succ`, `isNat_zero_or_succ`, `isNat_isTransitive`, `isNat_mem_isNat`, `isNat_pred`, `isNat_induction`) | Claude (AI assistant) |
 | 2026-05-16 | Axioms/Ordinal (nuevos: `isOrdinal`, 4 teoremas), VN/CardVN (nuevo: `card_vN`), Axioms/Cardinal (`card_eq_zero_iff`) | Claude (AI assistant) |
 | 2026-05-16 | Axioms/Cardinal (`card_succ`), Axioms/OrdinalNat (nuevo módulo: `instDecidableEqHFSet`, `card_le_of_subset`, `isOrdinal_isNat`, `isOrdinal_iff_isNat`) — Phase 7e | Claude (AI assistant) |
+| 2026-05-16 | Axioms/Fintype (nuevo módulo #78): `Finset`, `Fintype`, `HFSet.toList`, `HFSet.toFinset`, `HFSet.membership_fintype`, teoremas `mem_toList`, `nodup_toList`, `mem_toFinset` — Phase F1+F2 | Claude (AI assistant) |
 
 > To project a file: read it fully, then update sections 1–8 above following AI-GUIDE.md §4–14.

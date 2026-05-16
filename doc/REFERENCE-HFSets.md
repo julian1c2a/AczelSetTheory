@@ -1,6 +1,6 @@
 # Technical Reference — HFSets (Hereditarily Finite Sets — Core Layer)
 
-**Last updated:** 2026-05-14
+**Last updated:** 2026-05-16
 **Parent:** [../REFERENCE.md](../REFERENCE.md)
 **Related:** [REFERENCE-CList.md](REFERENCE-CList.md) | [REFERENCE-Relations.md](REFERENCE-Relations.md) | [REFERENCE-Algebra.md](REFERENCE-Algebra.md)
 
@@ -41,6 +41,7 @@ intersection, set difference, powerset) all as **proven theorems** — not postu
 | 20 | `AczelSetTheory/Axioms/Pair.lean` | ✅ Complete |
 | 21 | `AczelSetTheory/Axioms/Powerset.lean` | ✅ Complete |
 | 22 | `AczelSetTheory/Notation.lean` | ✅ Complete |
+| 78 | `AczelSetTheory/Axioms/Fintype.lean` | ✅ Complete |
 
 ---
 
@@ -338,6 +339,72 @@ Duplicate definitions in Notation.lean for the comprehension syntax macro. Same 
 
 ---
 
+### 4.16 Axioms/Fintype.lean — top-level + `namespace HFSet`
+
+#### 4.16.1 `Finset`
+
+```lean
+structure Finset (α : Type) where
+  val   : List α
+  nodup : val.Nodup
+```
+
+- **Math**: Finₛ(α) ≔ { (l, h) | l : List α, Nodup(l) }. Subconjunto finito de α representado como lista sin duplicados.
+- Computable.
+
+#### 4.16.2 `Membership α (Finset α)` instance
+
+```lean
+instance {α} : Membership α (Finset α) where
+  mem s x := x ∈ s.val
+```
+
+- Habilita notación `x ∈ s` para `Finset`. Contenedor primero (s), elemento segundo (x).
+
+#### 4.16.3 `Fintype`
+
+```lean
+class Fintype (α : Type) where
+  elems    : List α
+  complete : ∀ x : α, x ∈ elems
+```
+
+- **Math**: α es finito si ∃ l : List α, ∀ x : α, x ∈ l.
+- Clase computable de tipos finitos (análogo local sin Mathlib).
+
+#### 4.16.4 `HFSet.toList`
+
+```lean
+def toList (A : HFSet) : List HFSet :=
+  reprToList A.repr
+```
+
+- **Math**: toList(A) ≔ lista de los elementos de A como HFSets (vía representante normalizado).
+- Computable. Depende del auxiliar privado `reprToList` y de `HFSet.repr`.
+
+#### 4.16.5 `HFSet.toFinset`
+
+```lean
+def toFinset (A : HFSet) : Finset HFSet :=
+  ⟨A.toList, A.nodup_toList⟩
+```
+
+- **Math**: Finₛ(A) ≔ (toList(A), nodup_toList(A)).
+- Computable.
+
+#### 4.16.6 `HFSet.membership_fintype` instance
+
+```lean
+instance membership_fintype (A : HFSet) : Fintype {x // x ∈ A} where
+  elems    := A.toList.filterMap (fun y => if hy : y ∈ A then some ⟨y, hy⟩ else none)
+  complete := fun ⟨x, hx⟩ => by rw [List.mem_filterMap]; exact ⟨x, (mem_toList x A).mpr hx, by rw [dif_pos hx]⟩
+```
+
+- **Math**: El subtipo {x : HFSet | x ∈ A} es finito para todo A.
+- Computable vía `List.filterMap`.
+
+---
+
 ## 6. Theorems
 
 ### 6.8 HFSets.lean — `namespace HFSet`
@@ -433,6 +500,14 @@ All **Zermelo axioms** are proven as theorems (not postulated):
 | 4 | `insertCList_extEq` | `(x₁ A₁ x₂ A₂ : CList) (hx : CList.extEq x₁ x₂ = true) (hA : CList.extEq A₁ A₂ = true) : CList.extEq (insertCList x₁ A₁) (insertCList x₂ A₂) = true` |
 | 5 | `filterCList_extEq_extEq` | `(P : HFSet → Prop) [DecidablePred P] (A₁ A₂ : CList) (hA : CList.extEq A₁ A₂ = true) : CList.extEq (filterCList P A₁) (filterCList P A₂) = true` |
 
+### 6.16 Axioms/Fintype.lean — top-level + `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `mem_toList` | `(x A : HFSet) : x ∈ A.toList ↔ x ∈ A` |
+| 2 | `nodup_toList` | `(A : HFSet) : A.toList.Nodup` |
+| 3 | `mem_toFinset` | `(x A : HFSet) : x ∈ A.toFinset ↔ x ∈ A` |
+
 ---
 
 ## 7. Exports per Module
@@ -492,3 +567,7 @@ All **Zermelo axioms** are proven as theorems (not postulated):
 ### Notation.lean
 
 `HFSet.singleton`, `HFSet.insertCList`, `HFSet.insert`, `HFSet.mem_insertCList_right`, `HFSet.subset_insertCList_right`, `HFSet.insertCList_subset`, `HFSet.insertCList_extEq`, `HFSet.filterCList` (redefined), `HFSet.filterCList_extEq_extEq` (redefined), `HFSet.sep` (redefined), `HFSet.zero` … `HFSet.nine`, `OfNat HFSet 0` … `OfNat HFSet 9`
+
+### Axioms/Fintype.lean
+
+`Finset`, `Membership α (Finset α)` (instance), `Fintype`, `HFSet.toList`, `HFSet.mem_toList`, `HFSet.nodup_toList`, `HFSet.toFinset`, `HFSet.mem_toFinset`, `HFSet.membership_fintype` (instance)

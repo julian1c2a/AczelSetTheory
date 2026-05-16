@@ -1,5 +1,6 @@
 import AczelSetTheory.Operations.Setminus
 import AczelSetTheory.HFSets
+import AczelSetTheory.Axioms.Subset
 
 namespace HFSet
 
@@ -49,5 +50,8 @@ theorem mem_setminus
       · specialize hnot hc; contradiction
   rw [h_not] at h_iff
   exact h_iff
+
+theorem setminus_subset (A B : HFSet) : setminus A B ⊆ A :=
+  fun x hx => ((mem_setminus A B x).mp hx).1
 
 end HFSet

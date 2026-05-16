@@ -27,3 +27,4 @@ import AczelSetTheory.Operations.FunctionComp
 import AczelSetTheory.Operations.Identity
 import AczelSetTheory.Operations.Product
 import AczelSetTheory.Operations.CartProd
+import AczelSetTheory.Operations.NPow
