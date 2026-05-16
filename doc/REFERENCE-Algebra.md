@@ -36,6 +36,7 @@ foundation, decidability).
 | 61 | `AczelSetTheory/Axioms/Cardinal.lean` | ✅ Complete |
 | 71 | `AczelSetTheory/Axioms/Adjunction.lean` | ✅ Complete |
 | 72 | `AczelSetTheory/Axioms/Induction.lean` | ✅ Complete |
+| 75 | `AczelSetTheory/Axioms/Ordinal.lean` | ✅ Complete |
 
 ---
 
@@ -141,6 +142,21 @@ noncomputable def HFSet.choose (A : HFSet) (_ : A ≠ empty) : HFSet
 ### 4.43 Axioms/Adjunction.lean + Axioms/Induction.lean — `namespace HFSet`
 
 > No new computable definitions. Both files export theorems only (see §6.52, §6.53).
+
+---
+
+### 4.45 Axioms/Ordinal.lean — `namespace HFSet`
+
+#### 4.45.1 `HFSet.isOrdinal`
+
+```lean
+def HFSet.isOrdinal (A : HFSet) : Prop :=
+  isTransitive A ∧ ∀ x y, x ∈ A → y ∈ A → x ∈ y ∨ x = y ∨ y ∈ x
+```
+
+- **Math**: A is a (von Neumann) ordinal iff it is transitive and linearly ordered by ∈.
+- Depends on `HFSet.isTransitive` (from `Axioms/VonNeumann.lean`).
+- Non-computable (Prop-valued predicate).
 
 ---
 
@@ -289,6 +305,7 @@ noncomputable def HFSet.choose (A : HFSet) (_ : A ≠ empty) : HFSet
 | 1 | `card_empty` | `card empty = 𝟘` |
 | 2 | `card_insert` | `(x A : HFSet) (h : x ∉ A) : card (insert x A) = σ (card A)` |
 | 3 | `card_powerset` | `(A : HFSet) : card (powerset A) = pow 𝟚 (card A)` |
+| 4 | `card_eq_zero_iff` | `{A : HFSet} : card A = 𝟘 ↔ A = empty` |
 
 ### 6.52 Axioms/Adjunction.lean — `namespace HFSet`
 
@@ -304,6 +321,17 @@ noncomputable def HFSet.choose (A : HFSet) (_ : A ≠ empty) : HFSet
 |---|---------|---------------|
 | 1 | `eps_induction` | `(P : HFSet → Prop) (h_empty : P empty) (h_adj : ∀ A b, P A → P (insert b A)) : ∀ A, P A` |
 | 2 | `strong_eps_induction` | `(P : HFSet → Prop) (h : ∀ A, (∀ x, x ∈ A → P x) → P A) : ∀ A, P A` |
+
+### 6.56 Axioms/Ordinal.lean — `namespace HFSet`
+
+**Imports:** `AczelSetTheory.Axioms.VonNeumann`, `AczelSetTheory.Axioms.Induction`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `isOrdinal_empty` | `isOrdinal empty` |
+| 2 | `isOrdinal_succ` | `{A : HFSet} (hA : isOrdinal A) : isOrdinal (succ A)` |
+| 3 | `isNat_isOrdinal` | `{n : HFSet} (hn : isNat n) : isOrdinal n` |
+| 4 | `isOrdinal_mem` | `{A x : HFSet} (hA : isOrdinal A) (hx : x ∈ A) : isOrdinal x` |
 
 ---
 
@@ -363,7 +391,7 @@ noncomputable def HFSet.choose (A : HFSet) (_ : A ≠ empty) : HFSet
 
 ### Axioms/Cardinal.lean
 
-`HFSet.card_empty`, `HFSet.card_insert`, `HFSet.card_powerset`
+`HFSet.card_empty`, `HFSet.card_insert`, `HFSet.card_powerset`, `HFSet.card_eq_zero_iff`
 
 ### Axioms/Adjunction.lean
 
@@ -372,3 +400,7 @@ noncomputable def HFSet.choose (A : HFSet) (_ : A ≠ empty) : HFSet
 ### Axioms/Induction.lean
 
 `HFSet.eps_induction`, `HFSet.strong_eps_induction`
+
+### Axioms/Ordinal.lean
+
+`HFSet.isOrdinal`, `HFSet.isOrdinal_empty`, `HFSet.isOrdinal_succ`, `HFSet.isNat_isOrdinal`, `HFSet.isOrdinal_mem`

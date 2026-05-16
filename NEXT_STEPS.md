@@ -1,10 +1,18 @@
 # Next Steps
 
-**Last updated:** 2026-05-15
+**Last updated:** 2026-05-16
 
-The project compiles on Lean 4.29.0 with **0 sorry, 69 modules**.
+The project compiles on Lean 4.29.0 with **0 sorry, 73 modules**.
 Full Zermelo axioms derived. Architecture: CList/ + Operations/ + Axioms/ + PList/ + VN/.
 See PLANNING.md for the full long-term roadmap.
+
+---
+
+## ✅ COMPLETED (2026-05-16) — Ordinal predicate + Cardinal-VN bridge
+
+- **Axioms/Ordinal.lean**: `isOrdinal` (transitivity + ∈-trichotomy), theorems: `isOrdinal_empty`, `isOrdinal_succ`, `isNat_isOrdinal`, `isOrdinal_mem`
+- **Axioms/Cardinal.lean** (+1): `card_eq_zero_iff` (↔ empty)
+- **VN/CardVN.lean**: `card_vN (n : ℕ₀) : HFSet.card (vN n) = n` (VN embedding preserves cardinality)
 
 ---
 

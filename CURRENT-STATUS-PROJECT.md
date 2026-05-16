@@ -95,6 +95,8 @@
 | AczelSetTheory/Axioms/Induction.lean | 0 | ✅ Complete |
 | AczelSetTheory/Operations/CartProd.lean | 0 | ✅ Complete |
 | AczelSetTheory/Axioms/CartProd.lean | 0 | ✅ Complete |
+| AczelSetTheory/Axioms/Ordinal.lean | 0 | ✅ Complete |
+| AczelSetTheory/VN/CardVN.lean | 0 | ✅ Complete |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 

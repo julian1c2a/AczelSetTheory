@@ -1,6 +1,6 @@
 # Technical Reference — VN (von Neumann Embedding)
 
-**Last updated:** 2026-05-15
+**Last updated:** 2026-05-16
 **Parent:** [../REFERENCE.md](../REFERENCE.md)
 **Related:** [REFERENCE-HFSets.md](REFERENCE-HFSets.md) | [REFERENCE-Algebra.md](REFERENCE-Algebra.md) | [REFERENCE-PList.md](REFERENCE-PList.md)
 
@@ -31,6 +31,7 @@ and establishes order-preservation (`∈` ↔ `<`).
 | 68 | `AczelSetTheory/VN/FSet.lean` | ✅ Complete |
 | 69 | `AczelSetTheory/VN/PeanoAxioms.lean` | ✅ Complete |
 | 70 | `AczelSetTheory/VN/PeanoArith.lean` | ✅ Complete |
+| 76 | `AczelSetTheory/VN/CardVN.lean` | ✅ Complete |
 
 ---
 
@@ -169,6 +170,15 @@ def VN.fsetToHFSet (S : ℕ₀FSet) : HFSet :=
 | 14 | `vN_mul_add` | `(m n k : ℕ₀) → vN (mul m (add n k)) = vN (add (mul m n) (mul m k))` |
 | 15 | `vN_add_mul` | `(m n k : ℕ₀) → vN (mul (add m n) k) = vN (add (mul m k) (mul n k))` |
 
+### 6.57 VN/CardVN.lean — `namespace VN`
+
+**Imports:** `AczelSetTheory.VN.IsNat`
+**Opens:** `Peano`, `VN`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `card_vN` | `(n : ℕ₀) : HFSet.card (vN n) = n` |
+
 ---
 
 ## 7. Exports per Module
@@ -205,3 +215,7 @@ def VN.fsetToHFSet (S : ℕ₀FSet) : HFSet :=
 `VN.vN_add_comm`, `VN.vN_add_assoc`, `VN.vN_add_zero`, `VN.vN_zero_add`,
 `VN.vN_mul_comm`, `VN.vN_mul_assoc`, `VN.vN_mul_zero`, `VN.vN_zero_mul`,
 `VN.vN_mul_one`, `VN.vN_one_mul`, `VN.vN_mul_add`, `VN.vN_add_mul`
+
+### VN/CardVN.lean
+
+`VN.card_vN`
