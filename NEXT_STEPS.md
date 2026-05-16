@@ -2,9 +2,25 @@
 
 **Last updated:** 2026-05-17
 
-The project compiles on Lean 4.29.0 with **0 sorry, 79 modules**.
+The project compiles on Lean 4.29.0 with **0 sorry, 85 modules**.
 Full Zermelo axioms derived. Architecture: CList/ + Operations/ + Axioms/ + PList/ + VN/.
 See PLANNING.md for the full long-term roadmap.
+
+---
+
+## ✅ COMPLETED (2026-05-17) — B1: Axioms/Rank + VN/RankVN: rango de Von Neumann
+
+- **Axioms/Rank.lean**: `rank : HFSet → ℕ₀` (rango de Von Neumann), `rank_empty : rank ∅ = 𝟘`, `rank_insert (x A h) : rank (insert x A) = max (σ (rank x)) (rank A)`. Implementado con recursión mutual estructural sobre `CList` normalizado.
+- **VN/RankVN.lean**: `rank_vN (n : ℕ₀) : HFSet.rank (vN n) = n` — el embedding vN preserva el rango. Prueba por inducción Peano usando `rank_insert`, `not_mem_self`, `max_comm`, `max_eq_of_lt`, `lt_succ_self`.
+
+---
+
+## ✅ COMPLETED (2026-05-17) — A1/A2/A3/C1: VN/PowVN, SubVN, DivVN, FactorialVN
+
+- **VN/PowVN.lean**: `powVN (m n : ℕ₀) : HFSet := vN (m ^ n)` — transporte de la potenciación Peano. 14 teoremas: `powVN_def`, `powVN_zero`, `powVN_succ`, `vN_pow`, `vN_pow_zero`, `vN_pow_one`, `vN_one_pow`, `vN_zero_pow`, `vN_pow_add`, `vN_mul_pow`, `vN_pow_pow`, `vN_pow_two`, `vN_pow_ne_zero`.
+- **VN/SubVN.lean**: sustracción acotada (monus) transportada vía `congrArg vN`. 12 teoremas: `vN_sub_zero`, `vN_zero_sub`, `vN_sub_self`, `vN_succ_sub_one`, `vN_sub_succ_succ`, `vN_add_k_sub_k`, `vN_sub_k_add_k`, `vN_add_sub_assoc`, `sub_le_vN_self`, `sub_pos_of_lt_vN`, `vN_succ_sub`, `vN_sub_succ_left`.
+- **VN/DivVN.lean**: división euclidiana transportada. 6 teoremas: `vN_divMod_spec`, `div_le_vN_self`, `div_lt_vN_self`, `mod_lt_vN`, `mod_of_lt_vN`, `div_of_lt_vN`.
+- **VN/FactorialVN.lean**: `factVN (n : ℕ₀) : HFSet := vN (factorial n)` — transporte del factorial de Peano. 10 teoremas: `factVN_def`, `vN_factorial_zero`, `vN_factorial_one`, `vN_factorial_two`, `vN_factorial_succ`, `vN_factorial_pos`, `vN_factorial_ge_one`, `vN_factorial_ne_zero`, `vN_factorial_mono`, `vN_factorial_le_succ`.
 
 ---
 

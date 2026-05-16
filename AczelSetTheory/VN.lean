@@ -5,4 +5,9 @@ import AczelSetTheory.VN.Arithmetic
 import AczelSetTheory.VN.FSet
 import AczelSetTheory.VN.PeanoAxioms
 import AczelSetTheory.VN.PeanoArith
+import AczelSetTheory.VN.PowVN
+import AczelSetTheory.VN.SubVN
+import AczelSetTheory.VN.DivVN
+import AczelSetTheory.VN.FactorialVN
 import AczelSetTheory.VN.CardVN
+import AczelSetTheory.VN.RankVN

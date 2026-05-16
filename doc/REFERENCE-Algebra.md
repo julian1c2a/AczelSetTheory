@@ -1,6 +1,6 @@
 # Technical Reference — Algebra, Lattice & Structural Axioms
 
-**Last updated:** 2026-05-16
+**Last updated:** 2026-05-17
 **Parent:** [../REFERENCE.md](../REFERENCE.md)
 **Related:** [REFERENCE-HFSets.md](REFERENCE-HFSets.md) | [REFERENCE-Relations.md](REFERENCE-Relations.md) | [REFERENCE-VN.md](REFERENCE-VN.md)
 
@@ -38,6 +38,7 @@ foundation, decidability).
 | 72 | `AczelSetTheory/Axioms/Induction.lean` | ✅ Complete |
 | 75 | `AczelSetTheory/Axioms/Ordinal.lean` | ✅ Complete |
 | 77 | `AczelSetTheory/Axioms/OrdinalNat.lean` | ✅ Complete |
+| 83 | `AczelSetTheory/Axioms/Rank.lean` | ✅ Complete |
 
 ---
 
@@ -172,6 +173,25 @@ instance : DecidableEq HFSet
 - **Math**: La igualdad en HFSet es decidible.
 - Construida por `Quotient.recOnSubsingleton₂` a partir de `CList.extEq : CList → CList → Bool`.
 - Computable.
+
+---
+
+### 4.48 Axioms/Rank.lean — `namespace HFSet`
+
+#### 4.48.1 `HFSet.rank`
+
+```lean
+def HFSet.rank (A : HFSet) : ℕ₀
+```
+
+- **Math**: ρ(A) — rango de Von Neumann de A. Defined by well-founded recursion on the
+  normalized `CList` representative via internal `rankNorm : CList → ℕ₀`
+  and `rankNormList : PList CList → ℕ₀` (mutual structural recursion).
+  `rank(A) = max{ σ(rank(x)) | x ∈ A }`; `rank(∅) = 0`.
+- Lifted to the quotient via `Quotient.liftOn` using `rankCList_congr`.
+- Computable.
+- Depends on `Operations/Cardinal` (for `orderedInsert`-level helpers), `Axioms/Adjunction`.
+- See `VN/RankVN.lean` for `rank_vN : rank (vN n) = n`.
 
 ---
 
@@ -359,6 +379,16 @@ instance : DecidableEq HFSet
 | 2 | `isOrdinal_isNat` | `{A : HFSet} (hA : isOrdinal A) : isNat A` |
 | 3 | `isOrdinal_iff_isNat` | `{A : HFSet} : isOrdinal A ↔ isNat A` |
 
+### 6.64 Axioms/Rank.lean — `namespace HFSet`
+
+**Imports:** `AczelSetTheory.Operations.Cardinal`, `AczelSetTheory.Axioms.Adjunction`
+**Opens:** `Peano`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `rank_empty` | `rank empty = 𝟘` |
+| 2 | `rank_insert` | `(x A : HFSet) (h : x ∉ A) : rank (insert x A) = max (σ (rank x)) (rank A)` |
+
 ---
 
 ## 7. Exports per Module
@@ -434,3 +464,7 @@ instance : DecidableEq HFSet
 ### Axioms/OrdinalNat.lean
 
 `HFSet.card_le_of_subset`, `HFSet.isOrdinal_isNat`, `HFSet.isOrdinal_iff_isNat`
+
+### Axioms/Rank.lean
+
+`HFSet.rank`, `HFSet.rank_empty`, `HFSet.rank_insert`

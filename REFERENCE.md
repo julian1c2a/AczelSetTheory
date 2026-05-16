@@ -1,6 +1,6 @@
 # Technical Reference — AczelSetTheory
 
-**Last updated:** 2026-05-16 12:00
+**Last updated:** 2026-05-17
 **Author**: Julián Calderón Almendros
 **Lean version**: v4.29.0
 
@@ -114,7 +114,13 @@ Below are the keys for reading and searching theorems.
 | 76 | `AczelSetTheory/VN/CardVN.lean` | `VN` | ✅ Complete | VN/IsNat, Axioms/Cardinal | — |
 | 77 | `AczelSetTheory/Axioms/OrdinalNat.lean` | `HFSet` | ✅ Complete | Axioms/Ordinal, Axioms/Cardinal, Axioms/Separation, Axioms/Decidable, Axioms/Setminus, PList/Omega0 | — |
 | 78 | `AczelSetTheory/Axioms/Fintype.lean` | top-level + `HFSet` | ✅ Complete | Axioms/OrdinalNat, PList/Lemmas | — |
-| — | `AczelSetTheory/VN.lean` | — | ✅ Complete | VN/{Basic,Injective,IsNat,Arithmetic,FSet,PeanoAxioms,PeanoArith} | AczelSetTheory.lean |
+| 79 | `AczelSetTheory/VN/PowVN.lean` | `VN` | ✅ Complete | VN/PeanoArith | — |
+| 80 | `AczelSetTheory/VN/SubVN.lean` | `VN` | ✅ Complete | VN/PeanoArith | — |
+| 81 | `AczelSetTheory/VN/DivVN.lean` | `VN` | ✅ Complete | VN/PeanoArith | — |
+| 82 | `AczelSetTheory/VN/FactorialVN.lean` | `VN` | ✅ Complete | VN/PeanoArith, `Peano.PeanoNat.Combinatorics.Factorial` | — |
+| 83 | `AczelSetTheory/Axioms/Rank.lean` | `HFSet` | ✅ Complete | Operations/Cardinal, Axioms/Adjunction | VN/RankVN |
+| 84 | `AczelSetTheory/VN/RankVN.lean` | `VN` | ✅ Complete | VN/IsNat | — |
+| — | `AczelSetTheory/VN.lean` | — | ✅ Complete | VN/{Basic,Injective,IsNat,Arithmetic,FSet,PeanoAxioms,PeanoArith,PowVN,SubVN,DivVN,FactorialVN,CardVN,RankVN} | AczelSetTheory.lean |
 | — | `AczelSetTheory/PList.lean` | — | ✅ Complete | PList/{Basic,Lemmas,Omega0} | AczelSetTheory.lean |
 | — | `AczelSetTheory.lean` | — | ✅ Complete | PList, CList, HFSets, Operations/*, Axioms/*, Notation | Main |
 | — | `Main.lean` | — | ✅ Complete | CList.Basic | — |
@@ -246,6 +252,18 @@ CList.lean (root) ── imports all 7 sub-modules
 
 ---
 
+### 4.48 VN/PowVN.lean + VN/SubVN.lean + VN/DivVN.lean + VN/FactorialVN.lean (A1–A3, C1)
+
+> Definitions moved to [doc/REFERENCE-VN.md](doc/REFERENCE-VN.md#4-definitions).
+
+---
+
+### 4.49 Axioms/Rank.lean + VN/RankVN.lean (B1)
+
+> Definitions moved to [doc/REFERENCE-Algebra.md](doc/REFERENCE-Algebra.md#4-definitions) and [doc/REFERENCE-VN.md](doc/REFERENCE-VN.md#4-definitions).
+
+---
+
 None. This project builds constructively from Lean 4 without additional axioms.
 
 ---
@@ -298,7 +316,7 @@ None. This project builds constructively from Lean 4 without additional axioms.
 
 > Theorems moved to [doc/REFERENCE-HFList.md](doc/REFERENCE-HFList.md#6-theorems).
 
-### 6.45–6.51, 6.57 VN modules (incl. CardVN)
+### 6.45–6.51, 6.57, 6.59–6.63 VN modules (incl. CardVN, PowVN, SubVN, DivVN, FactorialVN, RankVN)
 
 > Theorems moved to [doc/REFERENCE-VN.md](doc/REFERENCE-VN.md#6-theorems).
 
@@ -360,6 +378,14 @@ None. This project builds constructively from Lean 4 without additional axioms.
 
 > Exports moved to [doc/REFERENCE-Algebra.md](doc/REFERENCE-Algebra.md#7-exports-per-module) and [doc/REFERENCE-VN.md](doc/REFERENCE-VN.md#7-exports-per-module).
 
+### VN/PowVN.lean + VN/SubVN.lean + VN/DivVN.lean + VN/FactorialVN.lean + VN/RankVN.lean (A1–A3, C1, B1-VN)
+
+> Exports moved to [doc/REFERENCE-VN.md](doc/REFERENCE-VN.md#7-exports-per-module).
+
+### Axioms/Rank.lean (B1-Axioms)
+
+> Exports moved to [doc/REFERENCE-Algebra.md](doc/REFERENCE-Algebra.md#7-exports-per-module).
+
 ### Axioms/OrdinalNat.lean (Phase 7e)
 
 > Exports moved to [doc/REFERENCE-Algebra.md](doc/REFERENCE-Algebra.md#7-exports-per-module).
@@ -405,5 +431,7 @@ None. This project builds constructively from Lean 4 without additional axioms.
 | 2026-05-16 | Axioms/Ordinal (nuevos: `isOrdinal`, 4 teoremas), VN/CardVN (nuevo: `card_vN`), Axioms/Cardinal (`card_eq_zero_iff`) | Claude (AI assistant) |
 | 2026-05-16 | Axioms/Cardinal (`card_succ`), Axioms/OrdinalNat (nuevo módulo: `instDecidableEqHFSet`, `card_le_of_subset`, `isOrdinal_isNat`, `isOrdinal_iff_isNat`) — Phase 7e | Claude (AI assistant) |
 | 2026-05-16 | Axioms/Fintype (nuevo módulo #78): `Finset`, `Fintype`, `HFSet.toList`, `HFSet.toFinset`, `HFSet.membership_fintype`, teoremas `mem_toList`, `nodup_toList`, `mem_toFinset` — Phase F1+F2 | Claude (AI assistant) |
+| 2026-05-17 | VN/PowVN (#79): `powVN`, `vN_pow` y 13 teoremas de potenciación; VN/SubVN (#80): 12 teoremas de sustracción acotada; VN/DivVN (#81): 6 teoremas de división euclidiana; VN/FactorialVN (#82): `factVN`, `vN_factorial_succ` y 8 teoremas de factorial — fases A1–A3, C1 | Claude (AI assistant) |
+| 2026-05-17 | Axioms/Rank (#83): `HFSet.rank`, `rank_empty`, `rank_insert` (rango de Von Neumann); VN/RankVN (#84): `VN.rank_vN` — fase B1 | Claude (AI assistant) |
 
 > To project a file: read it fully, then update sections 1–8 above following AI-GUIDE.md §4–14.

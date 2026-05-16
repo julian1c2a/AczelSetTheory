@@ -1,6 +1,6 @@
 # Technical Reference — VN (von Neumann Embedding)
 
-**Last updated:** 2026-05-16
+**Last updated:** 2026-05-17
 **Parent:** [../REFERENCE.md](../REFERENCE.md)
 **Related:** [REFERENCE-HFSets.md](REFERENCE-HFSets.md) | [REFERENCE-Algebra.md](REFERENCE-Algebra.md) | [REFERENCE-PList.md](REFERENCE-PList.md)
 
@@ -32,6 +32,11 @@ and establishes order-preservation (`∈` ↔ `<`).
 | 69 | `AczelSetTheory/VN/PeanoAxioms.lean` | ✅ Complete |
 | 70 | `AczelSetTheory/VN/PeanoArith.lean` | ✅ Complete |
 | 76 | `AczelSetTheory/VN/CardVN.lean` | ✅ Complete |
+| 79 | `AczelSetTheory/VN/PowVN.lean` | ✅ Complete |
+| 80 | `AczelSetTheory/VN/SubVN.lean` | ✅ Complete |
+| 81 | `AczelSetTheory/VN/DivVN.lean` | ✅ Complete |
+| 82 | `AczelSetTheory/VN/FactorialVN.lean` | ✅ Complete |
+| 84 | `AczelSetTheory/VN/RankVN.lean` | ✅ Complete |
 
 ---
 
@@ -75,6 +80,27 @@ def VN.fsetToHFSet (S : ℕ₀FSet) : HFSet :=
 - Computable.
 - Membership: `x ∈ fsetToHFSet S ↔ ∃ n ∈ S, x = vN n`
 - Injective (uses `FSet.eq_of_mem_iff'`).
+
+#### 4.42.4 `VN.powVN` — `VN/PowVN.lean`
+
+```lean
+def VN.powVN (m n : ℕ₀) : HFSet := vN (m ^ n)
+```
+
+- **Math**: powVN(m, n) = vN(m^n) — imagen directa de la potenciación de Peano bajo vN.
+- Computable, definitionally equal to `vN (m ^ n)`.
+- Key theorem: `powVN_def : powVN m n = vN (m ^ n)` (`@[simp]`)
+
+#### 4.42.5 `VN.factVN` — `VN/FactorialVN.lean`
+
+```lean
+def VN.factVN (n : ℕ₀) : HFSet := vN (factorial n)
+```
+
+- **Math**: factVN(n) = vN(n!) — imagen directa del factorial de Peano bajo vN.
+- Requires `import Peano.PeanoNat.Combinatorics.Factorial`.
+- Computable.
+- Key theorem: `factVN_def : factVN n = vN (factorial n)`
 
 ---
 
@@ -179,6 +205,89 @@ def VN.fsetToHFSet (S : ℕ₀FSet) : HFSet :=
 |---|---------|---------------|
 | 1 | `card_vN` | `(n : ℕ₀) : HFSet.card (vN n) = n` |
 
+### 6.59 VN/PowVN.lean — `namespace VN`
+
+**Imports:** `AczelSetTheory.VN.PeanoArith`
+**Opens:** `Peano`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `powVN_def` | `(m n : ℕ₀) : powVN m n = vN (m ^ n)` (`@[simp]`) |
+| 2 | `powVN_zero` | `(m : ℕ₀) : powVN m 𝟘 = vN 𝟙` (`@[simp]`) |
+| 3 | `powVN_succ` | `(m n : ℕ₀) : powVN m (σ n) = vN (mul (m ^ n) m)` (`@[simp]`) |
+| 4 | `vN_pow` | `(m n : ℕ₀) : vN (m ^ n) = powVN m n` |
+| 5 | `vN_pow_zero` | `(m : ℕ₀) : vN (m ^ 𝟘) = vN 𝟙` |
+| 6 | `vN_pow_succ` | `(m n : ℕ₀) : vN (m ^ σ n) = vN (mul (m ^ n) m)` |
+| 7 | `vN_pow_one` | `(m : ℕ₀) : vN (m ^ 𝟙) = vN m` |
+| 8 | `vN_one_pow` | `(n : ℕ₀) : vN (𝟙 ^ n) = vN 𝟙` |
+| 9 | `vN_zero_pow` | `{n : ℕ₀} (h : n ≠ 𝟘) : vN (𝟘 ^ n) = vN 𝟘` |
+| 10 | `vN_pow_add` | `(m n k : ℕ₀) : vN (m ^ add n k) = vN (mul (m ^ n) (m ^ k))` |
+| 11 | `vN_mul_pow` | `(m n k : ℕ₀) : vN (mul (m ^ k) (n ^ k)) = vN ((mul m n) ^ k)` |
+| 12 | `vN_pow_pow` | `(m n k : ℕ₀) : vN ((m ^ n) ^ k) = vN (m ^ mul n k)` |
+| 13 | `vN_pow_two` | `(m : ℕ₀) : vN (m ^ 𝟒) = vN (mul m m)` |
+| 14 | `vN_pow_ne_zero` | `{m : ℕ₀} (h : m ≠ 𝟘) (n : ℕ₀) : vN (m ^ n) ≠ vN 𝟘` |
+
+### 6.60 VN/SubVN.lean — `namespace VN`
+
+**Imports:** `AczelSetTheory.VN.PeanoArith`
+**Opens:** `Peano`, `Peano.Sub`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `vN_sub_zero` | `(n : ℕ₀) : vN (sub n 𝟘) = vN n` |
+| 2 | `vN_zero_sub` | `(n : ℕ₀) : vN (sub 𝟘 n) = vN 𝟘` |
+| 3 | `vN_sub_self` | `(n : ℕ₀) : vN (sub n n) = vN 𝟘` |
+| 4 | `vN_succ_sub_one` | `(n : ℕ₀) : vN (sub (σ n) 𝟙) = vN n` |
+| 5 | `vN_sub_succ_succ` | `(a b : ℕ₀) : vN (sub a b) = vN (sub (σ a) (σ b))` |
+| 6 | `vN_add_k_sub_k` | `(n k : ℕ₀) : vN (sub (add k n) k) = vN n` |
+| 7 | `vN_sub_k_add_k` | `(n k : ℕ₀) (h : le₀ k n) : vN (add (sub n k) k) = vN n` |
+| 8 | `vN_add_sub_assoc` | `(n m k : ℕ₀) (h : le₀ k n) : vN (add (sub n k) m) = vN (sub (add n m) k)` |
+| 9 | `sub_le_vN_self` | `(n m : ℕ₀) : le₀ (sub n m) n` |
+| 10 | `sub_pos_of_lt_vN` | `{n m : ℕ₀} (h : lt₀ m n) : lt₀ 𝟘 (sub n m)` |
+| 11 | `vN_succ_sub` | `(n m : ℕ₀) (h : le₀ (σ m) n) : vN (sub n (σ m)) = vN (τ (sub n m))` |
+| 12 | `vN_sub_succ_left` | `(n k : ℕ₀) (h : le₀ k n) : vN (sub (σ n) k) = vN (σ (sub n k))` |
+
+### 6.61 VN/DivVN.lean — `namespace VN`
+
+**Imports:** `AczelSetTheory.VN.PeanoArith`
+**Opens:** `Peano`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `vN_divMod_spec` | `(a b : ℕ₀) (h : b ≠ 𝟘) : vN a = vN (add (mul (div a b) b) (mod a b))` |
+| 2 | `div_le_vN_self` | `(a b : ℕ₀) (h : b ≠ 𝟘) : le₀ (div a b) a` |
+| 3 | `div_lt_vN_self` | `(a b : ℕ₀) (h_b : lt₀ 𝟙 b) (h_a : a ≠ 𝟘) : lt₀ (div a b) a` |
+| 4 | `mod_lt_vN` | `(a b : ℕ₀) (h : b ≠ 𝟘) : lt₀ (mod a b) b` |
+| 5 | `mod_of_lt_vN` | `(a b : ℕ₀) (h : lt₀ a b) : mod a b = a` |
+| 6 | `div_of_lt_vN` | `(a b : ℕ₀) (h : lt₀ a b) : div a b = 𝟘` |
+
+### 6.62 VN/FactorialVN.lean — `namespace VN`
+
+**Imports:** `AczelSetTheory.VN.PeanoArith`, `Peano.PeanoNat.Combinatorics.Factorial`
+**Opens:** `Peano`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `factVN_def` | `(n : ℕ₀) : factVN n = vN (factorial n)` |
+| 2 | `vN_factorial_zero` | `vN (factorial 𝟘) = vN 𝟙` |
+| 3 | `vN_factorial_one` | `vN (factorial 𝟙) = vN 𝟙` |
+| 4 | `vN_factorial_two` | `vN (factorial 𝟒) = vN 𝟒` |
+| 5 | `vN_factorial_succ` | `(n : ℕ₀) : vN (factorial (σ n)) = vN (mul (factorial n) (σ n))` |
+| 6 | `vN_factorial_pos` | `(n : ℕ₀) : lt₀ 𝟘 (factorial n)` |
+| 7 | `vN_factorial_ge_one` | `(n : ℕ₀) : le₀ 𝟙 (factorial n)` |
+| 8 | `vN_factorial_ne_zero` | `(n : ℕ₀) : factVN n ≠ vN 𝟘` |
+| 9 | `vN_factorial_mono` | `{m n : ℕ₀} (h : le₀ m n) : le₀ (factorial m) (factorial n)` |
+| 10 | `vN_factorial_le_succ` | `(n : ℕ₀) : le₀ (factorial n) (factorial (σ n))` |
+
+### 6.63 VN/RankVN.lean — `namespace VN`
+
+**Imports:** `AczelSetTheory.VN.IsNat`
+**Opens:** `Peano`, `VN`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `rank_vN` | `(n : ℕ₀) : HFSet.rank (vN n) = n` |
+
 ---
 
 ## 7. Exports per Module
@@ -219,3 +328,33 @@ def VN.fsetToHFSet (S : ℕ₀FSet) : HFSet :=
 ### VN/CardVN.lean
 
 `VN.card_vN`
+
+### VN/PowVN.lean
+
+`VN.powVN`, `VN.powVN_def`, `VN.powVN_zero`, `VN.powVN_succ`,
+`VN.vN_pow`, `VN.vN_pow_zero`, `VN.vN_pow_succ`, `VN.vN_pow_one`,
+`VN.vN_one_pow`, `VN.vN_zero_pow`, `VN.vN_pow_add`, `VN.vN_mul_pow`,
+`VN.vN_pow_pow`, `VN.vN_pow_two`, `VN.vN_pow_ne_zero`
+
+### VN/SubVN.lean
+
+`VN.vN_sub_zero`, `VN.vN_zero_sub`, `VN.vN_sub_self`, `VN.vN_succ_sub_one`,
+`VN.vN_sub_succ_succ`, `VN.vN_add_k_sub_k`, `VN.vN_sub_k_add_k`,
+`VN.vN_add_sub_assoc`, `VN.sub_le_vN_self`, `VN.sub_pos_of_lt_vN`,
+`VN.vN_succ_sub`, `VN.vN_sub_succ_left`
+
+### VN/DivVN.lean
+
+`VN.vN_divMod_spec`, `VN.div_le_vN_self`, `VN.div_lt_vN_self`,
+`VN.mod_lt_vN`, `VN.mod_of_lt_vN`, `VN.div_of_lt_vN`
+
+### VN/FactorialVN.lean
+
+`VN.factVN`, `VN.factVN_def`, `VN.vN_factorial_zero`, `VN.vN_factorial_one`,
+`VN.vN_factorial_two`, `VN.vN_factorial_succ`, `VN.vN_factorial_pos`,
+`VN.vN_factorial_ge_one`, `VN.vN_factorial_ne_zero`,
+`VN.vN_factorial_mono`, `VN.vN_factorial_le_succ`
+
+### VN/RankVN.lean
+
+`VN.rank_vN`
