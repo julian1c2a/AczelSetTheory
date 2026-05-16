@@ -44,3 +44,4 @@ import AczelSetTheory.Axioms.Adjunction
 import AczelSetTheory.Axioms.Induction
 import AczelSetTheory.Axioms.CartProd
 import AczelSetTheory.Axioms.Ordinal
+import AczelSetTheory.Axioms.OrdinalNat

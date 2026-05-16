@@ -7,6 +7,8 @@ License: MIT
 import AczelSetTheory.Operations.Cardinal
 import AczelSetTheory.Operations.Powerset
 import AczelSetTheory.Notation
+import AczelSetTheory.Axioms.Succ
+import AczelSetTheory.Axioms.Adjunction
 
 open Peano
 
@@ -82,6 +84,22 @@ theorem card_insert (x A : HFSet) (h : x ∉ A) : card (insert x A) = σ (card A
     CList.normalize_cons_fresh xc₀ xs₀ hxc₀_norm h_sorted h_nodup h_fresh h_hall]
   -- Apply length_orderedInsert_fresh
   rw [CList.length_orderedInsert_fresh xc₀ xs₀ h_fresh, h_norm]
+
+-- ==================================================================
+-- Cardinalidad del sucesor: card(succ A) = σ(card A)
+-- ==================================================================
+
+/-- El sucesor de Von Neumann `succ A = A ∪ {A}` añade exactamente
+    un elemento nuevo (A ∉ A por Fundación), así que su cardinalidad
+    es el sucesor de la de A. -/
+theorem card_succ (A : HFSet) : card (succ A) = σ (card A) := by
+  have h_eq : succ A = insert A A := by
+    apply extensionality
+    intro x
+    rw [mem_succ, mem_insert]
+    exact Or.comm
+  rw [h_eq]
+  exact card_insert A A (not_mem_self A)
 
 -- ==================================================================
 -- Cardinalidad del conjunto potencia: card(powerset A) = 2^(card A)

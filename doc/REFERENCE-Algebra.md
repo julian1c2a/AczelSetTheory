@@ -37,6 +37,7 @@ foundation, decidability).
 | 71 | `AczelSetTheory/Axioms/Adjunction.lean` | ✅ Complete |
 | 72 | `AczelSetTheory/Axioms/Induction.lean` | ✅ Complete |
 | 75 | `AczelSetTheory/Axioms/Ordinal.lean` | ✅ Complete |
+| 77 | `AczelSetTheory/Axioms/OrdinalNat.lean` | ✅ Complete |
 
 ---
 
@@ -157,6 +158,20 @@ def HFSet.isOrdinal (A : HFSet) : Prop :=
 - **Math**: A is a (von Neumann) ordinal iff it is transitive and linearly ordered by ∈.
 - Depends on `HFSet.isTransitive` (from `Axioms/VonNeumann.lean`).
 - Non-computable (Prop-valued predicate).
+
+---
+
+### 4.46 Axioms/OrdinalNat.lean — `namespace HFSet`
+
+#### 4.46.1 `instDecidableEqHFSet`
+
+```lean
+instance : DecidableEq HFSet
+```
+
+- **Math**: La igualdad en HFSet es decidible.
+- Construida por `Quotient.recOnSubsingleton₂` a partir de `CList.extEq : CList → CList → Bool`.
+- Computable.
 
 ---
 
@@ -306,6 +321,7 @@ def HFSet.isOrdinal (A : HFSet) : Prop :=
 | 2 | `card_insert` | `(x A : HFSet) (h : x ∉ A) : card (insert x A) = σ (card A)` |
 | 3 | `card_powerset` | `(A : HFSet) : card (powerset A) = pow 𝟚 (card A)` |
 | 4 | `card_eq_zero_iff` | `{A : HFSet} : card A = 𝟘 ↔ A = empty` |
+| 5 | `card_succ` | `(A : HFSet) : card (succ A) = σ (card A)` |
 
 ### 6.52 Axioms/Adjunction.lean — `namespace HFSet`
 
@@ -332,6 +348,16 @@ def HFSet.isOrdinal (A : HFSet) : Prop :=
 | 2 | `isOrdinal_succ` | `{A : HFSet} (hA : isOrdinal A) : isOrdinal (succ A)` |
 | 3 | `isNat_isOrdinal` | `{n : HFSet} (hn : isNat n) : isOrdinal n` |
 | 4 | `isOrdinal_mem` | `{A x : HFSet} (hA : isOrdinal A) (hx : x ∈ A) : isOrdinal x` |
+
+### 6.58 Axioms/OrdinalNat.lean — `namespace HFSet`
+
+**Imports:** `AczelSetTheory.Axioms.Ordinal`, `AczelSetTheory.Axioms.Cardinal`, `AczelSetTheory.Axioms.Separation`, `AczelSetTheory.Axioms.Decidable`, `AczelSetTheory.Axioms.Setminus`, `AczelSetTheory.PList.Omega0`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `card_le_of_subset` | `{A B : HFSet} (h : A ⊆ B) : card A ≤ card B` |
+| 2 | `isOrdinal_isNat` | `{A : HFSet} (hA : isOrdinal A) : isNat A` |
+| 3 | `isOrdinal_iff_isNat` | `{A : HFSet} : isOrdinal A ↔ isNat A` |
 
 ---
 
@@ -391,7 +417,7 @@ def HFSet.isOrdinal (A : HFSet) : Prop :=
 
 ### Axioms/Cardinal.lean
 
-`HFSet.card_empty`, `HFSet.card_insert`, `HFSet.card_powerset`, `HFSet.card_eq_zero_iff`
+`HFSet.card_empty`, `HFSet.card_insert`, `HFSet.card_powerset`, `HFSet.card_eq_zero_iff`, `HFSet.card_succ`
 
 ### Axioms/Adjunction.lean
 
@@ -404,3 +430,7 @@ def HFSet.isOrdinal (A : HFSet) : Prop :=
 ### Axioms/Ordinal.lean
 
 `HFSet.isOrdinal`, `HFSet.isOrdinal_empty`, `HFSet.isOrdinal_succ`, `HFSet.isNat_isOrdinal`, `HFSet.isOrdinal_mem`
+
+### Axioms/OrdinalNat.lean
+
+`HFSet.card_le_of_subset`, `HFSet.isOrdinal_isNat`, `HFSet.isOrdinal_iff_isNat`

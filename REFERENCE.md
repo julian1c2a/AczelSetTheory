@@ -1,6 +1,6 @@
 # Technical Reference — AczelSetTheory
 
-**Last updated:** 2026-05-16 00:00
+**Last updated:** 2026-05-16 12:00
 **Author**: Julián Calderón Almendros
 **Lean version**: v4.29.0
 
@@ -96,7 +96,7 @@ Below are the keys for reading and searching theorems.
 | 58 | `AczelSetTheory/Axioms/BooleanRing.lean` | `HFSet` | ✅ Complete | Axioms/Decidable, Axioms/Lattice, Axioms/BooleanAlgebra, Axioms/SymDiff | — |
 | 59 | `AczelSetTheory/Axioms/VonNeumann.lean` | `HFSet` | ✅ Complete | Axioms/Succ | VN/Basic, VN/IsNat |
 | 60 | `AczelSetTheory/Axioms/Choice.lean` | `HFSet` | ✅ Complete | Axioms/Function | — |
-| 61 | `AczelSetTheory/Axioms/Cardinal.lean` | `HFSet` | ✅ Complete | Operations/Cardinal, Operations/Powerset, Notation | — |
+| 61 | `AczelSetTheory/Axioms/Cardinal.lean` | `HFSet` | ✅ Complete | Operations/Cardinal, Operations/Powerset, Notation | Axioms/OrdinalNat |
 | 62 | `AczelSetTheory/PList/Fin0.lean` | `Fin₀`, `PList` | ✅ Complete | PList/Omega0, Peano.PeanoNat.{StrictOrder,Order,Axioms} | HFList |
 | 63 | `AczelSetTheory/HFList.lean` | `HFList`, `FinList` | ✅ Complete | HFSets, PList/Fin0 | — |
 | 64 | `AczelSetTheory/VN/Basic.lean` | `VN` | ✅ Complete | Axioms | VN/Injective, VN/IsNat, VN/Arithmetic |
@@ -110,8 +110,9 @@ Below are the keys for reading and searching theorems.
 | 72 | `AczelSetTheory/Axioms/Induction.lean` | `HFSet` | ✅ Complete | Axioms/Adjunction, Axioms/Foundation | — |
 | 73 | `AczelSetTheory/Operations/CartProd.lean` | `HFSet` | ✅ Complete | Operations/OrderedPair | Axioms/CartProd |
 | 74 | `AczelSetTheory/Axioms/CartProd.lean` | `HFSet` | ✅ Complete | Operations/CartProd, Axioms/OrderedPair | — |
-| 75 | `AczelSetTheory/Axioms/Ordinal.lean` | `HFSet` | ✅ Complete | Axioms/VonNeumann, Axioms/Induction | — |
+| 75 | `AczelSetTheory/Axioms/Ordinal.lean` | `HFSet` | ✅ Complete | Axioms/VonNeumann, Axioms/Induction | Axioms/OrdinalNat |
 | 76 | `AczelSetTheory/VN/CardVN.lean` | `VN` | ✅ Complete | VN/IsNat, Axioms/Cardinal | — |
+| 77 | `AczelSetTheory/Axioms/OrdinalNat.lean` | `HFSet` | ✅ Complete | Axioms/Ordinal, Axioms/Cardinal, Axioms/Separation, Axioms/Decidable, Axioms/Setminus, PList/Omega0 | — |
 | — | `AczelSetTheory/VN.lean` | — | ✅ Complete | VN/{Basic,Injective,IsNat,Arithmetic,FSet,PeanoAxioms,PeanoArith} | AczelSetTheory.lean |
 | — | `AczelSetTheory/PList.lean` | — | ✅ Complete | PList/{Basic,Lemmas,Omega0} | AczelSetTheory.lean |
 | — | `AczelSetTheory.lean` | — | ✅ Complete | PList, CList, HFSets, Operations/*, Axioms/*, Notation | Main |
@@ -232,6 +233,12 @@ CList.lean (root) ── imports all 7 sub-modules
 
 ---
 
+### 4.46 Axioms/OrdinalNat.lean (Phase 7e)
+
+> Definitions moved to [doc/REFERENCE-Algebra.md](doc/REFERENCE-Algebra.md#4-definitions).
+
+---
+
 None. This project builds constructively from Lean 4 without additional axioms.
 
 ---
@@ -272,7 +279,7 @@ None. This project builds constructively from Lean 4 without additional axioms.
 
 > Theorems moved to [doc/REFERENCE-Relations.md](doc/REFERENCE-Relations.md#6-theorems).
 
-### 6.35–6.42, 6.56 Algebra: Succ, SymDiff, Lattice, BooleanAlgebra, BooleanRing, VonNeumann, Choice, Cardinal, Ordinal
+### 6.35–6.42, 6.56, 6.58 Algebra: Succ, SymDiff, Lattice, BooleanAlgebra, BooleanRing, VonNeumann, Choice, Cardinal, Ordinal, OrdinalNat
 
 > Theorems moved to [doc/REFERENCE-Algebra.md](doc/REFERENCE-Algebra.md#6-theorems).
 
@@ -346,6 +353,10 @@ None. This project builds constructively from Lean 4 without additional axioms.
 
 > Exports moved to [doc/REFERENCE-Algebra.md](doc/REFERENCE-Algebra.md#7-exports-per-module) and [doc/REFERENCE-VN.md](doc/REFERENCE-VN.md#7-exports-per-module).
 
+### Axioms/OrdinalNat.lean (Phase 7e)
+
+> Exports moved to [doc/REFERENCE-Algebra.md](doc/REFERENCE-Algebra.md#7-exports-per-module).
+
 ---
 
 ## 8. Notations
@@ -385,5 +396,6 @@ None. This project builds constructively from Lean 4 without additional axioms.
 | 2026-05-16 | Axioms/Adjunction, Axioms/Induction (Phase 7a/7b: adjunction axiom, ε-induction), Operations/CartProd, Axioms/CartProd (Phase 7c: computable Cartesian product ×ₕ) | Claude (AI assistant) |
 | 2026-05-16 | Axioms/VonNeumann — re-proyección: `isTransitive`, `isNat`, 9 teoremas (`isTransitive_empty`, `isTransitive_succ`, `isNat_zero`, `isNat_succ`, `isNat_zero_or_succ`, `isNat_isTransitive`, `isNat_mem_isNat`, `isNat_pred`, `isNat_induction`) | Claude (AI assistant) |
 | 2026-05-16 | Axioms/Ordinal (nuevos: `isOrdinal`, 4 teoremas), VN/CardVN (nuevo: `card_vN`), Axioms/Cardinal (`card_eq_zero_iff`) | Claude (AI assistant) |
+| 2026-05-16 | Axioms/Cardinal (`card_succ`), Axioms/OrdinalNat (nuevo módulo: `instDecidableEqHFSet`, `card_le_of_subset`, `isOrdinal_isNat`, `isOrdinal_iff_isNat`) — Phase 7e | Claude (AI assistant) |
 
 > To project a file: read it fully, then update sections 1–8 above following AI-GUIDE.md §4–14.
