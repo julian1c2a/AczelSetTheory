@@ -1,10 +1,31 @@
 # Next Steps
 
-**Last updated:** 2026-05-16
+**Last updated:** 2026-05-17
 
-The project compiles on Lean 4.29.0 with **0 sorry, 73 modules**.
+The project compiles on Lean 4.29.0 with **0 sorry, 79 modules**.
 Full Zermelo axioms derived. Architecture: CList/ + Operations/ + Axioms/ + PList/ + VN/.
 See PLANNING.md for the full long-term roadmap.
+
+---
+
+## ✅ COMPLETED (2026-05-17) — Axioms/NPow: membresía de la potencia cartesiana n-aria
+
+- **Axioms/NPow.lean**: `mem_nPow_zero (t A) : t ∈ nPow A 𝟘 ↔ t = empty`, `mem_nPow_succ (t A n) : t ∈ nPow A (σ n) ↔ ∃ s ∈ nPow A n, ∃ a ∈ A, t = ⟪s, a⟫`.
+- Agrega la caracterización de membresía axiomática (vs las ecuaciones de reducción en `Operations/NPow.lean`).
+
+---
+
+## ✅ COMPLETED (2026-05-16) — Axioms/Fintype: tipos finitos scratch-built (F1+F2)
+
+- **Axioms/Fintype.lean**: `Finset α` (estructura `{val : List α, nodup}`), `Fintype α` (clase `{elems, complete}`), `HFSet.toList`, `HFSet.toFinset` (convierte HFSet en Finset HFSet), `HFSet.membership_fintype` (instancia `Fintype {x // x ∈ A}`).
+- Sin dependencia de Mathlib. Teoremas: `mem_toList`, `nodup_toList`, `mem_toFinset`.
+
+---
+
+## ✅ COMPLETED (2026-05-16) — Phase 7e: OrdinalNat + NPow
+
+- **Axioms/OrdinalNat.lean**: `card_le_of_subset : A ⊆ B → card A ≤ card B`, `isOrdinal_isNat : isOrdinal A → isNat A`, `isOrdinal_iff_isNat : isOrdinal A ↔ isNat A` (en V_ω los ordinales son exactamente los naturales de von Neumann).
+- **Operations/NPow.lean**: `nPow : HFSet → ℕ₀ → HFSet`, `nPow_zero : nPow A 𝟭 = singleton empty`, `nPow_succ : nPow A (σ n) = nPow A n ×ₕ A`.
 
 ---
 

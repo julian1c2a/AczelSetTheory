@@ -43,6 +43,7 @@ import AczelSetTheory.Axioms.Image
 import AczelSetTheory.Axioms.Adjunction
 import AczelSetTheory.Axioms.Induction
 import AczelSetTheory.Axioms.CartProd
+import AczelSetTheory.Axioms.NPow
 import AczelSetTheory.Axioms.Ordinal
 import AczelSetTheory.Axioms.OrdinalNat
 import AczelSetTheory.Axioms.Fintype

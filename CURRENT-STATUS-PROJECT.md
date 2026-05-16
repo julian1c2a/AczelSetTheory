@@ -1,6 +1,6 @@
 # Current Project Status — AczelSetTheory
 
-**Last updated:** 2026-05-16 00:00
+**Last updated:** 2026-05-17
 **Author**: Julián Calderón Almendros
 
 ---
@@ -9,8 +9,8 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | 73 |
-| Modules with 0 sorry | 73 / 73 |
+| Total modules | 79 |
+| Modules with 0 sorry | 79 / 79 |
 | Total sorry | 0 |
 | Build status | ✅ Passing — 0 errors, 0 warnings |
 | Lean version | v4.29.0 |
@@ -96,6 +96,10 @@
 | AczelSetTheory/Operations/CartProd.lean | 0 | ✅ Complete |
 | AczelSetTheory/Axioms/CartProd.lean | 0 | ✅ Complete |
 | AczelSetTheory/Axioms/Ordinal.lean | 0 | ✅ Complete |
+| AczelSetTheory/Axioms/OrdinalNat.lean | 0 | ✅ Complete |
+| AczelSetTheory/Operations/NPow.lean | 0 | ✅ Complete |
+| AczelSetTheory/Axioms/NPow.lean | 0 | ✅ Complete |
+| AczelSetTheory/Axioms/Fintype.lean | 0 | ✅ Complete |
 | AczelSetTheory/VN/CardVN.lean | 0 | ✅ Complete |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
@@ -129,12 +133,16 @@ None — 0 sorry across the entire project.
 - ✅ **Fase 5**: `VN/PeanoAxioms.lean` — PA1/PA2/PA3 as pure HFSet theorems + vN bridge; `VN/PeanoArith.lean` — `addVN` (set-theoretic iteration of succ), transport of all arithmetic laws.
 - ✅ **Phase 7a/7b**: `Axioms/Adjunction.lean` — `mem_insert`, `mem_insert_self`, `insert_ne_empty`; `Axioms/Induction.lean` — `eps_induction`, `strong_eps_induction` (structural ε-induction on HFSets).
 - ✅ **Phase 7c**: `Operations/CartProd.lean` — computable Cartesian product `×ₕ` via CList flatMap/map, lifted to HFSet quotient; `Axioms/CartProd.lean` — `mem_cartProd`, `cartProd_empty_left/right`, `cartProd_isRelation`.
+- ✅ **Phase 7d**: `Axioms/Ordinal.lean` — `isOrdinal` (transitivity + ∈-trichotomy), `isOrdinal_empty/succ/mem`; `VN/CardVN.lean` — `card_vN : card (vN n) = n`.
+- ✅ **Phase 7e**: `Axioms/OrdinalNat.lean` — `isOrdinal_iff_isNat` (en V_ω los ordinales son exactamente los naturales de vN); `Operations/NPow.lean` — `nPow : HFSet → ℕ₀ → HFSet`, `nPow_zero`, `nPow_succ`.
+- ✅ **Phase 7f**: `Axioms/Fintype.lean` — `Finset α`, `Fintype α` (scratch-built, sin Mathlib), `HFSet.toList`, `HFSet.toFinset`, `HFSet.membership_fintype`.
+- ✅ **Phase 7g**: `Axioms/NPow.lean` — `mem_nPow_zero`, `mem_nPow_succ` (caracterización axiomática de membresía en `nPow`).
 
 ---
 
 ## Pending Work
 
-- [ ] REFERENCE.md projection: fully up-to-date (projected 2026-05-16, 73 modules).
+- [ ] REFERENCE.md projection: fully up-to-date (projected 2026-05-17, 79 modules).
 
 ---
 
@@ -143,10 +151,10 @@ None — 0 sorry across the entire project.
 ```
 AczelSetTheory/
   CList/             — Core CList behavior (7 sub-modules)
-  Operations/        — Constructors and definitions over HFSet (18 modules)
-  Axioms/            — Axiomatic properties and theorems over HFSet (30 modules)
+  Operations/        — Constructors and definitions over HFSet (20 modules)
+  Axioms/            — Axiomatic properties and theorems over HFSet (36 modules)
   PList/             — Polymorphic list type over ℕ₀ (4 modules: Basic, Fin0, Lemmas, Omega0)
-  VN/                — Von Neumann embedding vN : ℕ₀ → HFSet (4 modules)
+  VN/                — Von Neumann embedding vN : ℕ₀ → HFSet (8 modules)
   HFSets.lean        — Core HFSet quotient type
   HFList.lean        — Ordered sequences of HFSets (PList HFSet)
   Notation.lean      — Notation macros, von Neumann numerals 0–9
@@ -168,12 +176,16 @@ AczelSetTheory/
 | Phase 6c: Von Neumann embedding | `vN : ℕ₀ → HFSet`, injectivity, IsNat, arithmetic | ✅ Complete |
 | Phase 7: Adjunction, ε-induction | Adjunction axiom, strong ε-induction | ✅ Complete |
 | Phase 7c: Cartesian product | Computable `×ₕ` via CList flatMap/map, lifted to HFSet | ✅ Complete |
+| Phase 7d: Ordinal + CardVN | `isOrdinal`, `card_vN` | ✅ Complete |
+| Phase 7e: OrdinalNat + NPow | `isOrdinal_iff_isNat`, n-ary cartesian power `nPow` | ✅ Complete |
+| Phase 7f: Fintype | `Finset`, `Fintype`, `toFinset`, scratch-built | ✅ Complete |
+| Phase 7g: NPow membership | `mem_nPow_zero`, `mem_nPow_succ` | ✅ Complete |
 
 > See [NEXT_STEPS.md](NEXT_STEPS.md) for detailed planning.
 
 ---
 
 **Author**: Julián Calderón Almendros
-*Last updated: 2026-05-16 00:00*
+*Last updated: 2026-05-17*
 
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
