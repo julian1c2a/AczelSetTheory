@@ -67,14 +67,8 @@ instance : Append HFList := ⟨append⟩
 
 /-- Longitud de la concatenación. -/
 theorem length_append (l₁ l₂ : HFList) :
-    length (l₁ ++ l₂) = add (length l₁) (length l₂) := by
-  unfold length append
-  induction l₁ with
-  | nil => simp [PList.append, PList.length, Peano.Add.zero_add]
-  | cons h t ih =>
-    simp only [PList.length_cons, PList.append]
-    rw [ih]
-    simp [Peano.Add.succ_add]
+    length (l₁ ++ l₂) = add (length l₁) (length l₂) :=
+  PList.length_append l₁ l₂
 
 -- ─────────────────────────────────────────────────────────────────
 -- Membresía
@@ -115,10 +109,10 @@ def toHFList (t : FinList n) : HFList := t.val
 
 /-- Acceso total al i-ésimo componente de la n-tupla. -/
 def get (t : FinList n) (i : Fin₀ n) : HFSet :=
-  t.val.get (t.prop ▸ i)
+  t.val.get ⟨i.val, by rw [t.property]; exact i.isLt⟩
 
 /-- La longitud de una `FinList n` es siempre `n`. -/
-theorem length_eq (t : FinList n) : t.val.length = n := t.prop
+theorem length_eq (t : FinList n) : t.val.length = n := t.property
 
 -- ─────────────────────────────────────────────────────────────────
 -- n-tupla vacía y singleton
@@ -137,7 +131,7 @@ def singleton (x : HFSet) : FinList (σ 𝟘) :=
 
 /-- Antepone un `HFSet` a una n-tupla produciendo una (σ n)-tupla. -/
 def cons (x : HFSet) (t : FinList n) : FinList (σ n) :=
-  ⟨HFList.cons x t.val, by simp [HFList.length_cons, t.prop]⟩
+  ⟨HFList.cons x t.val, congrArg (σ ·) t.property⟩
 
 -- ─────────────────────────────────────────────────────────────────
 -- Igualdad extensional (componente a componente)

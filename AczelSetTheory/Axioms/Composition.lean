@@ -13,15 +13,15 @@ import AczelSetTheory.Axioms.OrderedPair
 
 namespace HFSet
 
--- Helpers: si ⟪a,b⟫ ∈ R entonces a,b ∈ ⋃⋃R
-private theorem fst_in (a b R : HFSet) (h : ⟪a, b⟫ ∈ R) : a ∈ sUnion (sUnion R) := by
+-- Si ⟪a,b⟫ ∈ R entonces a,b ∈ ⋃⋃R
+theorem fst_in (a b R : HFSet) (h : ⟪a, b⟫ ∈ R) : a ∈ sUnion (sUnion R) := by
   have h1 : singleton a ∈ ⟪a, b⟫ :=
     (mem_pair (singleton a) (singleton a) (pair a b)).mpr (Or.inl rfl)
   have h2 : singleton a ∈ sUnion R :=
     (mem_sUnion (singleton a) R).mpr ⟨⟪a, b⟫, h, h1⟩
   exact (mem_sUnion a (sUnion R)).mpr ⟨singleton a, h2, (mem_singleton a a).mpr rfl⟩
 
-private theorem snd_in (a b R : HFSet) (h : ⟪a, b⟫ ∈ R) : b ∈ sUnion (sUnion R) := by
+theorem snd_in (a b R : HFSet) (h : ⟪a, b⟫ ∈ R) : b ∈ sUnion (sUnion R) := by
   have h1 : pair a b ∈ ⟪a, b⟫ :=
     (mem_pair (pair a b) (singleton a) (pair a b)).mpr (Or.inr rfl)
   have h2 : pair a b ∈ sUnion R :=

@@ -11,14 +11,6 @@ import AczelSetTheory.Axioms.OrderedPair
 
 namespace HFSet
 
--- Helper local
-private theorem fst_in' (a b R : HFSet) (h : ⟪a, b⟫ ∈ R) : a ∈ sUnion (sUnion R) := by
-  have h1 : singleton a ∈ ⟪a, b⟫ :=
-    (mem_pair (singleton a) (singleton a) (pair a b)).mpr (Or.inl rfl)
-  have h2 : singleton a ∈ sUnion R :=
-    (mem_sUnion (singleton a) R).mpr ⟨⟪a, b⟫, h, h1⟩
-  exact (mem_sUnion a (sUnion R)).mpr ⟨singleton a, h2, (mem_singleton a a).mpr rfl⟩
-
 -- ==================================================================
 -- Lemas sobre restrict
 -- ==================================================================
@@ -65,7 +57,7 @@ theorem mem_preimage {R B a : HFSet} :
   · rintro ⟨_, b, hbB, habR⟩
     exact ⟨b, hbB, habR⟩
   · rintro ⟨b, hbB, habR⟩
-    exact ⟨fst_in' a b R habR, b, hbB, habR⟩
+    exact ⟨fst_in a b R habR, b, hbB, habR⟩
 
 /-- La preimagen de ∅ es ∅. -/
 theorem preimage_empty_set {R : HFSet} : preimage R empty = empty := by

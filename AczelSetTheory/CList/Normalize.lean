@@ -14,32 +14,6 @@ import AczelSetTheory.CList.Sort
 namespace CList
 
 -- ─────────────────────────────────────────────────────────────────
--- Helper: plist_any_eq_true (reproduced locally; private in SetEquiv)
--- ─────────────────────────────────────────────────────────────────
-
-private theorem plist_any_cons {α : Type} (p : α → Bool) (h : α) (t : PList α) :
-    PList.any p (.cons h t) = (p h || PList.any p t) := rfl
-
-private theorem plist_any_eq_true {α : Type} (p : α → Bool) (l : PList α) :
-    PList.any p l = true ↔ ∃ x, PList.Mem x l ∧ p x = true := by
-  induction l with
-  | nil =>
-    constructor
-    · intro h; simp [PList.any] at h
-    · intro ⟨x, hx, _⟩; exact absurd hx (PList.not_mem_nil _)
-  | cons h t ih =>
-    simp only [plist_any_cons, Bool.or_eq_true]
-    constructor
-    · rintro (hp | ht)
-      · exact ⟨h, PList.Mem.head, hp⟩
-      · obtain ⟨x, hx, hpx⟩ := ih.mp ht
-        exact ⟨x, PList.Mem.tail hx, hpx⟩
-    · rintro ⟨x, hx, hpx⟩
-      cases hx with
-      | head => exact Or.inl hpx
-      | tail hxt => exact Or.inr (ih.mpr ⟨x, hxt, hpx⟩)
-
--- ─────────────────────────────────────────────────────────────────
 -- Helper: membership in normalizePList
 -- ─────────────────────────────────────────────────────────────────
 
@@ -215,7 +189,7 @@ theorem dedup_id_of_nodup
     apply ih (.cons x vistos) hxs_nd
     intro y hy
     have hy_fresh := hfresh y (PList.Mem.tail hy)
-    simp only [plist_any_cons, Bool.or_eq_false_iff]
+    simp only [PList.any_cons, Bool.or_eq_false_iff]
     exact ⟨by rw [extEq_comm]; exact hx_nd y hy, hy_fresh⟩
 
 theorem insertionSort_id_of_sorted_nodup
@@ -329,12 +303,12 @@ theorem sorted_nodup_setEquiv_eq :
           simp only [PList.any_cons, Bool.or_eq_true] at hy_in_l1
           rcases hy_in_l1 with h_yx | h_yx
           · rwa [extEq_comm]
-          · obtain ⟨w, hw_mem, hw_eq⟩ := (plist_any_eq_true _ _).mp h_yx
+          · obtain ⟨w, hw_mem, hw_eq⟩ := (PList.any_eq_true _ _).mp h_yx
             have hw_eq_y : w = y :=
               hprop w (PList.Mem.tail hw_mem) y PList.Mem.head
                 (by rwa [extEq_comm])
             have hy_in_xs : PList.Mem y xs := hw_eq_y ▸ hw_mem
-            obtain ⟨v, hv_mem, hv_eq⟩ := (plist_any_eq_true _ _).mp h
+            obtain ⟨v, hv_mem, hv_eq⟩ := (PList.any_eq_true _ _).mp h
             have hv_eq_x : x = v :=
               hprop x PList.Mem.head v (PList.Mem.tail hv_mem) hv_eq
             have hx_in_ys : PList.Mem x ys := hv_eq_x.symm ▸ hv_mem
@@ -352,7 +326,7 @@ theorem sorted_nodup_setEquiv_eq :
         · intro hz_xs
           rcases hfull.mp (Or.inr hz_xs) with h | h
           · exfalso
-            obtain ⟨w, hw_mem, hw_eq⟩ := (plist_any_eq_true _ _).mp hz_xs
+            obtain ⟨w, hw_mem, hw_eq⟩ := (PList.any_eq_true _ _).mp hz_xs
             obtain ⟨hx_nd, _⟩ := hn1
             have hxw : extEq x w = true := extEq_trans x z w (by
               have hzx : extEq z x = true := by rwa [hxy_eq]
@@ -362,7 +336,7 @@ theorem sorted_nodup_setEquiv_eq :
         · intro hz_ys
           rcases hfull.mpr (Or.inr hz_ys) with h | h
           · exfalso
-            obtain ⟨w, hw_mem, hw_eq⟩ := (plist_any_eq_true _ _).mp hz_ys
+            obtain ⟨w, hw_mem, hw_eq⟩ := (PList.any_eq_true _ _).mp hz_ys
             obtain ⟨hy_nd, _⟩ := hn2
             have hyw : extEq y w = true := extEq_trans y z w (by
               have hzy : extEq z y = true := by rwa [← hxy_eq]
@@ -394,14 +368,14 @@ theorem extEq_normalize
     · intro z
       constructor
       · intro hz
-        obtain ⟨w, hw_mem, hw_eq⟩ := (plist_any_eq_true _ _).mp hz
-        apply (plist_any_eq_true _ _).mpr
+        obtain ⟨w, hw_mem, hw_eq⟩ := (PList.any_eq_true _ _).mp hz
+        apply (PList.any_eq_true _ _).mpr
         exact ⟨normalize w, mem_normalizePList.mpr ⟨w, hw_mem, rfl⟩,
                extEq_trans z w (normalize w) hw_eq (ih_all w hw_mem)⟩
       · intro hz
-        obtain ⟨w_norm, hw_norm_mem, hw_norm_eq⟩ := (plist_any_eq_true _ _).mp hz
+        obtain ⟨w_norm, hw_norm_mem, hw_norm_eq⟩ := (PList.any_eq_true _ _).mp hz
         obtain ⟨w, hw_mem, rfl⟩ := mem_normalizePList.mp hw_norm_mem
-        apply (plist_any_eq_true _ _).mpr
+        apply (PList.any_eq_true _ _).mpr
         have hw_ih : extEq (normalize w) w = true := by
           rw [extEq_comm]; exact ih_all w hw_mem
         exact ⟨w, hw_mem, extEq_trans z (normalize w) w hw_norm_eq hw_ih⟩
@@ -439,22 +413,22 @@ theorem normalize_eq_of_extEq {A B : CList}
         intro z
         constructor
         · intro hz
-          obtain ⟨w, hw_mem, hw_eq⟩ := (plist_any_eq_true _ _).mp hz
+          obtain ⟨w, hw_mem, hw_eq⟩ := (PList.any_eq_true _ _).mp hz
           obtain ⟨xi, hxi_mem, rfl⟩ := mem_normalizePList.mp hw_mem
           have hxi_in_ys :=
-            (h xi).mp ((plist_any_eq_true _ _).mpr ⟨xi, hxi_mem, extEq_refl xi⟩)
-          obtain ⟨yj, hyj_mem, hyj_eq⟩ := (plist_any_eq_true _ _).mp hxi_in_ys
+            (h xi).mp ((PList.any_eq_true _ _).mpr ⟨xi, hxi_mem, extEq_refl xi⟩)
+          obtain ⟨yj, hyj_mem, hyj_eq⟩ := (PList.any_eq_true _ _).mp hxi_in_ys
           have hIH : normalize xi = normalize yj := normalize_eq_of_extEq hyj_eq
-          exact (plist_any_eq_true _ _).mpr
+          exact (PList.any_eq_true _ _).mpr
             ⟨normalize yj, mem_normalizePList.mpr ⟨yj, hyj_mem, rfl⟩, hIH ▸ hw_eq⟩
         · intro hz
-          obtain ⟨w, hw_mem, hw_eq⟩ := (plist_any_eq_true _ _).mp hz
+          obtain ⟨w, hw_mem, hw_eq⟩ := (PList.any_eq_true _ _).mp hz
           obtain ⟨yj, hyj_mem, rfl⟩ := mem_normalizePList.mp hw_mem
           have hyj_in_xs :=
-            (h yj).mpr ((plist_any_eq_true _ _).mpr ⟨yj, hyj_mem, extEq_refl yj⟩)
-          obtain ⟨xi, hxi_mem, hxi_eq⟩ := (plist_any_eq_true _ _).mp hyj_in_xs
+            (h yj).mpr ((PList.any_eq_true _ _).mpr ⟨yj, hyj_mem, extEq_refl yj⟩)
+          obtain ⟨xi, hxi_mem, hxi_eq⟩ := (PList.any_eq_true _ _).mp hyj_in_xs
           have hIH : normalize yj = normalize xi := normalize_eq_of_extEq hxi_eq
-          exact (plist_any_eq_true _ _).mpr
+          exact (PList.any_eq_true _ _).mpr
             ⟨normalize xi, mem_normalizePList.mpr ⟨xi, hxi_mem, rfl⟩, hIH ▸ hw_eq⟩
       exact SetEquiv.trans (insertionSort_setEquiv _)
         (SetEquiv.trans (dedup_setEquiv_self _)
@@ -508,7 +482,7 @@ private theorem dedupAux_id_of_nodup_fresh_aux
     congr 1
     apply ih (.cons a vistos) has_nd
     intro y hy
-    simp only [plist_any_cons, Bool.or_eq_false_iff]
+    simp only [PList.any_cons, Bool.or_eq_false_iff]
     exact ⟨by rw [extEq_comm]; exact ha_nd y hy, hfresh y (PList.Mem.tail hy)⟩
 
 theorem dedup_cons_fresh (x : CList) (l : PList CList)
