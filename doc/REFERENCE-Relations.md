@@ -1,6 +1,6 @@
 # Technical Reference — Relations, Functions & Products
 
-**Last updated:** 2026-05-16
+**Last updated:** 2026-05-18
 **Parent:** [../REFERENCE.md](../REFERENCE.md)
 **Related:** [REFERENCE-HFSets.md](REFERENCE-HFSets.md) | [REFERENCE-Algebra.md](REFERENCE-Algebra.md)
 
@@ -43,6 +43,8 @@ inverse, restriction, replacement, and cartesian products.
 | 53 | `AczelSetTheory/Axioms/Replacement.lean` | ✅ Complete |
 | 73 | `AczelSetTheory/Operations/CartProd.lean` | ✅ Complete |
 | 74 | `AczelSetTheory/Axioms/CartProd.lean` | ✅ Complete |
+| 75 | `AczelSetTheory/Operations/NPow.lean` | ✅ Complete |
+| 76 | `AczelSetTheory/Axioms/NPow.lean` | ✅ Complete |
 
 ---
 
@@ -309,6 +311,32 @@ def HFSet.cartProd (A B : HFSet) : HFSet :=
 
 ---
 
+### 4.46 Operations/NPow.lean — `namespace HFSet`
+
+#### 4.46.1 `HFSet.nPow`
+
+```lean
+def nPow (A : HFSet) : ℕ₀ → HFSet
+  | .zero   => singleton empty
+  | .succ n => nPow A n ×ₕ A
+
+@[simp] theorem nPow_zero (A : HFSet) : nPow A 𝟘 = singleton empty := rfl
+@[simp] theorem nPow_succ (A : HFSet) (n : ℕ₀) : nPow A (σ n) = nPow A n ×ₕ A := rfl
+```
+
+- **Math**: Aⁿ ≔ n-ary Cartesian power of A encoded as nested ordered pairs.
+  - A⁰ = {∅}  (the unique 0-tuple)
+  - Aⁿ⁺¹ = Aⁿ ×ₕ A  (left-nested pairs)
+- Computable. Structural recursion on `n : ℕ₀`.
+
+---
+
+### 4.47 Axioms/NPow.lean — `namespace HFSet`
+
+> No new computable definitions. Exports theorems only (see §6.57).
+
+---
+
 ## 6. Theorems
 
 ### 6.18 Axioms/FunctionComp.lean — `namespace HFSet`
@@ -438,12 +466,14 @@ def HFSet.cartProd (A B : HFSet) : HFSet :=
 
 | # | Theorem | Lean signature |
 |---|---------|---------------|
-| 1 | `mem_imageRel` | `{R A b : HFSet} : b ∈ imageRel R A ↔ ∃ a, a ∈ A ∧ ⟪a, b⟫ ∈ R` |
-| 2 | `imageRel_empty_rel` | `{A : HFSet} : imageRel empty A = empty` |
-| 3 | `imageRel_empty_set` | `{R : HFSet} : imageRel R empty = empty` |
-| 4 | `mem_relComp` | `{R S c : HFSet} : c ∈ S ∘ᵣ R ↔ ∃ a b, ⟪a, b⟫ ∈ R ∧ ⟪b, c⟫ ∈ S` |
-| 5 | `relComp_empty_left` | `{R : HFSet} : empty ∘ᵣ R = empty` |
-| 6 | `relComp_empty_right` | `{S : HFSet} : S ∘ᵣ empty = empty` |
+| 1 | `fst_in` | `(a b R : HFSet) (h : ⟪a, b⟫ ∈ R) : a ∈ sUnion (sUnion R)` |
+| 2 | `snd_in` | `(a b R : HFSet) (h : ⟪a, b⟫ ∈ R) : b ∈ sUnion (sUnion R)` |
+| 3 | `mem_imageRel` | `{R A b : HFSet} : b ∈ imageRel R A ↔ ∃ a, a ∈ A ∧ ⟪a, b⟫ ∈ R` |
+| 4 | `imageRel_empty_rel` | `{A : HFSet} : imageRel empty A = empty` |
+| 5 | `imageRel_empty_set` | `{R : HFSet} : imageRel R empty = empty` |
+| 6 | `mem_relComp` | `{R S c : HFSet} : c ∈ S ∘ᵣ R ↔ ∃ a b, ⟪a, b⟫ ∈ R ∧ ⟪b, c⟫ ∈ S` |
+| 7 | `relComp_empty_left` | `{R : HFSet} : empty ∘ᵣ R = empty` |
+| 8 | `relComp_empty_right` | `{S : HFSet} : S ∘ᵣ empty = empty` |
 
 ### 6.33 Axioms/Restriction.lean — `namespace HFSet`
 
@@ -466,6 +496,22 @@ def HFSet.cartProd (A B : HFSet) : HFSet :=
 | 4 | `image_subset_range` | `(f A y : HFSet) (h : y ∈ image f A) : y ∈ range f` |
 | 5 | `apply_mem_image` | `(f A x : HFSet) (_hf : isFunction f) (hxA : x ∈ A) (hx : ∃ b, ⟪x, b⟫ ∈ f) : apply f x hx ∈ image f A` |
 | 6 | `image_totalFunction_subset` | `(f A B y : HFSet) (hf : isTotalFunction f A B) (hy : y ∈ image f A) : y ∈ B` |
+
+### 6.56 Operations/NPow.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `nPow_zero` | `@[simp] (A : HFSet) : nPow A 𝟘 = singleton empty` |
+| 2 | `nPow_succ` | `@[simp] (A : HFSet) (n : ℕ₀) : nPow A (σ n) = nPow A n ×ₕ A` |
+
+### 6.57 Axioms/NPow.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `mem_nPow_zero` | `(t A : HFSet) : t ∈ nPow A 𝟘 ↔ t = empty` |
+| 2 | `mem_nPow_succ` | `(t A : HFSet) (n : ℕ₀) : t ∈ nPow A (σ n) ↔ ∃ s ∈ nPow A n, ∃ a ∈ A, t = ⟪s, a⟫` |
+
+---
 
 ### 6.54 Operations/CartProd.lean — `namespace HFSet`
 
@@ -566,7 +612,7 @@ def HFSet.cartProd (A B : HFSet) : HFSet :=
 
 ### Axioms/Composition.lean
 
-`HFSet.mem_imageRel`, `HFSet.imageRel_empty_rel`, `HFSet.imageRel_empty_set`, `HFSet.mem_relComp`, `HFSet.relComp_empty_left`, `HFSet.relComp_empty_right`
+`HFSet.fst_in`, `HFSet.snd_in`, `HFSet.mem_imageRel`, `HFSet.imageRel_empty_rel`, `HFSet.imageRel_empty_set`, `HFSet.mem_relComp`, `HFSet.relComp_empty_left`, `HFSet.relComp_empty_right`
 
 ### Axioms/Restriction.lean
 
@@ -583,3 +629,11 @@ def HFSet.cartProd (A B : HFSet) : HFSet :=
 ### Axioms/CartProd.lean
 
 `HFSet.mem_cartProd`, `HFSet.mem_cartProd_pair`, `HFSet.cartProd_empty_left`, `HFSet.cartProd_empty_right`, `HFSet.cartProd_isRelation`
+
+### Operations/NPow.lean
+
+`HFSet.nPow`, `HFSet.nPow_zero`, `HFSet.nPow_succ`
+
+### Axioms/NPow.lean
+
+`HFSet.mem_nPow_zero`, `HFSet.mem_nPow_succ`

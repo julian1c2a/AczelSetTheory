@@ -1,6 +1,6 @@
 # Technical Reference — PList (Peano-indexed Lists)
 
-**Last updated:** 2026-05-14
+**Last updated:** 2026-05-18
 **Parent:** [../REFERENCE.md](../REFERENCE.md)
 **Related:** [REFERENCE-HFList.md](REFERENCE-HFList.md) | [REFERENCE-VN.md](REFERENCE-VN.md)
 
@@ -208,6 +208,13 @@ Total bounded access. Contrast with `get? : PList α → ℕ₀ → Option α`.
 | `Mem_cons_iff` | `(x y : α) (t : PList α) : Mem x (cons y t) ↔ x = y ∨ Mem x t` |
 | `not_mem_nil` | `(x : α) : ¬ Mem x nil` |
 
+**Any**
+
+| Theorem | Statement |
+|---------|-----------|
+| `any_cons` | `@[simp] (p : α → Bool) (h : α) (t : PList α) : any p (cons h t) = (p h \|\| any p t)` |
+| `any_eq_true` | `(p : α → Bool) (l : PList α) : any p l = true ↔ ∃ x, Mem x l ∧ p x = true` |
+
 **Filter**
 
 | Theorem | Statement |
@@ -241,7 +248,7 @@ Bridge lemmas only (see §4.18). No independent theorems.
 
 ### PList/Lemmas.lean
 
-`PList.length_nil`, `PList.length_cons`, `PList.length_eq_zero_iff_nil`, `PList.append_nil`, `PList.nil_append`, `PList.append_assoc`, `PList.length_append`, `PList.map_nil`, `PList.map_cons`, `PList.length_map`, `PList.map_append`, `PList.toList_nil`, `PList.toList_cons`, `PList.ofList_nil`, `PList.ofList_cons`, `PList.toList_ofList`, `PList.ofList_toList`, `PList.length_toList`, `PList.mem_cons_iff`, `PList.Mem_cons_iff`, `PList.not_mem_nil`, `PList.length_filter_le`
+`PList.length_nil`, `PList.length_cons`, `PList.length_eq_zero_iff_nil`, `PList.append_nil`, `PList.nil_append`, `PList.append_assoc`, `PList.length_append`, `PList.map_nil`, `PList.map_cons`, `PList.length_map`, `PList.map_append`, `PList.toList_nil`, `PList.toList_cons`, `PList.ofList_nil`, `PList.ofList_cons`, `PList.toList_ofList`, `PList.ofList_toList`, `PList.length_toList`, `PList.mem_cons_iff`, `PList.Mem_cons_iff`, `PList.not_mem_nil`, `PList.any_cons`, `PList.any_eq_true`, `PList.length_filter_le`
 
 ### PList/Omega0.lean
 

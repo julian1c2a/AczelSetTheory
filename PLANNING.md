@@ -1,6 +1,6 @@
 # PLANNING — AczelSetTheory
 
-**Last updated:** 2026-05-11
+**Last updated:** 2026-05-18
 **Author:** Julián Calderón Almendros
 
 > Plan de largo plazo para AczelSetTheory. Cada fase es ejecutable de forma
@@ -25,19 +25,52 @@
 
 ---
 
-## Estado actual (2026-05-11)
+## Estado actual (2026-05-18)
 
-- **22 módulos Lean, 0 sorry.**
-- CList completo (7 sub-módulos).
-- HFSet: tipo cociente sobre CList, membresía extensional, 0 sorry.
-- Axiomas Zermelo completos: Extensionalidad, Vacío, Par, Unión, Separación,
-  Intersección, Setminus, Potencia, Fundación, Singleton, Par Ordenado.
-- Fases pendientes en HFSet puro: 7 (Adjunción, ε-inducción, Prod Cartesiano),
-  8 (Decidabilidad, Álgebra Boole), 9–11 (Naturales vN internos, Relaciones,
-  Reemplazo, Elección).
+- **~85 módulos Lean, 0 sorry.**
+- Fases 1–5 **completadas**. Ver detalle abajo.
 
-**Dependencia actual:** solo `Init.Data.List.Basic` de Lean. El objetivo es
-eliminar esta dependencia progresivamente en favor de PList/ℕ₀.
+### Completado
+
+**CList** (8 módulos): Basic, ExtEq, Filter, SetEquiv, Order, Sort, Normalize, barrel.
+- Refactorizado completamente a `PList CList` / `ℕ₀` (Fase 2 ✅).
+
+**PList** (4 módulos): Basic, Lemmas, Omega0, Fin0.
+- `omega₀` tactic disponible. Fase 1 ✅.
+
+**HFSet** (1 módulo): cociente extensional sobre CList.
+
+**Axiomas Zermelo** completos: Extensionalidad, Vacío, Par, Unión, Separación,
+Intersección, Setminus, Potencia, Fundación, Singleton.
+
+**Relaciones y funciones** (Fase 10 ✅): Par Ordenado, isRelation, domain/range,
+isFunction, isTotalFunction, apply, relInv, restrict, preimage, relComp,
+imageRel, image (reemplazo), FunctionComp, Identity, Product (×ₛ), Bijection.
+
+**Producto Cartesiano computable** (Fase 7 ✅): `cartProd` / `×ₕ` a nivel CList
+y HFSet. `CartProd.lean` + `Axioms/CartProd.lean`.
+
+**Potencia n-aria** (NPow): `nPow A n` = Aⁿ como potencia cartesiana iterada.
+`Operations/NPow.lean` + `Axioms/NPow.lean`.
+
+**HFList / FinList**: `HFList = PList HFSet`, `FinList n = {l : HFList // l.length = n}`.
+Infrastructura de n-tuplas tipadas estáticamente.
+
+**Embedding vN** (Fases 3–5 ✅): `vN : ℕ₀ → HFSet` inyectivo, aritmética
+transportada (addVN, mulVN, subVN, divVN, powVN, factorialVN, rank, card),
+`VN/CardVN.lean`. `Axioms/OrdinalNat.lean`: `isOrdinal ↔ isNat` en V_ω.
+
+**Fintype** (F1+F2): `Finset`, `Fintype`, `HFSet.toList`, `HFSet.toFinset`,
+`membership_fintype`.
+
+### Pendiente (medio plazo)
+
+- **[B1]** Teoría de FinList / HFList: igualdad extensional n-tuplas, concatenación, slice.
+- **[B2]** Transporte VN de más operaciones de Peanolib (mcd, mcm, divisibilidad, primalidad).
+- **[B3]** Teoría de relaciones de orden: preorden, orden parcial, orden total, orden bien fundado — exhaustiva como infraestructura para fases futuras.
+- **[C]** Plan y discusión ASet₁ antes de comenzar la implementación.
+
+**Dependencia actual:** `Init.Data.List.Basic` eliminada. Dependencia: `Peano` (library externa).
 
 ---
 

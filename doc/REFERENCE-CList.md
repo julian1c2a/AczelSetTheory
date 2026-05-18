@@ -1,6 +1,6 @@
 # Technical Reference — CList (Concrete Hereditarily Finite Lists)
 
-**Last updated:** 2026-05-14
+**Last updated:** 2026-05-18
 **Parent:** [../REFERENCE.md](../REFERENCE.md)
 **Related:** [REFERENCE-HFSets.md](REFERENCE-HFSets.md)
 
@@ -40,36 +40,41 @@ normalization algorithm (dedup + insertion sort) that feeds into the `HFSet` quo
 
 ```lean
 inductive CList : Type where
-  | mk : List CList → CList
+  | mk : PList CList → CList
   deriving Repr, Inhabited
 ```
 
 - **Math**: A ≔ {a₁, a₂, …, aₙ} where each aᵢ is itself a CList
+- Children stored as a `PList CList` (Peano-indexed list).
 - Computable. No termination proof needed (structural).
 
 #### 4.1.2 Size Functions (mutual)
 
 ```lean
 mutual
-  def cSize : CList → Nat
-    | mk xs => 1 + cSizeList xs
-  def cSizeList : List CList → Nat
-    | [] => 0
-    | x :: xs => 1 + cSize x + cSizeList xs
+  def cSize : CList → ℕ₀
+    | mk xs => σ (cSizePList xs)
+  def cSizePList : PList CList → ℕ₀
+    | .nil      => 𝟘
+    | .cons x xs => σ (add (cSize x) (cSizePList xs))
 end
+
+@[simp] theorem cSize_mk (xs : PList CList) : cSize (mk xs) = σ (cSizePList xs)
+@[simp] theorem cSizePList_nil : cSizePList .nil = 𝟘
+@[simp] theorem cSizePList_cons (x : CList) (xs : PList CList) :
+    cSizePList (.cons x xs) = σ (add (cSize x) (cSizePList xs))
 ```
 
-- **Math**: |A| ≔ 1 + Σᵢ (1 + |aᵢ|)
+- **Math**: |A| ≔ σ (Σᵢ σ(1 + |aᵢ|))  — size in ℕ₀.
 - Computable. Structural recursion.
 
 #### 4.1.3 `empty`
 
 ```lean
-def empty : CList := mk []
+def empty : CList := mk .nil
 ```
 
 - **Math**: ∅ ≔ {}
-- Computable.
 
 #### 4.1.4 Comparison Engine
 
@@ -110,8 +115,8 @@ def lt (A B : CList) : Bool
 #### 4.1.7 Deduplication
 
 ```lean
-def dedupAux (l : List CList) (vistos : List CList) : List CList
-def dedup (l : List CList) : List CList := dedupAux l []
+def dedupAux (l vistos : PList CList) : PList CList
+def dedup (l : PList CList) : PList CList := dedupAux l .nil
 ```
 
 - **Math**: Remove extensional duplicates, keeping first occurrence.
@@ -120,8 +125,8 @@ def dedup (l : List CList) : List CList := dedupAux l []
 #### 4.1.8 Insertion Sort
 
 ```lean
-def orderedInsert (x : CList) : List CList → List CList
-def insertionSort : List CList → List CList
+def orderedInsert (x : CList) : PList CList → PList CList
+def insertionSort : PList CList → PList CList
 ```
 
 - **Math**: Insertion sort using `lt` with extensional duplicate removal.
@@ -130,21 +135,33 @@ def insertionSort : List CList → List CList
 #### 4.1.9 Normalization
 
 ```lean
-def normalize : CList → CList
-  | mk xs => mk (insertionSort (dedup (xs.map normalize)))
+mutual
+  def normalize : CList → CList
+    | mk xs => mk (normalizePList xs)
+  def normalizePList : PList CList → PList CList
+    | .nil      => .nil
+    | .cons x xs => insertionSort (dedup (normalizePList xs |>.cons (normalize x)))
+end
 ```
 
 - **Math**: norm(A) ≔ sort(dedup(map(norm, children(A))))
-- Computable. Termination by well-founded recursion on the tree structure.
+- Computable. Termination by well-founded recursion on `sizeOf`.
 
-#### 4.1.10 Test Definitions
+#### 4.1.10 Key Lemma
+
+```lean
+theorem cSize_lt_of_mem {x : CList} {xs : PList CList} (h : x ∈ xs) :
+    cSize x < cSize (mk xs)
+```
+
+#### 4.1.11 Test Definitions
 
 ```lean
 def zero  := empty                                    -- ∅
-def one   := mk [zero]                                -- {∅}
-def two   := mk [zero, one]                           -- {∅, {∅}}
-def three := mk [zero, one, two]                      -- {∅, {∅}, {∅, {∅}}}
-def dirty := mk [one, two, zero, three, one, zero, zero, two, three, two]
+def one   := mk (.cons zero .nil)                     -- {∅}
+def two   := mk (.cons zero (.cons one .nil))          -- {∅, {∅}}
+def three := mk (.cons zero (.cons one (.cons two .nil))) -- {∅, {∅}, {∅, {∅}}}
+def dirty := mk (...)  -- a list with duplicates and disorder
 ```
 
 ---
@@ -174,22 +191,33 @@ def P_respects (P : CList → Bool) : Prop :=
 #### 4.4.1 `Nodup`
 
 ```lean
-def Nodup (l : List CList) : Prop :=
-  l.Pairwise (fun a b => extEq a b = false)
+def Nodup : PList CList → Prop
+  | .nil      => True
+  | .cons x xs => (∀ y ∈ xs, extEq x y = false) ∧ Nodup xs
 ```
 
-- **Math**: No two distinct positions i < j satisfy aᵢ =ₑ aⱼ.
-- Noncomputable (Prop). Decidable via `extEq`.
+- **Math**: No element in the list is extensionally equal to a later element.
+- Noncomputable (Prop). Inductive definition over `PList CList`.
 
 #### 4.4.2 `SetEquiv`
 
 ```lean
-def SetEquiv (l₁ l₂ : List CList) : Prop :=
-  ∀ x, (l₁.any (extEq x) = true) ↔ (l₂.any (extEq x) = true)
+def SetEquiv (l₁ l₂ : PList CList) : Prop :=
+  ∀ x, (PList.any (fun y => extEq x y) l₁ = true) ↔
+       (PList.any (fun y => extEq x y) l₂ = true)
 ```
 
 - **Math**: l₁ ≡ l₂ ⟺ ∀ x, (∃ a ∈ l₁, a =ₑ x) ↔ (∃ b ∈ l₂, b =ₑ x)
 - Noncomputable (Prop with universal quantifier over CList).
+
+#### 4.4.3 `mem_eq_any`
+
+```lean
+theorem mem_eq_any (x : CList) (l : PList CList) :
+    mem x (mk l) = PList.any (fun y => extEq x y) l
+```
+
+Bridges Boolean `mem` and `PList.any` for reasoning about SetEquiv.
 
 ---
 
@@ -204,10 +232,10 @@ No new definitions. Only theorems (see §6.5).
 #### 4.6.1 `Sorted`
 
 ```lean
-def Sorted : List CList → Prop
-  | []               => True
-  | [_]              => True
-  | a :: b :: rest   => lt a b = true ∧ Sorted (b :: rest)
+def Sorted : PList CList → Prop
+  | .nil               => True
+  | .cons _ .nil       => True
+  | .cons a (.cons b rest) => lt a b = true ∧ Sorted (.cons b rest)
 ```
 
 - **Math**: Strictly sorted by `lt`.
@@ -227,9 +255,12 @@ No new definitions. Only theorems (see §6.7).
 
 ### 6.1 CList/Basic.lean
 
-| # | Theorem | Lean signature | Math | Terminated by |
-|---|---------|---------------|------|---------------|
-| 1 | `cSize_lt_of_mem` | `{x : CList} {xs : List CList} (h : x ∈ xs) : cSize x < cSize (mk xs)` | x ∈ xs → \|x\| < \|{xs}\| | structural |
+| # | Theorem | Lean signature | Math |
+|---|---------|---------------|------|
+| 1 | `cSize_mk` | `@[simp] (xs : PList CList) : cSize (mk xs) = σ (cSizePList xs)` | size of node |
+| 2 | `cSizePList_nil` | `@[simp] : cSizePList .nil = 𝟘` | size of empty list |
+| 3 | `cSizePList_cons` | `@[simp] (x : CList) (xs : PList CList) : cSizePList (.cons x xs) = σ (add (cSize x) (cSizePList xs))` | size of cons |
+| 4 | `cSize_lt_of_mem` | `{x : CList} {xs : PList CList} (h : x ∈ xs) : cSize x < cSize (mk xs)` | x ∈ xs → \|x\| < \|{xs}\| |
 
 ---
 
@@ -237,14 +268,14 @@ No new definitions. Only theorems (see §6.7).
 
 | # | Theorem | Lean signature | Terminated by |
 |---|---------|---------------|---------------|
-| 1 | `subset_mono` | `(xs : List CList) (y : CList) (ys : List CList) (h : evalOp .subset (mk xs) (mk ys) = true) : evalOp .subset (mk xs) (mk (y :: ys)) = true` | — |
+| 1 | `subset_mono` | `(xs : PList CList) (y : CList) (ys : PList CList) (h : evalOp .subset (mk xs) (mk ys) = true) : evalOp .subset (mk xs) (mk (.cons y ys)) = true` | — |
 | 2 | `subset_refl` | `(A : CList) : subset A A = true` | `cSize A` |
 | 3 | `extEq_refl` | `(A : CList) : extEq A A = true` | — (uses `subset_refl`) |
 | 4 | `extEq_def` | `(A B : CList) : extEq A B = (subset A B && subset B A)` | — |
-| 5 | `subset_nil` | `(B : CList) : subset (mk []) B = true` | — |
-| 6 | `subset_cons` | `(x : CList) (xs : List CList) (B : CList) : subset (mk (x :: xs)) B = (mem x B && subset (mk xs) B)` | — |
-| 7 | `mem_nil` | `(x : CList) : mem x (mk []) = false` | — |
-| 8 | `mem_cons` | `(x y : CList) (ys : List CList) : mem x (mk (y :: ys)) = (extEq x y \|\| mem x (mk ys))` | — |
+| 5 | `subset_nil` | `(B : CList) : subset (mk .nil) B = true` | — |
+| 6 | `subset_cons` | `(x : CList) (xs : PList CList) (B : CList) : subset (mk (.cons x xs)) B = (mem x B && subset (mk xs) B)` | — |
+| 7 | `mem_nil` | `(x : CList) : mem x (mk .nil) = false` | — |
+| 8 | `mem_cons` | `(x y : CList) (ys : PList CList) : mem x (mk (.cons y ys)) = (extEq x y \|\| mem x (mk ys))` | — |
 
 **Mutual block** (*terminated by* weighted sum of `cSize` arguments):
 
@@ -265,11 +296,11 @@ No new definitions. Only theorems (see §6.7).
 
 | # | Theorem | Lean signature |
 |---|---------|---------------|
-| 1 | `subset_filter` | `(P : CList → Bool) (xs : List CList) : subset (mk (xs.filter P)) (mk xs) = true` |
-| 2 | `mem_filter_of_mem` | `(P : CList → Bool) (hP_resp : P_respects P) (x : CList) (xs : List CList) (hx : mem x (mk xs) = true) (hPx : P x = true) : mem x (mk (xs.filter P)) = true` |
-| 3 | `filter_subset_filter` | `(P : CList → Bool) (hP_resp : P_respects P) (xs ys : List CList) (hsub : subset (mk xs) (mk ys) = true) : subset (mk (xs.filter P)) (mk (ys.filter P)) = true` |
-| 4 | `extEq_filter` | `(P : CList → Bool) (hP_resp : P_respects P) (xs ys : List CList) (heq : extEq (mk xs) (mk ys) = true) : extEq (mk (xs.filter P)) (mk (ys.filter P)) = true` |
-| 5 | `P_of_mem_filter` | `(P : CList → Bool) (hP_resp : P_respects P) (x : CList) (xs : List CList) (hx : mem x (mk (xs.filter P)) = true) : P x = true` |
+| 1 | `subset_filter` | `(P : CList → Bool) (xs : PList CList) : subset (mk (PList.filter P xs)) (mk xs) = true` |
+| 2 | `mem_filter_of_mem` | `(P : CList → Bool) (hP_resp : P_respects P) (x : CList) (xs : PList CList) (hx : mem x (mk xs) = true) (hPx : P x = true) : mem x (mk (PList.filter P xs)) = true` |
+| 3 | `filter_subset_filter` | `(P : CList → Bool) (hP_resp : P_respects P) (xs ys : PList CList) (hsub : subset (mk xs) (mk ys) = true) : subset (mk (PList.filter P xs)) (mk (PList.filter P ys)) = true` |
+| 4 | `extEq_filter` | `(P : CList → Bool) (hP_resp : P_respects P) (xs ys : PList CList) (heq : extEq (mk xs) (mk ys) = true) : extEq (mk (PList.filter P xs)) (mk (PList.filter P ys)) = true` |
+| 5 | `P_of_mem_filter` | `(P : CList → Bool) (hP_resp : P_respects P) (x : CList) (xs : PList CList) (hx : mem x (mk (PList.filter P xs)) = true) : P x = true` |
 
 ---
 
@@ -277,13 +308,13 @@ No new definitions. Only theorems (see §6.7).
 
 | # | Theorem | Lean signature |
 |---|---------|---------------|
-| 1 | `dedup_nodup` | `(l : List CList) : Nodup (dedup l)` |
-| 2 | `SetEquiv.refl` | `(l : List CList) : SetEquiv l l` |
-| 3 | `SetEquiv.symm` | `{l₁ l₂ : List CList} (h : SetEquiv l₁ l₂) : SetEquiv l₂ l₁` |
-| 4 | `SetEquiv.trans` | `{l₁ l₂ l₃ : List CList} (h₁ : SetEquiv l₁ l₂) (h₂ : SetEquiv l₂ l₃) : SetEquiv l₁ l₃` |
-| 5 | `mem_eq_any` | `(x : CList) (l : List CList) : mem x (mk l) = l.any (extEq x)` |
-| 6 | `extEq_mk_iff_setEquiv` | `(xs ys : List CList) : extEq (mk xs) (mk ys) = true ↔ SetEquiv xs ys` |
-| 7 | `dedup_setEquiv_self` | `(l : List CList) : SetEquiv (dedup l) l` |
+| 1 | `dedup_nodup` | `(l : PList CList) : Nodup (dedup l)` |
+| 2 | `SetEquiv.refl` | `(l : PList CList) : SetEquiv l l` |
+| 3 | `SetEquiv.symm` | `{l₁ l₂ : PList CList} (h : SetEquiv l₁ l₂) : SetEquiv l₂ l₁` |
+| 4 | `SetEquiv.trans` | `{l₁ l₂ l₃ : PList CList} (h₁ : SetEquiv l₁ l₂) (h₂ : SetEquiv l₂ l₃) : SetEquiv l₁ l₃` |
+| 5 | `mem_eq_any` | `(x : CList) (l : PList CList) : mem x (mk l) = PList.any (fun y => extEq x y) l` |
+| 6 | `extEq_mk_iff_setEquiv` | `(xs ys : PList CList) : extEq (mk xs) (mk ys) = true ↔ SetEquiv xs ys` |
+| 7 | `dedup_setEquiv_self` | `(l : PList CList) : SetEquiv (dedup l) l` |
 
 ---
 
@@ -304,26 +335,32 @@ No new definitions. Only theorems (see §6.7).
 
 | # | Theorem | Lean signature | Dependencies |
 |---|---------|---------------|--------------|
-| 1 | `insertionSort_sorted` | `(l : List CList) : Sorted (insertionSort l)` | `orderedInsert_sorted` (private) |
-| 2 | `insertionSort_mem_subset` | `(z : CList) (l : List CList) : z ∈ insertionSort l → z ∈ l` | `mem_of_mem_orderedInsert` (private) |
-| 3 | `insertionSort_nodup` | `(l : List CList) (hl : Nodup l) : Nodup (insertionSort l)` | `orderedInsert_nodup` (private) |
-| 4 | `insertionSort_setEquiv` | `(l : List CList) : SetEquiv (insertionSort l) l` | `orderedInsert_setEquiv` (private) |
+| 1 | `insertionSort_sorted` | `(l : PList CList) : Sorted (insertionSort l)` | `orderedInsert_sorted` (private) |
+| 2 | `insertionSort_mem_subset` | `(z : CList) (l : PList CList) : PList.Mem z (insertionSort l) → PList.Mem z l` | `mem_of_mem_orderedInsert` (private) |
+| 3 | `insertionSort_nodup` | `(l : PList CList) (hl : Nodup l) : Nodup (insertionSort l)` | `orderedInsert_nodup` (private) |
+| 4 | `insertionSort_setEquiv` | `(l : PList CList) : SetEquiv (insertionSort l) l` | `orderedInsert_setEquiv` (private) |
+| 5 | `sorted_head_lt_of_mem` | `{a b : CList} {l : PList CList} (hs : Sorted (.cons a l)) (hb : PList.Mem b l) : lt a b = true` | — |
+| 6 | `length_orderedInsert_fresh` | `(x : CList) (l : PList CList) (hf : ∀ y ∈ l, extEq x y = false) : PList.length (orderedInsert x l) = σ (PList.length l)` | — |
+| 7 | `length_insertionSort_nodup` | `(l : PList CList) (hn : Nodup l) : PList.length (insertionSort l) = PList.length l` | — |
 
 ---
 
 ### 6.7 CList/Normalize.lean
 
-| # | Theorem | Lean signature | Terminated by |
-|---|---------|---------------|---------------|
-| 1 | `cSizeList_dedup_le` | `(l : List CList) : cSizeList (dedup l) ≤ cSizeList l` | — |
-| 2 | `cSizeList_insertionSort_le` | `(l : List CList) : cSizeList (insertionSort l) ≤ cSizeList l` | — |
-| 3 | `normalize_cSize_le` | `(A : CList) : cSize (normalize A) ≤ cSize A` | `cSize A * 2` (mutual with `normalize_cSizeList_le`) |
-| 4 | `dedup_id_of_nodup` | `(l : List CList) (h : Nodup l) : dedup l = l` | — |
-| 5 | `insertionSort_id_of_sorted_nodup` | `(l : List CList) (hs : Sorted l) (hn : Nodup l) : insertionSort l = l` | — |
-| 6 | `normalize_idem` | `(A : CList) : normalize (normalize A) = normalize A` | `cSize A * 2` (mutual with `normalize_idem_list`) |
-| 7 | `mem_of_mem_dedup` | `(l : List CList) (y : CList) (h : y ∈ dedup l) : y ∈ l` | — |
-| 8 | `sorted_nodup_setEquiv_eq` | `(l₁ l₂ : List CList) : Sorted l₁ → Sorted l₂ → Nodup l₁ → Nodup l₂ → SetEquiv l₁ l₂ → (∀ a ∈ l₁, ∀ b ∈ l₂, extEq a b = true → a = b) → l₁ = l₂` | structural on `l₁`, `l₂` |
-| 9 | `normalize_eq_of_extEq` | `{A B : CList} (h : CList.extEq A B = true) : CList.normalize A = CList.normalize B` | `CList.cSize A + CList.cSize B` |
+| # | Theorem | Lean signature | Notes |
+|---|---------|---------------|-------|
+| 1 | `mem_of_mem_dedup` | `(l : PList CList) (y : CList) (h : PList.Mem y (dedup l)) : PList.Mem y l` | — |
+| 2 | `dedup_id_of_nodup` | `(l : PList CList) (h : Nodup l) : dedup l = l` | — |
+| 3 | `insertionSort_id_of_sorted_nodup` | `(l : PList CList) (hs : Sorted l) (hn : Nodup l) : insertionSort l = l` | — |
+| 4 | `normalize_idem` | `(A : CList) : normalize (normalize A) = normalize A` | mutual with `normalizePList_idem` |
+| 5 | `sorted_nodup_setEquiv_eq` | `(l₁ l₂ : PList CList) : Sorted l₁ → Sorted l₂ → Nodup l₁ → Nodup l₂ → SetEquiv l₁ l₂ → (∀ a ∈ l₁, ∀ b ∈ l₂, extEq a b = true → a = b) → l₁ = l₂` | — |
+| 6 | `extEq_normalize` | `(A : CList) : extEq A (normalize A) = true` | — |
+| 7 | `normalize_eq_of_extEq` | `{A B : CList} (h : CList.extEq A B = true) : CList.normalize A = CList.normalize B` | — |
+| 8 | `extEq_iff_normalize_eq` | `{A B : CList} : extEq A B = true ↔ normalize A = normalize B` | — |
+| 9 | `dedup_cons_fresh` | `(x : CList) (l : PList CList) (hf : ∀ y ∈ l, extEq x y = false) : dedup (.cons x l) = .cons x (dedup l)` | — |
+| 10 | `normalize_cons_fresh` | (related normalization lemma for fresh cons) | — |
+| 11 | `normalize_fixed_of_mem_normalize` | (element of normalized list is already normalized) | — |
+| 12 | `normalize_mk_of_normalized_sorted_nodup` | `(xs : PList CList) (hn : Nodup xs) (hs : Sorted xs) (hf : ∀ x ∈ xs, normalize x = x) : normalize (mk xs) = mk xs` | — |
 
 ---
 
@@ -331,7 +368,7 @@ No new definitions. Only theorems (see §6.7).
 
 ### CList/Basic.lean
 
-`CList`, `CList.mk`, `CList.cSize`, `CList.cSizeList`, `CList.cSize_lt_of_mem`, `CList.empty`, `CListOp`, `CList.evalOp`, `CList.mem`, `CList.subset`, `CList.extEq`, `BEq CList`, `CList.lt`, `CList.dedupAux`, `CList.dedup`, `CList.orderedInsert`, `CList.insertionSort`, `CList.normalize`, `CList.zero`, `CList.one`, `CList.two`, `CList.three`, `CList.dirty`
+`CList`, `CList.mk`, `CList.cSize`, `CList.cSizePList`, `CList.cSize_mk`, `CList.cSizePList_nil`, `CList.cSizePList_cons`, `CList.cSize_lt_of_mem`, `CList.empty`, `CListOp`, `CList.evalOp`, `CList.mem`, `CList.subset`, `CList.extEq`, `BEq CList`, `CList.lt`, `CList.dedupAux`, `CList.dedup`, `CList.orderedInsert`, `CList.insertionSort`, `CList.normalize`, `CList.normalizePList`, `CList.zero`, `CList.one`, `CList.two`, `CList.three`, `CList.dirty`
 
 ### CList/ExtEq.lean
 
@@ -351,11 +388,11 @@ No new definitions. Only theorems (see §6.7).
 
 ### CList/Sort.lean
 
-`CList.Sorted`, `CList.insertionSort_sorted`, `CList.insertionSort_mem_subset`, `CList.insertionSort_nodup`, `CList.insertionSort_setEquiv`
+`CList.Sorted`, `CList.insertionSort_sorted`, `CList.insertionSort_mem_subset`, `CList.insertionSort_nodup`, `CList.insertionSort_setEquiv`, `CList.sorted_head_lt_of_mem`, `CList.length_orderedInsert_fresh`, `CList.length_insertionSort_nodup`
 
 ### CList/Normalize.lean
 
-`CList.cSizeList_dedup_le`, `CList.cSizeList_insertionSort_le`, `CList.normalize_cSize_le`, `CList.dedup_id_of_nodup`, `CList.insertionSort_id_of_sorted_nodup`, `CList.normalize_idem`, `CList.mem_of_mem_dedup`, `CList.sorted_nodup_setEquiv_eq`, `CList.normalize_eq_of_extEq`
+`CList.mem_of_mem_dedup`, `CList.dedup_id_of_nodup`, `CList.insertionSort_id_of_sorted_nodup`, `CList.normalize_idem`, `CList.sorted_nodup_setEquiv_eq`, `CList.extEq_normalize`, `CList.normalize_eq_of_extEq`, `CList.extEq_iff_normalize_eq`, `CList.dedup_cons_fresh`, `CList.normalize_cons_fresh`, `CList.normalize_fixed_of_mem_normalize`, `CList.normalize_mk_of_normalized_sorted_nodup`
 
 ### CList.lean (barrel)
 

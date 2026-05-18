@@ -86,6 +86,29 @@ instance : Membership HFSet HFList := ⟨fun l x => Mem x l⟩
 -- No definimos esta conversión aquí para no necesitar los axiomas
 -- de unión/inserción; se hará en Operations cuando estén disponibles.
 
+-- ─────────────────────────────────────────────────────────────────
+-- Lemas de membresía
+-- ─────────────────────────────────────────────────────────────────
+
+theorem not_mem_nil (x : HFSet) : ¬ x ∈ (nil : HFList) :=
+  PList.not_mem_nil x
+
+theorem mem_cons_iff (x h : HFSet) (t : HFList) :
+    x ∈ HFList.cons h t ↔ x = h ∨ x ∈ t :=
+  PList.Mem_cons_iff x h t
+
+-- ─────────────────────────────────────────────────────────────────
+-- get? simp lemmas
+-- ─────────────────────────────────────────────────────────────────
+
+@[simp] theorem get?_nil (i : ℕ₀) : (nil : HFList).get? i = none := rfl
+
+@[simp] theorem get?_cons_zero (h : HFSet) (t : HFList) :
+    (cons h t).get? 𝟘 = some h := rfl
+
+@[simp] theorem get?_cons_succ (h : HFSet) (t : HFList) (i : ℕ₀) :
+    (cons h t).get? (σ i) = (get? t i) := rfl
+
 end HFList
 
 -- ─────────────────────────────────────────────────────────────────
@@ -139,5 +162,71 @@ def cons (x : HFSet) (t : FinList n) : FinList (σ n) :=
 
 theorem ext {t s : FinList n} (h : t.val = s.val) : t = s :=
   Subtype.ext h
+
+-- ─────────────────────────────────────────────────────────────────
+-- Concatenación: (add n m)-tupla desde n-tupla y m-tupla
+-- ─────────────────────────────────────────────────────────────────
+
+/-- Concatena una n-tupla con una m-tupla produciendo una (n+m)-tupla. -/
+def append (t : FinList n) (s : FinList m) : FinList (add n m) :=
+  ⟨t.val ++ s.val, by rw [HFList.length_append, t.property, s.property]⟩
+
+/-- Longitud de la concatenación. -/
+theorem length_append (t : FinList n) (s : FinList m) :
+    (t.append s).val.length = add n m :=
+  (t.append s).property
+
+-- ─────────────────────────────────────────────────────────────────
+-- Map: aplicar una función a cada componente
+-- ─────────────────────────────────────────────────────────────────
+
+/-- Aplica una función a cada componente, preservando la aridad. -/
+def map (f : HFSet → HFSet) (t : FinList n) : FinList n :=
+  ⟨PList.map f t.val, by
+    show PList.length (PList.map f t.val) = n
+    rw [PList.length_map]; exact t.property⟩
+
+-- ─────────────────────────────────────────────────────────────────
+-- Head y Tail: primer componente y resto de una (σ n)-tupla
+-- ─────────────────────────────────────────────────────────────────
+
+/-- Primer componente de una (σ n)-tupla. -/
+def head (t : FinList (σ n)) : HFSet :=
+  match h : t.val with
+  | PList.nil => by
+      exfalso
+      have := t.property; rw [h, HFList.length_nil] at this; omega₀
+  | PList.cons x _ => x
+
+/-- Resto (n-tupla) de una (σ n)-tupla. -/
+def tail (t : FinList (σ n)) : FinList n :=
+  match h : t.val with
+  | PList.nil => by
+      exfalso
+      have := t.property; rw [h, HFList.length_nil] at this; omega₀
+  | PList.cons _ rest =>
+    ⟨rest, by
+      have := t.property
+      simp only [h, HFList.length_cons] at this
+      omega₀⟩
+
+-- ─────────────────────────────────────────────────────────────────
+-- Lemas de reducción para head y tail
+-- ─────────────────────────────────────────────────────────────────
+
+@[simp] theorem head_cons (x : HFSet) (t : FinList n) : head (cons x t) = x := rfl
+
+@[simp] theorem tail_cons (x : HFSet) (t : FinList n) : tail (cons x t) = t :=
+  FinList.ext rfl
+
+/-- Descomposición: toda (σ n)-tupla es `cons (head t) (tail t)`. -/
+theorem cons_head_tail (t : FinList (σ n)) : cons (head t) (tail t) = t := by
+  rcases t with ⟨l, hl⟩
+  cases l with
+  | nil =>
+      exfalso
+      simp only [HFList.length_nil] at hl; omega₀
+  | cons x rest =>
+      apply FinList.ext; rfl
 
 end FinList

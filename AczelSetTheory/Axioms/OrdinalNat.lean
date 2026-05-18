@@ -395,7 +395,7 @@ private theorem has_max_le (n : Nat) : ∀ A : HFSet,
 /-- En todo ordinal no vacío existe un ∈-máximo. -/
 private theorem ordinal_has_max (A : HFSet) (hA : isOrdinal A) (hne : A ≠ empty) :
     ∃ m, m ∈ A ∧ ∀ x ∈ A, x ∈ m ∨ x = m :=
-  has_max_le (Ψ (card A)) A hA.2 (fun x hx => isOrdinal_mem hA hx) hne (Nat.le_refl _)
+  has_max_le (Ψ (card A)) A hA.2 (fun _ hx => isOrdinal_mem hA hx) hne (Nat.le_refl _)
 
 -- ==================================================================
 -- El ordinal es el sucesor de su máximo

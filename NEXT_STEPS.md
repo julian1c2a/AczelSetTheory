@@ -1,6 +1,6 @@
 # Next Steps
 
-**Last updated:** 2026-05-17
+**Last updated:** 2026-05-18
 
 The project compiles on Lean 4.29.0 with **0 sorry, 85 modules**.
 Full Zermelo axioms derived. Architecture: CList/ + Operations/ + Axioms/ + PList/ + VN/.
@@ -82,70 +82,86 @@ See PLANNING.md for the full long-term roadmap.
 
 ---
 
-## CURRENT PRIORITY — Fase 1: Peano Integration Foundation
+## ✅ COMPLETED — Fase 1: Peano Integration Foundation
 
-> Objetivo: incorporar Peano como dependencia y construir la infraestructura
-> propia (PList + omega₀) que soporta el resto del plan.
-
----
-
-### ✅ 1.1 Lakefile — añadir Peano
-
-Completado. `lakefile.lean` actualizado con `require peanolib from git`.
+Fase 1 completada. Peano es dependencia, PList con ℕ₀ funciona, omega₀ disponible.
+Ver historial de commits para detalles.
 
 ---
 
-### ✅ 1.2 PList — lista propia con ℕ₀
+## CURRENT PRIORITIES (2026-05-18)
 
-Completado. Archivos creados:
+### [B1] FinList / HFList theory (medium difficulty)
 
-- `AczelSetTheory/PList/Basic.lean` — tipo `PList (α : Type)`, `length : PList α → ℕ₀`,
-  `map`, `filter`, `foldl`, `foldr`, `append`, `flatMap`, `reverse`, `zipWith`,
-  `mem [DecidableEq]` (Bool), `Mem` (Prop), `Membership` instance, `toList`/`ofList`
-- `AczelSetTheory/PList/Lemmas.lean` — lemas `@[simp]` + `length_append` (usa `add`
-  no `+` por la ambigüedad de elaboración), `length_toList`, `length_filter_le`
-- `AczelSetTheory/PList.lean` — barrel
+Develop what remains of `HFList.lean` and the `FinList n` n-tuple theory:
 
-**Nota técnica:** `export Peano.Add(add, ...)` en `Peano.PeanoNat.Add` coloca la
-función `add` directamente en el namespace `Peano`. Con `open Peano`, el operador `+`
-y la función `add` son dos caminos de elaboración distintos para el mismo valor, lo que
-causa ambigüedad. Solución: usar `add n m` en lugar de `n + m` en los enunciados de
-lemas que involucren longitudes.
+- Extensional equality for n-tuples (component-wise `=`)
+- `FinList.append` with arith: `FinList n → FinList m → FinList (n + m)`
+- `FinList.slice` / `FinList.take` / `FinList.drop` (bounded by Fin₀)
+- Conversión `FinList n → HFSet` (olvidar orden, eliminar dups, via Operations)
+- `HFList.Mem` ↔ `HFSet.Mem` para listas sin duplicados
+- `FinList` como dominio/codominio de funciones tipadas (infraestructura para ASet₁)
 
----
-
-### ✅ 1.3 omega₀ — táctica puente
-
-Completado. `AczelSetTheory/PList/Omega0.lean` creado.
-
-**Implementación real (vía Ψ : ℕ₀ → ℕ, no Λ):**
-
-La API de Peano usa `Ψ : ℕ₀ → ℕ` para transportar a `Nat`, no `Λ`.
-Los lemas puente viven en `namespace PList.Omega0` (sin `@[simp]` global):
-
-```lean
-PList.Omega0.ψ_eq_iff  : n = m   ↔ Ψ n = Ψ m       -- Peano.Axioms.Ψ_inj
-PList.Omega0.ψ_le_iff  : n ≤ m   ↔ Ψ n ≤ Ψ m       -- isomorph_Ψ_le.symm
-PList.Omega0.ψ_lt_iff  : n < m   ↔ Ψ n < Ψ m       -- StrictOrder.isomorph_Ψ_lt
-PList.Omega0.ψ_zero    : Ψ 𝟘 = 0                    -- isomorph_0_Ψ
-PList.Omega0.ψ_succ    : Ψ (σ n) = Nat.succ (Ψ n)  -- isomorph_σ_Ψ
-PList.Omega0.ψ_add     : Ψ (add n m) = Ψ n + Ψ m   -- isomorph_Ψ_add
-```
-
-**Nota técnica:** `ψ_add` usa `@HAdd.hAdd Nat Nat Nat instHAdd` en lugar de
-`+` para evitar la ambigüedad del `Coe Nat ℕ₀` y garantizar que `omega`
-reconozca la suma (omega no reconoce `Nat.add`).
-
-15 tests verificados en `section omega₀_tests`.
+**Archivos:** `AczelSetTheory/HFList.lean` (ya existe, incompleto)
+**Dependencias:** `HFSets.lean`, `Operations/*`, `PList/Fin0.lean`
+**Prerrequisito para:** codificación de n-tuplas en ASet₁
 
 ---
 
-### 1.4 Actualizar AczelSetTheory.lean (barrel raíz)
+### [B2] VN transport of more Peanolib operations
 
-```lean
-import AczelSetTheory.PList
--- (los imports existentes permanecen intactos)
-```
+Transportar vía `congrArg vN` las operaciones de Peanolib aún no cubiertas:
+
+- `mcd`, `mcm` (mínimo común divisor / múltiplo)
+- `isPrime`, `primorial`
+- `fibonacci`
+- Lemas de divisibilidad: `dvd_antisymm`, `dvd_mul`, `prime_dvd_mul`
+- Funciones combinatorias: `choose` (binomios), `catalan`
+
+**Patrón:** cada `f : ℕ₀ → ℕ₀` da `fVN (n : ℕ₀) : HFSet := vN (f n)` + transporte.
+**Archivos:** `VN/McdVN.lean`, `VN/PrimeVN.lean`, `VN/FibVN.lean`, etc.
+**Dificultad:** Baja por operación (patrón repetitivo).
+
+---
+
+### [B3] Order relation theory — exhaustiva (infraestructura futura)
+
+Desarrollar una teoría de relaciones de orden completa en `HFSet`, más exhaustiva
+que en Peano. Será infraestructura crítica para los siguientes pasos del proyecto.
+
+**Módulos propuestos:**
+
+| Módulo | Contenido |
+|--------|-----------|
+| `Operations/Order.lean` | `isPreorder`, `isPartialOrder`, `isTotalOrder`, `isWellOrder` |
+| `Axioms/Order.lean` | Lemas de preservación, restricción, composición |
+| `Operations/LatticeOrder.lean` | `isLattice`, `isCompleteLattice` |
+| `Axioms/LatticeOrder.lean` | Lemas infimum/supremum |
+| `Operations/WellOrder.lean` | `isWellFounded`, `minElement` |
+| `Axioms/WellOrder.lean` | Principio de inducción bien fundada, descenso infinito |
+
+**Conceptos clave a formalizar:**
+- Preorder: reflexividad + transitividad
+- Orden parcial: + antisimetría
+- Orden total: + totalidad (tricotomía para HFSets)
+- Buen orden: + cada subconjunto no vacío tiene mínimo
+- Elementos minimales / maximales
+- Supremo e ínfimo de subconjuntos
+- Orden lexicográfico sobre FinList
+- Isomorfismo de órdenes
+
+**Dependencias:** `Axioms/Relation.lean`, `Axioms/Function.lean`, `Operations/CartProd.lean`
+**Prerrequisito para:** ASet₁, teoría de ordinales, jerarquía aritmética
+
+---
+
+### [C] Plan y discusión ASet₁ antes de implementar
+
+Antes de entrar en ASet₁, planear la arquitectura y discutir:
+- Decisión CList₁: `mk : PList CList₁ → CList₁` | `inf : (HFSet → Bool) → CList₁`
+- Definición de `extEq₁`, `normalize₁`, `ASet₁ = Quotient CList₁.Setoid`
+- Qué parte de la infraestructura actual se reutiliza vs. se generaliza
+- Cómo representar ω = `inf (fun _ => true)` y los conjuntos Δ⁰₁
 
 ---
 
