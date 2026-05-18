@@ -96,6 +96,29 @@ theorem map_append (f : α → β) (l₁ l₂ : PList α) :
   | cons h t ih => simp [append, map, ih]
 
 -- ─────────────────────────────────────────────────────────────────
+-- zipWith
+-- ─────────────────────────────────────────────────────────────────
+
+theorem length_zipWith_same (f : α → β → γ) :
+    ∀ (l₁ : PList α) (l₂ : PList β),
+    length l₁ = length l₂ → length (zipWith f l₁ l₂) = length l₁ := by
+  intro l₁
+  induction l₁ with
+  | nil => intro _ _; rfl
+  | cons h t ih =>
+      intro l₂ hl
+      cases l₂ with
+      | nil =>
+          simp only [length_cons, length_nil] at hl
+          exact absurd hl (Peano.Axioms.succ_neq_zero _)
+      | cons h' t' =>
+          simp only [zipWith, length_cons]
+          congr 1
+          apply ih
+          simp only [length_cons] at hl
+          exact Peano.Axioms.succ_injective _ _ hl
+
+-- ─────────────────────────────────────────────────────────────────
 -- toList / ofList
 -- ─────────────────────────────────────────────────────────────────
 
