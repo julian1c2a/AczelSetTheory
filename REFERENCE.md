@@ -1,6 +1,6 @@
 # Technical Reference — AczelSetTheory
 
-**Last updated:** 2026-05-17
+**Last updated:** 2026-05-18
 **Author**: Julián Calderón Almendros
 **Lean version**: v4.29.0
 
@@ -119,7 +119,9 @@ Below are the keys for reading and searching theorems.
 | 81 | `AczelSetTheory/VN/DivVN.lean` | `VN` | ✅ Complete | VN/PeanoArith | — |
 | 82 | `AczelSetTheory/VN/FactorialVN.lean` | `VN` | ✅ Complete | VN/PeanoArith, `Peano.PeanoNat.Combinatorics.Factorial` | — |
 | 83 | `AczelSetTheory/Axioms/Rank.lean` | `HFSet` | ✅ Complete | Operations/Cardinal, Axioms/Adjunction | VN/RankVN |
-| 84 | `AczelSetTheory/VN/RankVN.lean` | `VN` | ✅ Complete | VN/IsNat | — |
+| 84 | `AczelSetTheory/VN/RankVN.lean` | `VN` | ✅ Complete | VN/IsNat, Axioms/Rank | — |
+| 85 | `AczelSetTheory/Operations/NPow.lean` | `HFSet` | ✅ Complete | Operations/CartProd, Notation, `Peano.PeanoNat.Combinatorics.Pow` | Axioms/NPow |
+| 86 | `AczelSetTheory/Axioms/NPow.lean` | `HFSet` | ✅ Complete | Operations/NPow, Axioms/CartProd, Axioms/Singleton | — |
 | — | `AczelSetTheory/VN.lean` | — | ✅ Complete | VN/{Basic,Injective,IsNat,Arithmetic,FSet,PeanoAxioms,PeanoArith,PowVN,SubVN,DivVN,FactorialVN,CardVN,RankVN} | AczelSetTheory.lean |
 | — | `AczelSetTheory/PList.lean` | — | ✅ Complete | PList/{Basic,Lemmas,Omega0} | AczelSetTheory.lean |
 | — | `AczelSetTheory.lean` | — | ✅ Complete | PList, CList, HFSets, Operations/*, Axioms/*, Notation | Main |
@@ -264,6 +266,12 @@ CList.lean (root) ── imports all 7 sub-modules
 
 ---
 
+### 4.50 Operations/NPow.lean + Axioms/NPow.lean (Phase 7e + 7g)
+
+> Definitions moved to [doc/REFERENCE-HFSets.md](doc/REFERENCE-HFSets.md#4-definitions).
+
+---
+
 None. This project builds constructively from Lean 4 without additional axioms.
 
 ---
@@ -328,6 +336,10 @@ None. This project builds constructively from Lean 4 without additional axioms.
 
 > Theorems moved to [doc/REFERENCE-Relations.md](doc/REFERENCE-Relations.md#6-theorems).
 
+### 6.64–6.65 Operations/NPow + Axioms/NPow (Phase 7e + 7g)
+
+> Theorems moved to [doc/REFERENCE-HFSets.md](doc/REFERENCE-HFSets.md#6-theorems).
+
 ## 7. Exports per Module
 
 ### CList modules (Basic, ExtEq, SetEquiv, Order, Sort, Normalize)
@@ -390,6 +402,10 @@ None. This project builds constructively from Lean 4 without additional axioms.
 
 > Exports moved to [doc/REFERENCE-Algebra.md](doc/REFERENCE-Algebra.md#7-exports-per-module).
 
+### Operations/NPow.lean + Axioms/NPow.lean (Phase 7e + 7g)
+
+> Exports moved to [doc/REFERENCE-HFSets.md](doc/REFERENCE-HFSets.md#7-exports-per-module).
+
 ---
 
 ## 8. Notations
@@ -430,7 +446,9 @@ None. This project builds constructively from Lean 4 without additional axioms.
 | 2026-05-16 | Axioms/VonNeumann — re-proyección: `isTransitive`, `isNat`, 9 teoremas (`isTransitive_empty`, `isTransitive_succ`, `isNat_zero`, `isNat_succ`, `isNat_zero_or_succ`, `isNat_isTransitive`, `isNat_mem_isNat`, `isNat_pred`, `isNat_induction`) | Claude (AI assistant) |
 | 2026-05-16 | Axioms/Ordinal (nuevos: `isOrdinal`, 4 teoremas), VN/CardVN (nuevo: `card_vN`), Axioms/Cardinal (`card_eq_zero_iff`) | Claude (AI assistant) |
 | 2026-05-16 | Axioms/Cardinal (`card_succ`), Axioms/OrdinalNat (nuevo módulo: `instDecidableEqHFSet`, `card_le_of_subset`, `isOrdinal_isNat`, `isOrdinal_iff_isNat`) — Phase 7e | Claude (AI assistant) |
+| 2026-05-16 | Operations/NPow (#85): `nPow : HFSet → ℕ₀ → HFSet`, `nPow_zero`, `nPow_succ` — potencia cartesiana n-aria (Phase 7e) | Claude (AI assistant) |
 | 2026-05-16 | Axioms/Fintype (nuevo módulo #78): `Finset`, `Fintype`, `HFSet.toList`, `HFSet.toFinset`, `HFSet.membership_fintype`, teoremas `mem_toList`, `nodup_toList`, `mem_toFinset` — Phase F1+F2 | Claude (AI assistant) |
+| 2026-05-17 | Axioms/NPow (#86): `mem_nPow_zero`, `mem_nPow_succ` — caracterización axiomática de membresía en `nPow` (Phase 7g) | Claude (AI assistant) |
 | 2026-05-17 | VN/PowVN (#79): `powVN`, `vN_pow` y 13 teoremas de potenciación; VN/SubVN (#80): 12 teoremas de sustracción acotada; VN/DivVN (#81): 6 teoremas de división euclidiana; VN/FactorialVN (#82): `factVN`, `vN_factorial_succ` y 8 teoremas de factorial — fases A1–A3, C1 | Claude (AI assistant) |
 | 2026-05-17 | Axioms/Rank (#83): `HFSet.rank`, `rank_empty`, `rank_insert` (rango de Von Neumann); VN/RankVN (#84): `VN.rank_vN` — fase B1 | Claude (AI assistant) |
 

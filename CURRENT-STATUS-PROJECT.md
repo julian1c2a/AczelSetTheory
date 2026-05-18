@@ -1,6 +1,6 @@
 # Current Project Status — AczelSetTheory
 
-**Last updated:** 2026-05-17
+**Last updated:** 2026-05-18
 **Author**: Julián Calderón Almendros
 
 ---
@@ -9,8 +9,9 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | 79 |
-| Modules with 0 sorry | 79 / 79 |
+| Total modules (non-barrel) | 85 |
+| Total modules (incl. barrels) | 90 |
+| Modules with 0 sorry | 85 / 85 |
 | Total sorry | 0 |
 | Build status | ✅ Passing — 0 errors, 0 warnings |
 | Lean version | v4.29.0 |
@@ -101,6 +102,14 @@
 | AczelSetTheory/Axioms/NPow.lean | 0 | ✅ Complete |
 | AczelSetTheory/Axioms/Fintype.lean | 0 | ✅ Complete |
 | AczelSetTheory/VN/CardVN.lean | 0 | ✅ Complete |
+| AczelSetTheory/Operations/NPow.lean | 0 | ✅ Complete |
+| AczelSetTheory/Axioms/NPow.lean | 0 | ✅ Complete |
+| AczelSetTheory/VN/PowVN.lean | 0 | ✅ Complete |
+| AczelSetTheory/VN/SubVN.lean | 0 | ✅ Complete |
+| AczelSetTheory/VN/DivVN.lean | 0 | ✅ Complete |
+| AczelSetTheory/VN/FactorialVN.lean | 0 | ✅ Complete |
+| AczelSetTheory/Axioms/Rank.lean | 0 | ✅ Complete |
+| AczelSetTheory/VN/RankVN.lean | 0 | ✅ Complete |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
@@ -137,12 +146,14 @@ None — 0 sorry across the entire project.
 - ✅ **Phase 7e**: `Axioms/OrdinalNat.lean` — `isOrdinal_iff_isNat` (en V_ω los ordinales son exactamente los naturales de vN); `Operations/NPow.lean` — `nPow : HFSet → ℕ₀ → HFSet`, `nPow_zero`, `nPow_succ`.
 - ✅ **Phase 7f**: `Axioms/Fintype.lean` — `Finset α`, `Fintype α` (scratch-built, sin Mathlib), `HFSet.toList`, `HFSet.toFinset`, `HFSet.membership_fintype`.
 - ✅ **Phase 7g**: `Axioms/NPow.lean` — `mem_nPow_zero`, `mem_nPow_succ` (caracterización axiomática de membresía en `nPow`).
+- ✅ **Phase A1–A3, C1**: `VN/PowVN.lean` (potenciación, 14 teoremas), `VN/SubVN.lean` (sustracción acotada, 12 teoremas), `VN/DivVN.lean` (división euclidiana, 6 teoremas), `VN/FactorialVN.lean` (factorial, 10 teoremas) — transporte de aritmética Peano vía `congrArg vN`.
+- ✅ **Phase B1**: `Axioms/Rank.lean` — `rank : HFSet → ℕ₀`, `rank_empty`, `rank_insert` (rango de Von Neumann); `VN/RankVN.lean` — `rank_vN (n : ℕ₀) : rank (vN n) = n`.
 
 ---
 
 ## Pending Work
 
-- [ ] REFERENCE.md projection: fully up-to-date (projected 2026-05-17, 79 modules).
+None — 0 sorry, 85 modules (non-barrel), build passing.
 
 ---
 
@@ -152,9 +163,9 @@ None — 0 sorry across the entire project.
 AczelSetTheory/
   CList/             — Core CList behavior (7 sub-modules)
   Operations/        — Constructors and definitions over HFSet (20 modules)
-  Axioms/            — Axiomatic properties and theorems over HFSet (36 modules)
+  Axioms/            — Axiomatic properties and theorems over HFSet (38 modules)
   PList/             — Polymorphic list type over ℕ₀ (4 modules: Basic, Fin0, Lemmas, Omega0)
-  VN/                — Von Neumann embedding vN : ℕ₀ → HFSet (8 modules)
+  VN/                — Von Neumann embedding vN : ℕ₀ → HFSet (13 modules)
   HFSets.lean        — Core HFSet quotient type
   HFList.lean        — Ordered sequences of HFSets (PList HFSet)
   Notation.lean      — Notation macros, von Neumann numerals 0–9
@@ -180,12 +191,14 @@ AczelSetTheory/
 | Phase 7e: OrdinalNat + NPow | `isOrdinal_iff_isNat`, n-ary cartesian power `nPow` | ✅ Complete |
 | Phase 7f: Fintype | `Finset`, `Fintype`, `toFinset`, scratch-built | ✅ Complete |
 | Phase 7g: NPow membership | `mem_nPow_zero`, `mem_nPow_succ` | ✅ Complete |
+| Phase A1–A3, C1: VN arithmetic | PowVN, SubVN, DivVN, FactorialVN — arithmetic transport via `congrArg vN` | ✅ Complete |
+| Phase B1: Von Neumann rank | `rank : HFSet → ℕ₀`, `rank_vN` (VN embedding preserves rank) | ✅ Complete |
 
 > See [NEXT_STEPS.md](NEXT_STEPS.md) for detailed planning.
 
 ---
 
 **Author**: Julián Calderón Almendros
-*Last updated: 2026-05-17*
+*Last updated: 2026-05-18*
 
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)

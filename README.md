@@ -5,7 +5,7 @@
 **Author**: Julián Calderón Almendros
 **License**: MIT
 **Lean version**: v4.29.0
-**Build status**: ✅ 0 `sorry` — 0 errors, 0 warnings — 85 modules
+**Build status**: ✅ 0 `sorry` — 0 errors, 0 warnings — 85 modules (90 incl. barrels)
 
 ---
 
@@ -40,31 +40,36 @@ Key properties of this set theory:
 
 ```
 AczelSetTheory/
-  CList/
-    Basic.lean       — CList type, size, comparison, order, dedup, sort, normalize
-    ExtEq.lean       — Extensional equality: reflexivity, transitivity, commutativity
+  CList/             — Computable hereditarily-finite lists (7 sub-modules)
+    Basic.lean       — CList type, cSize : ℕ₀, dedup, insertionSort, normalize
+    ExtEq.lean       — Extensional equality (reflexivity, transitivity, commutativity)
     SetEquiv.lean    — Nodup, SetEquiv, dedup properties
-    Order.lean       — lt: irreflexivity, antisymmetry, asymmetry, totality, transitivity
+    Order.lean       — lt: irreflexivity, antisymmetry, totality, transitivity
     Sort.lean        — Sorted, insertionSort preserves sorted/nodup/setEquiv
-    Normalize.lean   — Size bounds, idempotency, uniqueness (sorted_nodup_setEquiv_eq)
+    Normalize.lean   — Idempotency, uniqueness (sorted_nodup_setEquiv_eq)
     Filter.lean      — filter preserves extEq (P_respects, extEq_filter)
-  CList.lean         — Root module importing all CList sub-modules
+  PList/             — Polymorphic list over ℕ₀, Peano bridge (4 sub-modules)
+    Basic.lean       — PList α, length : ℕ₀, map, filter, flatMap, mem
+    Lemmas.lean      — @[simp] lemmas, length_append, mem_append, mem_filter
+    Omega0.lean      — ψ_* bridge lemmas enabling omega₀ tactic
+    Fin0.lean        — Fin₀ n type, decidable equality, PList.get
   HFSets.lean        — HFSet quotient type, membership, extensionality, empty, pairs
-  Operations/
-    Union.lean       — sUnion, union (CList-level + lift)
-    Intersection.lean — interCList
-    Setminus.lean    — setminusCList, setminus
-    Separation.lean  — filterCList, sep
-    Pair.lean        — mkPair, pair
-    Powerset.lean    — powersetCList, powerset
-  Axioms/
-    Union.lean       — mem_union, mem_sUnion
-    Intersection.lean — mem_inter
-    Setminus.lean    — mem_setminus
-    Separation.lean  — mem_sep
-    Pair.lean        — mem_pair
-    Powerset.lean    — mem_powerset
-  Notation.lean      — ∅, {[a,b]}, {[x ∈ A <|> P]}, von Neumann numerals 0–9
+  HFList.lean        — Ordered sequences of HFSets (PList HFSet)
+  Notation.lean      — ∅, {[a,b]}, {[a]}, {[x ∈ A <|> P]}, ⟪a,b⟫, numerals 0–9
+  Operations/        — CList-level constructors lifted to HFSet (20 sub-modules)
+    Union, Intersection, Setminus, Separation, Pair, Powerset, SymDiff,
+    OrderedPair, Relation, Function, Inverse, Restriction, Composition,
+    Replacement, Cardinal, FunctionComp, Identity, Product, CartProd, NPow
+  Axioms/            — HFSet-level axioms and theorems (38 sub-modules)
+    Union, Intersection, Setminus, Separation, Pair, Powerset, Singleton,
+    SymDiff, OrderedPair, Foundation, Decidable, Subset, Lattice,
+    BooleanAlgebra, BooleanRing, Succ, VonNeumann, Choice, Cardinal,
+    Relation, Function, Bijection, Inverse, Composition, Restriction,
+    Replacement, FunctionComp, Identity, Product, Image, Adjunction,
+    Induction, CartProd, Ordinal, OrdinalNat, Fintype, NPow, Rank
+  VN/                — Von Neumann embedding vN : ℕ₀ → HFSet (13 sub-modules)
+    Basic, Injective, IsNat, Arithmetic, FSet, PeanoAxioms, PeanoArith,
+    PowVN, SubVN, DivVN, FactorialVN, CardVN, RankVN
 ```
 
 ### Key types
