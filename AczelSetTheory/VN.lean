@@ -27,3 +27,6 @@ import AczelSetTheory.VN.NewtonBinomVN
 import AczelSetTheory.VN.ProductVN
 import AczelSetTheory.VN.GodelBetaVN
 import AczelSetTheory.VN.HFGroupVN
+import AczelSetTheory.VN.ProdBridgeVN
+import AczelSetTheory.VN.MapBridgeVN
+import AczelSetTheory.VN.ListBridgeVN

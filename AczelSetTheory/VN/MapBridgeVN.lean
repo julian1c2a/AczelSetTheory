@@ -41,13 +41,13 @@ private theorem mem_foldl_insert_pair (g : ℕ₀ → ℕ₀) (x : HFSet)
     rw [mem_insert]
     constructor
     · rintro ((hhead | hacc) | ⟨n, hn, hx⟩)
-      · exact Or.inr ⟨h, List.mem_cons_self h t, hhead.symm⟩
+      · exact Or.inr ⟨h, List.mem_cons.mpr (Or.inl rfl), hhead⟩
       · exact Or.inl hacc
       · exact Or.inr ⟨n, List.mem_cons_of_mem h hn, hx⟩
     · rintro (hacc | ⟨n, hn, hx⟩)
       · exact Or.inl (Or.inr hacc)
       · rcases List.mem_cons.mp hn with rfl | hn'
-        · exact Or.inl (Or.inl hx.symm)
+        · exact Or.inl (Or.inl hx)
         · exact Or.inr ⟨n, hn', hx⟩
 
 -- ─────────────────────────────────────────────────────────────────
@@ -73,7 +73,7 @@ theorem mem_mapBridge_pair {A B : FSet ℕ₀} (f : MapOn A B) (n m : ℕ₀) :
   constructor
   · rintro ⟨k, hk, heq⟩
     rw [orderedPair_eq_iff] at heq
-    exact ⟨(vN_injective heq.1) ▸ hk, vN_injective heq.2.symm⟩
+    exact ⟨(vN_injective heq.1) ▸ hk, (vN_injective heq.1) ▸ vN_injective heq.2.symm⟩
   · rintro ⟨hn, rfl⟩
     exact ⟨n, hn, rfl⟩
 
