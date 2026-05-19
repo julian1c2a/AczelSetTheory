@@ -1,4 +1,4 @@
-# Thoughts — AczelSetTheory
+﻿# Thoughts — AczelSetTheory
 
 **Last updated:** 2026-04-10 00:00
 **Author**: Julián Calderón Almendros
@@ -1025,3 +1025,195 @@ inductive EHFset : Type -- Las propiedades deben ser decidibles, es decir, `Prop
   ```
 
   En el tipo inductivo de `EHFSet`, cada cosa que nos ea EHFSet, podría ser un `Element`. La idea no es obtener un universo de conjuntos más grande, sino un universo de conjuntos más expresivo, que permita representar objetos matemáticos más complejos (funciones, grafos, tuplas, caracteres, etc.) como elementos de conjuntos. Esto podría facilitar la codificación de objetos matemáticos dentro de la teoría de conjuntos, y permitir una representación más directa de conceptos matemáticos comunes. Sin embargo, habría que asegurarse de que las propiedades decidibles y las funciones computables se mantengan para garantizar que el universo resultante siga siendo decidible.
+
+
+## [6.] Funciones que faltan por definir
+
+### [6.1] Funciones multiplicativas clásicas
+
+#### Diagnóstico: base disponible en Peano
+
+| Primitivo | Estado |
+|-----------|--------|
+| `gcd`, `lcm`, `coprime` | ✅ en Peano + HFSet |
+| `Prime`, `isPrimeb` (Bool) | ✅ en Peano + HFSet |
+| `smallestDivisor n` | ✅ en Peano (computable) |
+| `totient φ` | ✅ en Peano + HFSet |
+| FTA (existencia + unicidad) | ✅ en Peano + HFSet |
+| `factorize n → FactFSet` | ✅ en Peano pero **opaco** |
+
+**Brecha crítica:** `FactFSet` es una estructura interna sin API pública — no se puede extraer el exponente de cada factor primo. Para construir funciones multiplicativas necesitamos `vp(n)` (valuación p-ádica), que hay que construir desde cero.
+
+```RESPUESTA JULIÁN
+FactFSet: ¿se te ocurre una API pública para poder usar la factorización sin exponer la estructura interna? Por ejemplo, podríamos definir (sobre FactFSet) una función `padicVal : ℕ → ℕ₀` que devuelva el exponente de un primo dado en la factorización de n. Esto nos permitiría definir funciones multiplicativas clásicas como `squarefree`, `rad`, `ω(n)`, `Ω(n)`, etc., sin necesidad de exponer la estructura interna de FactFSet. La implementación de `padicVal` podría ser recursiva, dividiendo repetidamente por el primo p hasta que ya no sea divisible.
+```
+
+```PROPUESTA JULIÁN
+NECESITAMOS UN TIPO COMO \Nat₀, \Nat₁, \Nat₂ pero para primos, \Primes, un subtipo de \Nat\_2 que contenga solo los números primos. Luego, `padicVal : \Primes → \Nat₀` sería una función que, dado un primo p, devuelve el exponente de p en la factorización de n. Esto nos permitiría definir funciones multiplicativas clásicas como `squarefree`, `rad`, `ω(n)`, `Ω(n)`, etc., sin necesidad de exponer la estructura interna de FactFSet. La implementación de `padicVal` podría ser recursiva, dividiendo repetidamente por el primo p hasta que ya no sea divisible.
+Esto nos daría un mejor FactFSet.
+NECESITAMOS definir un PRIMORIAL `primorial n = ∏_{p ≤ n} p` que nos permita generar los primos necesarios para la factorización. Esto también nos ayudaría a definir funciones multiplicativas clásicas como `squarefree`, `rad`, `ω(n)`, `Ω(n)`, etc., sin necesidad de exponer la estructura interna de FactFSet. La implementación de `padicVal` podría ser recursiva, dividiendo repetidamente por el primo p hasta que ya no sea divisible.
+NOS FALTA LA PRUEBA DE QUE DADOS LOS PRIMEROS N PRIMOS, EXISTE UN PRIMO MAYOR COMO EL PRIMORIAL DE N + 1, QUE NOS GARANTIZA QUE SIEMPRE PODEMOS ENCONTRAR LOS PRIMOS NECESARIOS PARA LA FACTORIZACIÓN DE CUALQUIER N. Esto también nos ayudaría a definir funciones multiplicativas clásicas como `squarefree`, `rad`, `ω(n)`, `Ω(n)`, etc., sin necesidad de exponer la estructura interna de FactFSet. La implementación de `padicVal` podría ser recursiva, dividiendo repetidamente por el primo p hasta que ya no sea divisible.  
+```
+
+```RESPUESTA JULIÁN
+Efectivamente no tenemos los tipos enteros y los racionales. No los definimos en Peano pensando qjue sería más natural tenerlos aquí, pero es cierto que para funciones multiplicativas como μ y λ, el signo es crucial. Para μ(n), el valor es 0 si n no es squarefree, y (-1)^ω(n) si n es squarefree. Para λ(n), el valor es (-1)^Ω(n). Sin un tipo de enteros con signo, no podemos representar estos valores directamente.
+Tenemos que definir los enteros en AczelSetTheory, así como todo lo que teníamos previsto en Peano, pero aquí, Aczel sucede a Peano en desarrollo activo.
+```
+
+#### Mapa de capas
+
+```
+CAPA 0 — Primitivo clave
+─────────────────────────
+padicVal p n = exp. de p en n
+(recursión: div repetida por p)
+
+CAPA 1 — Sin signo, puras ℕ₀
+─────────────────────────────
+squarefree n   ↔  ∀p primo, padicVal p n ≤ 1
+rad n          =  ∏ {p primo | p∣n}          (radical)
+ω(n)           =  |{p primo | p∣n}|           (distintos)
+Ω(n)           =  Σ_p padicVal p n            (con mult.)
+divisors n     =  [d : ℕ₀ | d∣n, d∈[1..n]]
+d(n) = τ(n)    =  |divisors n|
+σ(n)           =  Σ_{d∣n} d
+σ_k(n)         =  Σ_{d∣n} d^k
+Jordan J_k(n)  =  n^k ∏_{p∣n} (1 − p^{−k})
+
+CAPA 2 — Requieren signo (ℤ o codificación)
+────────────────────────────────────────────
+μ(n)   = 0 si !squarefree,  (-1)^ω(n) si squarefree
+λ(n)   = (-1)^Ω(n)          (Liouville)
+
+CAPA 3 — Teoría de convolución
+───────────────────────────────
+IsMultiplicative f   =  gcd m n = 1 → f(mn)=f(m)f(n)
+(f ★ g)(n) = Σ_{d∣n} f(d)·g(n/d)   (Dirichlet)
+Inversión de Möbius: f = μ ★ (f ★ 1)
+```
+
+#### Árbol de dependencias
+
+```
+padicVal p n          ← base de todo
+    │
+    ├── squarefree n  (∀p primo, padicVal p n ≤ 1)
+    │       └── μ(n)  (0 si !squarefree, (-1)^ω(n) si squarefree)
+    │
+    ├── rad n         (∏ primos p con p∣n)
+    │
+    ├── ω(n)          (# de primos distintos que dividen n)
+    │       └── λ(n)  (solo si hay ℤ; (-1)^Ω(n))
+    │
+    ├── Ω(n)          (# de factores primos con multiplicidad)
+    │
+    └── divisors n    (lista de todos los divisores)
+            ├── d(n) = τ(n)   (# de divisores)
+            ├── σ(n)           (suma de divisores)
+            └── σ_k(n)         (suma de d^k)
+```
+
+#### Funciones con signo: decisión abierta
+
+| Función | Valores | ¿Hay ℤ en Peano? |
+|---------|---------|------------------|
+| μ(n) | −1, 0, 1 | **No** — solo ℕ₀ |
+| λ(n) | −1, 1 | **No** |
+
+Para μ y λ hay tres caminos:
+- **(a)** Usar el `Int` nativo de Lean: `μ : ℕ₀ → ℤ`, transporte directo.
+- **(b)** Codificación `Bool × ℕ₀` (signo + magnitud). Más engorroso.
+- **(c)** Definir solo predicados (`μ_pos`, `μ_neg`, `μ_zero`) como `Prop`. Sin extraer el entero.
+
+Los caminos (a) y (c) son los limpios. El proyecto hasta ahora es 100% ℕ₀; entrar en ℤ es un cambio de registro.
+
+#### Propuesta de fases
+
+| Fase | Contenido | Dificultad |
+|------|-----------|------------|
+| **C1** | `padicVal`, `squarefree`, `rad`, `ω`, `Ω` | Media |
+| **C2** | `divisors`, `d(n)=τ`, `σ`, `σ_k` | Media |
+| **C3** | `μ` y `λ` (con decisión de signo) | Alta |
+| **C4** | `IsMultiplicative`, convolución de Dirichlet, inversión de Möbius | Muy alta |
+| **C5** | Transport de todo lo anterior a HFSet vía vN | Baja (patrón establecido) |
+
+C1+C2 son directamente factibles con lo que ya hay. C3 depende de la decisión sobre ℤ. C4 es territorio de formalización seria (Mathlib-level).
+
+#### Decisiones de diseño pendientes
+
+1. **¿Dónde implementar `padicVal`, `divisors`, `d`, `σ`?**
+   - **Opción A — En Peano** (añadir módulos a peanolib): garantiza que los resultados son lemas Peano transportables con el patrón `congrArg vN`. Consistente con Fermat, Wilson y CRT.
+   - **Opción B — Directamente en AczelSetTheory** usando los primitivos de HFSet (`filter`, `card`, etc.): más rápido, pero rompe la simetría del proyecto.
+
+2. **Para μ y λ: ¿`Int` nativo de Lean o solo predicados?**
+
+3. **¿Llegar hasta la inversión de Möbius (C4), o solo las funciones individuales con sus propiedades clave?**
+
+---
+
+### [6.2] Computabilidad y decidabilidad en Peano
+
+Peano tiene un módulo central `Peano.PeanoNat.Decidable` que agrega toda la infraestructura. El inventario es más rico de lo esperado.
+
+#### Lo que existe en Peano
+
+**Instancias para ℕ₀:**
+
+```lean
+DecidableEq ℕ₀           -- via deriving
+BEq ℕ₀, Repr ℕ₀          -- via deriving
+DecidableRel (@LT.lt ℕ₀)
+DecidableRel (@LE.le ℕ₀)
+Ord ℕ₀                    -- compare
+```
+
+**Instancias para predicados numéricos:**
+
+```lean
+decidablePrime     : Decidable (Prime n)       -- Primes.lean
+decidableIsEven    : Decidable (IsEven n)      -- Arith.lean
+decidableIsOdd     : Decidable (IsOdd n)       -- Arith.lean
+instDecidableModEq : Decidable (ModEq n a b)   -- NumberTheory/ModEq.lean
+```
+
+**Funciones Bool (las "audit functions"):**
+
+```lean
+isPrimeb  (n : ℕ₀)      : Bool  -- ble₀ 𝟚 n && decide (smallestDivisor n = n)
+dividesb  (d n : ℕ₀)    : Bool  -- decide ((n % d) = 𝟘)
+blt₀, bgt₀, ble₀, bge₀ : Bool  -- comparaciones
+```
+
+**Instancias para estructuras derivadas:**
+
+```lean
+DecidableEq ℕ₁, DecidableEq ℕ₂
+DecidableEq (List ℕ₀)
+DecidableEq (Fin₀ m)
+DecidableEq (FSet ℕ₀)
+DecidableEq (Tuple α n), DecidableEq (HTuple ts)
+```
+
+#### Brechas en Peano
+
+- No existe `Decidable (a ∣ b)` como instancia — solo `dividesb` Bool.
+- No existe `dividesb_iff_divides` (teorema de equivalencia Bool ↔ Prop).
+- No existe `isCoprimeB`.
+
+#### Lo que habría que añadir en AczelSetTheory
+
+Un módulo `Axioms/Computability.lean` (o extender el existente `Axioms/Decidable.lean`) con instancias decidibles para los predicados HFSet que ya tenemos:
+
+```lean
+-- Derivadas directamente vía vN + instancias Peano
+instance : Decidable (dvd_HF (vN n) (vN m))        -- via dividesb
+instance : Decidable (prime_HF (vN n))              -- via decidablePrime
+instance : Decidable (coprime_HF (vN n) (vN m))    -- via decide (gcd n m = 𝟙)
+instance : Decidable (vN a ≡ₕ vN b [MODHF vN n])  -- via instDecidableModEq
+
+-- Funciones de evaluación directa (#eval)
+def isPrimeb_HF  (x : HFSet) : Bool
+def dividesb_HF  (a b : HFSet) : Bool
+```
+
+Esto permitiría usar `decide` y `#eval` directamente sobre predicados HFSet.
