@@ -26,3 +26,4 @@ import AczelSetTheory.VN.PairingVN
 import AczelSetTheory.VN.NewtonBinomVN
 import AczelSetTheory.VN.ProductVN
 import AczelSetTheory.VN.GodelBetaVN
+import AczelSetTheory.VN.HFGroupVN
