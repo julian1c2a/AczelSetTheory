@@ -83,7 +83,7 @@ AczelSetTheory/
 
 ```
 CList  ──normalize──▶  CList (canonical form)
-  │                        │
+  │                                  │
   └──Quotient.mk──▶  HFSet ◀──repr──┘
 ```
 

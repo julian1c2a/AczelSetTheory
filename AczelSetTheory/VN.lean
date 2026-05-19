@@ -30,3 +30,6 @@ import AczelSetTheory.VN.HFGroupVN
 import AczelSetTheory.VN.ProdBridgeVN
 import AczelSetTheory.VN.MapBridgeVN
 import AczelSetTheory.VN.ListBridgeVN
+import AczelSetTheory.VN.PrimeVN
+import AczelSetTheory.VN.FermatVN
+import AczelSetTheory.VN.CRTVN
