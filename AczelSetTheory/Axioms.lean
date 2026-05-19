@@ -50,3 +50,4 @@ import AczelSetTheory.Axioms.OrdinalNat
 import AczelSetTheory.Axioms.Fintype
 import AczelSetTheory.Axioms.Order
 import AczelSetTheory.Axioms.WellOrder
+import AczelSetTheory.Axioms.LinearOrder
