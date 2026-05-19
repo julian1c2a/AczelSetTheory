@@ -1,6 +1,6 @@
 # Current Project Status — AczelSetTheory
 
-**Last updated:** 2026-05-18
+**Last updated:** 2026-05-20
 **Author**: Julián Calderón Almendros
 
 ---
@@ -9,9 +9,9 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules (non-barrel) | 85 |
-| Total modules (incl. barrels) | 90 |
-| Modules with 0 sorry | 85 / 85 |
+| Total modules (non-barrel) | 114 |
+| Total modules (incl. barrels) | 123 |
+| Modules with 0 sorry | 114 / 114 |
 | Total sorry | 0 |
 | Build status | ✅ Passing — 0 errors, 0 warnings |
 | Lean version | v4.29.0 |
@@ -19,141 +19,172 @@
 
 ---
 
-## Status by Module
+## Module Inventory
 
-| Module | Sorry | Status |
-|--------|-------|--------|
-| AczelSetTheory/CList/Basic.lean | 0 | ✅ Complete |
-| AczelSetTheory/CList/ExtEq.lean | 0 | ✅ Complete |
-| AczelSetTheory/CList/SetEquiv.lean | 0 | ✅ Complete |
-| AczelSetTheory/CList/Order.lean | 0 | ✅ Complete |
-| AczelSetTheory/CList/Sort.lean | 0 | ✅ Complete |
-| AczelSetTheory/CList/Normalize.lean | 0 | ✅ Complete |
-| AczelSetTheory/CList/Filter.lean | 0 | ✅ Complete |
-| AczelSetTheory/HFSets.lean | 0 | ✅ Complete |
-| AczelSetTheory/HFList.lean | 0 | ✅ Complete |
-| AczelSetTheory/Notation.lean | 0 | ✅ Complete |
-| AczelSetTheory/Operations/Cardinal.lean | 0 | ✅ Complete |
-| AczelSetTheory/Operations/Composition.lean | 0 | ✅ Complete |
-| AczelSetTheory/Operations/Function.lean | 0 | ✅ Complete |
-| AczelSetTheory/Operations/FunctionComp.lean | 0 | ✅ Complete |
-| AczelSetTheory/Operations/Identity.lean | 0 | ✅ Complete |
-| AczelSetTheory/Operations/Intersection.lean | 0 | ✅ Complete |
-| AczelSetTheory/Operations/Inverse.lean | 0 | ✅ Complete |
-| AczelSetTheory/Operations/OrderedPair.lean | 0 | ✅ Complete |
-| AczelSetTheory/Operations/Pair.lean | 0 | ✅ Complete |
-| AczelSetTheory/Operations/Powerset.lean | 0 | ✅ Complete |
-| AczelSetTheory/Operations/Product.lean | 0 | ✅ Complete |
-| AczelSetTheory/Operations/Relation.lean | 0 | ✅ Complete |
-| AczelSetTheory/Operations/Replacement.lean | 0 | ✅ Complete |
-| AczelSetTheory/Operations/Restriction.lean | 0 | ✅ Complete |
-| AczelSetTheory/Operations/Separation.lean | 0 | ✅ Complete |
-| AczelSetTheory/Operations/Setminus.lean | 0 | ✅ Complete |
-| AczelSetTheory/Operations/SymDiff.lean | 0 | ✅ Complete |
-| AczelSetTheory/Operations/Union.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Bijection.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/BooleanAlgebra.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/BooleanRing.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Cardinal.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Choice.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Composition.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Decidable.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Foundation.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Function.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/FunctionComp.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Identity.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Image.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Intersection.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Inverse.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Lattice.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/OrderedPair.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Pair.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Powerset.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Product.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Relation.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Replacement.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Restriction.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Separation.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Setminus.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Singleton.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Subset.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Succ.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/SymDiff.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Union.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/VonNeumann.lean | 0 | ✅ Complete |
-| AczelSetTheory/PList/Basic.lean | 0 | ✅ Complete |
-| AczelSetTheory/PList/Fin0.lean | 0 | ✅ Complete |
-| AczelSetTheory/PList/Lemmas.lean | 0 | ✅ Complete |
-| AczelSetTheory/PList/Omega0.lean | 0 | ✅ Complete |
-| AczelSetTheory/VN/Basic.lean | 0 | ✅ Complete |
-| AczelSetTheory/VN/Injective.lean | 0 | ✅ Complete |
-| AczelSetTheory/VN/IsNat.lean | 0 | ✅ Complete |
-| AczelSetTheory/VN/Arithmetic.lean | 0 | ✅ Complete |
-| AczelSetTheory/VN/FSet.lean | 0 | ✅ Complete |
-| AczelSetTheory/VN/PeanoAxioms.lean | 0 | ✅ Complete |
-| AczelSetTheory/VN/PeanoArith.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Adjunction.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Induction.lean | 0 | ✅ Complete |
-| AczelSetTheory/Operations/CartProd.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/CartProd.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Ordinal.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/OrdinalNat.lean | 0 | ✅ Complete |
-| AczelSetTheory/Operations/NPow.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/NPow.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Fintype.lean | 0 | ✅ Complete |
-| AczelSetTheory/VN/CardVN.lean | 0 | ✅ Complete |
-| AczelSetTheory/Operations/NPow.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/NPow.lean | 0 | ✅ Complete |
-| AczelSetTheory/VN/PowVN.lean | 0 | ✅ Complete |
-| AczelSetTheory/VN/SubVN.lean | 0 | ✅ Complete |
-| AczelSetTheory/VN/DivVN.lean | 0 | ✅ Complete |
-| AczelSetTheory/VN/FactorialVN.lean | 0 | ✅ Complete |
-| AczelSetTheory/Axioms/Rank.lean | 0 | ✅ Complete |
-| AczelSetTheory/VN/RankVN.lean | 0 | ✅ Complete |
+### CList/ (7 modules)
+| Module | Status |
+|--------|--------|
+| CList/Basic.lean | ✅ |
+| CList/ExtEq.lean | ✅ |
+| CList/SetEquiv.lean | ✅ |
+| CList/Order.lean | ✅ |
+| CList/Sort.lean | ✅ |
+| CList/Normalize.lean | ✅ |
+| CList/Filter.lean | ✅ |
 
-*Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
+### PList/ (4 modules)
+| Module | Status |
+|--------|--------|
+| PList/Basic.lean | ✅ |
+| PList/Fin0.lean | ✅ |
+| PList/Lemmas.lean | ✅ |
+| PList/Omega0.lean | ✅ |
+
+### Top-level (4 modules)
+| Module | Status |
+|--------|--------|
+| HFSets.lean | ✅ |
+| HFList.lean | ✅ |
+| HFListOps.lean | ✅ |
+| Notation.lean | ✅ |
+
+### Operations/ (21 modules)
+| Module | Status |
+|--------|--------|
+| Operations/Union.lean | ✅ |
+| Operations/Intersection.lean | ✅ |
+| Operations/Setminus.lean | ✅ |
+| Operations/Separation.lean | ✅ |
+| Operations/Pair.lean | ✅ |
+| Operations/Powerset.lean | ✅ |
+| Operations/SymDiff.lean | ✅ |
+| Operations/OrderedPair.lean | ✅ |
+| Operations/Relation.lean | ✅ |
+| Operations/Function.lean | ✅ |
+| Operations/Inverse.lean | ✅ |
+| Operations/Restriction.lean | ✅ |
+| Operations/Composition.lean | ✅ |
+| Operations/Replacement.lean | ✅ |
+| Operations/Cardinal.lean | ✅ |
+| Operations/FunctionComp.lean | ✅ |
+| Operations/Identity.lean | ✅ |
+| Operations/Product.lean | ✅ |
+| Operations/CartProd.lean | ✅ |
+| Operations/NPow.lean | ✅ |
+| Operations/Order.lean | ✅ |
+
+### Axioms/ (41 modules)
+| Module | Status |
+|--------|--------|
+| Axioms/Union.lean | ✅ |
+| Axioms/Intersection.lean | ✅ |
+| Axioms/Setminus.lean | ✅ |
+| Axioms/Separation.lean | ✅ |
+| Axioms/Pair.lean | ✅ |
+| Axioms/Powerset.lean | ✅ |
+| Axioms/Singleton.lean | ✅ |
+| Axioms/SymDiff.lean | ✅ |
+| Axioms/OrderedPair.lean | ✅ |
+| Axioms/Foundation.lean | ✅ |
+| Axioms/Decidable.lean | ✅ |
+| Axioms/Subset.lean | ✅ |
+| Axioms/Lattice.lean | ✅ |
+| Axioms/BooleanAlgebra.lean | ✅ |
+| Axioms/BooleanRing.lean | ✅ |
+| Axioms/Succ.lean | ✅ |
+| Axioms/VonNeumann.lean | ✅ |
+| Axioms/Choice.lean | ✅ |
+| Axioms/Cardinal.lean | ✅ |
+| Axioms/Relation.lean | ✅ |
+| Axioms/Function.lean | ✅ |
+| Axioms/Bijection.lean | ✅ |
+| Axioms/Inverse.lean | ✅ |
+| Axioms/Composition.lean | ✅ |
+| Axioms/Restriction.lean | ✅ |
+| Axioms/Replacement.lean | ✅ |
+| Axioms/FunctionComp.lean | ✅ |
+| Axioms/Identity.lean | ✅ |
+| Axioms/Product.lean | ✅ |
+| Axioms/Image.lean | ✅ |
+| Axioms/Adjunction.lean | ✅ |
+| Axioms/Induction.lean | ✅ |
+| Axioms/CartProd.lean | ✅ |
+| Axioms/Ordinal.lean | ✅ |
+| Axioms/OrdinalNat.lean | ✅ |
+| Axioms/Fintype.lean | ✅ |
+| Axioms/NPow.lean | ✅ |
+| Axioms/Rank.lean | ✅ |
+| Axioms/Order.lean | ✅ |
+| Axioms/WellOrder.lean | ✅ |
+| Axioms/LinearOrder.lean | ✅ |
+
+### VN/ (35 modules)
+| Module | Key exports | Status |
+|--------|-------------|--------|
+| VN/Basic.lean | `vN : ℕ₀ → HFSet`, `vN_zero`, `vN_succ` | ✅ |
+| VN/Injective.lean | `vN_injective` | ✅ |
+| VN/IsNat.lean | `isNat_iff_range` | ✅ |
+| VN/Arithmetic.lean | `mem_vN_iff_lt`, `vN_mono`, `vN_le_iff_subset` | ✅ |
+| VN/FSet.lean | `fsetToHFSet`, `fsetToHFSet_injective` | ✅ |
+| VN/PeanoAxioms.lean | PA1/PA2/PA3 as HFSet theorems | ✅ |
+| VN/PeanoArith.lean | `addVN`, `vN_add`, arithmetic laws | ✅ |
+| VN/PowVN.lean | `powVN`, 14 theorems | ✅ |
+| VN/SubVN.lean | `vN_sub_*`, 12 theorems | ✅ |
+| VN/DivVN.lean | `vN_divMod_spec`, 6 theorems | ✅ |
+| VN/FactorialVN.lean | `factVN`, 10 theorems | ✅ |
+| VN/CardVN.lean | `card_vN` | ✅ |
+| VN/RankVN.lean | `rank_vN` | ✅ |
+| VN/GcdVN.lean | `gcdVN`, `lcmVN`, 13 theorems | ✅ |
+| VN/FibVN.lean | `fibVN`, 4 theorems | ✅ |
+| VN/BinomVN.lean | `binomVN`, 8 theorems | ✅ |
+| VN/SummationVN.lean | `finSumVN`, 8 theorems | ✅ |
+| VN/SqrtVN.lean | `sqrtVN`, `sqrtRemVN`, `csqrtVN`, 7 theorems | ✅ |
+| VN/LogVN.lean | `logVN`, `logRemVN`, `clogVN`, 7 theorems | ✅ |
+| VN/DigitsVN.lean | `numDigitsVN`, `ofDigitsVN`, 4 theorems | ✅ |
+| VN/ModEqVN.lean | `ModEq_HF`, `≡ₕ [MODHF]`, 12 theorems | ✅ |
+| VN/TotientVN.lean | `totientVN`, 6 theorems | ✅ |
+| VN/PrimesVN.lean | `smallestDivisorVN` | ✅ |
+| VN/CantorPairingVN.lean | `pairVN`, `fstVN`, `sndVN`, 6 theorems | ✅ |
+| VN/PairingVN.lean | `cantorPairVN`, 5 theorems | ✅ |
+| VN/NewtonBinomVN.lean | `binomTermVN`, 4 theorems | ✅ |
+| VN/ProductVN.lean | `finProdVN`, 7 theorems | ✅ |
+| VN/GodelBetaVN.lean | `betaVN`, `vN_beta_of_lt` | ✅ |
+| VN/HFGroupVN.lean | `imageGroup : ℕ₀FinGroup → FinGroup HFSet` | ✅ |
+| VN/ProdBridgeVN.lean | `prodBridge : ℕ₀ × ℕ₀ → HFSet` | ✅ |
+| VN/MapBridgeVN.lean | `mapBridge : MapOn A B → HFSet` | ✅ |
+| VN/ListBridgeVN.lean | `listBridge : List ℕ₀ → HFSet` | ✅ |
+| VN/PrimeVN.lean | `prime_HF`, `dvd_HF`, TFA, Gauss, 15 theorems | ✅ |
+| VN/FermatVN.lean | `vN_fermat_little`, `vN_wilson` | ✅ |
+| VN/CRTVN.lean | `vN_chinese_remainder` | ✅ |
+
+### Algebra/ (1 module)
+| Module | Key exports | Status |
+|--------|-------------|--------|
+| Algebra/Group.lean | `HFAlgebra.HFGroup`, 10 derived lemmas | ✅ |
+
+### Integers/ (1 module)
+| Module | Key exports | Status |
+|--------|-------------|--------|
+| Integers/Basic.lean | `ℤ₀`, ring instances, 18 ring laws, `ofNat` | ✅ |
 
 ---
 
 ## Known Sorry Locations
 
-None — 0 sorry across the entire project.
+None — **0 sorry** across the entire project.
 
 ---
 
-## Recent Achievements
+## Recent Achievements (2026-05-19 – 2026-05-20)
 
-- ✅ **Fase 2** (CList refactoring): `mk : PList CList → CList`, `cSize : CList → ℕ₀`, sin dependencias de `Init.Data.List` (2026-05-15).
-- ✅ Phase 1 (Peano integration): PList + omega₀ tactic (2026-05-11).
-- ✅ All 8 Zermelo axioms derived as theorems (not postulated).
-- ✅ Powerset axiom proof completed (Phase 5).
-- ✅ Full notation system: ∅, {[a,b]}, {[a]}, {[x ∈ A <|> P]}, von Neumann numerals 0–9.
-- ✅ Architecture split: Operations/ (CList-level) + Axioms/ (HFSet-level).
-- ✅ Replacement axiom (Axioms/Replacement.lean).
-- ✅ Axiom of Choice (Axioms/Choice.lean).
-- ✅ Boolean algebra and Boolean ring structures (Axioms/BooleanAlgebra, BooleanRing).
-- ✅ Relations, functions, injections, surjections, bijections (Operations+Axioms/Relation, Function, Inverse, Restriction, Composition, Bijection).
-- ✅ Ordered pairs, singletons, subsets, successor (Operations+Axioms/OrderedPair, Singleton, Subset, Succ).
-- ✅ Function composition `∘f`, identity function `idFunc`, cartesian product `×ₛ` (2026-05-14).
-- ✅ Image of a set under a relation `imageRel` (2026-05-14).
-- ✅ Von Neumann embedding `vN : ℕ₀ → HFSet` with injectivity, IsNat, arithmetic (VN/).
-- ✅ HFList (ordered sequences of HFSets) + PList/Fin0.
-- ✅ **Fase 4**: `VN/FSet.lean` — embedding `fsetToHFSet : ℕ₀FSet → HFSet` (injective, with membership iff via vN).
-- ✅ **Fase 5**: `VN/PeanoAxioms.lean` — PA1/PA2/PA3 as pure HFSet theorems + vN bridge; `VN/PeanoArith.lean` — `addVN` (set-theoretic iteration of succ), transport of all arithmetic laws.
-- ✅ **Phase 7a/7b**: `Axioms/Adjunction.lean` — `mem_insert`, `mem_insert_self`, `insert_ne_empty`; `Axioms/Induction.lean` — `eps_induction`, `strong_eps_induction` (structural ε-induction on HFSets).
-- ✅ **Phase 7c**: `Operations/CartProd.lean` — computable Cartesian product `×ₕ` via CList flatMap/map, lifted to HFSet quotient; `Axioms/CartProd.lean` — `mem_cartProd`, `cartProd_empty_left/right`, `cartProd_isRelation`.
-- ✅ **Phase 7d**: `Axioms/Ordinal.lean` — `isOrdinal` (transitivity + ∈-trichotomy), `isOrdinal_empty/succ/mem`; `VN/CardVN.lean` — `card_vN : card (vN n) = n`.
-- ✅ **Phase 7e**: `Axioms/OrdinalNat.lean` — `isOrdinal_iff_isNat` (en V_ω los ordinales son exactamente los naturales de vN); `Operations/NPow.lean` — `nPow : HFSet → ℕ₀ → HFSet`, `nPow_zero`, `nPow_succ`.
-- ✅ **Phase 7f**: `Axioms/Fintype.lean` — `Finset α`, `Fintype α` (scratch-built, sin Mathlib), `HFSet.toList`, `HFSet.toFinset`, `HFSet.membership_fintype`.
-- ✅ **Phase 7g**: `Axioms/NPow.lean` — `mem_nPow_zero`, `mem_nPow_succ` (caracterización axiomática de membresía en `nPow`).
-- ✅ **Phase A1–A3, C1**: `VN/PowVN.lean` (potenciación, 14 teoremas), `VN/SubVN.lean` (sustracción acotada, 12 teoremas), `VN/DivVN.lean` (división euclidiana, 6 teoremas), `VN/FactorialVN.lean` (factorial, 10 teoremas) — transporte de aritmética Peano vía `congrArg vN`.
-- ✅ **Phase B1**: `Axioms/Rank.lean` — `rank : HFSet → ℕ₀`, `rank_empty`, `rank_insert` (rango de Von Neumann); `VN/RankVN.lean` — `rank_vN (n : ℕ₀) : rank (vN n) = n`.
-
----
-
-## Pending Work
-
-None — 0 sorry, 85 modules (non-barrel), build passing.
+- ✅ **B3: Order theory** — `Operations/Order.lean` (24 definitions: isReflexive…isWellOrder), `Axioms/Order.lean` (~28 theorems: chain of implications, empty/restrict, uniqueness), `Axioms/WellOrder.lean` (`wf_induction`, `wo_induction`, `minimum_in_nonempty`, `no_infinite_descent`).
+- ✅ **VN transport groups 1+2+3** — 12 new VN modules: SummationVN, SqrtVN, LogVN, DigitsVN, ModEqVN, TotientVN, PrimesVN, CantorPairingVN, PairingVN, NewtonBinomVN, ProductVN, GodelBetaVN.
+- ✅ **VN bridges** — HFGroupVN (`imageGroup`), ProdBridgeVN (`prodBridge`), MapBridgeVN (`mapBridge`), ListBridgeVN (`listBridge`).
+- ✅ **Fase A: aritmética completa** — ModEqVN (extendido, `ModEq_HF`), TotientVN (extendido), PrimeVN (TFA, Lema de Gauss, `dvd_HF`/`prime_HF`/`coprime_HF`), FermatVN (Pequeño Teorema de Fermat, Teorema de Wilson), CRTVN (Teorema Chino del Resto).
+- ✅ **Algebra/Group.lean** — `HFAlgebra.HFGroup` con axiomas mínimos izquierdos; 10 lemas derivados: `op_inv_left_apply`, `left_cancel`, `op_inv_right`, `op_id_right`, `right_cancel`, `inv_inv`, `inv_e`, `inv_op`, `unique_id`, `unique_inv`.
+- ✅ **Axioms/LinearOrder.lean** — `LT HFSet` + `StrictLinearOrder HFSet` vía `CList.lt` en representantes canónicos. Instancias: `instDecidableLt`, `StrictLinearOrder HFSet`.
+- ✅ **Integers/Basic.lean** — `ℤ₀ = Quotient intSetoid` (enteros como cociente de ℕ₀ × ℕ₀). Representante canónico `normalize`. Instancias: `Zero`, `One`, `Add`, `Neg`, `Mul`, `Sub`. Leyes de anillo conmutativo completas (18 teoremas). Embedding `ofNat : ℕ₀ → ℤ₀` inyectivo.
+- ✅ **Barrel fix** — `HFListOps.lean` añadido a `AczelSetTheory.lean` (era módulo huérfano).
 
 ---
 
@@ -161,14 +192,17 @@ None — 0 sorry, 85 modules (non-barrel), build passing.
 
 ```
 AczelSetTheory/
-  CList/             — Core CList behavior (7 sub-modules)
-  Operations/        — Constructors and definitions over HFSet (20 modules)
-  Axioms/            — Axiomatic properties and theorems over HFSet (38 modules)
-  PList/             — Polymorphic list type over ℕ₀ (4 modules: Basic, Fin0, Lemmas, Omega0)
-  VN/                — Von Neumann embedding vN : ℕ₀ → HFSet (13 modules)
-  HFSets.lean        — Core HFSet quotient type
-  HFList.lean        — Ordered sequences of HFSets (PList HFSet)
-  Notation.lean      — Notation macros, von Neumann numerals 0–9
+  CList/          — Core CList behavior (7 sub-modules)
+  PList/          — Polymorphic list type over ℕ₀ (4 modules)
+  Operations/     — Constructors and definitions over HFSet (21 modules)
+  Axioms/         — Axiomatic properties and theorems over HFSet (41 modules)
+  VN/             — Von Neumann embedding vN : ℕ₀ → HFSet (35 modules)
+  Algebra/        — Algebraic structures native in HFSet (1 module)
+  Integers/       — Integer type ℤ₀ as quotient of ℕ₀ × ℕ₀ (1 module)
+  HFSets.lean     — Core HFSet quotient type
+  HFList.lean     — Ordered sequences of HFSets (PList HFSet)
+  HFListOps.lean  — toHFSet conversions (FinList/HFList → HFSet)
+  Notation.lean   — Notation macros, von Neumann numerals 0–9
 ```
 
 ---
@@ -177,28 +211,36 @@ AczelSetTheory/
 
 | Phase | Description | Status |
 |-------|-------------|--------|
-| Phase 1: CList foundations | 7 sub-modules — canonical lists, sorting, normalization | ✅ Complete |
-| Phase 2: HFSet quotient | Quotient type, repr, canonical representatives | ✅ Complete |
-| Phase 3: Zermelo axioms (basic) | Extensionality, Empty Set, Pairs | ✅ Complete |
-| Phase 4: Zermelo axioms (advanced) | Union, Separation, Intersection, Setminus | ✅ Complete |
-| Phase 5: Powerset | Combinatorics over CList and sublists | ✅ Complete |
-| Phase 6: Relations and functions | Ordered pair, relation, function, injection, surjection, bijection, composition, identity | ✅ Complete |
-| Phase 6b: Cartesian product & image | `prodHF`, `imageRel` with full theorem coverage | ✅ Complete |
-| Phase 6c: Von Neumann embedding | `vN : ℕ₀ → HFSet`, injectivity, IsNat, arithmetic | ✅ Complete |
-| Phase 7: Adjunction, ε-induction | Adjunction axiom, strong ε-induction | ✅ Complete |
-| Phase 7c: Cartesian product | Computable `×ₕ` via CList flatMap/map, lifted to HFSet | ✅ Complete |
-| Phase 7d: Ordinal + CardVN | `isOrdinal`, `card_vN` | ✅ Complete |
-| Phase 7e: OrdinalNat + NPow | `isOrdinal_iff_isNat`, n-ary cartesian power `nPow` | ✅ Complete |
-| Phase 7f: Fintype | `Finset`, `Fintype`, `toFinset`, scratch-built | ✅ Complete |
-| Phase 7g: NPow membership | `mem_nPow_zero`, `mem_nPow_succ` | ✅ Complete |
-| Phase A1–A3, C1: VN arithmetic | PowVN, SubVN, DivVN, FactorialVN — arithmetic transport via `congrArg vN` | ✅ Complete |
-| Phase B1: Von Neumann rank | `rank : HFSet → ℕ₀`, `rank_vN` (VN embedding preserves rank) | ✅ Complete |
+| Phase 1 | CList foundations (7 sub-modules) | ✅ |
+| Phase 2 | HFSet quotient, repr, canonical representatives | ✅ |
+| Phase 3 | Zermelo axioms: Extensionality, Empty, Pairs | ✅ |
+| Phase 4 | Zermelo axioms: Union, Separation, Intersection, Setminus | ✅ |
+| Phase 5 | Powerset | ✅ |
+| Phase 6 | Relations, functions, injections, bijections, composition, identity | ✅ |
+| Phase 6b | Cartesian product `×ₛ`, image `imageRel` | ✅ |
+| Phase 6c | Von Neumann embedding `vN : ℕ₀ → HFSet` | ✅ |
+| Phase 7 | Adjunction, ε-induction | ✅ |
+| Phase 7c | Computable `×ₕ` CartProd via CList flatMap | ✅ |
+| Phase 7d | Ordinals + `card_vN` | ✅ |
+| Phase 7e | `isOrdinal_iff_isNat` + n-ary `nPow` | ✅ |
+| Phase 7f | `Finset`, `Fintype`, `toFinset` (scratch-built) | ✅ |
+| Phase 7g | `mem_nPow_zero/succ` | ✅ |
+| Phase A1–A3, C1 | PowVN, SubVN, DivVN, FactorialVN | ✅ |
+| Phase B1 | Von Neumann rank (`rank : HFSet → ℕ₀`, `rank_vN`) | ✅ |
+| Phase B2 | GcdVN, FibVN, BinomVN; HFList/FinList theory | ✅ |
+| Phase B3 | Order theory (Operations/Order, Axioms/Order, Axioms/WellOrder) | ✅ |
+| VN Groups 1+2+3 | 12 VN transport modules (summation, sqrt, log, digits, …) | ✅ |
+| VN Bridges | HFGroupVN, ProdBridgeVN, MapBridgeVN, ListBridgeVN | ✅ |
+| Fase A | ModEqVN (ext.), TotientVN (ext.), PrimeVN, FermatVN, CRTVN | ✅ |
+| Algebra | `HFAlgebra.HFGroup` with 10 derived lemmas | ✅ |
+| LinearOrder | `LT HFSet`, `StrictLinearOrder HFSet` | ✅ |
+| Integers | `ℤ₀` commutative ring (quotient ℕ₀ × ℕ₀) | ✅ |
 
-> See [NEXT_STEPS.md](NEXT_STEPS.md) for detailed planning.
+> See [NEXT_STEPS.md](NEXT_STEPS.md) for detailed planning and next priorities.
 
 ---
 
 **Author**: Julián Calderón Almendros
-*Last updated: 2026-05-18*
+*Last updated: 2026-05-20*
 
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)

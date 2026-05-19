@@ -4,6 +4,57 @@ All notable changes to this project are documented here.
 
 ---
 
+## [2026-05-20] — Integers/Basic: ℤ₀, barrel fix, 114 módulos, 0 sorry
+
+### Added
+
+- **`Integers/Basic.lean`** (módulo nuevo): `ℤ₀ = Quotient intSetoid` donde `intEq (a,b) (c,d) ↔ Peano.Add.add a d = Peano.Add.add b c`. Representante canónico `normalize`. Instancias: `Zero`, `One`, `Add`, `Neg`, `Mul`, `Sub`. 18 leyes de anillo conmutativo (tipos escritos con `Add.add`/`Mul.mul` para evitar conflicto con notación global Peano `notation a "+" b => Peano.Add.add a b`). Embedding `ofNat : ℕ₀ → ℤ₀` con `ofNat_injective`, `ofNat_add`, `ofNat_mul`.
+- **`AczelSetTheory.lean`** (root barrel): añadido `import AczelSetTheory.HFListOps` — era módulo huérfano no importado desde ningún barrel.
+
+**Project status: 0 sorry, 0 errors. 114 non-barrel modules (123 total).**
+
+---
+
+## [2026-05-19] — B3 + VN grupos 1-3 + Bridges + Fase A + Algebra + LinearOrder, 0 sorry
+
+### Added — Operations/Order + Axioms/Order + Axioms/WellOrder (B3)
+
+- **`Operations/Order.lean`**: 24 definiciones de propiedades de relaciones de orden.
+- **`Axioms/Order.lean`**: ~28 teoremas (implicaciones, vacío, unicidad, restricción).
+- **`Axioms/WellOrder.lean`**: `wf_induction`, `minimum_in_nonempty`, `wo_induction`, `no_infinite_descent`.
+
+**VN Groups 1–3** (12 módulos): SummationVN, SqrtVN, LogVN, DigitsVN, ModEqVN, TotientVN, PrimesVN, CantorPairingVN, PairingVN, NewtonBinomVN, ProductVN, GodelBetaVN.
+
+**VN Bridges** (4 módulos): HFGroupVN (`imageGroup`), ProdBridgeVN (`prodBridge`), MapBridgeVN (`mapBridge`), ListBridgeVN (`listBridge`).
+
+**Fase A — aritmética en HFSet** (3 módulos):
+
+- **`VN/PrimeVN.lean`**: `dvd_HF`, `prime_HF`, `coprime_HF`, TFA existencia/unicidad, Lema de Gauss.
+- **`VN/FermatVN.lean`**: Pequeño Teorema de Fermat, Teorema de Wilson.
+- **`VN/CRTVN.lean`**: Teorema Chino del Resto.
+
+**Algebra/Group.lean**: `HFAlgebra.HFGroup`, axiomas mínimos izquierdos, 10 lemas derivados.
+
+**Axioms/LinearOrder.lean**: `LT HFSet`, `StrictLinearOrder HFSet` vía `CList.lt` en representantes canónicos.
+
+**Project status: 0 sorry, 0 errors. 113 non-barrel modules.**
+
+---
+
+## [2026-05-18] — B1 + B2 + B3-prep: Rank, GcdVN, FibVN, BinomVN, HFList/FinList, Order.lean, 0 sorry
+
+### Added
+
+- **`Axioms/Rank.lean`** + **`VN/RankVN.lean`**: rango de Von Neumann.
+- **`VN/GcdVN.lean`**, **`VN/FibVN.lean`**, **`VN/BinomVN.lean`**: transport de gcd/lcm, Fibonacci, binomio.
+- **`HFList.lean`** extendido: `FinList.append/map/zipWith/head/tail`.
+- **`HFListOps.lean`** (nuevo): `HFList.toHFSet`, `FinList.toHFSet`, `mem_toHFSet`.
+- **`PList/Lemmas.lean`** (+1): `length_zipWith_same`.
+
+**Project status: 0 sorry, 0 errors. 91 modules (non-barrel).**
+
+---
+
 ## [2026-05-16] — Axioms/Fintype: tipos finitos scratch-built (F1+F2), 0 sorry
 
 ### Added

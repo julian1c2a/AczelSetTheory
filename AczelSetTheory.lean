@@ -14,6 +14,7 @@ import AczelSetTheory.CList
 import AczelSetTheory.Operations
 import AczelSetTheory.HFSets
 import AczelSetTheory.HFList
+import AczelSetTheory.HFListOps
 import AczelSetTheory.Notation
 import AczelSetTheory.VN
 import AczelSetTheory.Algebra
