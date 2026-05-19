@@ -6,22 +6,22 @@ namespace HFSet
 -- Conjuntos transitivos
 -- ==================================================================
 
-/-- Un conjunto es transitivo si todo elemento suyo es subconjunto suyo. -/
-def isTransitive
+/-- Un conjunto es transitivo (como conjunto): todo elemento suyo es subconjunto suyo. -/
+def isTransSet
   (A : HFSet) :
     Prop
       :=
   ∀ x, x ∈ A → x ⊆ A
 
-theorem isTransitive_empty :
-    isTransitive empty
+theorem isTransSet_empty :
+    isTransSet empty
       := by
   intro x hx
   exact absurd hx (not_mem_empty x)
 
-theorem isTransitive_succ
-  (A : HFSet) (hT : isTransitive A) :
-    isTransitive (succ A)
+theorem isTransSet_succ
+  (A : HFSet) (hT : isTransSet A) :
+    isTransSet (succ A)
       := by
   intro x hx
   rcases (mem_succ x A).mp hx with h | h
@@ -57,13 +57,13 @@ theorem isNat_zero_or_succ {n : HFSet}
   | zero => exact Or.inl rfl
   | succ hk => exact Or.inr ⟨_, hk, rfl⟩
 
-theorem isNat_isTransitive {n : HFSet}
+theorem isNat_isTransSet {n : HFSet}
   (hn : isNat n) :
-    isTransitive n
+    isTransSet n
       := by
   induction hn with
-  | zero => exact isTransitive_empty
-  | succ _ ih => exact isTransitive_succ _ ih
+  | zero => exact isTransSet_empty
+  | succ _ ih => exact isTransSet_succ _ ih
 
 theorem isNat_mem_isNat {n m : HFSet}
   (hn : isNat n) (hm : m ∈ n) :

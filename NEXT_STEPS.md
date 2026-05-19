@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-05-18
 
-The project compiles on Lean 4.29.0 with **0 sorry, 85 modules**.
+The project compiles on Lean 4.29.0 with **0 sorry, 91 modules**.
 Full Zermelo axioms derived. Architecture: CList/ + Operations/ + Axioms/ + PList/ + VN/.
 See PLANNING.md for the full long-term roadmap.
 
@@ -89,69 +89,102 @@ Ver historial de commits para detalles.
 
 ---
 
-## CURRENT PRIORITIES (2026-05-18)
+## ✅ COMPLETED (2026-05-18) — B1: FinList / HFList theory
 
-### [B1] FinList / HFList theory (medium difficulty)
+**`AczelSetTheory/HFList.lean`** (extendido):
+- `HFList.not_mem_nil`, `HFList.mem_cons_iff` — membresía proposicional
+- `HFList.get?_nil`, `get?_cons_zero`, `get?_cons_succ` — simp lemmas para acceso parcial
+- `FinList.append` : `FinList n → FinList m → FinList (add n m)` + `length_append`
+- `FinList.map` : `(HFSet → HFSet) → FinList n → FinList n`
+- `FinList.zipWith` : `(HFSet → HFSet → HFSet) → FinList n → FinList n → FinList n`
+- `FinList.head`, `FinList.tail` : destructor de `FinList (σ n)` (eliminación de nil imposible)
+- `FinList.head_cons`, `FinList.tail_cons`, `FinList.cons_head_tail` — simp + round-trip
+- `FinList.ext_iff` — igualdad como iff sobre `.val`
 
-Develop what remains of `HFList.lean` and the `FinList n` n-tuple theory:
+**`AczelSetTheory/HFListOps.lean`** (nuevo):
+- `HFList.toHFSet : HFList → HFSet` — olvida orden, elimina dups via `HFSet.insert`
+- `HFList.mem_toHFSet : x ∈ toHFSet l ↔ x ∈ l` — membresía equivalente
+- `FinList.toHFSet`, `FinList.mem_toHFSet`
 
-- Extensional equality for n-tuples (component-wise `=`)
-- `FinList.append` with arith: `FinList n → FinList m → FinList (n + m)`
-- `FinList.slice` / `FinList.take` / `FinList.drop` (bounded by Fin₀)
-- Conversión `FinList n → HFSet` (olvidar orden, eliminar dups, via Operations)
-- `HFList.Mem` ↔ `HFSet.Mem` para listas sin duplicados
-- `FinList` como dominio/codominio de funciones tipadas (infraestructura para ASet₁)
+**`AczelSetTheory/PList/Lemmas.lean`** (+1):
+- `PList.length_zipWith_same` — longitud de zipWith cuando ambas listas tienen igual longitud
 
-**Archivos:** `AczelSetTheory/HFList.lean` (ya existe, incompleto)
-**Dependencias:** `HFSets.lean`, `Operations/*`, `PList/Fin0.lean`
-**Prerrequisito para:** codificación de n-tuplas en ASet₁
-
----
-
-### [B2] VN transport of more Peanolib operations
-
-Transportar vía `congrArg vN` las operaciones de Peanolib aún no cubiertas:
-
-- `mcd`, `mcm` (mínimo común divisor / múltiplo)
-- `isPrime`, `primorial`
-- `fibonacci`
-- Lemas de divisibilidad: `dvd_antisymm`, `dvd_mul`, `prime_dvd_mul`
-- Funciones combinatorias: `choose` (binomios), `catalan`
-
-**Patrón:** cada `f : ℕ₀ → ℕ₀` da `fVN (n : ℕ₀) : HFSet := vN (f n)` + transporte.
-**Archivos:** `VN/McdVN.lean`, `VN/PrimeVN.lean`, `VN/FibVN.lean`, etc.
-**Dificultad:** Baja por operación (patrón repetitivo).
+**`doc/REFERENCE-HFList.md`** — reescritura exhaustiva (7 secciones, 24 teoremas documentados).
 
 ---
 
-### [B3] Order relation theory — exhaustiva (infraestructura futura)
+## ✅ COMPLETED (2026-05-18) — B2: VN transport of more Peanolib operations
 
-Desarrollar una teoría de relaciones de orden completa en `HFSet`, más exhaustiva
-que en Peano. Será infraestructura crítica para los siguientes pasos del proyecto.
+**`AczelSetTheory/VN/GcdVN.lean`** (nuevo):
+- `gcdVN`, `lcmVN` — definiciones en imagen de vN
+- 13 teoremas: `vN_gcd_comm`, `vN_gcd_zero_right/left`, `vN_gcd_one_right/left`, `vN_gcd_self`, `vN_gcd_assoc`, `vN_gcd_mul_lcm`, `vN_lcm_comm`, `vN_lcm_zero_left/right`, `vN_lcm_self`, `gcdVN_ne_zero_left/right`
 
-**Módulos propuestos:**
+**`AczelSetTheory/VN/FibVN.lean`** (nuevo):
+- `fibVN` — imagen de `fib n` bajo vN
+- 4 teoremas: `vN_fib_zero`, `vN_fib_one`, `vN_fib_two`, `vN_fib_succ_succ`
 
-| Módulo | Contenido |
-|--------|-----------|
-| `Operations/Order.lean` | `isPreorder`, `isPartialOrder`, `isTotalOrder`, `isWellOrder` |
-| `Axioms/Order.lean` | Lemas de preservación, restricción, composición |
-| `Operations/LatticeOrder.lean` | `isLattice`, `isCompleteLattice` |
-| `Axioms/LatticeOrder.lean` | Lemas infimum/supremum |
-| `Operations/WellOrder.lean` | `isWellFounded`, `minElement` |
-| `Axioms/WellOrder.lean` | Principio de inducción bien fundada, descenso infinito |
+**`AczelSetTheory/VN/BinomVN.lean`** (nuevo):
+- `binomVN` — imagen de `binom n k` bajo vN
+- 8 teoremas: `vN_binom_zero_zero`, `vN_binom_zero_succ`, `vN_binom_succ_zero`, `vN_binom_pascal`, `vN_binom_n_zero`, `vN_binom_n_one`, `vN_binom_self`, `vN_binom_eq_zero_gt`
 
-**Conceptos clave a formalizar:**
-- Preorder: reflexividad + transitividad
-- Orden parcial: + antisimetría
-- Orden total: + totalidad (tricotomía para HFSets)
-- Buen orden: + cada subconjunto no vacío tiene mínimo
-- Elementos minimales / maximales
-- Supremo e ínfimo de subconjuntos
-- Orden lexicográfico sobre FinList
-- Isomorfismo de órdenes
+**`AczelSetTheory/VN.lean`**: barrel actualizado (ahora 16 módulos).
 
-**Dependencias:** `Axioms/Relation.lean`, `Axioms/Function.lean`, `Operations/CartProd.lean`
-**Prerrequisito para:** ASet₁, teoría de ordinales, jerarquía aritmética
+---
+
+## ✅ COMPLETED (2026-05-18) — B3: Order relation theory
+
+**`AczelSetTheory/Operations/Order.lean`** (nuevo, 24 definiciones):
+- Propiedades básicas: `isReflexive`, `isIrreflexive`, `isSymmetric`, `isAntisymmetric`, `isTransitive`, `isConnected`, `isTotal`, `isTrichotomous`
+- Clases de órdenes: `isPreorder`, `isEquivRel`, `isPartialOrder`, `isStrictOrder`, `isTotalOrder`, `isStrictTotalOrder`
+- Elementos: `isMinimum`, `isMaximum`, `isMinimal`, `isMaximal`
+- Cotas: `isLowerBound`, `isUpperBound`, `isInfimum`, `isSupremum`
+- Bien fundados: `isWellFounded`, `isStrictlyWellFounded`, `isWellOrder`
+
+**`AczelSetTheory/Axioms/Order.lean`** (nuevo, ~28 teoremas):
+- Cadena de implicaciones: `totalOrder → partialOrder → preorder`, `strictTotalOrder → strictOrder`
+- `isConnected_of_isTotal`, `isConnected_of_isTrichotomous`
+- `isAntisymmetric_of_strictOrder` (irrefl + trans → antisim)
+- Casos vacíos: 11 teoremas (`isReflexive_empty` … `isWellOrder_empty`)
+- Unicidad: `minimum_unique`, `maximum_unique`, `infimum_unique`, `supremum_unique`
+- Minimal/maximal: `isMinimal_of_isMinimum`, `isMaximal_of_isMaximum`, `isMinimum_of_isMinimal_total`
+- Restricción: 13 teoremas (`isReflexive_restrict` … `isWellOrder_restrict`)
+
+**`AczelSetTheory/Axioms/WellOrder.lean`** (nuevo, 4 teoremas):
+- `wf_induction`: inducción bien fundada estricta (vía `isStrictlyWellFounded` + `sep` + `Classical.propDecidable`)
+- `minimum_in_nonempty`: todo subconjunto no vacío de un buen orden tiene mínimo
+- `wo_induction`: inducción por buen orden (versión no estricta)
+- `no_infinite_descent`: imposibilidad de cadenas descendentes infinitas
+
+---
+
+## ✅ COMPLETED (2026-05-19) — Grupos 1+2+3: VN transport de todos los módulos Peano
+
+**13 nuevos módulos VN** (todos 0 sorries, barrel actualizado a 29 módulos):
+
+| Módulo | Peano source | Exporta |
+| ------ | ----------- | ------- |
+| `SummationVN` | `Combinatorics/Summation` | `finSumVN`, 8 teoremas |
+| `SqrtVN` | `PeanoNat/Sqrt` | `sqrtVN`, `sqrtRemVN`, `csqrtVN`, 7 teoremas |
+| `LogVN` | `PeanoNat/Log` | `logVN`, `logRemVN`, `clogVN`, 7 teoremas |
+| `DigitsVN` | `PeanoNat/Digits` | `numDigitsVN`, `ofDigitsVN`, 4 teoremas |
+| `ModEqVN` | `NumberTheory/ModEq` | 6 teoremas mod (values ℕ₀) |
+| `TotientVN` | `NumberTheory/Totient` | `totientVN`, 4 teoremas |
+| `PrimesVN` | `PeanoNat/Primes` | `smallestDivisorVN` |
+| `CantorPairingVN` | `Foundation/CantorPairing` | `triagVN`, `pairVN`, `antidiagVN`, `fstVN`, `sndVN`, 6 teoremas |
+| `PairingVN` | `PeanoNat/Pairing` | `triVN`, `cantorPairVN`, 5 teoremas |
+| `NewtonBinomVN` | `Combinatorics/NewtonBinom` | `binomTermVN`, 4 teoremas |
+| `ProductVN` | `Combinatorics/Product` | `productListVN`, `finProdVN`, 7 teoremas |
+| `GodelBetaVN` | `Foundation/GodelBeta` | `betaVN`, `vN_beta_of_lt` |
+
+**Módulos Peano con solo Prop (sin ℕ₀ transport):**
+
+- `NumberTheory/{ChineseRemainder,Fermat,Wilson}` — solo teoremas Prop
+- `Combinatorics/{Perm,Counting,Orbit,Sign}` — stubs vacíos
+- `Foundation/{Initiality,PeanoSystem,PureAxioms}` — axiomático/meta
+
+---
+
+## CURRENT PRIORITIES (2026-05-19)
 
 ---
 

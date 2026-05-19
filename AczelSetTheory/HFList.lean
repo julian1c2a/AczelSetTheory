@@ -163,6 +163,9 @@ def cons (x : HFSet) (t : FinList n) : FinList (σ n) :=
 theorem ext {t s : FinList n} (h : t.val = s.val) : t = s :=
   Subtype.ext h
 
+theorem ext_iff {t s : FinList n} : t = s ↔ t.val = s.val :=
+  Subtype.ext_iff
+
 -- ─────────────────────────────────────────────────────────────────
 -- Concatenación: (add n m)-tupla desde n-tupla y m-tupla
 -- ─────────────────────────────────────────────────────────────────
@@ -185,6 +188,25 @@ def map (f : HFSet → HFSet) (t : FinList n) : FinList n :=
   ⟨PList.map f t.val, by
     show PList.length (PList.map f t.val) = n
     rw [PList.length_map]; exact t.property⟩
+
+-- ─────────────────────────────────────────────────────────────────
+-- ZipWith: combinar dos n-tuplas componente a componente
+-- ─────────────────────────────────────────────────────────────────
+
+/-- Aplica una función binaria componente a componente a dos n-tuplas. -/
+def zipWith (f : HFSet → HFSet → HFSet) (t s : FinList n) : FinList n :=
+  ⟨PList.zipWith f t.val s.val, by
+    show PList.length (PList.zipWith f t.val s.val) = n
+    exact (PList.length_zipWith_same f t.val s.val
+      (t.property.trans s.property.symm)).trans t.property⟩
+
+@[simp] theorem zipWith_nil (f : HFSet → HFSet → HFSet) :
+    zipWith f (empty : FinList 𝟘) empty = empty := rfl
+
+@[simp] theorem zipWith_cons (f : HFSet → HFSet → HFSet)
+    (x y : HFSet) (t s : FinList n) :
+    zipWith f (cons x t) (cons y s) = cons (f x y) (zipWith f t s) := by
+  apply FinList.ext; rfl
 
 -- ─────────────────────────────────────────────────────────────────
 -- Head y Tail: primer componente y resto de una (σ n)-tupla

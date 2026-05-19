@@ -1,6 +1,6 @@
 # Technical Reference — VN (von Neumann Embedding)
 
-**Last updated:** 2026-05-17
+**Last updated:** 2026-05-18
 **Parent:** [../REFERENCE.md](../REFERENCE.md)
 **Related:** [REFERENCE-HFSets.md](REFERENCE-HFSets.md) | [REFERENCE-Algebra.md](REFERENCE-Algebra.md) | [REFERENCE-PList.md](REFERENCE-PList.md)
 
@@ -37,6 +37,9 @@ and establishes order-preservation (`∈` ↔ `<`).
 | 81 | `AczelSetTheory/VN/DivVN.lean` | ✅ Complete |
 | 82 | `AczelSetTheory/VN/FactorialVN.lean` | ✅ Complete |
 | 84 | `AczelSetTheory/VN/RankVN.lean` | ✅ Complete |
+| 85 | `AczelSetTheory/VN/GcdVN.lean` | ✅ Complete |
+| 86 | `AczelSetTheory/VN/FibVN.lean` | ✅ Complete |
+| 87 | `AczelSetTheory/VN/BinomVN.lean` | ✅ Complete |
 
 ---
 
@@ -288,6 +291,60 @@ def VN.factVN (n : ℕ₀) : HFSet := vN (factorial n)
 |---|---------|---------------|
 | 1 | `rank_vN` | `(n : ℕ₀) : HFSet.rank (vN n) = n` |
 
+### 6.64 VN/GcdVN.lean — `namespace VN`
+
+**Imports:** `AczelSetTheory.VN.PeanoArith`, `Peano.PeanoNat.Arith`
+**Opens:** `Peano`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `gcdVN_def` | `(m n : ℕ₀) : gcdVN m n = vN (gcd m n)` |
+| 2 | `lcmVN_def` | `(m n : ℕ₀) : lcmVN m n = vN (lcm m n)` |
+| 3 | `vN_gcd_comm` | `(m n : ℕ₀) : vN (gcd m n) = vN (gcd n m)` |
+| 4 | `vN_gcd_zero_right` | `(m : ℕ₀) : vN (gcd m 𝟘) = vN m` |
+| 5 | `vN_gcd_zero_left` | `(m : ℕ₀) : vN (gcd 𝟘 m) = vN m` |
+| 6 | `vN_gcd_one_right` | `(m : ℕ₀) : vN (gcd m 𝟙) = vN 𝟙` |
+| 7 | `vN_gcd_one_left` | `(m : ℕ₀) : vN (gcd 𝟙 m) = vN 𝟙` |
+| 8 | `vN_gcd_self` | `(m : ℕ₀) : vN (gcd m m) = vN m` |
+| 9 | `vN_gcd_assoc` | `(m n k : ℕ₀) : vN (gcd (gcd m n) k) = vN (gcd m (gcd n k))` |
+| 10 | `vN_gcd_mul_lcm` | `(m n : ℕ₀) : vN (mul (gcd m n) (lcm m n)) = vN (mul m n)` |
+| 11 | `vN_lcm_comm` | `(m n : ℕ₀) : vN (lcm m n) = vN (lcm n m)` |
+| 12 | `vN_lcm_zero_left` | `(m : ℕ₀) : vN (lcm 𝟘 m) = vN 𝟘` |
+| 13 | `vN_lcm_zero_right` | `(m : ℕ₀) : vN (lcm m 𝟘) = vN 𝟘` |
+| 14 | `vN_lcm_self` | `(m : ℕ₀) : vN (lcm m m) = vN m` |
+| 15 | `gcdVN_ne_zero_left` | `{m n : ℕ₀} (hm : m ≠ 𝟘) : gcdVN m n ≠ vN 𝟘` |
+| 16 | `gcdVN_ne_zero_right` | `{m n : ℕ₀} (hn : n ≠ 𝟘) : gcdVN m n ≠ vN 𝟘` |
+
+### 6.65 VN/FibVN.lean — `namespace VN`
+
+**Imports:** `AczelSetTheory.VN.PeanoArith`, `Peano.PeanoNat.Combinatorics.Fibonacci`
+**Opens:** `Peano`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `fibVN_def` | `(n : ℕ₀) : fibVN n = vN (fib n)` |
+| 2 | `vN_fib_zero` | `vN (fib 𝟘) = vN 𝟘` |
+| 3 | `vN_fib_one` | `vN (fib 𝟙) = vN 𝟙` |
+| 4 | `vN_fib_two` | `vN (fib 𝟚) = vN 𝟙` |
+| 5 | `vN_fib_succ_succ` | `(n : ℕ₀) : vN (fib (σ (σ n))) = vN (add (fib n) (fib (σ n)))` |
+
+### 6.66 VN/BinomVN.lean — `namespace VN`
+
+**Imports:** `AczelSetTheory.VN.PeanoArith`, `Peano.PeanoNat.Combinatorics.Binom`
+**Opens:** `Peano`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `binomVN_def` | `(n k : ℕ₀) : binomVN n k = vN (binom n k)` |
+| 2 | `vN_binom_zero_zero` | `vN (binom 𝟘 𝟘) = vN 𝟙` |
+| 3 | `vN_binom_zero_succ` | `(k : ℕ₀) : vN (binom 𝟘 (σ k)) = vN 𝟘` |
+| 4 | `vN_binom_succ_zero` | `(n : ℕ₀) : vN (binom (σ n) 𝟘) = vN 𝟙` |
+| 5 | `vN_binom_pascal` | `(n k : ℕ₀) : vN (binom (σ n) (σ k)) = vN (add (binom n k) (binom n (σ k)))` |
+| 6 | `vN_binom_n_zero` | `(n : ℕ₀) : vN (binom n 𝟘) = vN 𝟙` |
+| 7 | `vN_binom_n_one` | `(n : ℕ₀) : vN (binom n 𝟙) = vN n` |
+| 8 | `vN_binom_self` | `(n : ℕ₀) : vN (binom n n) = vN 𝟙` |
+| 9 | `vN_binom_eq_zero_gt` | `{n k : ℕ₀} (h : lt₀ n k) : vN (binom n k) = vN 𝟘` |
+
 ---
 
 ## 7. Exports per Module
@@ -358,3 +415,23 @@ def VN.factVN (n : ℕ₀) : HFSet := vN (factorial n)
 ### VN/RankVN.lean
 
 `VN.rank_vN`
+
+### VN/GcdVN.lean
+
+`VN.gcdVN`, `VN.lcmVN`, `VN.gcdVN_def`, `VN.lcmVN_def`,
+`VN.vN_gcd_comm`, `VN.vN_gcd_zero_right`, `VN.vN_gcd_zero_left`,
+`VN.vN_gcd_one_right`, `VN.vN_gcd_one_left`, `VN.vN_gcd_self`, `VN.vN_gcd_assoc`,
+`VN.vN_gcd_mul_lcm`, `VN.vN_lcm_comm`, `VN.vN_lcm_zero_left`, `VN.vN_lcm_zero_right`,
+`VN.vN_lcm_self`, `VN.gcdVN_ne_zero_left`, `VN.gcdVN_ne_zero_right`
+
+### VN/FibVN.lean
+
+`VN.fibVN`, `VN.fibVN_def`,
+`VN.vN_fib_zero`, `VN.vN_fib_one`, `VN.vN_fib_two`, `VN.vN_fib_succ_succ`
+
+### VN/BinomVN.lean
+
+`VN.binomVN`, `VN.binomVN_def`,
+`VN.vN_binom_zero_zero`, `VN.vN_binom_zero_succ`, `VN.vN_binom_succ_zero`,
+`VN.vN_binom_pascal`, `VN.vN_binom_n_zero`, `VN.vN_binom_n_one`,
+`VN.vN_binom_self`, `VN.vN_binom_eq_zero_gt`

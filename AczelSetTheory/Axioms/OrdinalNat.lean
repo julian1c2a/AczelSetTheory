@@ -375,8 +375,8 @@ private theorem has_max_le (n : Nat) : ∀ A : HFSet,
       have hmA : m ∈ A := hA'A m hmA'
       -- a ∈ m  (pues m ∈ A' significa a ∈ m)
       have haM : a ∈ m := ((mem_sep A (fun z => a ∈ z) m).mp hmA').2
-      -- isOrdinal m  →  isTransitive m
-      have hTm : isTransitive m := (hord m hmA).1
+      -- isOrdinal m  →  isTransSet m
+      have hTm : isTransSet m := (hord m hmA).1
       -- m es el máximo de A
       refine ⟨m, hmA, fun x hxA => ?_⟩
       -- Clasificar x según si a ∈ x

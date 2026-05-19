@@ -7,7 +7,7 @@ License: MIT
 -- AczelSetTheory/Axioms/Ordinal.lean
 -- Ordinales de Von Neumann dentro de HFSet.
 --
--- Definición:  isOrdinal A  :=  isTransitive A  ∧  tricotomía de ∈ en A
+-- Definición:  isOrdinal A  :=  isTransSet A  ∧  tricotomía de ∈ en A
 --
 -- Público:
 --   isOrdinal            : HFSet → Prop
@@ -32,7 +32,7 @@ namespace HFSet
 /-- Un conjunto es un ordinal de Von Neumann si es transitivo y
     la relación de pertenencia satisface tricotomía en él. -/
 def isOrdinal (A : HFSet) : Prop :=
-  isTransitive A ∧ ∀ x y, x ∈ A → y ∈ A → x ∈ y ∨ x = y ∨ y ∈ x
+  isTransSet A ∧ ∀ x y, x ∈ A → y ∈ A → x ∈ y ∨ x = y ∨ y ∈ x
 
 -- ==================================================================
 -- Lema auxiliar de fundación: imposibilidad de ciclos de longitud 3
@@ -76,11 +76,11 @@ private theorem no_mem_cycle3 (A B C : HFSet)
 -- ==================================================================
 
 theorem isOrdinal_empty : isOrdinal empty :=
-  ⟨isTransitive_empty, fun x _ hx => absurd hx (not_mem_empty x)⟩
+  ⟨isTransSet_empty, fun x _ hx => absurd hx (not_mem_empty x)⟩
 
 theorem isOrdinal_succ {A : HFSet} (hA : isOrdinal A) : isOrdinal (succ A) := by
   obtain ⟨hT, htri⟩ := hA
-  refine ⟨isTransitive_succ A hT, ?_⟩
+  refine ⟨isTransSet_succ A hT, ?_⟩
   intro x y hx hy
   rcases (mem_succ x A).mp hx with hxA | hxeqA
   · -- x ∈ A
