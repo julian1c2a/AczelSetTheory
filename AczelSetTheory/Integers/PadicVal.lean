@@ -24,10 +24,10 @@ import Peano.PeanoNat.Primes
 import Peano.PeanoNat.WellFounded
 import Peano.PeanoNat.Div
 
-open Peano Peano.Axioms Peano.Add Peano.Mul Peano.Order Peano.StrictOrder hiding Prime
-open Peano.Div Peano.Arith hiding Prime
+open Peano Peano.Axioms Peano.Add Peano.Mul Peano.Order Peano.StrictOrder
+open Peano.Div Peano.Arith
 open Peano.WellFounded
-open Peano.Primes hiding Prime
+open Peano.Primes
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Valuación p-ádica
@@ -43,16 +43,18 @@ termination_by n
 decreasing_by
   exact div_lt_self n p (le_succ_then_lt 𝟙 p h.1) h.2.1
 
-theorem padicVal_zero_right (p : ℕ₀) : padicVal p 𝟘 = 𝟘 := by
-  unfold padicVal; exact dif_neg (fun ⟨_, h, _⟩ => h rfl)
+theorem padicVal_zero_right (p : ℕ₀) : padicVal p 𝟘 = 𝟘 :=
+  padicVal_of_not_cond (fun h => h.2.1 rfl)
 
 theorem padicVal_of_not_cond {p n : ℕ₀}
     (h : ¬ (le₀ 𝟚 p ∧ n ≠ 𝟘 ∧ p ∣ n)) : padicVal p n = 𝟘 := by
-  unfold padicVal; exact dif_neg h
+  conv_lhs => unfold padicVal
+  exact dif_neg h
 
 theorem padicVal_succ_dvd {p n : ℕ₀} (hp : le₀ 𝟚 p) (hn : n ≠ 𝟘) (hdvd : p ∣ n) :
     padicVal p n = σ (padicVal p (n / p)) := by
-  unfold padicVal; exact dif_pos ⟨hp, hn, hdvd⟩
+  conv_lhs => unfold padicVal
+  exact dif_pos (show le₀ 𝟚 p ∧ n ≠ 𝟘 ∧ p ∣ n from ⟨hp, hn, hdvd⟩)
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Lema auxiliar: p / p = 1
@@ -67,18 +69,28 @@ private theorem div_self_eq_one {p : ℕ₀} (hp : p ≠ 𝟘) : p / p = 𝟙 :=
 -- Valuación de un primo
 -- ─────────────────────────────────────────────────────────────────────────────
 
+private theorem padicVal_one_eq_zero (p : ℕ₀) (hp2 : le₀ 𝟚 p) : padicVal p 𝟙 = 𝟘 := by
+  apply padicVal_of_not_cond
+  intro hc
+  obtain ⟨_, _, hdvd⟩ := hc
+  have hle := divides_le hdvd (succ_neq_zero 𝟘)
+  exact lt_irrefl 𝟙 (le_succ_then_lt 𝟙 𝟙 (le_trans 𝟚 p 𝟙 hp2 hle))
+
 theorem padicVal_prime_self {p : ℕ₀} (hp : Peano.Arith.Prime p) : padicVal p p = 𝟙 := by
   have hp2 := prime_ge_two hp
   have hp0 := prime_ne_zero hp
-  rw [padicVal_succ_dvd hp2 hp0 (divides_refl p), div_self_eq_one hp0]
-  unfold padicVal; exact dif_neg (fun ⟨_, h, _⟩ => h rfl)
+  rw [padicVal_succ_dvd hp2 hp0 (divides_refl p), div_self_eq_one hp0,
+      padicVal_one_eq_zero p hp2]
 
-theorem padicVal_prime_of_ndvd {p q : ℕ₀} (hp : Peano.Arith.Prime p) (hq : Peano.Arith.Prime q) (hne : p ≠ q) :
-    padicVal p q = 𝟘 := by
+theorem padicVal_prime_of_ndvd {p q : ℕ₀} (hp : Peano.Arith.Prime p)
+    (hq : Peano.Arith.Prime q) (hne : p ≠ q) : padicVal p q = 𝟘 := by
   apply padicVal_of_not_cond
-  intro ⟨_, _, hdvd⟩
+  intro hc
+  obtain ⟨_, _, hdvd⟩ := hc
   rcases prime_divisors hq hdvd with h | h
-  · have := prime_ge_two hp; omega₀
+  · have hge := prime_ge_two hp
+    rw [h] at hge
+    exact lt_irrefl 𝟙 (le_succ_then_lt 𝟙 𝟙 hge)
   · exact hne h
 
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -90,38 +102,36 @@ def squarefree (n : ℕ₀) : Prop :=
   n ≠ 𝟘 ∧ ∀ p : ℕ₀, Peano.Arith.Prime p → le₀ (padicVal p n) 𝟙
 
 theorem squarefree_one : squarefree 𝟙 := by
-  refine ⟨by omega₀, fun p hp => ?_⟩
-  have hv : padicVal p 𝟙 = 𝟘 := by
-    apply padicVal_of_not_cond
-    intro ⟨hp2, _, hdvd⟩
-    have hle := divides_le hdvd (by omega₀ : 𝟙 ≠ 𝟘)
-    have := prime_ge_two hp
-    omega₀
-  rw [hv]; omega₀
+  refine ⟨succ_neq_zero 𝟘, fun p hp => ?_⟩
+  rw [padicVal_one_eq_zero p (prime_ge_two hp)]
+  exact zero_le 𝟙
 
 theorem squarefree_prime {p : ℕ₀} (hp : Peano.Arith.Prime p) : squarefree p := by
   refine ⟨prime_ne_zero hp, fun q hq => ?_⟩
   by_cases hqp : q = p
-  · subst hqp; rw [padicVal_prime_self hp]; omega₀
-  · rw [padicVal_prime_of_ndvd hq hp (Ne.symm hqp)]; omega₀
+  · subst hqp; rw [padicVal_prime_self hp]; exact le_refl 𝟙
+  · rw [padicVal_prime_of_ndvd hq hp hqp]; exact zero_le 𝟙
 
-theorem not_squarefree_prime_sq {p : ℕ₀} (hp : Peano.Arith.Prime p) : ¬ squarefree (mul p p) := by
-  intro ⟨_, hle⟩
+theorem not_squarefree_prime_sq {p : ℕ₀} (hp : Peano.Arith.Prime p) :
+    ¬ squarefree (mul p p) := by
+  intro h
+  obtain ⟨_, hle⟩ := h
   have hp2 := prime_ge_two hp
   have hp0 := prime_ne_zero hp
   have hpp0 : mul p p ≠ 𝟘 := by
     have hpos := pos_of_ne_zero p hp0
     have hpos2 := Peano.Mul.mul_pos hpos hpos
-    intro h; rw [h] at hpos2; exact lt_irrefl hpos2
+    intro heq; rw [heq] at hpos2; exact lt_irrefl 𝟘 hpos2
   have hdvd : p ∣ mul p p := ⟨p, rfl⟩
   have hdiv : mul p p / p = p := by
     have h1 : mul (mul p p / p) p = mul p p := div_mul_cancel hp0 hdvd
     exact mul_cancelation_right (mul p p / p) p p hp0 h1
   have hv2 : padicVal p (mul p p) = 𝟚 := by
     rw [padicVal_succ_dvd hp2 hpp0 hdvd, hdiv, padicVal_prime_self hp]
-  have := hle p hp
-  rw [hv2] at this
-  exact le_succ_then_lt 𝟙 𝟙 this
+    rfl
+  have hle_p := hle p hp
+  rw [hv2] at hle_p
+  exact lt_irrefl 𝟙 (le_succ_then_lt 𝟙 𝟙 hle_p)
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Ω(n): número de factores primos con multiplicidad
@@ -150,8 +160,7 @@ theorem Omega_prime_prime {p : ℕ₀} (hp : Peano.Arith.Prime p) : Omega_prime 
   have hp0 := prime_ne_zero hp
   have hsd : smallestDivisor p = p := prime_imp_smallestDivisor_eq_self hp
   have h1 : Omega_prime p = σ (Omega_prime (p / smallestDivisor p)) := by
-    show (if h : le₀ 𝟚 p then σ (Omega_prime (p / smallestDivisor p)) else 𝟘) =
-          σ (Omega_prime (p / smallestDivisor p))
+    conv_lhs => unfold Omega_prime
     exact dif_pos hp2
   rw [h1, hsd, div_self_eq_one hp0, Omega_prime_one]
   rfl
