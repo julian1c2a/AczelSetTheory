@@ -1,6 +1,6 @@
 ﻿# Thoughts — AczelSetTheory
 
-**Last updated:** 2026-04-10 00:00
+**Last updated:** 2026-05-20 00:00
 **Author**: Julián Calderón Almendros
 
 > This is an informal design journal. Record ideas, alternatives considered,
@@ -1056,9 +1056,25 @@ NOS FALTA LA PRUEBA DE QUE DADOS LOS PRIMEROS N PRIMOS, EXISTE UN PRIMO MAYOR CO
 ```
 
 ```RESPUESTA JULIÁN
-Efectivamente no tenemos los tipos enteros y los racionales. No los definimos en Peano pensando qjue sería más natural tenerlos aquí, pero es cierto que para funciones multiplicativas como μ y λ, el signo es crucial. Para μ(n), el valor es 0 si n no es squarefree, y (-1)^ω(n) si n es squarefree. Para λ(n), el valor es (-1)^Ω(n). Sin un tipo de enteros con signo, no podemos representar estos valores directamente.
+Efectivamente no tenemos los tipos enteros y los racionales. No los definimos en Peano pensando que sería más natural tenerlos aquí, pero es cierto que para funciones multiplicativas como μ y λ, el signo es crucial. Para μ(n), el valor es 0 si n no es squarefree, y (-1)^ω(n) si n es squarefree. Para λ(n), el valor es (-1)^Ω(n). Sin un tipo de enteros con signo, no podemos representar estos valores directamente.
 Tenemos que definir los enteros en AczelSetTheory, así como todo lo que teníamos previsto en Peano, pero aquí, Aczel sucede a Peano en desarrollo activo.
 ```
+
+PENSAMIENTOS JULIÁN SOBRE $\mathbb{Z}_0$
+
+Aparte de la creación del tipo de enteros $\mathbb{Z}_0$, esto es, el establecimiento de la relación de equivalencia entre pares de naturales, concretamente $∀ a,b ∈ \mathbb{N}_0 × \mathbb{N}_0, a \mathcal{E} b ⟺ π₁ a + π₂ b = π₂ a + π₁ b$. A partir de aquí, el tipo de los enteros $\mathbb{Z}_0 := (\mathbb{N}_0 × \mathbb{N}_0) / \mathcal{E}$, y la definición de las operaciones de suma, resta, multiplicación, etc., sobre $\mathbb{Z}_0$ es relativamente directa. Sin embargo, hay que tener cuidado con la implementación de estas operaciones para asegurarse de que respetan la relación de equivalencia $\mathcal{E}$ y que se comportan como se espera para los enteros y los naturales embebidos en los enteros. Además habrá que crear la relación de orden lineal sobre $\mathbb{Z}_0$ y demostrar que es un orden total compatible con las operaciones definidas. Además tendremos que dar un representante canónico de la clase de equivalencia para cada entero, que será aquel representantes que que tenga la forma $⟨ n, 0 ⟩$ o $⟨ 0, n ⟩$ dependiendo de si el entero es positivo o negativo, respectivamente. Esto nos permitirá definir la función `toInt : ℕ₀ → ℤ₀` que mapea cada natural a su representante canónico en los enteros, y la función `toNat : ℤ₀ → ℕ₀` que mapea cada entero a su valor absoluto como natural.
+
+Resumiendo esta primera parte:
+- Definir la relación de equivalencia $\mathcal{E}$ sobre $\mathbb{N}_0 × \mathbb{N}_0$.
+- Definir el tipo de enteros $\mathbb{Z}_0$ como el cociente de $\mathbb{N}_0 × \mathbb{N}_0$ por la relación $\mathcal{E}$.
+- Definir el representante canónico de cada clase de equivalencia en $\mathbb{Z}_0$.
+- Establcer las funciones `toInt` y `toNat` para mapear entre $\mathbb{N}_0$ y $\mathbb{Z}_0$, demostrando que son inversas entre sí, y que `toInt` es inyectiva. Demostrar que cada natural representa su propia clase de euivalencia, es decir, `toInt n` representa la clase de equivalencia de $⟨ n, 0 ⟩$.
+- Definir la relación de orden total sobre $\mathbb{Z}_0$.
+- Demostrar que `toInt` es un orden-embedding, es decir, que preserva el orden entre $\mathbb{N}_0$ y $\mathbb{Z}_0`. Demostrar que el orden total se preserva exactamente, es decir, que para cada $a, b ∈ \mathbb{Z}_0$, $a ≤ b$, $a ≥ 0, b≥ 0$ si y solo si `toNat a ≤ toNat b`. También para el orden estricto.
+- Definir la operación de suma y de resta sobre $\mathbb{Z}_0$ y demostrar que es compatible con la relación de equivalencia, y con la relación de orden. Demostrar que conforma un grupo abeliano, cíclico, ${⟨ 1_{mathbb{Z}_0} ⟩}_{mathbb{Z}_0} = \mathbb{Z}_0$ y que `toInt` es un homomorfismo de grupos inyectivo (no totalmente porque $\mathbb{N}_0$ no es un grupo, sino un monoide conmutativo). Mostrar cual es el neutro y el inverso del a unidad. Mostrar el inverso aditivo de cualquier entero.
+- Definir la operación de multiplicación sobre $\mathbb{Z}_0$ y demostrar que es compatible con la relación de equivalencia, y con la relación de orden. Demostrar que conforma un anillo conmutativo con unidad, y que `toInt` es un homomorfismo de anillos inyectivo (no totalmente porque $\mathbb{N}_0$ no es un anillo, sino un semianillo conmutativo). Mostrar cual es el neutro multiplicativo. Mostrar que el producto de dos enteros negativos es positivo, el producto de un entero negativo por uno positivo es negativo, y el producto de dos enteros positivos es positivo.
+- Definir la función `neg`, `abs`, `sign` y `square` sobre $\mathbb{Z}_0$, y las principales propiedades de estas funciones. Mostrar que `neg` es un homomorfismo de grupos, que `abs` es un homomorfismo de monoides conmutativos, y que `sign` es un homomorfismo de monoides conmutativos a la multiplicación de signos. Mostrar que `square` es una función que preserva el orden, y que el cuadrado de cualquier entero es positivo o cero.
+
 
 #### Mapa de capas
 
