@@ -191,6 +191,98 @@ theorem add_mk (p q : ℕ₀ × ℕ₀) : HAdd.hAdd (mk p) (mk q) = mk (addRaw p
 theorem neg_mk (p : ℕ₀ × ℕ₀) : Neg.neg (mk p) = mk (negRaw p) := rfl
 theorem mul_mk (p q : ℕ₀ × ℕ₀) : HMul.hMul (mk p) (mk q) = mk (mulRaw p q) := rfl
 
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Helpers para módulos hijo
+-- ─────────────────────────────────────────────────────────────────────────────
+
+private theorem normalize_intEq (p : ℕ₀ × ℕ₀) :
+    add (normalize p).1 p.2 = add (normalize p).2 p.1 := by
+  unfold normalize
+  by_cases h : p.2 ≤ p.1
+  · rw [if_pos h]
+    have := sub_k_add_k p.1 p.2 h; omega₀
+  · rw [if_neg h]
+    have h' := lt_imp_le p.1 p.2 (nle_then_gt p.2 p.1 h)
+    have := sub_k_add_k p.2 p.1 h'; omega₀
+
+private theorem normalize_is_intEq (p : ℕ₀ × ℕ₀) : intEq (normalize p) p :=
+  normalize_intEq p
+
+-- For all of the following, `repr (mk p) = normalize p` holds definitionally.
+private theorem repr_mk (p : ℕ₀ × ℕ₀) : repr (mk p) = normalize p := rfl
+
+theorem mk_repr (a : ℤ₀) : mk a.repr = a := by
+  rcases Quotient.exists_rep a with ⟨p, rfl⟩
+  rw [repr_mk, mk_eq_iff]
+  exact normalize_is_intEq p
+
+theorem repr_normalized (a : ℤ₀) : a.repr.1 = 𝟘 ∨ a.repr.2 = 𝟘 := by
+  rcases Quotient.exists_rep a with ⟨p, rfl⟩
+  rw [repr_mk]; unfold normalize
+  by_cases h : p.2 ≤ p.1
+  · rw [if_pos h]; exact Or.inr rfl
+  · rw [if_neg h]; exact Or.inl rfl
+
+theorem repr_inj {a b : ℤ₀} (h : a.repr = b.repr) : a = b := by
+  rcases Quotient.exists_rep a with ⟨p, rfl⟩
+  rcases Quotient.exists_rep b with ⟨q, rfl⟩
+  rw [repr_mk, repr_mk] at h
+  rw [mk_eq_iff]; unfold intEq
+  unfold normalize at h
+  by_cases h1 : p.2 ≤ p.1 <;> by_cases h2 : q.2 ≤ q.1
+  · rw [if_pos h1, if_pos h2] at h
+    simp only [Prod.mk.injEq] at h
+    have hp1 := sub_k_add_k p.1 p.2 h1
+    have hq1 := sub_k_add_k q.1 q.2 h2
+    omega₀
+  · rw [if_pos h1, if_neg h2] at h
+    simp only [Prod.mk.injEq] at h
+    have hp1 := sub_k_add_k p.1 p.2 h1
+    have h2' := lt_imp_le q.1 q.2 (nle_then_gt q.2 q.1 h2)
+    have hq1 := sub_k_add_k q.2 q.1 h2'
+    omega₀
+  · rw [if_neg h1, if_pos h2] at h
+    simp only [Prod.mk.injEq] at h
+    have h1' := lt_imp_le p.1 p.2 (nle_then_gt p.2 p.1 h1)
+    have hp1 := sub_k_add_k p.2 p.1 h1'
+    have hq1 := sub_k_add_k q.1 q.2 h2
+    omega₀
+  · rw [if_neg h1, if_neg h2] at h
+    simp only [Prod.mk.injEq] at h
+    have h1' := lt_imp_le p.1 p.2 (nle_then_gt p.2 p.1 h1)
+    have h2' := lt_imp_le q.1 q.2 (nle_then_gt q.2 q.1 h2)
+    have hp1 := sub_k_add_k p.2 p.1 h1'
+    have hq1 := sub_k_add_k q.2 q.1 h2'
+    omega₀
+
+theorem repr_add_intEq (a b : ℤ₀) :
+    add (HAdd.hAdd a b).repr.1 (add a.repr.2 b.repr.2) =
+    add (HAdd.hAdd a b).repr.2 (add a.repr.1 b.repr.1) := by
+  rcases Quotient.exists_rep a with ⟨p, rfl⟩
+  rcases Quotient.exists_rep b with ⟨q, rfl⟩
+  rw [add_mk, repr_mk, repr_mk, repr_mk]
+  simp only [addRaw]
+  have h1 := normalize_intEq (add p.1 q.1, add p.2 q.2)
+  have h2 := normalize_intEq p
+  have h3 := normalize_intEq q
+  omega₀
+
+theorem repr_neg_intEq (a : ℤ₀) :
+    add (Neg.neg a).repr.1 a.repr.1 = add (Neg.neg a).repr.2 a.repr.2 := by
+  rcases Quotient.exists_rep a with ⟨p, rfl⟩
+  rw [neg_mk, repr_mk, repr_mk]
+  simp only [negRaw]
+  have h1 := normalize_intEq (p.2, p.1)
+  have h2 := normalize_intEq p
+  omega₀
+
+theorem repr_ofNat (n : ℕ₀) : (ofNat n).repr = (n, 𝟘) := by
+  rw [show (ofNat n).repr = normalize (n, 𝟘) from rfl]
+  unfold normalize
+  have h : (n, 𝟘).snd ≤ (n, 𝟘).fst := zero_le n
+  rw [if_pos h]
+  exact Prod.ext (sub_zero n) rfl
+
 end ℤ₀
 
 end PrivateDefs
