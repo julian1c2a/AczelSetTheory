@@ -1,6 +1,6 @@
 # Technical Reference — PList (Peano-indexed Lists)
 
-**Last updated:** 2026-05-18
+**Last updated:** 2026-05-22
 **Parent:** [../REFERENCE.md](../REFERENCE.md)
 **Related:** [REFERENCE-HFList.md](REFERENCE-HFList.md) | [REFERENCE-VN.md](REFERENCE-VN.md)
 
@@ -52,24 +52,24 @@ inductive PList (α : Type) : Type where
 | `head?` | `PList α → Option α` | |
 | `tail` | `PList α → PList α` | |
 | `get?` | `PList α → ℕ₀ → Option α` | |
-| `getD` | `PList α → ℕ₀ → α → α` | |
+| `getD` | `(dflt : α) → PList α → ℕ₀ → α` | default on out-of-bounds |
 
 All computable, structurally recursive.
 
 #### 4.16.3 Higher-order operations
 
-| Name | Notes |
-|------|-------|
-| `map` | |
-| `foldl` | |
-| `foldr` | |
-| `any` | |
-| `all` | |
-| `filter` | |
-| `append` | `Append (PList α)` instance provided |
-| `flatMap` | |
-| `reverse` | |
-| `zipWith` | |
+| Name | Signature | Notes |
+|------|-----------|-------|
+| `map` | `(f : α → β) → PList α → PList β` | |
+| `foldl` | `(f : β → α → β) → β → PList α → β` | left fold |
+| `foldr` | `(f : α → β → β) → β → PList α → β` | right fold |
+| `any` | `(p : α → Bool) → PList α → Bool` | |
+| `all` | `(p : α → Bool) → PList α → Bool` | |
+| `filter` | `(p : α → Bool) → PList α → PList α` | |
+| `append` | `PList α → PList α → PList α` | `Append (PList α)` instance |
+| `flatMap` | `(f : α → PList β) → PList α → PList β` | |
+| `reverse` | `PList α → PList α` | |
+| `zipWith` | `(f : α → β → γ) → PList α → PList β → PList γ` | stops at shorter |
 
 All computable, structurally recursive.
 

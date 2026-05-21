@@ -1,6 +1,6 @@
 # Technical Reference — AczelSetTheory
 
-**Last updated:** 2026-05-18
+**Last updated:** 2026-05-22
 **Author**: Julián Calderón Almendros
 **Lean version**: v4.29.0
 
@@ -127,9 +127,17 @@ Below are the keys for reading and searching theorems.
 | 89 | `AczelSetTheory/Algebra/GroupHom.lean` | `HFAlgebra`, `HFAlgebra.HFGroupHom` | ✅ Complete | Algebra/Subgroup | — |
 | 90 | `AczelSetTheory/Algebra/Ring.lean` | `HFAlgebra`, `HFAlgebra.HFRing` | ✅ Complete | Algebra/Group | — |
 | 91 | `AczelSetTheory/Algebra/CosetCount.lean` | `HFAlgebra.HFSubgroup`, `HFSet` | ✅ Complete | Algebra/Subgroup, Axioms/OrdinalNat, Axioms/Union, Axioms/Powerset, Peano.PeanoNat.Arith | — |
+| 92 | `AczelSetTheory/Integers/Basic.lean` | `ℤ₀` | ✅ Complete | PList/Omega0, `Peano.PeanoNat.{Sub,Mul,Decidable}` | Integers/Order, Integers/MobiusLiouville |
+| 93 | `AczelSetTheory/Integers/Order.lean` | `ℤ₀` | ✅ Complete | Integers/Basic, `Peano.PeanoNat.Decidable` | Integers/Functions |
+| 94 | `AczelSetTheory/Integers/Functions.lean` | `ℤ₀` | ✅ Complete | Integers/Order | Integers/Arithmetic, Integers/Bijection |
+| 95 | `AczelSetTheory/Integers/Arithmetic.lean` | `ℤ₀` | ✅ Complete | Integers/Functions, `Peano.PeanoNat.{Div,Arith}` | Integers.lean |
+| 96 | `AczelSetTheory/Integers/Bijection.lean` | `ℤ₀` | ✅ Complete | Integers/Functions, `Peano.PeanoNat.Pairing` | Integers.lean |
+| 97 | `AczelSetTheory/Integers/PadicVal.lean` | `ℤ₀` | ⚠ 1 sorry | PList/Omega0, `Peano.PeanoNat.{Arith,Primes,WellFounded,Div}` | Integers/MobiusLiouville |
+| 98 | `AczelSetTheory/Integers/MobiusLiouville.lean` | `ℤ₀` | ⚠ 1 sorry | Integers/Basic, Integers/PadicVal | Integers.lean |
 | — | `AczelSetTheory/VN.lean` | — | ✅ Complete | VN/{Basic,Injective,IsNat,Arithmetic,FSet,PeanoAxioms,PeanoArith,PowVN,SubVN,DivVN,FactorialVN,CardVN,RankVN} | AczelSetTheory.lean |
 | — | `AczelSetTheory/PList.lean` | — | ✅ Complete | PList/{Basic,Lemmas,Omega0} | AczelSetTheory.lean |
-| — | `AczelSetTheory.lean` | — | ✅ Complete | PList, CList, HFSets, Operations/*, Axioms/*, Notation | Main |
+| — | `AczelSetTheory/Integers.lean` | — | ✅ Complete | Integers/{Basic,Order,Functions,Arithmetic,Bijection,PadicVal,MobiusLiouville} | AczelSetTheory.lean |
+| — | `AczelSetTheory.lean` | — | ✅ Complete | PList, CList, HFSets, Operations/*, Axioms/*, Integers, Notation | Main |
 | — | `Main.lean` | — | ✅ Complete | CList.Basic | — |
 
 ---
@@ -163,6 +171,18 @@ CList.lean (root) ── imports all 7 sub-modules
        ├─ Operations/Powerset.lean ───────── Axioms/Powerset.lean ◀───┘
        └─ Notation.lean
             └─ AczelSetTheory.lean (project root)
+
+PList/Omega0 + Peano.PeanoNat.{Sub,Mul,Decidable}
+  └─ Integers/Basic.lean
+       └─ Integers/Order.lean
+            └─ Integers/Functions.lean
+                 ├─ Integers/Arithmetic.lean ─────────┐
+                 └─ Integers/Bijection.lean ───────────┤
+                                                       └─ Integers.lean
+PList/Omega0 + Peano.PeanoNat.{Arith,Primes,WellFounded,Div}
+  └─ Integers/PadicVal.lean  ⚠ Omega_prime_mul: sorry
+       └─ Integers/MobiusLiouville.lean ─────────────── Integers.lean
+            (also imports Integers/Basic)
 ```
 
 ---
@@ -175,6 +195,7 @@ CList.lean (root) ── imports all 7 sub-modules
 | `HFSet` | HFSets, Operations/*, Axioms/*, Notation | Quotient type and its API |
 | `PList` | PList/Basic, PList/Lemmas | Polymorphic list type with ℕ₀ indexing; bridge to `List` |
 | `PList.Omega0` | PList/Omega0 | Bridge lemmas `ψ_*` used internally by the `omega₀` tactic |
+| `ℤ₀` | Integers/{Basic,Order,Functions,Arithmetic,Bijection,PadicVal,MobiusLiouville} | Integers as quotient `Quotient intSetoid`; ring operations, p-adic val, μ, λ |
 | (top-level) | Basic | `CList` inductive type defined at top level, operations inside `namespace CList` |
 
 ---
@@ -277,7 +298,26 @@ CList.lean (root) ── imports all 7 sub-modules
 
 ---
 
-None. This project builds constructively from Lean 4 without additional axioms.
+### 4.51 Integers modules (#92–#98)
+
+> Integers definitions are documented inline in `REFERENCE.md` §1 (module list) and in the source files.
+> A dedicated `doc/REFERENCE-Integers.md` is planned once the full API stabilises.
+
+Key symbols:
+
+| Symbol | Kind | File | Notes |
+|--------|------|------|-------|
+| `ℤ₀` | type alias | Integers/Basic | `Quotient intSetoid`; `CommRing ℤ₀` instance |
+| `negOne` | def | Integers/Basic | `mk (𝟘, 𝟙)` = −1 |
+| `ofNat` | def | Integers/Basic | embedding ℕ₀ → ℤ₀ |
+| `negOnePow` | def | Integers/MobiusLiouville | (−1)^k ∈ ℤ₀, computable |
+| `mobius` | noncomputable def | Integers/MobiusLiouville | Möbius function μ : ℕ₀ → ℤ₀ |
+| `liouville` | noncomputable def | Integers/MobiusLiouville | Liouville function λ : ℕ₀ → ℤ₀ |
+| `squarefree` | def | Integers/PadicVal | predicate on ℕ₀ |
+| `padicVal` | def | Integers/PadicVal | p-adic valuation ℕ₀ |
+| `Omega_prime` | def | Integers/PadicVal | total prime-power exponent Ω : ℕ₀ → ℕ₀ |
+
+---
 
 ---
 
@@ -345,6 +385,30 @@ None. This project builds constructively from Lean 4 without additional axioms.
 
 > Theorems moved to [doc/REFERENCE-HFSets.md](doc/REFERENCE-HFSets.md#6-theorems).
 
+### 6.66 Integers modules (#92–#98)
+
+Key proven theorems (non-sorry):
+
+| Theorem | Statement |
+|---------|----------|
+| `negOnePow_zero` | `negOnePow 𝟘 = 1` |
+| `negOnePow_succ` | `negOnePow (σ k) = -(negOnePow k)` |
+| `negOnePow_one` | `negOnePow 𝟙 = negOne` |
+| `negOnePow_two` | `negOnePow 𝟚 = 1` |
+| `negOnePow_add` | `negOnePow (a + b) = negOnePow a * negOnePow b` |
+| `negOnePow_mul_self` | `negOnePow k * negOnePow k = 1` |
+| `mobius_one` | `mobius 𝟙 = 1` |
+| `mobius_prime` | `Prime p → mobius p = negOne` |
+| `mobius_prime_sq` | `Prime p → mobius (p * p) = 0` |
+| `liouville_one` | `liouville 𝟙 = 1` |
+| `liouville_prime` | `Prime p → liouville p = negOne` |
+| `liouville_sq` | `liouville n * liouville n = 1` |
+| `liouville_ne_zero` | `liouville n ≠ 0` |
+| `mobius_eq_liouville_of_squarefree` | `squarefree n → mobius n = liouville n` |
+| `mobius_sq` | `mobius n * mobius n = if squarefree n then 1 else 0` |
+| `liouville_mul` ⚠ | `m ≠ 𝟘 → n ≠ 𝟘 → liouville (m * n) = liouville m * liouville n` (via sorry) |
+| `liouville_prime_pow` ⚠ | `Prime p → liouville (p ^ k) = negOnePow k` (via sorry) |
+
 ## 7. Exports per Module
 
 ### CList modules (Basic, ExtEq, SetEquiv, Order, Sort, Normalize)
@@ -411,6 +475,16 @@ None. This project builds constructively from Lean 4 without additional axioms.
 
 > Exports moved to [doc/REFERENCE-HFSets.md](doc/REFERENCE-HFSets.md#7-exports-per-module).
 
+### Integers modules (#92–#98)
+
+> Full export lists are in each source file and in §6.66 above. A dedicated `doc/REFERENCE-Integers.md` is planned.
+
+**`Integers/MobiusLiouville.lean` (public API):**
+`negOnePow`, `negOnePow_zero`, `negOnePow_succ`, `negOnePow_one`, `negOnePow_two`, `negOnePow_add`, `negOnePow_mul_self`, `mobius`, `mobius_one`, `mobius_prime`, `mobius_prime_sq`, `liouville`, `liouville_one`, `liouville_prime`, `liouville_sq`, `liouville_ne_zero`, `mobius_eq_liouville_of_squarefree`, `mobius_sq`, `liouville_mul`, `liouville_prime_pow`
+
+**`Integers/PadicVal.lean` (public API):**
+`squarefree`, `padicVal`, `Omega_prime`, `Omega_prime_mul_prime`, `Omega_prime_mul` ⚠ sorry
+
 ---
 
 ## 8. Notations
@@ -456,5 +530,6 @@ None. This project builds constructively from Lean 4 without additional axioms.
 | 2026-05-17 | Axioms/NPow (#86): `mem_nPow_zero`, `mem_nPow_succ` — caracterización axiomática de membresía en `nPow` (Phase 7g) | Claude (AI assistant) |
 | 2026-05-17 | VN/PowVN (#79): `powVN`, `vN_pow` y 13 teoremas de potenciación; VN/SubVN (#80): 12 teoremas de sustracción acotada; VN/DivVN (#81): 6 teoremas de división euclidiana; VN/FactorialVN (#82): `factVN`, `vN_factorial_succ` y 8 teoremas de factorial — fases A1–A3, C1 | Claude (AI assistant) |
 | 2026-05-17 | Axioms/Rank (#83): `HFSet.rank`, `rank_empty`, `rank_insert` (rango de Von Neumann); VN/RankVN (#84): `VN.rank_vN` — fase B1 | Claude (AI assistant) |
+| 2026-05-22 | Integers/{Basic,Order,Functions,Arithmetic,Bijection,PadicVal,MobiusLiouville}.lean (#92–#98): entradas de módulos, cadena de dependencias, namespace `ℤ₀`, definiciones clave (negOnePow, mobius, liouville, Omega_prime), 17 teoremas incluyendo `liouville_prime_pow` — actualización_documentación completa de Integers/ | Claude (AI assistant) |
 
 > To project a file: read it fully, then update sections 1–8 above following AI-GUIDE.md §4–14.
