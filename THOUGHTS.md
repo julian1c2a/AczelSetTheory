@@ -145,7 +145,7 @@ Pero cada nivel solo captura los **subconjuntos finitos** del universo previo,
 no el powerset completo. Así:
 
 | Nivel | Tipo | Universo capturado |
-|-------|------|-------------------|
+| ------- | ------ | ------------------- |
 | CList | `HFSet` | $V_\omega$ |
 | CList₁ | `HFSet₁` | $\text{HF}(\{V_\omega\})$ — finito sobre $V_\omega$ |
 | CList₂ | `HFSet₂` | $\text{HF}(\{V_\omega, \text{HF}_1\})$ |
@@ -194,7 +194,7 @@ cuya función característica es computable (recursiva total).
 ### 1.7. Conexión con marcos teóricos establecidos
 
 | Marco teórico | Relación con la propuesta |
-|---------------|--------------------------|
+| --------------- | -------------------------- |
 | **KP (Kripke-Platek)** | $V_\omega$ (nuestro HFSet) es el admisible mínimo. KP$\omega$ (con axioma de infinito) da $L_{\omega_1^{CK}}$, que contiene todos los conjuntos hiperaritméticos. |
 | **Jerarquía constructible $L_\alpha$** | $L_\omega = V_\omega = HFSet$. $L_{\omega+1}$ = subconjuntos aritméticos de $\omega$. Para todo $n$ finito, $L_n = V_n$. |
 | **Conjuntos admisibles (Barwise 1975)** | Un conjunto admisible es un conjunto transitivo que modela KP. La propuesta de CList₁ produce un conjunto transitivo que contiene a $V_\omega$ como elemento, pero NO es admisible (faltaría $\Delta_0$-Collection). |
@@ -264,7 +264,7 @@ tipo siendo definido en posición negativa.
 La membresía `x ∈ₛ t` se define por casos sobre `t`:
 
 | Forma de `t` | `x ∈ₛ t` iff |
-|---------------|---------------|
+| --------------- | --------------- |
 | `mk xs` | `∃ y ∈ xs, extEq₊ x y` (como ahora con CList) |
 | `inf P` | `∃ h : HFSet, embed h ≡ x ∧ P h = true` |
 
@@ -291,7 +291,7 @@ def isPure : CList₊ → Bool
 
 Como la membresía en `inf P` solo admite HFSets (no `inf`-términos), se simplifica:
 
-```
+```text
 x ∈ₛ inf P  ↔  isPure x ∧ P (project x) = true
 ```
 
@@ -317,7 +317,7 @@ $$t_1 \equiv t_2 \iff \forall x : \text{CList}_+, \; (x \in_s t_1 \leftrightarro
 Casos relevantes:
 
 | Comparación | Condición de igualdad |
-|-------------|----------------------|
+| ------------- | ---------------------- |
 | `mk xs ≡ mk ys` | Como ahora: mismos miembros (recursivo sobre listas) |
 | `inf P ≡ inf Q` | `∀ h : HFSet, P h = Q h` (igualdad funcional pointwise) |
 | `mk xs ≡ inf P` | Cada `y ∈ xs` es un HFSet puro con `P (project y) = true`, **y** para todo `h` con `P h = true` existe `y ∈ xs` con `embed h ≡ y` |
@@ -356,7 +356,7 @@ es total.
 Estas son las operaciones limpias, donde el esquema `fin + inf` brilla:
 
 | Operación | Definición | Tipo |
-|-----------|-----------|------|
+| ----------- | ----------- | ------ |
 | $A \cup B$ | `inf (fun h => P h \|\| Q h)` | $\text{Comp}(V_\omega)$ |
 | $A \cap B$ | `inf (fun h => P h && Q h)` | $\text{Comp}(V_\omega)$ |
 | $A \setminus B$ | `inf (fun h => P h && !Q h)` | $\text{Comp}(V_\omega)$ |
@@ -369,7 +369,7 @@ intersección. Esto corresponde a la clase $\Delta^0_1$ en la jerarquía aritmé
 #### 2.4.2. Operaciones mixtas (fin + inf)
 
 | Operación | Definición | Complejidad |
-|-----------|-----------|-------------|
+| ----------- | ----------- | ------------- |
 | `mk xs ∪ inf P` | Requiere combinar una lista finita con un predicado | Ver abajo |
 | `mk xs ∩ inf P` | `mk (xs.filter (fun y => isPure y && P (project y)))` | OK si xs finita |
 | `∅ ∪ inf P` | `inf P` | Trivial |
@@ -439,7 +439,7 @@ Esto es consistente con KP (Kripke-Platek), que **no incluye Powerset**.
 ### 2.5. Axiomas de ZF: verificación para Nivel 1
 
 | Axioma | ¿Se cumple? | Comentario |
-|--------|-------------|------------|
+| -------- | ------------- | ------------ |
 | **Extensionalidad** | ✓ | Por definición del cociente |
 | **Conjunto vacío** | ✓ | `mk []` o `inf (fun _ => false)` |
 | **Par** | ✓ | `mk [a, b]` para cualesquiera `a, b : CList₊` |
@@ -490,7 +490,7 @@ directamente, porque requieren predicados semi-decidibles (`HFSet → Prop` sin
 #### Cardinalidades
 
 | Colección | Cardinalidad |
-|-----------|-------------|
+| ----------- | ------------- |
 | $V_\omega$ (HFSets) | $\aleph_0$ |
 | $\text{Comp}(V_\omega)$ (decidibles) | $\aleph_0$ (contablemente muchos programas) |
 | $U_1$ (Nivel 1 completo) | $\aleph_0$ |
@@ -590,7 +590,7 @@ En cada paso:
 #### Los primeros niveles explícitos
 
 | Nivel | Universo | Contiene |
-|-------|----------|----------|
+| ------- | ---------- | ---------- |
 | $U_0$ | $V_\omega$ | $\emptyset, \{∅\}, \{∅,\{∅\}\}, \ldots$ — todos los HFSets finitos |
 | $U_1$ | $\text{HF}(V_\omega \cup \text{Comp}(V_\omega))$ | Todo lo de $U_0$ + subconj. decidibles de $V_\omega$ (primos, pares, etc.) + combinaciones finitas |
 | $U_2$ | $\text{HF}(U_1 \cup \text{Comp}(U_1))$ | Todo lo de $U_1$ + subconj. decidibles de $U_1$ (p.ej. "todos los subconj. decidibles de $\omega$ que contienen al $0$") |
@@ -616,7 +616,7 @@ La iteración $U_0, U_1, U_2, \ldots$ tiene una correspondencia precisa con los
 niveles de la jerarquía aritmética, pero **relativizada**:
 
 | Nivel | Subconjuntos de $\omega$ capturados | Clase aritmética |
-|-------|-------------------------------------|------------------|
+| ------- | ------------------------------------- | ------------------ |
 | $U_0$ | Solo los finitos y cofinitos (como HFSets) | $\Delta^0_0$ (primitiva recursiva) |
 | $U_1$ | Todos los decidibles: función car. total computable | $\Delta^0_1$ (recursivo) |
 | $U_2$ | Decidibles relativos a un $\Delta^0_1$-oráculo | $\Delta^0_2$ (computable en el salto de Turing) |
@@ -780,7 +780,7 @@ Lean 4 **no soporta** tipos inductivo-recursivos. Se tendría que simular con
 Suponiendo que se construye $U_\omega = \bigcup_n U_n$:
 
 | Axioma | ¿Se cumple? | Justificación |
-|--------|-------------|---------------|
+| -------- | ------------- | --------------- |
 | **Extensionalidad** | ✓ | Por cociente en cada nivel |
 | **Vacío** | ✓ | `fin [] ∈ U_0 ⊆ U_\omega` |
 | **Par** | ✓ | `{a, b}` vive en $U_{\max(n_a, n_b)}$ |
@@ -823,7 +823,7 @@ $\omega_1^{CK}$ (ordinal de Church-Kleene).
 $$V_\omega \subsetneq U_\omega \subsetneq L_{\omega_1^{CK}} \subsetneq L_{\omega_1} \subsetneq V_{\omega+1}$$
 
 | Universo | Conjuntos de naturales | Cardinalidad |
-|----------|----------------------|-------------|
+| ---------- | ---------------------- | ------------- |
 | $V_\omega$ | Solo finitos/cofinitos | $\aleph_0$ |
 | $U_\omega$ | Aritméticos ($\bigcup_n \Delta^0_n$) | $\aleph_0$ |
 | $L_{\omega_1^{CK}}$ | Hiperaritméticos ($\Delta^1_1$) | $\aleph_0$ |
@@ -849,7 +849,7 @@ $$V_\omega \subsetneq U_\omega \subsetneq L_{\omega_1^{CK}} \subsetneq L_{\omega
 ### 3.9. Comparación: Nivel 1 vs Nivel 1+
 
 | Criterio | Nivel 1 (`fin + inf`) | Nivel 1+ ($U_n$ indexado) |
-|----------|----------------------|---------------------------|
+| ---------- | ---------------------- | --------------------------- |
 | **Lean 4 factible** | ✓ Sí (inductive directo) | ⚠ Solo niveles explícitos finitos |
 | **Positividad estricta** | ✓ | ✗ (como familia indexada) |
 | **DecidableEq** | ✗ (perdido) | ✗ (perdido desde $n \geq 1$) |
@@ -941,7 +941,7 @@ La pregunta sobre separación/reemplazo es independiente de si se usan W-trees.
 Este proyecto (**AczelSetTheory**) es uno de cuatro que eventualmente se fusionarán:
 
 | Proyecto | Alcance | Universo |
-|----------|---------|----------|
+| ---------- | --------- | ---------- |
 | **AczelSetTheory** (este) | Conjuntos hereditariamente finitos + extensión decidible | $V_\omega$ → $U_1 = \text{HF}(V_\omega \cup \Delta^0_1)$ |
 | **ZFC** (futuro) | Teoría de conjuntos ZFC completa | $V$ (clase universal) |
 | **Peano** (existente) | Números naturales de Peano | $\omega$ |
@@ -1033,7 +1033,7 @@ inductive EHFset : Type -- Las propiedades deben ser decidibles, es decir, `Prop
 #### Diagnóstico: base disponible en Peano
 
 | Primitivo | Estado |
-|-----------|--------|
+| ----------- | -------- |
 | `gcd`, `lcm`, `coprime` | ✅ en Peano + HFSet |
 | `Prime`, `isPrimeb` (Bool) | ✅ en Peano + HFSet |
 | `smallestDivisor n` | ✅ en Peano (computable) |
@@ -1082,7 +1082,7 @@ Resumiendo esta primera parte:
 - Ahora hay que mostrar una biyección entre $\mathbb{Z}_0$ y $\mathbb{N}_0$ para que se vea claro que se trata de una extensión de $\mathbb{N}_0$ con el mismo cardinal. Se puede hacer mapeando cada natural `2⋅n` a su representante canónico `toInt n` en $\mathbb{Z}_0$, y cada entero negativo `2⋅n+1` a su representante canónico `neg toInt (n)` en $\mathbb{Z}_0$. Esto nos da una biyección de $\mathbb{Z}_0$ a $\mathbb{N}_0$. La inversa la podemos calcular directamente, si $z ∈ \mathbb{Z}_0, z = [⟨0,0⟩]_{mathbb{Z}_0}, inv biy z → 0$, si $z ∈ \mathbb{Z}_0, z = [⟨n,0⟩]_{mathbb{Z}_0}, inv biy z → 2⋅n$ y por último si $z ∈ \mathbb{Z}_0, z = [⟨0,n⟩]_{mathbb{Z}_0}, inv biy z → 2⋅n+1$.
 - Demostrar que si `(B : HFSet)` una función $f : \mathbb{N}_0 → B$ es necesariamente no inyectiva, y que por lo tanto, tampoco será inyectiva $g : \mathbb{Z}_0 → B$. Igualmente, demostrar que si `(B : HFSet)` una función $f : B → \mathbb{N}_0$ es necesariamente no sobreyectiva, y que por lo tanto, tampoco será sobreyectiva $g : B → \mathbb{Z}_0$.
 
-**PENSAMIENTOS DE JULIÁN SOBRE SOBREES TRUCTURAS ALGEBRAICAS Y SU INFRAESTRUCTURA**
+### PENSAMIENTOS DE JULIÁN SOBRE SOBREES TRUCTURAS ALGEBRAICAS Y SU INFRAESTRUCTURA
 
 Deberíamos tener las definiciones de las principalesest ructuras algebraicasdeunc o nj untosobre  una od osoper aciones:
 
@@ -1141,7 +1141,7 @@ Deberíamos tener las definiciones de las principalesest ructuras algebraicasdeu
 
 #### Mapa de capas
 
-```
+```text
 CAPA 0 — Primitivo clave
 ─────────────────────────
 padicVal p n = exp. de p en n
@@ -1173,7 +1173,7 @@ Inversión de Möbius: f = μ ★ (f ★ 1)
 
 #### Árbol de dependencias
 
-```
+```text
 padicVal p n          ← base de todo
     │
     ├── squarefree n  (∀p primo, padicVal p n ≤ 1)
@@ -1195,7 +1195,7 @@ padicVal p n          ← base de todo
 #### Funciones con signo: decisión abierta
 
 | Función | Valores | ¿Hay ℤ en Peano? |
-|---------|---------|------------------|
+| --------- | --------- | ------------------ |
 | μ(n) | −1, 0, 1 | **No** — solo ℕ₀ |
 | λ(n) | −1, 1 | **No** |
 
@@ -1210,7 +1210,7 @@ Los caminos (a) y (c) son los limpios. El proyecto hasta ahora es 100% ℕ₀; e
 #### Propuesta de fases
 
 | Fase | Contenido | Dificultad |
-|------|-----------|------------|
+| ------ | ----------- | ------------ |
 | **C1** | `padicVal`, `squarefree`, `rad`, `ω`, `Ω` | Media |
 | **C2** | `divisors`, `d(n)=τ`, `σ`, `σ_k` | Media |
 | **C3** | `μ` y `λ` (con decisión de signo) | Alta |

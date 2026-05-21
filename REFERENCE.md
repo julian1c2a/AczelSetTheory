@@ -22,7 +22,7 @@ Below are the keys for reading and searching theorems.
 ### 0.2 Symbol-to-Word Dictionary
 
 | Symbol | Name | | Symbol | Name | | Symbol | Name |
-|--------|------|---|--------|------|---|--------|------|
+| -------- | ------ | --- | -------- | ------ | --- | -------- | ------ |
 | ∈ | `mem` | | ∪ | `union` | | + | `add` |
 | ∉ | `not_mem` | | ∩ | `inter` | | * | `mul` |
 | ⊆ | `subset` | | ⋃ | `sUnion` | | - | `sub`/`neg` |
@@ -35,7 +35,7 @@ Below are the keys for reading and searching theorems.
 ## 1. Module List
 
 | # | File | Namespace | Status | Depends on | Depended on by |
-|---|------|-----------|--------|------------|----------------|
+| --- | ------ | ----------- | -------- | ------------ | ---------------- |
 | 1 | [`AczelSetTheory/CList/Basic.lean`](doc/REFERENCE-CList.md) | `CList` | ✅ Complete | `Init.Data.List.Basic` | ExtEq, SetEquiv, Order, Sort, Normalize, Filter, HFSets, Main |
 | 2 | [`AczelSetTheory/CList/ExtEq.lean`](doc/REFERENCE-CList.md) | `CList` | ✅ Complete | Basic | SetEquiv, Order, Filter |
 | 3 | [`AczelSetTheory/CList/Filter.lean`](doc/REFERENCE-CList.md) | `CList` | ✅ Complete | ExtEq | Operations/Separation, Operations/Intersection, Operations/Setminus |
@@ -144,7 +144,7 @@ Below are the keys for reading and searching theorems.
 
 ## 2. Module Dependencies
 
-```
+```text
 Peano.PeanoNat (+ Add, Axioms, Order, StrictOrder)
   └─ PList/Basic.lean
        └─ PList/Lemmas.lean
@@ -190,7 +190,7 @@ PList/Omega0 + Peano.PeanoNat.{Arith,Primes,WellFounded,Div}
 ## 3. Namespaces
 
 | Namespace | Modules | Description |
-|-----------|---------|-------------|
+| ----------- | --------- | ------------- |
 | `CList` | Basic, ExtEq, Filter, SetEquiv, Order, Sort, Normalize, Operations/Union (partial), Operations/Powerset (partial) | All CList definitions and theorems |
 | `HFSet` | HFSets, Operations/*, Axioms/*, Notation | Quotient type and its API |
 | `PList` | PList/Basic, PList/Lemmas | Polymorphic list type with ℕ₀ indexing; bridge to `List` |
@@ -306,7 +306,7 @@ PList/Omega0 + Peano.PeanoNat.{Arith,Primes,WellFounded,Div}
 Key symbols:
 
 | Symbol | Kind | File | Notes |
-|--------|------|------|-------|
+| -------- | ------ | ------ | ------- |
 | `ℤ₀` | type alias | Integers/Basic | `Quotient intSetoid`; `CommRing ℤ₀` instance |
 | `negOne` | def | Integers/Basic | `mk (𝟘, 𝟙)` = −1 |
 | `ofNat` | def | Integers/Basic | embedding ℕ₀ → ℤ₀ |
@@ -390,7 +390,7 @@ Key symbols:
 Key proven theorems (non-sorry):
 
 | Theorem | Statement |
-|---------|----------|
+| --------- | ---------- |
 | `negOnePow_zero` | `negOnePow 𝟘 = 1` |
 | `negOnePow_succ` | `negOnePow (σ k) = -(negOnePow k)` |
 | `negOnePow_one` | `negOnePow 𝟙 = negOne` |
@@ -490,7 +490,7 @@ Key proven theorems (non-sorry):
 ## 8. Notations
 
 | Symbol | Lean definition | Module | Notes |
-|--------|----------------|--------|-------|
+| -------- | ---------------- | -------- | ------- |
 | `==` | `BEq CList` instance via `extEq` | Basic | Standard Lean `BEq` typeclass |
 | `∈` | `Membership HFSet HFSet` instance via `Mem` | HFSets | Standard Lean `Membership` typeclass |
 | `∅` | `notation "∅" => empty` | Notation | Empty set |
@@ -512,7 +512,7 @@ Key proven theorems (non-sorry):
 ## Projection Log
 
 | Date | Files projected | Projector |
-|------|----------------|-----------|
+| ------ | ---------------- | ----------- |
 | 2026-04-04 | (stub created) | Julián Calderón Almendros |
 | 2026-04-08 | CList/{Basic,ExtEq,SetEquiv,Order,Sort,Normalize}.lean, CList.lean, HFSets.lean | Claude (AI assistant) |
 | 2026-04-09 | HFSets.lean (Mem, pair, Zermelo axioms) | Claude (AI assistant) |

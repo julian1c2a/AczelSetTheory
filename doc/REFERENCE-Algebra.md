@@ -19,7 +19,7 @@ foundation, decidability).
 **Primary namespace:** `HFSet`
 
 | # | File | Status |
-|---|------|--------|
+| --- | ------ | -------- |
 | 40 | `AczelSetTheory/Operations/SymDiff.lean` | ✅ Complete |
 | 41 | `AczelSetTheory/Operations/Cardinal.lean` | ✅ Complete |
 | 42 | `AczelSetTheory/Axioms/Singleton.lean` | ✅ Complete |
@@ -205,19 +205,19 @@ def HFSet.rank (A : HFSet) : ℕ₀
 ### 6.22 Operations/SymDiff.lean — `namespace HFSet`
 
 | # | Theorem | Lean signature |
-|---|---------|---------------|
+| --- | --------- | --------------- |
 | 1 | `symDiffCList_extEq` | `(a₁ a₂ b₁ b₂ : CList) (ha : CList.extEq a₁ a₂ = true) (hb : CList.extEq b₁ b₂ = true) : CList.extEq (symDiffCList a₁ b₁) (symDiffCList a₂ b₂) = true` |
 
 ### 6.23 Axioms/Singleton.lean — `namespace HFSet`
 
 | # | Theorem | Lean signature |
-|---|---------|---------------|
+| --- | --------- | --------------- |
 | 1 | `mem_singleton` | `(x a : HFSet) : x ∈ singleton a ↔ x = a` |
 
 ### 6.24 Axioms/Subset.lean — `namespace HFSet`
 
 | # | Theorem | Lean signature |
-|---|---------|---------------|
+| --- | --------- | --------------- |
 | 1 | `subset_iff` | `(A B : HFSet) : A ⊆ B ↔ ∀ x, x ∈ A → x ∈ B` |
 | 2 | `subset_refl` | `(A : HFSet) : A ⊆ A` |
 | 3 | `subset_trans` | `(A B C : HFSet) (h₁ : A ⊆ B) (h₂ : B ⊆ C) : A ⊆ C` |
@@ -232,7 +232,7 @@ def HFSet.rank (A : HFSet) : ℕ₀
 ### 6.26 Axioms/Foundation.lean — `namespace CList` + `namespace HFSet`
 
 | # | Theorem | Lean signature |
-|---|---------|---------------|
+| --- | --------- | --------------- |
 | 1 | `CList.mem_exists_plist_mem` | `(x : CList) (xs : PList CList) (h : mem x (mk xs) = true) : ∃ y, PList.Mem y xs ∧ extEq x y = true` |
 | 2 | `CList.mem_of_plist_mem` | `(y : CList) (xs : PList CList) (h : PList.Mem y xs) : mem y (mk xs) = true` |
 | 3 | `foundation` | `(A : HFSet) (hne : A ≠ empty) : ∃ x : HFSet, x ∈ A ∧ ∀ y : HFSet, y ∈ x → ¬ y ∈ A` |
@@ -240,14 +240,14 @@ def HFSet.rank (A : HFSet) : ℕ₀
 ### 6.27 Axioms/Decidable.lean — `namespace HFSet`
 
 | # | Instance | Lean signature |
-|---|----------|---------------|
+| --- | ---------- | --------------- |
 | 1 | `mem_decidable` | `(x A : HFSet) → Decidable (x ∈ A)` |
 | 2 | `existsMem_decidable` | `(A : HFSet) → (P : HFSet → Prop) → [DecidablePred P] → Decidable (∃ x, x ∈ A ∧ P x)` |
 
 ### 6.35 Axioms/Succ.lean — `namespace HFSet`
 
 | # | Theorem | Lean signature |
-|---|---------|---------------|
+| --- | --------- | --------------- |
 | 1 | `mem_succ` | `(x A : HFSet) : x ∈ succ A ↔ x ∈ A ∨ x = A` |
 | 2 | `A_mem_succ_A` | `(A : HFSet) : A ∈ succ A` |
 | 3 | `mem_succ_of_mem` | `(x A : HFSet) (h : x ∈ A) : x ∈ succ A` |
@@ -260,13 +260,13 @@ def HFSet.rank (A : HFSet) : ℕ₀
 ### 6.36 Axioms/SymDiff.lean — `namespace HFSet`
 
 | # | Theorem | Lean signature |
-|---|---------|---------------|
+| --- | --------- | --------------- |
 | 1 | `mem_symDiff` | `(A B x : HFSet) : x ∈ symDiff A B ↔ (x ∈ A ∧ ¬ x ∈ B) ∨ (x ∈ B ∧ ¬ x ∈ A)` |
 
 ### 6.37 Axioms/Lattice.lean — `namespace HFSet`
 
 | # | Theorem | Lean signature |
-|---|---------|---------------|
+| --- | --------- | --------------- |
 | 1 | `union_comm` | `(A B : HFSet) : union A B = union B A` |
 | 2 | `inter_comm` | `(A B : HFSet) : inter A B = inter B A` |
 | 3 | `union_assoc` | `(A B C : HFSet) : union (union A B) C = union A (union B C)` |
@@ -288,7 +288,7 @@ def HFSet.rank (A : HFSet) : ℕ₀
 ### 6.38 Axioms/BooleanAlgebra.lean — `namespace HFSet`
 
 | # | Theorem | Lean signature |
-|---|---------|---------------|
+| --- | --------- | --------------- |
 | 1 | `mem_compl` | `(U X x : HFSet) : x ∈ compl U X ↔ x ∈ U ∧ ¬ x ∈ X` |
 | 2 | `inter_full` | `(U A : HFSet) (hA : A ⊆ U) : inter A U = A` |
 | 3 | `full_inter` | `(U A : HFSet) (hA : A ⊆ U) : inter U A = A` |
@@ -306,7 +306,7 @@ def HFSet.rank (A : HFSet) : ℕ₀
 ### 6.39 Axioms/BooleanRing.lean — `namespace HFSet`
 
 | # | Theorem | Lean signature |
-|---|---------|---------------|
+| --- | --------- | --------------- |
 | 1 | `symDiff_comm` | `(A B : HFSet) : symDiff A B = symDiff B A` |
 | 2 | `symDiff_assoc` | `(A B C : HFSet) : symDiff (symDiff A B) C = symDiff A (symDiff B C)` |
 | 3 | `symDiff_empty` | `(A : HFSet) : symDiff A empty = A` |
@@ -319,7 +319,7 @@ def HFSet.rank (A : HFSet) : ℕ₀
 ### 6.40 Axioms/VonNeumann.lean — `namespace HFSet`
 
 | # | Theorem | Lean signature |
-|---|---------|---------------|
+| --- | --------- | --------------- |
 | 1 | `isTransitive_empty` | `isTransitive empty` |
 | 2 | `isTransitive_succ` | `(A : HFSet) (hT : isTransitive A) : isTransitive (succ A)` |
 | 3 | `isNat_zero` | `isNat empty` |
@@ -333,7 +333,7 @@ def HFSet.rank (A : HFSet) : ℕ₀
 ### 6.41 Axioms/Choice.lean — `namespace HFSet`
 
 | # | Theorem | Lean signature |
-|---|---------|---------------|
+| --- | --------- | --------------- |
 | 1 | `nonempty_of_ne_empty` | `(A : HFSet) (h : A ≠ empty) : ∃ x, x ∈ A` |
 | 2 | `choose_mem` | `(A : HFSet) (h : A ≠ empty) : choose A h ∈ A` |
 | 3 | `choice_principle` | `(F : HFSet) (hne : ∀ A, A ∈ F → A ≠ empty) : ∃ f : HFSet → HFSet, ∀ A, A ∈ F → f A ∈ A` |
@@ -341,7 +341,7 @@ def HFSet.rank (A : HFSet) : ℕ₀
 ### 6.42 Axioms/Cardinal.lean — `namespace HFSet`
 
 | # | Theorem | Lean signature |
-|---|---------|---------------|
+| --- | --------- | --------------- |
 | 1 | `card_empty` | `card empty = 𝟘` |
 | 2 | `card_insert` | `(x A : HFSet) (h : x ∉ A) : card (insert x A) = σ (card A)` |
 | 3 | `card_powerset` | `(A : HFSet) : card (powerset A) = pow 𝟚 (card A)` |
@@ -351,7 +351,7 @@ def HFSet.rank (A : HFSet) : ℕ₀
 ### 6.52 Axioms/Adjunction.lean — `namespace HFSet`
 
 | # | Theorem | Lean signature |
-|---|---------|---------------|
+| --- | --------- | --------------- |
 | 1 | `mem_insert` | `(x b A : HFSet) : x ∈ insert b A ↔ x = b ∨ x ∈ A` |
 | 2 | `mem_insert_self` | `(b A : HFSet) : b ∈ insert b A` |
 | 3 | `insert_ne_empty` | `(b A : HFSet) : insert b A ≠ empty` |
@@ -359,7 +359,7 @@ def HFSet.rank (A : HFSet) : ℕ₀
 ### 6.53 Axioms/Induction.lean — `namespace HFSet`
 
 | # | Theorem | Lean signature |
-|---|---------|---------------|
+| --- | --------- | --------------- |
 | 1 | `eps_induction` | `(P : HFSet → Prop) (h_empty : P empty) (h_adj : ∀ A b, P A → P (insert b A)) : ∀ A, P A` |
 | 2 | `strong_eps_induction` | `(P : HFSet → Prop) (h : ∀ A, (∀ x, x ∈ A → P x) → P A) : ∀ A, P A` |
 
@@ -368,7 +368,7 @@ def HFSet.rank (A : HFSet) : ℕ₀
 **Imports:** `AczelSetTheory.Axioms.VonNeumann`, `AczelSetTheory.Axioms.Induction`
 
 | # | Theorem | Lean signature |
-|---|---------|---------------|
+| --- | --------- | --------------- |
 | 1 | `isOrdinal_empty` | `isOrdinal empty` |
 | 2 | `isOrdinal_succ` | `{A : HFSet} (hA : isOrdinal A) : isOrdinal (succ A)` |
 | 3 | `isNat_isOrdinal` | `{n : HFSet} (hn : isNat n) : isOrdinal n` |
@@ -379,7 +379,7 @@ def HFSet.rank (A : HFSet) : ℕ₀
 **Imports:** `AczelSetTheory.Axioms.Ordinal`, `AczelSetTheory.Axioms.Cardinal`, `AczelSetTheory.Axioms.Separation`, `AczelSetTheory.Axioms.Decidable`, `AczelSetTheory.Axioms.Setminus`, `AczelSetTheory.PList.Omega0`
 
 | # | Theorem | Lean signature |
-|---|---------|---------------|
+| --- | --------- | --------------- |
 | 1 | `card_le_of_subset` | `{A B : HFSet} (h : A ⊆ B) : card A ≤ card B` |
 | 2 | `isOrdinal_isNat` | `{A : HFSet} (hA : isOrdinal A) : isNat A` |
 | 3 | `isOrdinal_iff_isNat` | `{A : HFSet} : isOrdinal A ↔ isNat A` |
@@ -390,7 +390,7 @@ def HFSet.rank (A : HFSet) : ℕ₀
 **Opens:** `Peano`
 
 | # | Theorem | Lean signature |
-|---|---------|---------------|
+| --- | --------- | --------------- |
 | 1 | `rank_empty` | `rank empty = 𝟘` |
 | 2 | `rank_insert` | `(x A : HFSet) (h : x ∉ A) : rank (insert x A) = max (σ (rank x)) (rank A)` |
 
@@ -655,7 +655,7 @@ def HFSubgroup.index (sub : HFSubgroup grp) : ℕ₀ := card sub.cosets
 `variable (grp : HFGroup)`
 
 | # | Theorem | Lean signature |
-|---|---------|----------------|
+| --- | --------- | ---------------- |
 | 1 | `op_inv_left_apply` | `{a b : HFSet} (ha : a ∈ grp.G) (hb : b ∈ grp.G) : grp.op (grp.inv a) (grp.op a b) = b` |
 | 2 | `left_cancel` | `{x a b : HFSet} (hx : x ∈ grp.G) (ha : a ∈ grp.G) (hb : b ∈ grp.G) (h : grp.op x a = grp.op x b) : a = b` |
 | 3 | `op_inv_right` | `{a : HFSet} (ha : a ∈ grp.G) : grp.op a (grp.inv a) = grp.e` |
@@ -674,7 +674,7 @@ def HFSubgroup.index (sub : HFSubgroup grp) : ℕ₀ := card sub.cosets
 `variable {grp : HFGroup}`
 
 | # | Theorem | Lean signature |
-|---|---------|----------------|
+| --- | --------- | ---------------- |
 | 1 | `mem_rightCoset` | `(sub : HFSubgroup grp) {a x : HFSet} (ha : a ∈ grp.G) : x ∈ sub.rightCoset a ↔ ∃ h ∈ sub.H, x = grp.op h a` |
 | 2 | `cosetEq_refl` | `(sub : HFSubgroup grp) {a : HFSet} (ha : a ∈ grp.G) : sub.cosetEq a a` |
 | 3 | `cosetEq_symm` | `(sub : HFSubgroup grp) {a b : HFSet} (ha : a ∈ grp.G) (hb : b ∈ grp.G) (h : sub.cosetEq a b) : sub.cosetEq b a` |
@@ -699,7 +699,7 @@ def HFSubgroup.index (sub : HFSubgroup grp) : ℕ₀ := card sub.cosets
 `variable {G H : HFGroup} (φ : HFGroupHom G H)`
 
 | # | Theorem | Lean signature |
-|---|---------|----------------|
+| --- | --------- | ---------------- |
 | 1 | `hom_e` | `(φ : HFGroupHom G H) : φ.f G.e = H.e` |
 | 2 | `hom_inv` | `(φ : HFGroupHom G H) {a : HFSet} (ha : a ∈ G.G) : φ.f (G.inv a) = H.inv (φ.f a)` |
 
@@ -710,7 +710,7 @@ def HFSubgroup.index (sub : HFSubgroup grp) : ℕ₀ := card sub.cosets
 `variable (rng : HFRing)`
 
 | # | Theorem | Lean signature |
-|---|---------|----------------|
+| --- | --------- | ---------------- |
 | 1 | `add_zero` | `{a : HFSet} (ha : a ∈ rng.R) : rng.add a rng.zero = a` |
 | 2 | `add_neg` | `{a : HFSet} (ha : a ∈ rng.R) : rng.add a (rng.neg a) = rng.zero` |
 | 3 | `neg_neg` | `{a : HFSet} (ha : a ∈ rng.R) : rng.neg (rng.neg a) = a` |
@@ -724,7 +724,7 @@ def HFSubgroup.index (sub : HFSubgroup grp) : ℕ₀ := card sub.cosets
 ### 6.91 Algebra/CosetCount.lean
 
 | # | Theorem | Namespace | Lean signature |
-|---|---------|-----------|----------------|
+| --- | --------- | ----------- | ---------------- |
 | 1 | `sUnion_insert` | `HFSet` | `(C F : HFSet) : sUnion (insert C F) = union C (sUnion F)` |
 | 2 | `card_sUnion_uniform_partition` | `HFSet` | `(F : HFSet) (k : ℕ₀) (hunif : ∀ C, C ∈ F → card C = k) (hdisj : ∀ C D, C ∈ F → D ∈ F → C ≠ D → inter C D = empty) : card (sUnion F) = mul (card F) k` |
 | 3 | `card_rightCoset_eq_card_H` | `HFAlgebra.HFSubgroup` | `(sub : HFSubgroup grp) {a : HFSet} (ha : a ∈ grp.G) : card (sub.rightCoset a) = card sub.H` |

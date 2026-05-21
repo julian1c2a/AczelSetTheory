@@ -154,8 +154,7 @@ theorem mobius_sq (n : ℕ₀) :
 -- Multiplicatividad de liouville
 -- ─────────────────────────────────────────────────────────────────────────────
 
-/-- λ es completamente multiplicativa: λ(m·n) = λ(m)·λ(n) para m, n ≠ 0.
-    (Usa Omega_prime_mul, que tiene un sorry.) -/
+/-- λ es completamente multiplicativa: λ(m·n) = λ(m)·λ(n) para m, n ≠ 0. -/
 theorem liouville_mul {m n : ℕ₀} (hm : m ≠ 𝟘) (hn : n ≠ 𝟘) :
     liouville (Peano.Mul.mul m n) = Mul.mul (liouville m) (liouville n) := by
   unfold liouville
