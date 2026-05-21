@@ -1232,3 +1232,128 @@ def HFSubspace.inter (sub₁ sub₂ : HFSubspace fld vs) : HFSubspace fld vs
 ### Algebra/LinearSpace.lean
 
 `HFAlgebra.HFLinearSpace`, `HFAlgebra.HFLinearSpace.toAdditiveHFGroup`, `HFAlgebra.HFLinearSpace.zero_smul`, `HFAlgebra.HFLinearSpace.smul_zero`, `HFAlgebra.HFLinearSpace.neg_smul`, `HFAlgebra.HFLinearSpace.smul_neg`, `HFAlgebra.HFLinearMap`, `HFAlgebra.HFLinearMap.hom_zero`, `HFAlgebra.HFLinearMap.hom_neg`, `HFAlgebra.HFLinearMap.id`, `HFAlgebra.HFLinearMap.comp`, `HFAlgebra.HFSubspace`, `HFAlgebra.HFSubspace.toHFLinearSpace`, `HFAlgebra.HFSubspace.inter`
+
+### Algebra/Lattice.lean
+
+`HFAlgebra.HFLattice`, `HFAlgebra.HFLattice.le`, `HFAlgebra.HFLattice.meet_idem`, `HFAlgebra.HFLattice.join_idem`, `HFAlgebra.HFLattice.le_refl`, `HFAlgebra.HFLattice.le_antisymm`, `HFAlgebra.HFLattice.le_trans`, `HFAlgebra.HFLattice.meet_le_left`, `HFAlgebra.HFLattice.meet_le_right`, `HFAlgebra.HFLattice.le_join_left`, `HFAlgebra.HFLattice.le_join_right`, `HFAlgebra.HFBoundedLattice`, `HFAlgebra.HFBoundedLattice.toLattice`, `HFAlgebra.HFBoundedLattice.meet_bot`, `HFAlgebra.HFBoundedLattice.join_top`, `HFAlgebra.HFDistributiveLattice`, `HFAlgebra.HFDistributiveLattice.toLattice`, `HFAlgebra.HFDistributiveLattice.join_distrib` (⚠️ sorry), `HFAlgebra.HFLatHom`, `HFAlgebra.HFLatHom.id`, `HFAlgebra.HFLatHom.comp`, `HFAlgebra.HFSublattice`, `HFAlgebra.HFSublattice.toHFLattice`, `HFAlgebra.HFSublattice.inter`
+
+---
+
+## Algebra/Lattice.lean — Sección detallada
+
+**Fuente:** `AczelSetTheory/Algebra/Lattice.lean`  
+**Namespace:** `HFAlgebra`  
+**Imports:** `AczelSetTheory.HFSets`, `AczelSetTheory.Axioms.Subset`, `AczelSetTheory.Axioms.Intersection`
+
+### `HFAlgebra.HFLattice`
+
+```lean
+structure HFLattice where
+  L    : HFSet
+  meet : HFSet → HFSet → HFSet          -- ⊓
+  join : HFSet → HFSet → HFSet          -- ⊔
+  meet_closed : ∀ {a b}, a ∈ L → b ∈ L → meet a b ∈ L
+  join_closed : ∀ {a b}, a ∈ L → b ∈ L → join a b ∈ L
+  meet_comm   : ∀ {a b}, a ∈ L → b ∈ L → meet a b = meet b a
+  join_comm   : ∀ {a b}, a ∈ L → b ∈ L → join a b = join b a
+  meet_assoc  : ∀ {a b c}, a ∈ L → b ∈ L → c ∈ L → meet (meet a b) c = meet a (meet b c)
+  join_assoc  : ∀ {a b c}, a ∈ L → b ∈ L → c ∈ L → join (join a b) c = join a (join b c)
+  meet_absorb : ∀ {a b}, a ∈ L → b ∈ L → meet a (join a b) = a
+  join_absorb : ∀ {a b}, a ∈ L → b ∈ L → join a (meet a b) = a
+```
+
+- **Math**: `(L, ⊓, ⊔)` — retículo; absorción implica idempotencia.
+- Computable carrier. No `noncomputable`.
+
+#### Definición derivada
+
+```lean
+def HFLattice.le (lat : HFLattice) (a b : HFSet) : Prop := lat.meet a b = a
+-- a ≤ b  ↔  a ⊓ b = a
+```
+
+#### Teoremas — `HFLattice`
+
+| Nombre | Enunciado |
+|--------|-----------|
+| `meet_idem` | `a ∈ L → lat.meet a a = a` |
+| `join_idem` | `a ∈ L → lat.join a a = a` |
+| `le_refl` | `a ∈ L → lat.le a a` |
+| `le_antisymm` | `lat.le a b → lat.le b a → a = b` |
+| `le_trans` | `lat.le a b → lat.le b c → lat.le a c` |
+| `meet_le_left` | `lat.le (lat.meet a b) a` |
+| `meet_le_right` | `lat.le (lat.meet a b) b` |
+| `le_join_left` | `lat.le a (lat.join a b)` |
+| `le_join_right` | `lat.le b (lat.join a b)` |
+
+### `HFAlgebra.HFBoundedLattice`
+
+```lean
+structure HFBoundedLattice where
+  L    : HFSet;  meet join : HFSet → HFSet → HFSet;  bot top : HFSet
+  -- axiomas de retículo (meet_closed, join_closed, meet_comm, join_comm,
+  --   meet_assoc, join_assoc, meet_absorb, join_absorb)
+  bot_mem  : bot ∈ L;  top_mem : top ∈ L
+  join_bot : ∀ {a}, a ∈ L → join a bot = a    -- a ⊔ ⊥ = a
+  meet_top : ∀ {a}, a ∈ L → meet a top = a    -- a ⊓ ⊤ = a
+```
+
+```lean
+def HFBoundedLattice.toLattice (bl : HFBoundedLattice) : HFLattice
+```
+
+#### Teoremas — `HFBoundedLattice`
+
+| Nombre | Enunciado |
+|--------|-----------|
+| `meet_bot` | `a ∈ L → bl.meet a bl.bot = bl.bot` |
+| `join_top` | `a ∈ L → bl.join a bl.top = bl.top` |
+
+### `HFAlgebra.HFDistributiveLattice`
+
+```lean
+structure HFDistributiveLattice where
+  -- axiomas de retículo (ídem a HFLattice)
+  meet_distrib : ∀ {a b c}, a ∈ L → b ∈ L → c ∈ L →
+                   meet a (join b c) = join (meet a b) (meet a c)
+```
+
+```lean
+def HFDistributiveLattice.toLattice (dl : HFDistributiveLattice) : HFLattice
+```
+
+#### Teoremas — `HFDistributiveLattice`
+
+| Nombre | Enunciado |
+|--------|-----------|
+| `join_distrib` | `dl.join a (dl.meet b c) = dl.meet (dl.join a b) (dl.join a c)` ⚠️ sorry |
+
+### `HFAlgebra.HFLatHom`
+
+```lean
+structure HFLatHom (L M : HFLattice) where
+  f      : HFSet → HFSet
+  f_mem  : ∀ {a}, a ∈ L.L → f a ∈ M.L
+  f_meet : ∀ {a b}, a ∈ L.L → b ∈ L.L → f (L.meet a b) = M.meet (f a) (f b)
+  f_join : ∀ {a b}, a ∈ L.L → b ∈ L.L → f (L.join a b) = M.join (f a) (f b)
+```
+
+```lean
+def HFLatHom.id (L : HFLattice) : HFLatHom L L
+def HFLatHom.comp (ψ : HFLatHom M N) (φ : HFLatHom L M) : HFLatHom L N
+```
+
+### `HFAlgebra.HFSublattice`
+
+```lean
+structure HFSublattice (lat : HFLattice) where
+  S           : HFSet
+  S_sub       : ∀ {x}, x ∈ S → x ∈ lat.L
+  meet_closed : ∀ {a b}, a ∈ S → b ∈ S → lat.meet a b ∈ S
+  join_closed : ∀ {a b}, a ∈ S → b ∈ S → lat.join a b ∈ S
+```
+
+```lean
+def HFSublattice.toHFLattice (sub : HFSublattice lat) : HFLattice
+def HFSublattice.inter (sub₁ sub₂ : HFSublattice lat) : HFSublattice lat
+```

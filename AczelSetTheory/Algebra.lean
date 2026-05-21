@@ -8,3 +8,4 @@ import AczelSetTheory.Algebra.RingHom
 import AczelSetTheory.Algebra.Field
 import AczelSetTheory.Algebra.Module
 import AczelSetTheory.Algebra.LinearSpace
+import AczelSetTheory.Algebra.Lattice

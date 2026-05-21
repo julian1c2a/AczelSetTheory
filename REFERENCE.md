@@ -139,6 +139,11 @@ Below are the keys for reading and searching theorems.
 | 101 | `AczelSetTheory/Integers/Bijection.lean` | `ℤ₀` | ✅ Complete | Integers/Functions, `Peano.PeanoNat.Pairing` | Integers.lean |
 | 102 | `AczelSetTheory/Integers/PadicVal.lean` | `ℤ₀` | ✅ Complete | PList/Omega0, `Peano.PeanoNat.{Arith,Primes,WellFounded,Div}` | Integers/MobiusLiouville |
 | 103 | `AczelSetTheory/Integers/MobiusLiouville.lean` | `ℤ₀` | ✅ Complete | Integers/Basic, Integers/PadicVal | Integers.lean |
+| 104 | `AczelSetTheory/Topology/Basic.lean` | `HFTopology` | ✅ Complete | HFSets, Axioms/{Union,Intersection,Setminus,Subset,Singleton} | Topology/Interior, Topology/Neighborhoods, Topology/Subspace |
+| 105 | `AczelSetTheory/Topology/Interior.lean` | `HFTopology` | ⚠️ sorry | Topology/Basic, Axioms/{Separation,Intersection,Setminus} | — |
+| 106 | `AczelSetTheory/Topology/Neighborhoods.lean` | `HFTopology` | ⚠️ sorry | Topology/Basic, Axioms/{Separation,Powerset} | — |
+| 107 | `AczelSetTheory/Topology/Subspace.lean` | `HFTopology` | ⚠️ sorry | Topology/Basic, Axioms/{Separation,Powerset} | — |
+| — | `AczelSetTheory/Topology.lean` | — | ✅ Barrel | Topology/{Basic,Interior,Neighborhoods,Subspace} | AczelSetTheory.lean |
 | — | `AczelSetTheory/VN.lean` | — | ✅ Complete | VN/{Basic,Injective,IsNat,Arithmetic,FSet,PeanoAxioms,PeanoArith,PowVN,SubVN,DivVN,FactorialVN,CardVN,RankVN} | AczelSetTheory.lean |
 | — | `AczelSetTheory/PList.lean` | — | ✅ Complete | PList/{Basic,Lemmas,Omega0} | AczelSetTheory.lean |
 | — | `AczelSetTheory/Integers.lean` | — | ✅ Complete | Integers/{Basic,Order,Functions,Arithmetic,Bijection,PadicVal,MobiusLiouville} | AczelSetTheory.lean |
