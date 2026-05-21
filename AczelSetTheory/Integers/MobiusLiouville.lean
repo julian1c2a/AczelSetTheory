@@ -137,7 +137,7 @@ theorem liouville_sq (n : ℕ₀) : Mul.mul (liouville n) (liouville n) = 1 := b
 theorem liouville_ne_zero (n : ℕ₀) : liouville n ≠ 0 := fun h => by
   have hone := liouville_sq n
   rw [h, zero_mul] at hone
-  exact absurd (ofNat_injective (ofNat_zero.trans (hone.trans ofNat_one.symm))) (by omega₀)
+  exact absurd (ofNat_injective (ofNat_zero.trans (hone.trans ofNat_one.symm))) (Ne.symm (succ_neq_zero 𝟘))
 
 theorem mobius_eq_liouville_of_squarefree {n : ℕ₀} (h : squarefree n) :
     mobius n = liouville n := by
@@ -146,9 +146,9 @@ theorem mobius_eq_liouville_of_squarefree {n : ℕ₀} (h : squarefree n) :
 theorem mobius_sq (n : ℕ₀) :
     Mul.mul (mobius n) (mobius n) = if squarefree n then 1 else 0 := by
   unfold mobius
-  split_ifs with h
-  · exact negOnePow_mul_self _
-  · exact zero_mul 0
+  by_cases h : squarefree n
+  · simp only [if_pos h]; exact negOnePow_mul_self _
+  · simp only [if_neg h]; exact zero_mul 0
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Multiplicatividad de liouville
@@ -171,5 +171,6 @@ theorem liouville_prime_pow {p k : ℕ₀} (hp : Peano.Arith.Prime p) :
     rw [pow_succ,
         liouville_mul (pow_ne_zero (prime_ne_zero hp) k') (prime_ne_zero hp),
         ih, liouville_prime hp, ← negOnePow_one, ← negOnePow_add]
+    congr 1
 
 end ℤ₀

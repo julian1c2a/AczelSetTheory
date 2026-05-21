@@ -4,6 +4,28 @@ All notable changes to this project are documented here.
 
 ---
 
+## [2026-05-22] — PadicVal + MobiusLiouville: multiplicatividad de Ω y λ, corrección de bugs pre-existentes
+
+### Added / Fixed
+
+- **`Integers/PadicVal.lean`**:
+  - Corregido `padicVal_succ_dvd`: uso de `generalize hv : padicVal p (n/p) = v` antes de `unfold padicVal` para evitar que `unfold` desplegara la llamada recursiva en la RHS.
+  - Corregido `Omega_prime_prime`: eliminado paso intermedio `h1` que causaba ambigüedad; prueba directa desde goal `Omega_prime p = 𝟙` con `unfold + rw`.
+  - Añadido `mul_div_cancel_right'` (privado), `Omega_prime_mul` (**1 sorry** — requiere `smallestDivisorAux_spec` privado de Peano), `Omega_prime_mul_prime`.
+
+- **`Integers/MobiusLiouville.lean`**:
+  - Añadido `liouville_mul`: λ(m·n) = λ(m)·λ(n) para m,n ≠ 0 (usa `Omega_prime_mul`).
+  - Añadido `liouville_prime_pow`: λ(p^k) = (-1)^k para p primo (por inducción).
+  - Corregido `liouville_ne_zero`: `by omega₀` → `Ne.symm (succ_neq_zero 𝟘)` (omega₀ no prueba ¬(𝟘=𝟙) directamente).
+  - Corregido `mobius_sq`: `split_ifs` (no disponible en este entorno) → `by_cases h : squarefree n`.
+
+### Technical notes
+
+- Patrón clave para `unfold` de definiciones WFR con recursión: usar `generalize hv : f rec_arg = v` antes de `unfold f` para que `unfold` solo afecte la llamada de nivel superior.
+- `← negOnePow_add` + `congr 1` cierra `negOnePow (add k' 𝟙) = negOnePow (σ k')` sin `omega₀` adicional (la igualdad `add k' 𝟙 = σ k'` se reduce definitivamente via `congr 1`).
+
+---
+
 ## [2026-05-21] — Algebra completa: Subgroup, GroupHom, Ring, CosetCount + Teorema de Lagrange, 118 módulos, 0 sorry
 
 ### Added

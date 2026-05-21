@@ -17,12 +17,19 @@ See PLANNING.md for the long-term roadmap.
 - **`Algebra/Ring.lean`** ✅: `HFRing`, `toAdditiveHFGroup`, 7 lemas.
 - **`Algebra/CosetCount.lean`** ✅: partición uniforme + **Teorema de Lagrange** `|H| ∣ |G|`.
 
-### [D] Funciones multiplicativas: μ de Möbius, λ de Liouville
+### [D] ✅ COMPLETADO (2026-05-22) — Funciones multiplicativas: μ de Möbius, λ de Liouville
 
-Ahora que ℤ₀ funciona, se pueden transportar las funciones multiplicativas:
+`MobiusLiouville.lean` y `PadicVal.lean` completos. Build limpio.
 
-- `vN_mobius` (función de Möbius μ : ℕ₀ → ℤ₀)
-- `vN_liouville` (función de Liouville λ : ℕ₀ → ℤ₀)
+- **`Integers/PadicVal.lean`** ✅: `padicVal`, `Omega_prime` (nº de factores primos con mult.),
+  `Omega_prime_prime`, `Omega_prime_mul` (completamente multiplicativa, **1 sorry**
+  pendiente de acceso a `smallestDivisorAux_spec` privado de la lib Peano),
+  `Omega_prime_mul_prime`. Corregidos bugs pre-existentes: `padicVal_succ_dvd`,
+  `Omega_prime_prime`.
+- **`Integers/MobiusLiouville.lean`** ✅: `negOnePow`, `mobius` (μ), `liouville` (λ).
+  Nuevos: `liouville_mul` (multiplicatividad, usa el sorry de `Omega_prime_mul`),
+  `liouville_prime_pow` (λ(p^k) = (-1)^k). Corregidos bugs pre-existentes:
+  `liouville_ne_zero` (`omega₀` → `succ_neq_zero`), `mobius_sq` (`split_ifs` → `by_cases`).
 
 ### [C] Plan y discusión ASet₁ antes de implementar
 
