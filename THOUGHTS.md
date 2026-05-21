@@ -60,7 +60,7 @@ con parámetros de $X$ y cuantificadores acotados a $X$. Crucialmente:
 
 La idea era:
 
-```
+```lean
 inductive ASet where
   | fin : HFSet → ASet
   | ext : (ASet → Prop) → ASet
@@ -1297,3 +1297,24 @@ def dividesb_HF  (a b : HFSet) : Bool
 ```
 
 Esto permitiría usar `decide` y `#eval` directamente sobre predicados HFSet.
+
+### Otro intento
+
+Inicialmente propuse:
+
+```lean
+inductive ASet where
+  | fin : HFSet → ASet
+  | ext : (ASet → Prop) → ASet
+```
+
+Ahora quiero puntualizarlo:
+
+```lean
+abbrev (ASet : Type 0) := HFSet
+abbrev (omega : Type 1) := Type 0
+inductive (ASet : Type (u+1)) where
+  | omega : {h1: v ≥ 1} → {hv: v ≤ u} → (Type v) → (ASet : Type (u+1))
+  | fin : {hv: v ≤ u} → (ASet : Type v) → (ASet : Type (u+1))
+  | ext : {hv: v ≤ u} → ((ASet : Type v) → Bool) → (ASet : Type (u+1))
+```

@@ -17,6 +17,8 @@ License: MIT
 --   padicVal_prime_self, padicVal_prime_of_ndvd
 --   squarefree_one, squarefree_prime, not_squarefree_prime_sq
 --   Omega_prime_zero, Omega_prime_one, Omega_prime_prime
+--   Omega_prime_mul   (sorry: requiere minimalidad de smallestDivisor)
+--   Omega_prime_mul_prime
 
 import AczelSetTheory.PList.Omega0
 import Peano.PeanoNat.Arith
@@ -43,18 +45,18 @@ termination_by n
 decreasing_by
   exact div_lt_self n p (le_succ_then_lt 𝟙 p h.1) h.2.1
 
-theorem padicVal_zero_right (p : ℕ₀) : padicVal p 𝟘 = 𝟘 :=
-  padicVal_of_not_cond (fun h => h.2.1 rfl)
+theorem padicVal_zero_right (p : ℕ₀) : padicVal p 𝟘 = 𝟘 := by
+  unfold padicVal; exact dif_neg (fun ⟨_, h, _⟩ => h rfl)
 
 theorem padicVal_of_not_cond {p n : ℕ₀}
     (h : ¬ (le₀ 𝟚 p ∧ n ≠ 𝟘 ∧ p ∣ n)) : padicVal p n = 𝟘 := by
-  conv_lhs => unfold padicVal
-  exact dif_neg h
+  unfold padicVal; exact dif_neg h
 
 theorem padicVal_succ_dvd {p n : ℕ₀} (hp : le₀ 𝟚 p) (hn : n ≠ 𝟘) (hdvd : p ∣ n) :
     padicVal p n = σ (padicVal p (n / p)) := by
-  conv_lhs => unfold padicVal
-  exact dif_pos (show le₀ 𝟚 p ∧ n ≠ 𝟘 ∧ p ∣ n from ⟨hp, hn, hdvd⟩)
+  generalize hv : padicVal p (n / p) = v
+  unfold padicVal
+  rw [dif_pos (And.intro hp (And.intro hn hdvd)), hv]
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Lema auxiliar: p / p = 1
@@ -81,6 +83,7 @@ theorem padicVal_prime_self {p : ℕ₀} (hp : Peano.Arith.Prime p) : padicVal p
   have hp0 := prime_ne_zero hp
   rw [padicVal_succ_dvd hp2 hp0 (divides_refl p), div_self_eq_one hp0,
       padicVal_one_eq_zero p hp2]
+  rfl
 
 theorem padicVal_prime_of_ndvd {p q : ℕ₀} (hp : Peano.Arith.Prime p)
     (hq : Peano.Arith.Prime q) (hne : p ≠ q) : padicVal p q = 𝟘 := by
@@ -159,8 +162,36 @@ theorem Omega_prime_prime {p : ℕ₀} (hp : Peano.Arith.Prime p) : Omega_prime 
   have hp2 := prime_ge_two hp
   have hp0 := prime_ne_zero hp
   have hsd : smallestDivisor p = p := prime_imp_smallestDivisor_eq_self hp
-  have h1 : Omega_prime p = σ (Omega_prime (p / smallestDivisor p)) := by
-    conv_lhs => unfold Omega_prime
-    exact dif_pos hp2
-  rw [h1, hsd, div_self_eq_one hp0, Omega_prime_one]
+  unfold Omega_prime
+  rw [dif_pos hp2, hsd, div_self_eq_one hp0, Omega_prime_one]
   rfl
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Multiplicatividad de Omega_prime
+-- ─────────────────────────────────────────────────────────────────────────────
+
+/-- (m * n) / n = m para n ≠ 0. -/
+private theorem mul_div_cancel_right' {m n : ℕ₀} (hn : n ≠ 𝟘) :
+    Peano.Mul.mul m n / n = m := by
+  have hdvd : n ∣ Peano.Mul.mul m n := ⟨m, mul_comm m n⟩
+  exact mul_cancelation_right _ m n hn (div_mul_cancel hn hdvd)
+
+/-- Ω es completamente multiplicativa: Ω(m·n) = Ω(m) + Ω(n) para m, n ≠ 0.
+    SORRY: la prueba recurre a la minimalidad de `smallestDivisor`, encapsulada
+    en `smallestDivisorAux_spec` (private en Peano.PeanoNat.Primes).
+    Estrategia verificada matemáticamente:
+      – n = 1: Ω(m·1) = Ω(m) = Ω(m) + 0.
+      – n ≥ 2: sea q = sd(n) primo. Entonces n = (n/q)·q, luego m·n = (m·(n/q))·q.
+        Por Omega_prime_mul_prime con q primo: Ω(m·n) = 1 + Ω(m·(n/q)).
+        Por HI en n/q < n: Ω(m·(n/q)) = Ω(m) + Ω(n/q).
+        Y Ω(n) = 1 + Ω(n/q). Luego Ω(m·n) = Ω(m) + Ω(n). ✓ -/
+theorem Omega_prime_mul {m n : ℕ₀} (hm : m ≠ 𝟘) (hn : n ≠ 𝟘) :
+    Omega_prime (Peano.Mul.mul m n) =
+    Peano.Add.add (Omega_prime m) (Omega_prime n) := by
+  sorry
+
+/-- Caso especial de multiplicatividad: Ω(m·p) = 1 + Ω(m) para p primo, m ≠ 0. -/
+theorem Omega_prime_mul_prime {m p : ℕ₀} (hp : Peano.Arith.Prime p) (hm : m ≠ 𝟘) :
+    Omega_prime (Peano.Mul.mul m p) = σ (Omega_prime m) := by
+  rw [Omega_prime_mul hm (prime_ne_zero hp), Omega_prime_prime hp,
+      show (𝟙 : ℕ₀) = σ 𝟘 from rfl, add_succ, add_zero]

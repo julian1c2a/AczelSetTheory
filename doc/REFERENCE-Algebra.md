@@ -1,6 +1,6 @@
 # Technical Reference — Algebra, Lattice & Structural Axioms
 
-**Last updated:** 2026-05-17
+**Last updated:** 2026-05-21
 **Parent:** [../REFERENCE.md](../REFERENCE.md)
 **Related:** [REFERENCE-HFSets.md](REFERENCE-HFSets.md) | [REFERENCE-Relations.md](REFERENCE-Relations.md) | [REFERENCE-VN.md](REFERENCE-VN.md)
 
@@ -39,6 +39,11 @@ foundation, decidability).
 | 75 | `AczelSetTheory/Axioms/Ordinal.lean` | ✅ Complete |
 | 77 | `AczelSetTheory/Axioms/OrdinalNat.lean` | ✅ Complete |
 | 83 | `AczelSetTheory/Axioms/Rank.lean` | ✅ Complete |
+| 87 | `AczelSetTheory/Algebra/Group.lean` | ✅ Complete |
+| 88 | `AczelSetTheory/Algebra/Subgroup.lean` | ✅ Complete |
+| 89 | `AczelSetTheory/Algebra/GroupHom.lean` | ✅ Complete |
+| 90 | `AczelSetTheory/Algebra/Ring.lean` | ✅ Complete |
+| 91 | `AczelSetTheory/Algebra/CosetCount.lean` | ✅ Complete |
 
 ---
 
@@ -468,3 +473,291 @@ def HFSet.rank (A : HFSet) : ℕ₀
 ### Axioms/Rank.lean
 
 `HFSet.rank`, `HFSet.rank_empty`, `HFSet.rank_insert`
+
+---
+
+## Group Theory — `Algebra/` subdirectory
+
+**Last projected:** 2026-05-21
+
+**Primary namespaces:** `HFAlgebra`, `HFAlgebra.HFGroup`, `HFAlgebra.HFSubgroup`, `HFAlgebra.HFGroupHom`, `HFAlgebra.HFRing`
+
+---
+
+### 4.87 Algebra/Group.lean — `namespace HFAlgebra`
+
+**Imports:** `AczelSetTheory.HFSets`
+
+#### 4.87.1 `HFAlgebra.HFGroup`
+
+```lean
+structure HFGroup where
+  G   : HFSet
+  op  : HFSet → HFSet → HFSet
+  e   : HFSet
+  inv : HFSet → HFSet
+  e_mem       : e ∈ G
+  op_closed   : ∀ {a b}, a ∈ G → b ∈ G → op a b ∈ G
+  inv_closed  : ∀ {a}, a ∈ G → inv a ∈ G
+  op_assoc    : ∀ {a b c}, a ∈ G → b ∈ G → c ∈ G → op (op a b) c = op a (op b c)
+  op_id_left  : ∀ {a}, a ∈ G → op e a = a
+  op_inv_left : ∀ {a}, a ∈ G → op (inv a) a = e
+```
+
+- **Math**: `(G, ·, e, ⁻¹)` — grupo con axiomas mínimos izquierdos.
+- Prop-valued structure. Computable carrier.
+
+---
+
+### 4.88 Algebra/Subgroup.lean — `namespace HFAlgebra`
+
+**Imports:** `AczelSetTheory.Algebra.Group`, `AczelSetTheory.Axioms.Separation`, `AczelSetTheory.Axioms.Decidable`, `AczelSetTheory.Axioms.OrdinalNat`, `AczelSetTheory.Axioms.Intersection`
+
+#### 4.88.1 `HFAlgebra.HFSubgroup`
+
+```lean
+structure HFSubgroup (grp : HFGroup) where
+  H          : HFSet
+  H_sub      : ∀ {x}, x ∈ H → x ∈ grp.G
+  e_mem      : grp.e ∈ H
+  op_closed  : ∀ {a b}, a ∈ H → b ∈ H → grp.op a b ∈ H
+  inv_closed : ∀ {a}, a ∈ H → grp.inv a ∈ H
+```
+
+- **Math**: H ≤ G — subgrupo de G.
+
+#### 4.88.2 `HFSubgroup.toHFGroup`
+
+```lean
+def HFSubgroup.toHFGroup (sub : HFSubgroup grp) : HFGroup
+```
+
+- **Math**: Todo subgrupo es un grupo.
+
+#### 4.88.3 `HFSubgroup.inter`
+
+```lean
+def HFSubgroup.inter (sub₁ sub₂ : HFSubgroup grp) : HFSubgroup grp
+```
+
+- **Math**: H₁ ∩ H₂ ≤ G. (Nota: dentro de `namespace HFSubgroup`, este `inter` sombrea `HFSet.inter`.)
+
+#### 4.88.4 `HFSubgroup.rightCoset`
+
+```lean
+def HFSubgroup.rightCoset (sub : HFSubgroup grp) (a : HFSet) : HFSet :=
+  HFSet.sep grp.G (fun x => ∃ h ∈ sub.H, x = grp.op h a)
+```
+
+- **Math**: Ha = { h·a | h ∈ H } — cosete derecho de H en G por a.
+- Computable (separación decidible).
+
+#### 4.88.5 `HFSubgroup.cosetEq`
+
+```lean
+def HFSubgroup.cosetEq (sub : HFSubgroup grp) (a b : HFSet) : Prop :=
+  grp.op b (grp.inv a) ∈ sub.H
+```
+
+- **Math**: a ~_H b iff b·a⁻¹ ∈ H — relación de equivalencia de cosetes.
+
+---
+
+### 4.89 Algebra/GroupHom.lean — `namespace HFAlgebra`
+
+**Imports:** `AczelSetTheory.Algebra.Subgroup`
+
+#### 4.89.1 `HFAlgebra.HFGroupHom`
+
+```lean
+structure HFGroupHom (G H : HFGroup) where
+  f     : HFSet → HFSet
+  f_mem : ∀ {a}, a ∈ G.G → f a ∈ H.G
+  f_hom : ∀ {a b}, a ∈ G.G → b ∈ G.G → f (G.op a b) = H.op (f a) (f b)
+```
+
+- **Math**: φ : G →ₕ H — homomorfismo de grupos.
+
+#### 4.89.2 `HFGroupHom.ker`
+
+```lean
+def HFGroupHom.ker (φ : HFGroupHom G H) : HFSubgroup G
+```
+
+- **Math**: ker φ = { a ∈ G | φ(a) = e_H } ≤ G.
+
+#### 4.89.3 `HFGroupHom.image`
+
+```lean
+def HFGroupHom.image (φ : HFGroupHom G H) : HFSubgroup H
+```
+
+- **Math**: im φ = { φ(a) | a ∈ G } ≤ H.
+
+---
+
+### 4.90 Algebra/Ring.lean — `namespace HFAlgebra`
+
+**Imports:** `AczelSetTheory.Algebra.Group`
+
+#### 4.90.1 `HFAlgebra.HFRing`
+
+```lean
+structure HFRing where
+  R   : HFSet
+  add mul : HFSet → HFSet → HFSet
+  zero one : HFSet
+  neg  : HFSet → HFSet
+  -- cerradura, grupo aditivo abeliano (axiomas izq. + comm), monoide mult. unital, bilinealidad
+```
+
+- **Math**: `(R, +, ·, 0, 1, -)` — anillo unitario (no necesariamente conmutativo).
+- La conmutatividad aditiva es un axioma explícito (`add_comm`).
+
+#### 4.90.2 `HFRing.toAdditiveHFGroup`
+
+```lean
+def HFRing.toAdditiveHFGroup (rng : HFRing) : HFGroup
+```
+
+- **Math**: Grupo aditivo subyacente `(R, +, 0, -)`.
+
+---
+
+### 4.91 Algebra/CosetCount.lean — `namespace HFSet` + `namespace HFAlgebra.HFSubgroup`
+
+**Imports:** `AczelSetTheory.Algebra.Subgroup`, `AczelSetTheory.Axioms.OrdinalNat`, `AczelSetTheory.Axioms.Union`, `AczelSetTheory.Axioms.Powerset`, `Peano.PeanoNat.Arith`
+
+**Opens:** `Peano`, `Peano.Arith`
+
+#### 4.91.1 `HFSubgroup.cosets`
+
+```lean
+def HFSubgroup.cosets (sub : HFSubgroup grp) : HFSet :=
+  sep (powerset grp.G) (fun C => ∃ a ∈ grp.G, C = sub.rightCoset a)
+```
+
+- **Math**: El conjunto de todos los cosetes derechos de H en G.
+- Computable (separación decidible sobre powerset).
+
+#### 4.91.2 `HFSubgroup.index`
+
+```lean
+def HFSubgroup.index (sub : HFSubgroup grp) : ℕ₀ := card sub.cosets
+```
+
+- **Math**: [G : H] — índice de H en G.
+
+---
+
+### 6.87 Algebra/Group.lean — `namespace HFAlgebra.HFGroup`
+
+`variable (grp : HFGroup)`
+
+| # | Theorem | Lean signature |
+|---|---------|----------------|
+| 1 | `op_inv_left_apply` | `{a b : HFSet} (ha : a ∈ grp.G) (hb : b ∈ grp.G) : grp.op (grp.inv a) (grp.op a b) = b` |
+| 2 | `left_cancel` | `{x a b : HFSet} (hx : x ∈ grp.G) (ha : a ∈ grp.G) (hb : b ∈ grp.G) (h : grp.op x a = grp.op x b) : a = b` |
+| 3 | `op_inv_right` | `{a : HFSet} (ha : a ∈ grp.G) : grp.op a (grp.inv a) = grp.e` |
+| 4 | `op_id_right` | `{a : HFSet} (ha : a ∈ grp.G) : grp.op a grp.e = a` |
+| 5 | `right_cancel` | `{x a b : HFSet} (hx : x ∈ grp.G) (ha : a ∈ grp.G) (hb : b ∈ grp.G) (h : grp.op a x = grp.op b x) : a = b` |
+| 6 | `inv_inv` | `{a : HFSet} (ha : a ∈ grp.G) : grp.inv (grp.inv a) = a` |
+| 7 | `inv_e` | `(grp : HFGroup) : grp.inv grp.e = grp.e` |
+| 8 | `inv_op` | `{a b : HFSet} (ha : a ∈ grp.G) (hb : b ∈ grp.G) : grp.inv (grp.op a b) = grp.op (grp.inv b) (grp.inv a)` |
+| 9 | `unique_id` | `{e' : HFSet} (he' : e' ∈ grp.G) (h : ∀ {a}, a ∈ grp.G → grp.op e' a = a) : e' = grp.e` |
+| 10 | `unique_inv` | `{a b : HFSet} (ha : a ∈ grp.G) (hb : b ∈ grp.G) (h : grp.op b a = grp.e) : b = grp.inv a` |
+
+---
+
+### 6.88 Algebra/Subgroup.lean — `namespace HFAlgebra.HFSubgroup`
+
+`variable {grp : HFGroup}`
+
+| # | Theorem | Lean signature |
+|---|---------|----------------|
+| 1 | `mem_rightCoset` | `(sub : HFSubgroup grp) {a x : HFSet} (ha : a ∈ grp.G) : x ∈ sub.rightCoset a ↔ ∃ h ∈ sub.H, x = grp.op h a` |
+| 2 | `cosetEq_refl` | `(sub : HFSubgroup grp) {a : HFSet} (ha : a ∈ grp.G) : sub.cosetEq a a` |
+| 3 | `cosetEq_symm` | `(sub : HFSubgroup grp) {a b : HFSet} (ha : a ∈ grp.G) (hb : b ∈ grp.G) (h : sub.cosetEq a b) : sub.cosetEq b a` |
+| 4 | `cosetEq_trans` | `(sub : HFSubgroup grp) {a b c : HFSet} (ha : a ∈ grp.G) (hb : b ∈ grp.G) (hc : c ∈ grp.G) (hab : sub.cosetEq a b) (hbc : sub.cosetEq b c) : sub.cosetEq a c` |
+| 5 | `cosetEq_iff_rightCoset_eq` | `(sub : HFSubgroup grp) {a b : HFSet} (ha : a ∈ grp.G) (hb : b ∈ grp.G) : sub.cosetEq a b ↔ sub.rightCoset a = sub.rightCoset b` |
+| 6 | `rightCoset_self_mem` | `(sub : HFSubgroup grp) {a : HFSet} (ha : a ∈ grp.G) : a ∈ sub.rightCoset a` |
+| 7 | `rightCoset_nonempty` | `(sub : HFSubgroup grp) {a : HFSet} (ha : a ∈ grp.G) : ∃ x, x ∈ sub.rightCoset a` |
+| 8 | `mem_rightCoset_iff` | `(sub : HFSubgroup grp) {a x : HFSet} (ha : a ∈ grp.G) : x ∈ sub.rightCoset a ↔ ∃ h ∈ sub.H, x = grp.op h a` |
+| 9 | `rightCoset_eq_iff` | `(sub : HFSubgroup grp) {a b : HFSet} (ha : a ∈ grp.G) (hb : b ∈ grp.G) : sub.rightCoset a = sub.rightCoset b ↔ sub.cosetEq a b` |
+| 10 | `cosetEq_is_equiv_on_G` | `(sub : HFSubgroup grp) : (∀ {a}, a ∈ grp.G → sub.cosetEq a a) ∧ (∀ {a b}, a ∈ grp.G → b ∈ grp.G → sub.cosetEq a b → sub.cosetEq b a) ∧ (∀ {a b c}, a ∈ grp.G → b ∈ grp.G → c ∈ grp.G → sub.cosetEq a b → sub.cosetEq b c → sub.cosetEq a c)` |
+| 11 | `rightCoset_mul_mem` | `(sub : HFSubgroup grp) {a h x : HFSet} (ha : a ∈ grp.G) (hh : h ∈ sub.H) (hx : x ∈ sub.rightCoset a) : grp.op h x ∈ sub.rightCoset a` |
+| 12 | `rightCoset_eq_subgroup_of_mem` | `(sub : HFSubgroup grp) {a : HFSet} (haG : a ∈ grp.G) (haH : a ∈ sub.H) : sub.rightCoset a = sub.H` |
+| 13 | `rightCoset_equinumerous_H` | `(sub : HFSubgroup grp) {a : HFSet} (haG : a ∈ grp.G) (haH : a ∈ sub.H) : HFSet.card (sub.rightCoset a) = HFSet.card sub.H` |
+| 14 | `cosetEq_of_mem_inter_rightCoset` | `(sub : HFSubgroup grp) {a b x : HFSet} (ha : a ∈ grp.G) (hb : b ∈ grp.G) (hx : x ∈ HFSet.inter (sub.rightCoset a) (sub.rightCoset b)) : sub.cosetEq a b` |
+| 15 | `rightCosets_cover_G` | `(sub : HFSubgroup grp) {x : HFSet} (hx : x ∈ grp.G) : x ∈ sub.rightCoset x` |
+| 16 | `rightCoset_eq_or_disjoint` | `(sub : HFSubgroup grp) {a b : HFSet} (ha : a ∈ grp.G) (hb : b ∈ grp.G) : sub.rightCoset a = sub.rightCoset b ∨ HFSet.inter (sub.rightCoset a) (sub.rightCoset b) = HFSet.empty` |
+
+---
+
+### 6.89 Algebra/GroupHom.lean — `namespace HFAlgebra.HFGroupHom`
+
+`variable {G H : HFGroup} (φ : HFGroupHom G H)`
+
+| # | Theorem | Lean signature |
+|---|---------|----------------|
+| 1 | `hom_e` | `(φ : HFGroupHom G H) : φ.f G.e = H.e` |
+| 2 | `hom_inv` | `(φ : HFGroupHom G H) {a : HFSet} (ha : a ∈ G.G) : φ.f (G.inv a) = H.inv (φ.f a)` |
+
+---
+
+### 6.90 Algebra/Ring.lean — `namespace HFAlgebra.HFRing`
+
+`variable (rng : HFRing)`
+
+| # | Theorem | Lean signature |
+|---|---------|----------------|
+| 1 | `add_zero` | `{a : HFSet} (ha : a ∈ rng.R) : rng.add a rng.zero = a` |
+| 2 | `add_neg` | `{a : HFSet} (ha : a ∈ rng.R) : rng.add a (rng.neg a) = rng.zero` |
+| 3 | `neg_neg` | `{a : HFSet} (ha : a ∈ rng.R) : rng.neg (rng.neg a) = a` |
+| 4 | `zero_mul` | `{a : HFSet} (ha : a ∈ rng.R) : rng.mul rng.zero a = rng.zero` |
+| 5 | `mul_zero` | `{a : HFSet} (ha : a ∈ rng.R) : rng.mul a rng.zero = rng.zero` |
+| 6 | `neg_mul` | `{a b : HFSet} (ha : a ∈ rng.R) (hb : b ∈ rng.R) : rng.mul (rng.neg a) b = rng.neg (rng.mul a b)` |
+| 7 | `mul_neg` | `{a b : HFSet} (ha : a ∈ rng.R) (hb : b ∈ rng.R) : rng.mul a (rng.neg b) = rng.neg (rng.mul a b)` |
+
+---
+
+### 6.91 Algebra/CosetCount.lean
+
+| # | Theorem | Namespace | Lean signature |
+|---|---------|-----------|----------------|
+| 1 | `sUnion_insert` | `HFSet` | `(C F : HFSet) : sUnion (insert C F) = union C (sUnion F)` |
+| 2 | `card_sUnion_uniform_partition` | `HFSet` | `(F : HFSet) (k : ℕ₀) (hunif : ∀ C, C ∈ F → card C = k) (hdisj : ∀ C D, C ∈ F → D ∈ F → C ≠ D → inter C D = empty) : card (sUnion F) = mul (card F) k` |
+| 3 | `card_rightCoset_eq_card_H` | `HFAlgebra.HFSubgroup` | `(sub : HFSubgroup grp) {a : HFSet} (ha : a ∈ grp.G) : card (sub.rightCoset a) = card sub.H` |
+| 4 | `mem_cosets` | `HFAlgebra.HFSubgroup` | `{sub : HFSubgroup grp} {C : HFSet} : C ∈ sub.cosets ↔ ∃ a ∈ grp.G, C = sub.rightCoset a` |
+| 5 | `cosets_cover` | `HFAlgebra.HFSubgroup` | `(sub : HFSubgroup grp) : sUnion sub.cosets = grp.G` |
+| 6 | `cosets_pairwise_disjoint` | `HFAlgebra.HFSubgroup` | `(sub : HFSubgroup grp) {C D : HFSet} (hC : C ∈ sub.cosets) (hD : D ∈ sub.cosets) (hCD : C ≠ D) : HFSet.inter C D = HFSet.empty` |
+| 7 | `coset_card_eq` | `HFAlgebra.HFSubgroup` | `(sub : HFSubgroup grp) {C : HFSet} (hC : C ∈ sub.cosets) : card C = card sub.H` |
+| 8 | `card_G_eq_card_H_mul_index` | `HFAlgebra.HFSubgroup` | `(sub : HFSubgroup grp) : card grp.G = mul (card sub.cosets) (card sub.H)` |
+| 9 | `card_subgroup_dvd_card_group` | `HFAlgebra.HFSubgroup` | `(sub : HFSubgroup grp) : card sub.H ∣ card grp.G` — **Teorema de Lagrange** |
+
+> `∣` es `Peano.Arith.Divides` (no `Dvd`): `Divides a b = ∃ k : ℕ₀, b = mul a k`.
+> Requiere `import Peano.PeanoNat.Arith` + `open Peano.Arith`.
+
+---
+
+## 7b. Exports — Algebra/ subdirectory
+
+### Algebra/Group.lean
+
+`HFAlgebra.HFGroup`, `HFAlgebra.HFGroup.op_inv_left_apply`, `HFAlgebra.HFGroup.left_cancel`, `HFAlgebra.HFGroup.op_inv_right`, `HFAlgebra.HFGroup.op_id_right`, `HFAlgebra.HFGroup.right_cancel`, `HFAlgebra.HFGroup.inv_inv`, `HFAlgebra.HFGroup.inv_e`, `HFAlgebra.HFGroup.inv_op`, `HFAlgebra.HFGroup.unique_id`, `HFAlgebra.HFGroup.unique_inv`
+
+### Algebra/Subgroup.lean
+
+`HFAlgebra.HFSubgroup`, `HFAlgebra.HFSubgroup.toHFGroup`, `HFAlgebra.HFSubgroup.inter`, `HFAlgebra.HFSubgroup.rightCoset`, `HFAlgebra.HFSubgroup.cosetEq`, `HFAlgebra.HFSubgroup.mem_rightCoset`, `HFAlgebra.HFSubgroup.cosetEq_refl`, `HFAlgebra.HFSubgroup.cosetEq_symm`, `HFAlgebra.HFSubgroup.cosetEq_trans`, `HFAlgebra.HFSubgroup.cosetEq_iff_rightCoset_eq`, `HFAlgebra.HFSubgroup.rightCoset_self_mem`, `HFAlgebra.HFSubgroup.rightCoset_nonempty`, `HFAlgebra.HFSubgroup.mem_rightCoset_iff`, `HFAlgebra.HFSubgroup.rightCoset_eq_iff`, `HFAlgebra.HFSubgroup.cosetEq_is_equiv_on_G`, `HFAlgebra.HFSubgroup.rightCoset_mul_mem`, `HFAlgebra.HFSubgroup.rightCoset_eq_subgroup_of_mem`, `HFAlgebra.HFSubgroup.rightCoset_equinumerous_H`, `HFAlgebra.HFSubgroup.cosetEq_of_mem_inter_rightCoset`, `HFAlgebra.HFSubgroup.rightCosets_cover_G`, `HFAlgebra.HFSubgroup.rightCoset_eq_or_disjoint`
+
+### Algebra/GroupHom.lean
+
+`HFAlgebra.HFGroupHom`, `HFAlgebra.HFGroupHom.hom_e`, `HFAlgebra.HFGroupHom.hom_inv`, `HFAlgebra.HFGroupHom.ker`, `HFAlgebra.HFGroupHom.image`
+
+### Algebra/Ring.lean
+
+`HFAlgebra.HFRing`, `HFAlgebra.HFRing.toAdditiveHFGroup`, `HFAlgebra.HFRing.add_zero`, `HFAlgebra.HFRing.add_neg`, `HFAlgebra.HFRing.neg_neg`, `HFAlgebra.HFRing.zero_mul`, `HFAlgebra.HFRing.mul_zero`, `HFAlgebra.HFRing.neg_mul`, `HFAlgebra.HFRing.mul_neg`
+
+### Algebra/CosetCount.lean
+
+`HFSet.sUnion_insert`, `HFSet.card_sUnion_uniform_partition`, `HFAlgebra.HFSubgroup.card_rightCoset_eq_card_H`, `HFAlgebra.HFSubgroup.cosets`, `HFAlgebra.HFSubgroup.index`, `HFAlgebra.HFSubgroup.mem_cosets`, `HFAlgebra.HFSubgroup.cosets_cover`, `HFAlgebra.HFSubgroup.cosets_pairwise_disjoint`, `HFAlgebra.HFSubgroup.coset_card_eq`, `HFAlgebra.HFSubgroup.card_G_eq_card_H_mul_index`, `HFAlgebra.HFSubgroup.card_subgroup_dvd_card_group`

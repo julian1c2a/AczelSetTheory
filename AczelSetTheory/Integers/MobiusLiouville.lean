@@ -18,6 +18,7 @@ License: MIT
 --   mobius_one, mobius_prime, mobius_prime_sq
 --   mobius_eq_liouville_of_squarefree, mobius_sq
 --   liouville_one, liouville_prime, liouville_sq, liouville_ne_zero
+--   liouville_mul, liouville_prime_pow
 
 import AczelSetTheory.Integers.Basic
 import AczelSetTheory.Integers.PadicVal
@@ -148,5 +149,27 @@ theorem mobius_sq (n : ℕ₀) :
   split_ifs with h
   · exact negOnePow_mul_self _
   · exact zero_mul 0
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Multiplicatividad de liouville
+-- ─────────────────────────────────────────────────────────────────────────────
+
+/-- λ es completamente multiplicativa: λ(m·n) = λ(m)·λ(n) para m, n ≠ 0.
+    (Usa Omega_prime_mul, que tiene un sorry.) -/
+theorem liouville_mul {m n : ℕ₀} (hm : m ≠ 𝟘) (hn : n ≠ 𝟘) :
+    liouville (Peano.Mul.mul m n) = Mul.mul (liouville m) (liouville n) := by
+  unfold liouville
+  rw [Omega_prime_mul hm hn, negOnePow_add]
+
+open Peano.Pow in
+/-- λ(p^k) = (-1)^k para p primo. -/
+theorem liouville_prime_pow {p k : ℕ₀} (hp : Peano.Arith.Prime p) :
+    liouville (Peano.Pow.pow p k) = negOnePow k := by
+  induction k with
+  | zero => rw [pow_zero, liouville_one, negOnePow_zero]
+  | succ k' ih =>
+    rw [pow_succ,
+        liouville_mul (pow_ne_zero (prime_ne_zero hp) k') (prime_ne_zero hp),
+        ih, liouville_prime hp, ← negOnePow_one, ← negOnePow_add]
 
 end ℤ₀

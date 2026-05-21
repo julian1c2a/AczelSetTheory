@@ -122,6 +122,11 @@ Below are the keys for reading and searching theorems.
 | 84 | `AczelSetTheory/VN/RankVN.lean` | `VN` | ✅ Complete | VN/IsNat, Axioms/Rank | — |
 | 85 | `AczelSetTheory/Operations/NPow.lean` | `HFSet` | ✅ Complete | Operations/CartProd, Notation, `Peano.PeanoNat.Combinatorics.Pow` | Axioms/NPow |
 | 86 | `AczelSetTheory/Axioms/NPow.lean` | `HFSet` | ✅ Complete | Operations/NPow, Axioms/CartProd, Axioms/Singleton | — |
+| 87 | `AczelSetTheory/Algebra/Group.lean` | `HFAlgebra`, `HFAlgebra.HFGroup` | ✅ Complete | AczelSetTheory.HFSets | Algebra/Subgroup, Algebra/GroupHom, Algebra/Ring, Algebra/CosetCount |
+| 88 | `AczelSetTheory/Algebra/Subgroup.lean` | `HFAlgebra`, `HFAlgebra.HFSubgroup` | ✅ Complete | Algebra/Group, Axioms/Separation, Axioms/Decidable, Axioms/OrdinalNat, Axioms/Intersection | Algebra/CosetCount |
+| 89 | `AczelSetTheory/Algebra/GroupHom.lean` | `HFAlgebra`, `HFAlgebra.HFGroupHom` | ✅ Complete | Algebra/Subgroup | — |
+| 90 | `AczelSetTheory/Algebra/Ring.lean` | `HFAlgebra`, `HFAlgebra.HFRing` | ✅ Complete | Algebra/Group | — |
+| 91 | `AczelSetTheory/Algebra/CosetCount.lean` | `HFAlgebra.HFSubgroup`, `HFSet` | ✅ Complete | Algebra/Subgroup, Axioms/OrdinalNat, Axioms/Union, Axioms/Powerset, Peano.PeanoNat.Arith | — |
 | — | `AczelSetTheory/VN.lean` | — | ✅ Complete | VN/{Basic,Injective,IsNat,Arithmetic,FSet,PeanoAxioms,PeanoArith,PowVN,SubVN,DivVN,FactorialVN,CardVN,RankVN} | AczelSetTheory.lean |
 | — | `AczelSetTheory/PList.lean` | — | ✅ Complete | PList/{Basic,Lemmas,Omega0} | AczelSetTheory.lean |
 | — | `AczelSetTheory.lean` | — | ✅ Complete | PList, CList, HFSets, Operations/*, Axioms/*, Notation | Main |

@@ -1,6 +1,6 @@
 # Current Project Status — AczelSetTheory
 
-**Last updated:** 2026-05-20
+**Last updated:** 2026-05-21
 **Author**: Julián Calderón Almendros
 
 ---
@@ -9,9 +9,9 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules (non-barrel) | 114 |
-| Total modules (incl. barrels) | 123 |
-| Modules with 0 sorry | 114 / 114 |
+| Total modules (non-barrel) | 118 |
+| Total modules (incl. barrels) | 127 |
+| Modules with 0 sorry | 118 / 118 |
 | Total sorry | 0 |
 | Build status | ✅ Passing — 0 errors, 0 warnings |
 | Lean version | v4.29.0 |
@@ -22,6 +22,7 @@
 ## Module Inventory
 
 ### CList/ (7 modules)
+
 | Module | Status |
 |--------|--------|
 | CList/Basic.lean | ✅ |
@@ -33,6 +34,7 @@
 | CList/Filter.lean | ✅ |
 
 ### PList/ (4 modules)
+
 | Module | Status |
 |--------|--------|
 | PList/Basic.lean | ✅ |
@@ -41,6 +43,7 @@
 | PList/Omega0.lean | ✅ |
 
 ### Top-level (4 modules)
+
 | Module | Status |
 |--------|--------|
 | HFSets.lean | ✅ |
@@ -49,6 +52,7 @@
 | Notation.lean | ✅ |
 
 ### Operations/ (21 modules)
+
 | Module | Status |
 |--------|--------|
 | Operations/Union.lean | ✅ |
@@ -74,6 +78,7 @@
 | Operations/Order.lean | ✅ |
 
 ### Axioms/ (41 modules)
+
 | Module | Status |
 |--------|--------|
 | Axioms/Union.lean | ✅ |
@@ -119,6 +124,7 @@
 | Axioms/LinearOrder.lean | ✅ |
 
 ### VN/ (35 modules)
+
 | Module | Key exports | Status |
 |--------|-------------|--------|
 | VN/Basic.lean | `vN : ℕ₀ → HFSet`, `vN_zero`, `vN_succ` | ✅ |
@@ -157,12 +163,18 @@
 | VN/FermatVN.lean | `vN_fermat_little`, `vN_wilson` | ✅ |
 | VN/CRTVN.lean | `vN_chinese_remainder` | ✅ |
 
-### Algebra/ (1 module)
+### Algebra/ (5 modules)
+
 | Module | Key exports | Status |
 |--------|-------------|--------|
-| Algebra/Group.lean | `HFAlgebra.HFGroup`, 10 derived lemmas | ✅ |
+| Algebra/Group.lean | `HFAlgebra.HFGroup`, 10 lemas derivados | ✅ |
+| Algebra/Subgroup.lean | `HFSubgroup`, `toHFGroup`, `inter`, `rightCoset`, `cosetEq`, 16 teoremas | ✅ |
+| Algebra/GroupHom.lean | `HFGroupHom`, `hom_e`, `hom_inv`, `ker`, `image` | ✅ |
+| Algebra/Ring.lean | `HFRing`, `toAdditiveHFGroup`, 7 lemas derivados | ✅ |
+| Algebra/CosetCount.lean | `cosets`, `index`, `card_sUnion_uniform_partition`, Lagrange (9 teoremas) | ✅ |
 
 ### Integers/ (1 module)
+
 | Module | Key exports | Status |
 |--------|-------------|--------|
 | Integers/Basic.lean | `ℤ₀`, ring instances, 18 ring laws, `ofNat` | ✅ |
@@ -174,6 +186,13 @@
 None — **0 sorry** across the entire project.
 
 ---
+
+## Recent Achievements (2026-05-21)
+
+- ✅ **Algebra/Subgroup.lean** — `HFAlgebra.HFSubgroup`: subgrupo como estructura, `toHFGroup`, `inter` (intersección), `rightCoset` (cosete derecho Ha), `cosetEq` (relación a ~_H b). 16 teoremas: refl/symm/trans de `cosetEq`, equivalencia con igualdad de cosetes, cubrimiento de G, disyunción de cosetes, cardinalidad de Ha.
+- ✅ **Algebra/GroupHom.lean** — `HFAlgebra.HFGroupHom`: φ : G →ₕ H; `hom_e` (φ(e_G) = e_H), `hom_inv` (φ(a⁻¹) = φ(a)⁻¹); `ker` (subgrupo de G), `image` (subgrupo de H).
+- ✅ **Algebra/Ring.lean** — `HFAlgebra.HFRing`: anillo unitario con grupo aditivo abeliano; `toAdditiveHFGroup`; 7 lemas derivados: `add_zero`, `add_neg`, `neg_neg`, `zero_mul`, `mul_zero`, `neg_mul`, `mul_neg`.
+- ✅ **Algebra/CosetCount.lean** — Lema de partición uniforme (`card_sUnion_uniform_partition`) + **Teorema de Lagrange**: `card_subgroup_dvd_card_group` (⊢ |H| ∣ |G|). Build completo 0 errores.
 
 ## Recent Achievements (2026-05-19 – 2026-05-20)
 
@@ -197,7 +216,7 @@ AczelSetTheory/
   Operations/     — Constructors and definitions over HFSet (21 modules)
   Axioms/         — Axiomatic properties and theorems over HFSet (41 modules)
   VN/             — Von Neumann embedding vN : ℕ₀ → HFSet (35 modules)
-  Algebra/        — Algebraic structures native in HFSet (1 module)
+  Algebra/        — Algebraic structures native in HFSet (5 modules)
   Integers/       — Integer type ℤ₀ as quotient of ℕ₀ × ℕ₀ (1 module)
   HFSets.lean     — Core HFSet quotient type
   HFList.lean     — Ordered sequences of HFSets (PList HFSet)

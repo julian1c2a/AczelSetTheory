@@ -196,6 +196,142 @@ theorem cosetEq_iff_rightCoset_eq (sub : HFSubgroup grp) {a b : HFSet}
     rw [hba]
     exact sub.inv_closed hh
 
+-- ─────────────────────────────────────────────────────────────────
+-- Extras (pasos 1–8 del plan de trabajo)
+-- ─────────────────────────────────────────────────────────────────
+
+/-- (1) Todo cosete derecho `Ha` es no vacío: contiene a `a`.
+    Forma fuerte (elemento explícito). -/
+theorem rightCoset_self_mem (sub : HFSubgroup grp) {a : HFSet} (ha : a ∈ grp.G) :
+    a ∈ sub.rightCoset a := by
+  rw [sub.mem_rightCoset ha]
+  exact ⟨grp.e, sub.e_mem, (grp.op_id_left ha).symm⟩
+
+/-- (1, versión existencial) Todo cosete derecho `Ha` es no vacío. -/
+theorem rightCoset_nonempty (sub : HFSubgroup grp) {a : HFSet} (ha : a ∈ grp.G) :
+    ∃ x, x ∈ sub.rightCoset a :=
+  ⟨a, sub.rightCoset_self_mem ha⟩
+
+/-- (2) Alias estándar `_iff` para membresía en cosete derecho. -/
+theorem mem_rightCoset_iff (sub : HFSubgroup grp) {a x : HFSet} (ha : a ∈ grp.G) :
+    x ∈ sub.rightCoset a ↔ ∃ h ∈ sub.H, x = grp.op h a :=
+  sub.mem_rightCoset ha
+
+/-- (3) Reescritura simétrica: igualdad de cosetes iff `cosetEq`. -/
+theorem rightCoset_eq_iff (sub : HFSubgroup grp) {a b : HFSet}
+    (ha : a ∈ grp.G) (hb : b ∈ grp.G) :
+    sub.rightCoset a = sub.rightCoset b ↔ sub.cosetEq a b :=
+  (sub.cosetEq_iff_rightCoset_eq ha hb).symm
+
+/-- (4) `cosetEq` es una relación de equivalencia al restringir a `G`. -/
+theorem cosetEq_is_equiv_on_G (sub : HFSubgroup grp) :
+    (∀ {a : HFSet}, a ∈ grp.G → sub.cosetEq a a) ∧
+    (∀ {a b : HFSet}, a ∈ grp.G → b ∈ grp.G → sub.cosetEq a b → sub.cosetEq b a) ∧
+    (∀ {a b c : HFSet},
+      a ∈ grp.G → b ∈ grp.G → c ∈ grp.G →
+      sub.cosetEq a b → sub.cosetEq b c → sub.cosetEq a c) := by
+  refine ⟨?_, ?_, ?_⟩
+  · intro a ha
+    exact sub.cosetEq_refl ha
+  · intro a b ha hb hab
+    exact sub.cosetEq_symm ha hb hab
+  · intro a b c ha hb hc hab hbc
+    exact sub.cosetEq_trans ha hb hc hab hbc
+
+/-- (5) Cerradura por multiplicación izquierda de elementos de `H` dentro del cosete `Ha`. -/
+theorem rightCoset_mul_mem (sub : HFSubgroup grp) {a h x : HFSet}
+    (ha : a ∈ grp.G) (hh : h ∈ sub.H) (hx : x ∈ sub.rightCoset a) :
+    grp.op h x ∈ sub.rightCoset a := by
+  rw [sub.mem_rightCoset ha] at hx ⊢
+  obtain ⟨h₀, hh₀, rfl⟩ := hx
+  refine ⟨grp.op h h₀, sub.op_closed hh hh₀, ?_⟩
+  exact (grp.op_assoc (sub.H_sub hh) (sub.H_sub hh₀) ha).symm
+
+/-- Si `a ∈ H`, entonces el cosete derecho `Ha` coincide con `H`. -/
+theorem rightCoset_eq_subgroup_of_mem (sub : HFSubgroup grp) {a : HFSet}
+    (haG : a ∈ grp.G) (haH : a ∈ sub.H) :
+    sub.rightCoset a = sub.H := by
+  apply HFSet.extensionality
+  intro x
+  rw [sub.mem_rightCoset haG]
+  constructor
+  · intro hx
+    obtain ⟨h, hh, rfl⟩ := hx
+    exact sub.op_closed hh haH
+  · intro hxH
+    refine ⟨grp.op x (grp.inv a), sub.op_closed hxH (sub.inv_closed haH), ?_⟩
+    -- (x·a⁻¹)·a = x
+    calc x
+        = grp.op x grp.e := (grp.op_id_right (sub.H_sub hxH)).symm
+      _ = grp.op x (grp.op (grp.inv a) a) := by rw [grp.op_inv_left haG]
+      _ = grp.op (grp.op x (grp.inv a)) a := (grp.op_assoc (sub.H_sub hxH) (grp.inv_closed haG) haG).symm
+
+/-- (6) Versión base de equinumerosidad: si `a ∈ H`, entonces `card(Ha)=card(H)`. -/
+theorem rightCoset_equinumerous_H (sub : HFSubgroup grp) {a : HFSet}
+    (haG : a ∈ grp.G) (haH : a ∈ sub.H) :
+    HFSet.card (sub.rightCoset a) = HFSet.card sub.H := by
+  rw [sub.rightCoset_eq_subgroup_of_mem haG haH]
+
+/-- Lema técnico: un punto en la intersección de cosetes produce `cosetEq`. -/
+theorem cosetEq_of_mem_inter_rightCoset (sub : HFSubgroup grp)
+    {a b x : HFSet} (ha : a ∈ grp.G) (hb : b ∈ grp.G)
+    (hx : x ∈ HFSet.inter (sub.rightCoset a) (sub.rightCoset b)) :
+    sub.cosetEq a b := by
+  rw [HFSet.mem_inter] at hx
+  obtain ⟨hxa, hxb⟩ := hx
+  rw [sub.mem_rightCoset ha] at hxa
+  rw [sub.mem_rightCoset hb] at hxb
+  obtain ⟨h₁, hh₁, hx1⟩ := hxa
+  obtain ⟨h₂, hh₂, hx2⟩ := hxb
+  have hh₁G : h₁ ∈ grp.G := sub.H_sub hh₁
+  have hh₂G : h₂ ∈ grp.G := sub.H_sub hh₂
+  have hEq : grp.op h₁ a = grp.op h₂ b := hx1.symm.trans hx2
+  -- b = ((h₂)⁻¹·h₁)·a
+  have hb_eq : b = grp.op (grp.op (grp.inv h₂) h₁) a := by
+    calc b
+        = grp.op grp.e b := (grp.op_id_left hb).symm
+      _ = grp.op (grp.op (grp.inv h₂) h₂) b := by rw [grp.op_inv_left hh₂G]
+      _ = grp.op (grp.inv h₂) (grp.op h₂ b) := grp.op_assoc (grp.inv_closed hh₂G) hh₂G hb
+      _ = grp.op (grp.inv h₂) (grp.op h₁ a) := by rw [hEq.symm]
+      _ = grp.op (grp.op (grp.inv h₂) h₁) a := (grp.op_assoc (grp.inv_closed hh₂G) hh₁G ha).symm
+  -- por tanto b·a⁻¹ = (h₂)⁻¹·h₁ ∈ H
+  have hmem : grp.op (grp.inv h₂) h₁ ∈ sub.H :=
+    sub.op_closed (sub.inv_closed hh₂) hh₁
+  have hba : grp.op b (grp.inv a) = grp.op (grp.inv h₂) h₁ := by
+    calc grp.op b (grp.inv a)
+        = grp.op (grp.op (grp.op (grp.inv h₂) h₁) a) (grp.inv a) := by rw [hb_eq]
+      _ = grp.op (grp.op (grp.inv h₂) h₁) (grp.op a (grp.inv a)) :=
+            grp.op_assoc (grp.op_closed (grp.inv_closed hh₂G) hh₁G) ha (grp.inv_closed ha)
+      _ = grp.op (grp.op (grp.inv h₂) h₁) grp.e := by rw [grp.op_inv_right ha]
+      _ = grp.op (grp.inv h₂) h₁ := grp.op_id_right (grp.op_closed (grp.inv_closed hh₂G) hh₁G)
+  show grp.op b (grp.inv a) ∈ sub.H
+  rw [hba]
+  exact hmem
+
+/-- (7) Cobertura de `G` por cosetes derechos: cada `x ∈ G` está en `Hx`. -/
+theorem rightCosets_cover_G (sub : HFSubgroup grp) {x : HFSet} (hx : x ∈ grp.G) :
+    x ∈ sub.rightCoset x :=
+  sub.rightCoset_self_mem hx
+
+/-- (8) Dos cosetes derechos son iguales o disjuntos. -/
+theorem rightCoset_eq_or_disjoint (sub : HFSubgroup grp) {a b : HFSet}
+    (ha : a ∈ grp.G) (hb : b ∈ grp.G) :
+    sub.rightCoset a = sub.rightCoset b ∨
+      HFSet.inter (sub.rightCoset a) (sub.rightCoset b) = HFSet.empty := by
+  by_cases heq : sub.rightCoset a = sub.rightCoset b
+  · exact Or.inl heq
+  · right
+    apply HFSet.extensionality
+    intro x
+    constructor
+    · intro hx
+      have hcos : sub.cosetEq a b := sub.cosetEq_of_mem_inter_rightCoset ha hb hx
+      have : sub.rightCoset a = sub.rightCoset b :=
+        (sub.cosetEq_iff_rightCoset_eq ha hb).mp hcos
+      exact False.elim (heq this)
+    · intro hx
+      exact False.elim (HFSet.not_mem_empty _ hx)
+
 end HFSubgroup
 
 end HFAlgebra

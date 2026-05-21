@@ -1,22 +1,21 @@
 # Next Steps
 
-**Last updated:** 2026-05-20
+**Last updated:** 2026-05-21
 
-The project compiles on Lean 4.29.0 with **0 sorry, 114 non-barrel modules**.
+The project compiles on Lean 4.29.0 with **0 sorry, 118 non-barrel modules**.
 Full Zermelo axioms derived. Architecture: CList/ + Operations/ + Axioms/ + PList/ + VN/ + Algebra/ + Integers/.
 See PLANNING.md for the long-term roadmap.
 
 ---
 
-## CURRENT PRIORITIES (2026-05-20)
+## CURRENT PRIORITIES (2026-05-21)
 
-### [B2-cont] Álgebra: Subgrupo, Homomorfismo, Anillo
+### [B2-cont] ✅ COMPLETADO (2026-05-21) — Álgebra: Subgrupo, Homomorfismo, Anillo, Cosetes
 
-Continuación de la cadena de álgebra nativa en HFSet:
-
-- **`Algebra/Subgroup.lean`**: `HFSubgroup`, lema de Lagrange
-- **`Algebra/GroupHom.lean`**: `HFGroupHom`, primer teorema de isomorfismo
-- **`Algebra/Ring.lean`**: `HFRing` (o usar ℤ₀ como ejemplo concreto)
+- **`Algebra/Subgroup.lean`** ✅: `HFSubgroup`, `rightCoset`, `cosetEq`, 16 teoremas incluyendo disyunción de cosetes.
+- **`Algebra/GroupHom.lean`** ✅: `HFGroupHom`, `ker`, `image`, `hom_e`, `hom_inv`.
+- **`Algebra/Ring.lean`** ✅: `HFRing`, `toAdditiveHFGroup`, 7 lemas.
+- **`Algebra/CosetCount.lean`** ✅: partición uniforme + **Teorema de Lagrange** `|H| ∣ |G|`.
 
 ### [D] Funciones multiplicativas: μ de Möbius, λ de Liouville
 

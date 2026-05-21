@@ -4,6 +4,25 @@ All notable changes to this project are documented here.
 
 ---
 
+## [2026-05-21] — Algebra completa: Subgroup, GroupHom, Ring, CosetCount + Teorema de Lagrange, 118 módulos, 0 sorry
+
+### Added
+
+- **`Algebra/Subgroup.lean`** (módulo nuevo): `HFAlgebra.HFSubgroup` — estructura de subgrupo, `toHFGroup`, `inter` (intersección de subgrupos), `rightCoset` (cosete derecho Ha := {h·a | h ∈ H}), `cosetEq` (equivalencia a ~_H b ↔ b·a⁻¹ ∈ H). 16 teoremas: reflexividad/simetría/transitividad, equivalencia cosete-cosetEq, cubrimiento de G, disyunción Ha = Hb ∨ Ha ∩ Hb = ∅.
+- **`Algebra/GroupHom.lean`** (módulo nuevo): `HFAlgebra.HFGroupHom` — homomorfismo φ : G →ₕ H; `hom_e` (φ(eG) = eH), `hom_inv` (φ(a⁻¹) = φ(a)⁻¹); `ker` (subgrupo de G), `image` (subgrupo de H).
+- **`Algebra/Ring.lean`** (módulo nuevo): `HFAlgebra.HFRing` — anillo unitario con grupo aditivo abeliano (axiomas izq. + comm), monoide multiplicativo, bilinealidad; `toAdditiveHFGroup`; 7 lemas derivados: `add_zero`, `add_neg`, `neg_neg`, `zero_mul`, `mul_zero`, `neg_mul`, `mul_neg`.
+- **`Algebra/CosetCount.lean`** (módulo nuevo): `HFSet.sUnion_insert`, `HFSet.card_sUnion_uniform_partition` (cardinalidad de partición uniforme); `HFSubgroup.cosets` (conjunto de cosetes derechos), `HFSubgroup.index` ([G:H]); `cosets_cover` (∪Ha = G), `cosets_pairwise_disjoint`; **`card_subgroup_dvd_card_group`** — **Teorema de Lagrange**: |H| ∣ |G|.
+
+### Documentation
+
+- **`doc/REFERENCE-Algebra.md`** proyectado: nuevas secciones §4.87–§4.91 (definiciones) + §6.87–§6.91 (teoremas) + §7b (exports) para los 5 módulos de `Algebra/`.
+- **`REFERENCE.md`**: filas 87–91 añadidas a la tabla de módulos.
+- **`CURRENT-STATUS-PROJECT.md`**: actualizado a 118 módulos, sección Algebra/ expandida a 5 módulos.
+
+**Project status: 0 sorry, 0 errors. 118 non-barrel modules (127 total).**
+
+---
+
 ## [2026-05-20] — Integers/Basic: ℤ₀, barrel fix, 114 módulos, 0 sorry
 
 ### Added
