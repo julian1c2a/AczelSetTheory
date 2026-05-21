@@ -44,6 +44,11 @@ foundation, decidability).
 | 89 | `AczelSetTheory/Algebra/GroupHom.lean` | ✅ Complete |
 | 90 | `AczelSetTheory/Algebra/Ring.lean` | ✅ Complete |
 | 91 | `AczelSetTheory/Algebra/CosetCount.lean` | ✅ Complete |
+| 92 | `AczelSetTheory/Algebra/Monoid.lean` | ✅ Complete |
+| 93 | `AczelSetTheory/Algebra/RingHom.lean` | ✅ Complete |
+| 94 | `AczelSetTheory/Algebra/Field.lean` | ✅ Complete |
+| 95 | `AczelSetTheory/Algebra/Module.lean` | ✅ Complete |
+| 96 | `AczelSetTheory/Algebra/LinearSpace.lean` | ✅ Complete |
 
 ---
 
@@ -480,7 +485,7 @@ def HFSet.rank (A : HFSet) : ℕ₀
 
 **Last projected:** 2026-05-21
 
-**Primary namespaces:** `HFAlgebra`, `HFAlgebra.HFGroup`, `HFAlgebra.HFSubgroup`, `HFAlgebra.HFGroupHom`, `HFAlgebra.HFRing`
+**Primary namespaces:** `HFAlgebra`, `HFAlgebra.HFGroup`, `HFAlgebra.HFSubgroup`, `HFAlgebra.HFGroupHom`, `HFAlgebra.HFRing`, `HFAlgebra.HFMonoid`, `HFAlgebra.HFMonoidHom`, `HFAlgebra.HFSubmonoid`, `HFAlgebra.HFRingHom`, `HFAlgebra.HFSubring`, `HFAlgebra.HFField`, `HFAlgebra.HFFieldHom`, `HFAlgebra.HFSubfield`, `HFAlgebra.HFModule`, `HFAlgebra.HFModuleHom`, `HFAlgebra.HFSubmodule`, `HFAlgebra.HFLinearSpace`, `HFAlgebra.HFLinearMap`, `HFAlgebra.HFSubspace`
 
 ---
 
@@ -761,3 +766,469 @@ def HFSubgroup.index (sub : HFSubgroup grp) : ℕ₀ := card sub.cosets
 ### Algebra/CosetCount.lean
 
 `HFSet.sUnion_insert`, `HFSet.card_sUnion_uniform_partition`, `HFAlgebra.HFSubgroup.card_rightCoset_eq_card_H`, `HFAlgebra.HFSubgroup.cosets`, `HFAlgebra.HFSubgroup.index`, `HFAlgebra.HFSubgroup.mem_cosets`, `HFAlgebra.HFSubgroup.cosets_cover`, `HFAlgebra.HFSubgroup.cosets_pairwise_disjoint`, `HFAlgebra.HFSubgroup.coset_card_eq`, `HFAlgebra.HFSubgroup.card_G_eq_card_H_mul_index`, `HFAlgebra.HFSubgroup.card_subgroup_dvd_card_group`
+
+---
+
+### 4.92 Algebra/Monoid.lean — `namespace HFAlgebra`
+
+**Imports:** `AczelSetTheory.HFSets`, `AczelSetTheory.Axioms.Intersection`
+
+#### 4.92.1 `HFAlgebra.HFMonoid`
+
+```lean
+structure HFMonoid where
+  M   : HFSet
+  op  : HFSet → HFSet → HFSet
+  e   : HFSet
+  e_mem       : e ∈ M
+  op_closed   : ∀ {a b : HFSet}, a ∈ M → b ∈ M → op a b ∈ M
+  op_assoc    : ∀ {a b c : HFSet}, a ∈ M → b ∈ M → c ∈ M →
+                  op (op a b) c = op a (op b c)
+  op_id_left  : ∀ {a : HFSet}, a ∈ M → op e a = a
+  op_id_right : ∀ {a : HFSet}, a ∈ M → op a e = a
+```
+
+- **Math**: `(M, ·, e)` — monoide con identidad bilateral explícita.
+- Prop-valued structure. Computable carrier.
+- **Nota**: A diferencia de `HFGroup`, la identidad derecha es un axioma explícito (no derivable sin inversos).
+
+#### 4.92.2 `HFAlgebra.HFMonoidHom`
+
+```lean
+structure HFMonoidHom (M N : HFMonoid) where
+  f     : HFSet → HFSet
+  f_mem : ∀ {a : HFSet}, a ∈ M.M → f a ∈ N.M
+  f_hom : ∀ {a b : HFSet}, a ∈ M.M → b ∈ M.M → f (M.op a b) = N.op (f a) (f b)
+  f_one : f M.e = N.e
+```
+
+- **Math**: φ : M →ₘ N — homomorfismo de monoides.
+- `f_one` es axioma explícito (no derivable sin inversos).
+
+#### 4.92.3 `HFMonoidHom.id`
+
+```lean
+def HFMonoidHom.id (M : HFMonoid) : HFMonoidHom M M
+```
+
+- **Math**: Homomorfismo identidad.
+
+#### 4.92.4 `HFMonoidHom.comp`
+
+```lean
+def HFMonoidHom.comp (ψ : HFMonoidHom N P) (φ : HFMonoidHom M N) : HFMonoidHom M P
+```
+
+- **Math**: Composición ψ ∘ φ.
+
+#### 4.92.5 `HFAlgebra.HFSubmonoid`
+
+```lean
+structure HFSubmonoid (mon : HFMonoid) where
+  S         : HFSet
+  S_sub     : ∀ {x : HFSet}, x ∈ S → x ∈ mon.M
+  e_mem     : mon.e ∈ S
+  op_closed : ∀ {a b : HFSet}, a ∈ S → b ∈ S → mon.op a b ∈ S
+```
+
+- **Math**: S ≤ M — submonoide de M.
+
+#### 4.92.6 `HFSubmonoid.toHFMonoid`
+
+```lean
+def HFSubmonoid.toHFMonoid (sub : HFSubmonoid mon) : HFMonoid
+```
+
+- **Math**: Todo submonoide es un monoide.
+
+#### 4.92.7 `HFSubmonoid.inter`
+
+```lean
+def HFSubmonoid.inter (sub₁ sub₂ : HFSubmonoid mon) : HFSubmonoid mon
+```
+
+- **Math**: S₁ ∩ S₂ ≤ M.
+
+---
+
+### 4.93 Algebra/RingHom.lean — `namespace HFAlgebra`
+
+**Imports:** `AczelSetTheory.Algebra.Ring`, `AczelSetTheory.Axioms.Intersection`
+
+#### 4.93.1 `HFAlgebra.HFRingHom`
+
+```lean
+structure HFRingHom (R S : HFRing) where
+  f     : HFSet → HFSet
+  f_mem : ∀ {a : HFSet}, a ∈ R.R → f a ∈ S.R
+  f_add : ∀ {a b : HFSet}, a ∈ R.R → b ∈ R.R → f (R.add a b) = S.add (f a) (f b)
+  f_mul : ∀ {a b : HFSet}, a ∈ R.R → b ∈ R.R → f (R.mul a b) = S.mul (f a) (f b)
+  f_one : f R.one = S.one
+```
+
+- **Math**: φ : R →ᵣ S — homomorfismo de anillos unitarios. `f_one` es axioma explícito.
+
+#### 4.93.2 `HFRingHom.id`
+
+```lean
+def HFRingHom.id (R : HFRing) : HFRingHom R R
+```
+
+#### 4.93.3 `HFRingHom.comp`
+
+```lean
+def HFRingHom.comp (ψ : HFRingHom S T) (φ : HFRingHom R S) : HFRingHom R T
+```
+
+#### 4.93.4 `HFAlgebra.HFSubring`
+
+```lean
+structure HFSubring (rng : HFRing) where
+  S          : HFSet
+  S_sub      : ∀ {x : HFSet}, x ∈ S → x ∈ rng.R
+  zero_mem   : rng.zero ∈ S
+  one_mem    : rng.one ∈ S
+  add_closed : ∀ {a b : HFSet}, a ∈ S → b ∈ S → rng.add a b ∈ S
+  mul_closed : ∀ {a b : HFSet}, a ∈ S → b ∈ S → rng.mul a b ∈ S
+  neg_closed : ∀ {a : HFSet}, a ∈ S → rng.neg a ∈ S
+```
+
+- **Math**: S ≤ R — subanillo de R.
+
+#### 4.93.5 `HFSubring.toHFRing`
+
+```lean
+def HFSubring.toHFRing (sub : HFSubring rng) : HFRing
+```
+
+#### 4.93.6 `HFSubring.inter`
+
+```lean
+def HFSubring.inter (sub₁ sub₂ : HFSubring rng) : HFSubring rng
+```
+
+---
+
+### 4.94 Algebra/Field.lean — `namespace HFAlgebra`
+
+**Imports:** `AczelSetTheory.Algebra.RingHom`, `AczelSetTheory.Axioms.Intersection`
+
+#### 4.94.1 `HFAlgebra.HFField`
+
+```lean
+structure HFField where
+  F       : HFSet
+  add mul : HFSet → HFSet → HFSet
+  zero one : HFSet
+  neg inv_mul : HFSet → HFSet
+  zero_mem one_mem : _
+  add_closed mul_closed neg_closed : _
+  inv_closed  : ∀ {a : HFSet}, a ∈ F → inv_mul a ∈ F   -- sin condición a ≠ zero
+  add_assoc add_comm zero_add neg_add : _   -- grupo aditivo abeliano
+  mul_assoc mul_comm mul_one left_distrib : _
+  mul_inv  : ∀ {a : HFSet}, a ∈ F → a ≠ zero → mul a (inv_mul a) = one
+  zero_ne_one : zero ≠ one
+```
+
+- **Math**: `(F, +, ·, 0, 1, -, ⁻¹)` — cuerpo conmutativo unitario.
+- `inv_mul` es una función total con valor basura para `zero` (coherente con `inv_closed` sin condición `a ≠ 0`).
+
+#### 4.94.2 `HFField.toHFRing`
+
+```lean
+def HFField.toHFRing (fld : HFField) : HFRing
+```
+
+- **Math**: Todo cuerpo es un anillo.
+
+#### 4.94.3 `HFField.toAdditiveHFGroup`
+
+```lean
+def HFField.toAdditiveHFGroup (fld : HFField) : HFGroup
+```
+
+- **Math**: Grupo aditivo subyacente `(F, +, 0, -)`.
+
+#### 4.94.4 `HFAlgebra.HFFieldHom`
+
+```lean
+structure HFFieldHom (F G : HFField) where
+  f     : HFSet → HFSet
+  f_mem : ∀ {a : HFSet}, a ∈ F.F → f a ∈ G.F
+  f_add : ∀ {a b : HFSet}, a ∈ F.F → b ∈ F.F → f (F.add a b) = G.add (f a) (f b)
+  f_mul : ∀ {a b : HFSet}, a ∈ F.F → b ∈ F.F → f (F.mul a b) = G.mul (f a) (f b)
+  f_one : f F.one = G.one
+```
+
+- **Math**: φ : F →ᶠ G — homomorfismo de cuerpos.
+
+#### 4.94.5 `HFFieldHom.toHFRingHom`
+
+```lean
+def HFFieldHom.toHFRingHom (φ : HFFieldHom F G) : HFRingHom F.toHFRing G.toHFRing
+```
+
+#### 4.94.6 `HFFieldHom.id`, `HFFieldHom.comp`
+
+```lean
+def HFFieldHom.id (F : HFField) : HFFieldHom F F
+def HFFieldHom.comp (ψ : HFFieldHom G K) (φ : HFFieldHom F G) : HFFieldHom F K
+```
+
+#### 4.94.7 `HFAlgebra.HFSubfield`
+
+```lean
+structure HFSubfield (fld : HFField) where
+  S           : HFSet
+  S_sub       : ∀ {x : HFSet}, x ∈ S → x ∈ fld.F
+  zero_mem one_mem : _
+  add_closed mul_closed neg_closed : _
+  inv_closed  : ∀ {a : HFSet}, a ∈ S → fld.inv_mul a ∈ S   -- sin condición a ≠ zero
+```
+
+- **Math**: S ≤ F — subcuerpo de F.
+
+#### 4.94.8 `HFSubfield.toHFField`, `HFSubfield.inter`
+
+```lean
+def HFSubfield.toHFField (sub : HFSubfield fld) : HFField
+def HFSubfield.inter (sub₁ sub₂ : HFSubfield fld) : HFSubfield fld
+```
+
+---
+
+### 4.95 Algebra/Module.lean — `namespace HFAlgebra`
+
+**Imports:** `AczelSetTheory.Algebra.Ring`, `AczelSetTheory.Axioms.Intersection`
+
+#### 4.95.1 `HFAlgebra.HFModule`
+
+```lean
+structure HFModule (rng : HFRing) where
+  M    : HFSet
+  add  : HFSet → HFSet → HFSet
+  zero : HFSet
+  neg  : HFSet → HFSet
+  smul : HFSet → HFSet → HFSet   -- r ⊙ m
+  zero_mem add_closed neg_closed : _
+  smul_closed : ∀ {r m : HFSet}, r ∈ rng.R → m ∈ M → smul r m ∈ M
+  add_assoc add_comm zero_add neg_add : _   -- grupo aditivo abeliano
+  smul_add  : ∀ {r m n : HFSet}, r ∈ rng.R → m ∈ M → n ∈ M →
+                smul r (add m n) = add (smul r m) (smul r n)
+  add_smul  : ∀ {r s m : HFSet}, r ∈ rng.R → s ∈ rng.R → m ∈ M →
+                smul (rng.add r s) m = add (smul r m) (smul s m)
+  mul_smul  : ∀ {r s m : HFSet}, r ∈ rng.R → s ∈ rng.R → m ∈ M →
+                smul (rng.mul r s) m = smul r (smul s m)
+  one_smul  : ∀ {m : HFSet}, m ∈ M → smul rng.one m = m
+```
+
+- **Math**: Módulo izquierdo sobre `rng`. `smul r m` denota `r ⊙ m`.
+
+#### 4.95.2 `HFModule.toAdditiveHFGroup`
+
+```lean
+def HFModule.toAdditiveHFGroup {rng : HFRing} (mod : HFModule rng) : HFGroup
+```
+
+#### 4.95.3 `HFAlgebra.HFModuleHom`
+
+```lean
+structure HFModuleHom (rng : HFRing) (M N : HFModule rng) where
+  f      : HFSet → HFSet
+  f_mem  : ∀ {m : HFSet}, m ∈ M.M → f m ∈ N.M
+  f_add  : ∀ {m n : HFSet}, m ∈ M.M → n ∈ M.M → f (M.add m n) = N.add (f m) (f n)
+  f_smul : ∀ {r m : HFSet}, r ∈ rng.R → m ∈ M.M → f (M.smul r m) = N.smul r (f m)
+```
+
+- **Math**: φ : M →ᵣ N — homomorfismo R-lineal.
+
+#### 4.95.4 `HFModuleHom.id`, `HFModuleHom.comp`
+
+```lean
+def HFModuleHom.id (M : HFModule rng) : HFModuleHom rng M M
+def HFModuleHom.comp (ψ : HFModuleHom rng N P) (φ : HFModuleHom rng M N) : HFModuleHom rng M P
+```
+
+#### 4.95.5 `HFAlgebra.HFSubmodule`
+
+```lean
+structure HFSubmodule (rng : HFRing) (mod : HFModule rng) where
+  S           : HFSet
+  S_sub       : ∀ {x : HFSet}, x ∈ S → x ∈ mod.M
+  zero_mem    : mod.zero ∈ S
+  add_closed  : ∀ {m n : HFSet}, m ∈ S → n ∈ S → mod.add m n ∈ S
+  neg_closed  : ∀ {m : HFSet}, m ∈ S → mod.neg m ∈ S
+  smul_closed : ∀ {r m : HFSet}, r ∈ rng.R → m ∈ S → mod.smul r m ∈ S
+```
+
+- **Math**: N ≤ M — submódulo de M.
+
+#### 4.95.6 `HFSubmodule.toHFModule`, `HFSubmodule.inter`
+
+```lean
+def HFSubmodule.toHFModule (sub : HFSubmodule rng mod) : HFModule rng
+def HFSubmodule.inter (sub₁ sub₂ : HFSubmodule rng mod) : HFSubmodule rng mod
+```
+
+---
+
+### 4.96 Algebra/LinearSpace.lean — `namespace HFAlgebra`
+
+**Imports:** `AczelSetTheory.Algebra.Field`, `AczelSetTheory.Axioms.Intersection`
+
+#### 4.96.1 `HFAlgebra.HFLinearSpace`
+
+```lean
+structure HFLinearSpace (fld : HFField) where
+  V     : HFSet
+  add   : HFSet → HFSet → HFSet
+  zero  : HFSet
+  neg   : HFSet → HFSet
+  smul  : HFSet → HFSet → HFSet   -- k ⊙ v
+  zero_mem add_closed neg_closed : _
+  smul_closed : ∀ {k v : HFSet}, k ∈ fld.F → v ∈ V → smul k v ∈ V
+  add_assoc add_comm zero_add neg_add : _   -- grupo aditivo abeliano
+  smul_add  : ∀ {k v w : HFSet}, k ∈ fld.F → v ∈ V → w ∈ V →
+                smul k (add v w) = add (smul k v) (smul k w)
+  add_smul  : ∀ {k l v : HFSet}, k ∈ fld.F → l ∈ fld.F → v ∈ V →
+                smul (fld.add k l) v = add (smul k v) (smul l v)
+  mul_smul  : ∀ {k l v : HFSet}, k ∈ fld.F → l ∈ fld.F → v ∈ V →
+                smul (fld.mul k l) v = smul k (smul l v)
+  one_smul  : ∀ {v : HFSet}, v ∈ V → smul fld.one v = v
+```
+
+- **Math**: Espacio vectorial sobre `fld`. Definido independientemente de `HFModule` para evitar la conversión `HFField → HFRing`.
+
+#### 4.96.2 `HFLinearSpace.toAdditiveHFGroup`
+
+```lean
+def HFLinearSpace.toAdditiveHFGroup {fld : HFField} (vs : HFLinearSpace fld) : HFGroup
+```
+
+#### 4.96.3 `HFAlgebra.HFLinearMap`
+
+```lean
+structure HFLinearMap (fld : HFField) (V W : HFLinearSpace fld) where
+  f      : HFSet → HFSet
+  f_mem  : ∀ {v : HFSet}, v ∈ V.V → f v ∈ W.V
+  f_add  : ∀ {v w : HFSet}, v ∈ V.V → w ∈ V.V → f (V.add v w) = W.add (f v) (f w)
+  f_smul : ∀ {k v : HFSet}, k ∈ fld.F → v ∈ V.V → f (V.smul k v) = W.smul k (f v)
+```
+
+- **Math**: φ : V →ₗ W — aplicación lineal.
+
+#### 4.96.4 `HFLinearMap.id`, `HFLinearMap.comp`
+
+```lean
+def HFLinearMap.id (V : HFLinearSpace fld) : HFLinearMap fld V V
+def HFLinearMap.comp (ψ : HFLinearMap fld W U) (φ : HFLinearMap fld V W) : HFLinearMap fld V U
+```
+
+#### 4.96.5 `HFAlgebra.HFSubspace`
+
+```lean
+structure HFSubspace (fld : HFField) (vs : HFLinearSpace fld) where
+  W           : HFSet
+  W_sub       : ∀ {v : HFSet}, v ∈ W → v ∈ vs.V
+  zero_mem    : vs.zero ∈ W
+  add_closed  : ∀ {v w : HFSet}, v ∈ W → w ∈ W → vs.add v w ∈ W
+  neg_closed  : ∀ {v : HFSet}, v ∈ W → vs.neg v ∈ W
+  smul_closed : ∀ {k v : HFSet}, k ∈ fld.F → v ∈ W → vs.smul k v ∈ W
+```
+
+- **Math**: W ≤ V — subespacio vectorial de V.
+
+#### 4.96.6 `HFSubspace.toHFLinearSpace`, `HFSubspace.inter`
+
+```lean
+def HFSubspace.toHFLinearSpace (sub : HFSubspace fld vs) : HFLinearSpace fld
+def HFSubspace.inter (sub₁ sub₂ : HFSubspace fld vs) : HFSubspace fld vs
+```
+
+---
+
+### 6.92 Algebra/Monoid.lean — `namespace HFAlgebra.HFMonoid`
+
+`variable (mon : HFMonoid)`
+
+| # | Theorem | Lean signature |
+| --- | --------- | ---------------- |
+| 1 | `unique_id` | `{e' : HFSet} (he' : e' ∈ mon.M) (_hL : ∀ {a : HFSet}, a ∈ mon.M → mon.op e' a = a) (hR : ∀ {a : HFSet}, a ∈ mon.M → mon.op a e' = a) : e' = mon.e` |
+
+---
+
+### 6.93 Algebra/RingHom.lean — `namespace HFAlgebra.HFRingHom`
+
+`variable {R S : HFRing} (φ : HFRingHom R S)`
+
+| # | Theorem | Lean signature |
+| --- | --------- | ---------------- |
+| 1 | `hom_zero` | `(φ : HFRingHom R S) : φ.f R.zero = S.zero` |
+| 2 | `hom_neg` | `(φ : HFRingHom R S) {a : HFSet} (ha : a ∈ R.R) : φ.f (R.neg a) = S.neg (φ.f a)` |
+
+---
+
+### 6.94 Algebra/Field.lean — `namespace HFAlgebra.HFField` + `HFAlgebra.HFFieldHom`
+
+`variable (fld : HFField)`
+
+| # | Theorem | Namespace | Lean signature |
+| --- | --------- | ----------- | ---------------- |
+| 1 | `one_mul` | `HFAlgebra.HFField` | `{a : HFSet} (ha : a ∈ fld.F) : fld.mul fld.one a = fld.mul a fld.one` |
+| 2 | `right_distrib` | `HFAlgebra.HFField` | `{a b c : HFSet} (ha : a ∈ fld.F) (hb : b ∈ fld.F) (hc : c ∈ fld.F) : fld.mul (fld.add a b) c = fld.add (fld.mul a c) (fld.mul b c)` |
+| 3 | `mul_inv_left` | `HFAlgebra.HFField` | `{a : HFSet} (ha : a ∈ fld.F) (hne : a ≠ fld.zero) : fld.mul (fld.inv_mul a) a = fld.one` |
+| 4 | `hom_zero` | `HFAlgebra.HFFieldHom` | `(φ : HFFieldHom F G) : φ.f F.zero = G.zero` |
+| 5 | `hom_neg` | `HFAlgebra.HFFieldHom` | `(φ : HFFieldHom F G) {a : HFSet} (ha : a ∈ F.F) : φ.f (F.neg a) = G.neg (φ.f a)` |
+| 6 | `hom_inv` | `HFAlgebra.HFFieldHom` | `(φ : HFFieldHom F G) {a : HFSet} (ha : a ∈ F.F) (hne : a ≠ F.zero) : φ.f (F.inv_mul a) = G.inv_mul (φ.f a)` |
+
+---
+
+### 6.95 Algebra/Module.lean — `namespace HFAlgebra.HFModule` + `HFAlgebra.HFModuleHom`
+
+`variable {rng : HFRing} (mod : HFModule rng)`
+
+| # | Theorem | Namespace | Lean signature |
+| --- | --------- | ----------- | ---------------- |
+| 1 | `zero_smul` | `HFAlgebra.HFModule` | `{m : HFSet} (hm : m ∈ mod.M) : mod.smul rng.zero m = mod.zero` |
+| 2 | `smul_zero` | `HFAlgebra.HFModule` | `{r : HFSet} (hr : r ∈ rng.R) : mod.smul r mod.zero = mod.zero` |
+| 3 | `neg_smul` | `HFAlgebra.HFModule` | `{r m : HFSet} (hr : r ∈ rng.R) (hm : m ∈ mod.M) : mod.smul (rng.neg r) m = mod.neg (mod.smul r m)` |
+| 4 | `smul_neg` | `HFAlgebra.HFModule` | `{r m : HFSet} (hr : r ∈ rng.R) (hm : m ∈ mod.M) : mod.smul r (mod.neg m) = mod.neg (mod.smul r m)` |
+| 5 | `hom_zero` | `HFAlgebra.HFModuleHom` | `(φ : HFModuleHom rng M N) : φ.f M.zero = N.zero` |
+| 6 | `hom_neg` | `HFAlgebra.HFModuleHom` | `(φ : HFModuleHom rng M N) {m : HFSet} (hm : m ∈ M.M) : φ.f (M.neg m) = N.neg (φ.f m)` |
+
+---
+
+### 6.96 Algebra/LinearSpace.lean — `namespace HFAlgebra.HFLinearSpace` + `HFAlgebra.HFLinearMap`
+
+`variable {fld : HFField} (vs : HFLinearSpace fld)`
+
+| # | Theorem | Namespace | Lean signature |
+| --- | --------- | ----------- | ---------------- |
+| 1 | `zero_smul` | `HFAlgebra.HFLinearSpace` | `{v : HFSet} (hv : v ∈ vs.V) : vs.smul fld.zero v = vs.zero` |
+| 2 | `smul_zero` | `HFAlgebra.HFLinearSpace` | `{k : HFSet} (hk : k ∈ fld.F) : vs.smul k vs.zero = vs.zero` |
+| 3 | `neg_smul` | `HFAlgebra.HFLinearSpace` | `{k v : HFSet} (hk : k ∈ fld.F) (hv : v ∈ vs.V) : vs.smul (fld.neg k) v = vs.neg (vs.smul k v)` |
+| 4 | `smul_neg` | `HFAlgebra.HFLinearSpace` | `{k v : HFSet} (hk : k ∈ fld.F) (hv : v ∈ vs.V) : vs.smul k (vs.neg v) = vs.neg (vs.smul k v)` |
+| 5 | `hom_zero` | `HFAlgebra.HFLinearMap` | `(φ : HFLinearMap fld V W) : φ.f V.zero = W.zero` |
+| 6 | `hom_neg` | `HFAlgebra.HFLinearMap` | `(φ : HFLinearMap fld V W) {v : HFSet} (hv : v ∈ V.V) : φ.f (V.neg v) = W.neg (φ.f v)` |
+
+---
+
+### Algebra/Monoid.lean
+
+`HFAlgebra.HFMonoid`, `HFAlgebra.HFMonoid.unique_id`, `HFAlgebra.HFMonoidHom`, `HFAlgebra.HFMonoidHom.id`, `HFAlgebra.HFMonoidHom.comp`, `HFAlgebra.HFSubmonoid`, `HFAlgebra.HFSubmonoid.toHFMonoid`, `HFAlgebra.HFSubmonoid.inter`
+
+### Algebra/RingHom.lean
+
+`HFAlgebra.HFRingHom`, `HFAlgebra.HFRingHom.hom_zero`, `HFAlgebra.HFRingHom.hom_neg`, `HFAlgebra.HFRingHom.id`, `HFAlgebra.HFRingHom.comp`, `HFAlgebra.HFSubring`, `HFAlgebra.HFSubring.toHFRing`, `HFAlgebra.HFSubring.inter`
+
+### Algebra/Field.lean
+
+`HFAlgebra.HFField`, `HFAlgebra.HFField.one_mul`, `HFAlgebra.HFField.right_distrib`, `HFAlgebra.HFField.mul_inv_left`, `HFAlgebra.HFField.toHFRing`, `HFAlgebra.HFField.toAdditiveHFGroup`, `HFAlgebra.HFFieldHom`, `HFAlgebra.HFFieldHom.toHFRingHom`, `HFAlgebra.HFFieldHom.hom_zero`, `HFAlgebra.HFFieldHom.hom_neg`, `HFAlgebra.HFFieldHom.hom_inv`, `HFAlgebra.HFFieldHom.id`, `HFAlgebra.HFFieldHom.comp`, `HFAlgebra.HFSubfield`, `HFAlgebra.HFSubfield.toHFField`, `HFAlgebra.HFSubfield.inter`
+
+### Algebra/Module.lean
+
+`HFAlgebra.HFModule`, `HFAlgebra.HFModule.toAdditiveHFGroup`, `HFAlgebra.HFModule.zero_smul`, `HFAlgebra.HFModule.smul_zero`, `HFAlgebra.HFModule.neg_smul`, `HFAlgebra.HFModule.smul_neg`, `HFAlgebra.HFModuleHom`, `HFAlgebra.HFModuleHom.hom_zero`, `HFAlgebra.HFModuleHom.hom_neg`, `HFAlgebra.HFModuleHom.id`, `HFAlgebra.HFModuleHom.comp`, `HFAlgebra.HFSubmodule`, `HFAlgebra.HFSubmodule.toHFModule`, `HFAlgebra.HFSubmodule.inter`
+
+### Algebra/LinearSpace.lean
+
+`HFAlgebra.HFLinearSpace`, `HFAlgebra.HFLinearSpace.toAdditiveHFGroup`, `HFAlgebra.HFLinearSpace.zero_smul`, `HFAlgebra.HFLinearSpace.smul_zero`, `HFAlgebra.HFLinearSpace.neg_smul`, `HFAlgebra.HFLinearSpace.smul_neg`, `HFAlgebra.HFLinearMap`, `HFAlgebra.HFLinearMap.hom_zero`, `HFAlgebra.HFLinearMap.hom_neg`, `HFAlgebra.HFLinearMap.id`, `HFAlgebra.HFLinearMap.comp`, `HFAlgebra.HFSubspace`, `HFAlgebra.HFSubspace.toHFLinearSpace`, `HFAlgebra.HFSubspace.inter`

@@ -127,13 +127,18 @@ Below are the keys for reading and searching theorems.
 | 89 | `AczelSetTheory/Algebra/GroupHom.lean` | `HFAlgebra`, `HFAlgebra.HFGroupHom` | ✅ Complete | Algebra/Subgroup | — |
 | 90 | `AczelSetTheory/Algebra/Ring.lean` | `HFAlgebra`, `HFAlgebra.HFRing` | ✅ Complete | Algebra/Group | — |
 | 91 | `AczelSetTheory/Algebra/CosetCount.lean` | `HFAlgebra.HFSubgroup`, `HFSet` | ✅ Complete | Algebra/Subgroup, Axioms/OrdinalNat, Axioms/Union, Axioms/Powerset, Peano.PeanoNat.Arith | — |
-| 92 | `AczelSetTheory/Integers/Basic.lean` | `ℤ₀` | ✅ Complete | PList/Omega0, `Peano.PeanoNat.{Sub,Mul,Decidable}` | Integers/Order, Integers/MobiusLiouville |
-| 93 | `AczelSetTheory/Integers/Order.lean` | `ℤ₀` | ✅ Complete | Integers/Basic, `Peano.PeanoNat.Decidable` | Integers/Functions |
-| 94 | `AczelSetTheory/Integers/Functions.lean` | `ℤ₀` | ✅ Complete | Integers/Order | Integers/Arithmetic, Integers/Bijection |
-| 95 | `AczelSetTheory/Integers/Arithmetic.lean` | `ℤ₀` | ✅ Complete | Integers/Functions, `Peano.PeanoNat.{Div,Arith}` | Integers.lean |
-| 96 | `AczelSetTheory/Integers/Bijection.lean` | `ℤ₀` | ✅ Complete | Integers/Functions, `Peano.PeanoNat.Pairing` | Integers.lean |
-| 97 | `AczelSetTheory/Integers/PadicVal.lean` | `ℤ₀` | ✅ Complete | PList/Omega0, `Peano.PeanoNat.{Arith,Primes,WellFounded,Div}` | Integers/MobiusLiouville |
-| 98 | `AczelSetTheory/Integers/MobiusLiouville.lean` | `ℤ₀` | ✅ Complete | Integers/Basic, Integers/PadicVal | Integers.lean |
+| 92 | `AczelSetTheory/Algebra/Monoid.lean` | `HFAlgebra`, `HFAlgebra.HFMonoid`, `HFAlgebra.HFMonoidHom`, `HFAlgebra.HFSubmonoid` | ✅ Complete | AczelSetTheory.HFSets, Axioms/Intersection | — |
+| 93 | `AczelSetTheory/Algebra/RingHom.lean` | `HFAlgebra`, `HFAlgebra.HFRingHom`, `HFAlgebra.HFSubring` | ✅ Complete | Algebra/Ring, Axioms/Intersection | Algebra/Field |
+| 94 | `AczelSetTheory/Algebra/Field.lean` | `HFAlgebra`, `HFAlgebra.HFField`, `HFAlgebra.HFFieldHom`, `HFAlgebra.HFSubfield` | ✅ Complete | Algebra/RingHom, Axioms/Intersection | Algebra/LinearSpace |
+| 95 | `AczelSetTheory/Algebra/Module.lean` | `HFAlgebra`, `HFAlgebra.HFModule`, `HFAlgebra.HFModuleHom`, `HFAlgebra.HFSubmodule` | ✅ Complete | Algebra/Ring, Axioms/Intersection | — |
+| 96 | `AczelSetTheory/Algebra/LinearSpace.lean` | `HFAlgebra`, `HFAlgebra.HFLinearSpace`, `HFAlgebra.HFLinearMap`, `HFAlgebra.HFSubspace` | ✅ Complete | Algebra/Field, Axioms/Intersection | — |
+| 97 | `AczelSetTheory/Integers/Basic.lean` | `ℤ₀` | ✅ Complete | PList/Omega0, `Peano.PeanoNat.{Sub,Mul,Decidable}` | Integers/Order, Integers/MobiusLiouville |
+| 98 | `AczelSetTheory/Integers/Order.lean` | `ℤ₀` | ✅ Complete | Integers/Basic, `Peano.PeanoNat.Decidable` | Integers/Functions |
+| 99 | `AczelSetTheory/Integers/Functions.lean` | `ℤ₀` | ✅ Complete | Integers/Order | Integers/Arithmetic, Integers/Bijection |
+| 100 | `AczelSetTheory/Integers/Arithmetic.lean` | `ℤ₀` | ✅ Complete | Integers/Functions, `Peano.PeanoNat.{Div,Arith}` | Integers.lean |
+| 101 | `AczelSetTheory/Integers/Bijection.lean` | `ℤ₀` | ✅ Complete | Integers/Functions, `Peano.PeanoNat.Pairing` | Integers.lean |
+| 102 | `AczelSetTheory/Integers/PadicVal.lean` | `ℤ₀` | ✅ Complete | PList/Omega0, `Peano.PeanoNat.{Arith,Primes,WellFounded,Div}` | Integers/MobiusLiouville |
+| 103 | `AczelSetTheory/Integers/MobiusLiouville.lean` | `ℤ₀` | ✅ Complete | Integers/Basic, Integers/PadicVal | Integers.lean |
 | — | `AczelSetTheory/VN.lean` | — | ✅ Complete | VN/{Basic,Injective,IsNat,Arithmetic,FSet,PeanoAxioms,PeanoArith,PowVN,SubVN,DivVN,FactorialVN,CardVN,RankVN} | AczelSetTheory.lean |
 | — | `AczelSetTheory/PList.lean` | — | ✅ Complete | PList/{Basic,Lemmas,Omega0} | AczelSetTheory.lean |
 | — | `AczelSetTheory/Integers.lean` | — | ✅ Complete | Integers/{Basic,Order,Functions,Arithmetic,Bijection,PadicVal,MobiusLiouville} | AczelSetTheory.lean |
