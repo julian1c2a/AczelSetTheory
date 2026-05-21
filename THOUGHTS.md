@@ -1,6 +1,6 @@
 ﻿# Thoughts — AczelSetTheory
 
-**Last updated:** 2026-05-20 00:00
+**Last updated:** 2026-05-21
 **Author**: Julián Calderón Almendros
 
 > This is an informal design journal. Record ideas, alternatives considered,
@@ -1059,83 +1059,68 @@ Efectivamente no tenemos los tipos enteros y los racionales. No los definimos en
 Tenemos que definir los enteros en AczelSetTheory, así como todo lo que teníamos previsto en Peano, pero aquí, Aczel sucede a Peano en desarrollo activo.
 ```
 
-**PENSAMIENTOS DE JULIÁN SOBRE $\mathbb{Z}_0$**
+**ℤ₀ — Estado: ✅ Implementado** (`Integers/Basic.lean`, `Integers/Arithmetic.lean`, `Integers/Order.lean`, `Integers/Bijection.lean`, `Integers/Functions.lean`)
 
-Aparte de la creación del tipo de enteros $\mathbb{Z}_0$, esto es, el establecimiento de la relación de equivalencia entre pares de naturales, concretamente $∀ a,b ∈ \mathbb{N}_0 × \mathbb{N}_0, a \mathcal{E} b ⟺ π₁ a + π₂ b = π₂ a + π₁ b$. A partir de aquí, el tipo de los enteros $\mathbb{Z}_0 := (\mathbb{N}_0 × \mathbb{N}_0) / \mathcal{E}$, y la definición de las operaciones de suma, resta, multiplicación, etc., sobre $\mathbb{Z}_0$ es relativamente directa. Sin embargo, hay que tener cuidado con la implementación de estas operaciones para asegurarse de que respetan la relación de equivalencia $\mathcal{E}$ y que se comportan como se espera para los enteros y los naturales embebidos en los enteros. Además habrá que crear la relación de orden lineal sobre $\mathbb{Z}_0$ y demostrar que es un orden total compatible con las operaciones definidas. Además tendremos que dar un representante canónico de la clase de equivalencia para cada entero, que será aquel representantes que que tenga la forma $⟨ n, 0 ⟩$ o $⟨ 0, n ⟩$ dependiendo de si el entero es positivo o negativo, respectivamente. Esto nos permitirá definir la función `toInt : ℕ₀ → ℤ₀` que mapea cada natural a su representante canónico en los enteros, y la función `toNat : ℤ₀ → ℕ₀` que mapea cada entero a su valor absoluto como natural.
+$\mathbb{Z}_0 = (\mathbb{N}_0 \times \mathbb{N}_0) / \mathcal{E}$ (con $a \mathcal{E} b \iff \pi_1 a + \pi_2 b = \pi_2 a + \pi_1 b$) está completamente formalizado:
 
-Resumiendo esta primera parte:
+- **`Basic.lean`**: relación de equivalencia, representantes canónicos $\langle n,0\rangle$ / $\langle 0,n\rangle$, `toInt`, `toNat`.
+- **`Arithmetic.lean`**: suma, resta, multiplicación, `neg`, `abs`, `sign`, `pow` (exp. naturales). Anillo conmutativo con unidad. `toInt` es homomorfismo de anillos inyectivo.
+- **`Order.lean`**: orden total compatible con aritmética. `toInt` es order-embedding.
+- **`Bijection.lean`**: biyección $\mathbb{Z}_0 \leftrightarrow \mathbb{N}_0$ vía $2n \mapsto \langle n,0\rangle$, $2n+1 \mapsto \langle 0,n\rangle$.
+- **`Functions.lean`**: `gcd`, `lcm`, `isPrime`, `factorize` sobre ℤ₀.
+- **`PadicVal.lean` (#97)** y **`MobiusLiouville.lean` (#98)**: funciones multiplicativas con signo en ℤ₀. ✅ Sin sorry desde 2026-05-21.
 
-- Definir la relación de equivalencia $\mathcal{E}$ sobre $\mathbb{N}_0 × \mathbb{N}_0$.
-- Definir el tipo de enteros $\mathbb{Z}_0$ como el cociente de $\mathbb{N}_0 × \mathbb{N}_0$ por la relación $\mathcal{E}$.
-- Definir el representante canónico de cada clase de equivalencia en $\mathbb{Z}_0$.
-- Establcer las funciones `toInt` y `toNat` para mapear entre $\mathbb{N}_0$ y $\mathbb{Z}_0$, demostrando que son inversas entre sí, y que `toInt` es inyectiva. Demostrar que cada natural representa su propia clase de euivalencia, es decir, `toInt n` representa la clase de equivalencia de $⟨ n, 0 ⟩$.
-- Definir la relación de orden total sobre $\mathbb{Z}_0$.
-- Demostrar que `toInt` es un orden-embedding, es decir, que preserva el orden entre $\mathbb{N}_0$ y $\mathbb{Z}_0$. Demostrar que el orden total se preserva exactamente, es decir, que para cada $a, b ∈ \mathbb{Z}_0$, $a ≤ b$, $a ≥ 0, b≥ 0$ si y solo si `toNat a ≤ toNat b`. También para el orden estricto.
-- Definir la operación de suma y de resta sobre $\mathbb{Z}_0$ y demostrar que es compatible con la relación de equivalencia, y con la relación de orden. Demostrar que conforma un grupo abeliano, cíclico, ${⟨ 1_{\mathbb{Z}_0} ⟩}_{\mathbb{Z}_0} = \mathbb{Z}_0$ y que `toInt` es un homomorfismo de grupos inyectivo (no totalmente porque $\mathbb{N}_0$ no es un grupo, sino un monoide conmutativo). Mostrar cual es el neutro y el inverso del a unidad. Mostrar el inverso aditivo de cualquier entero. Para esto sería interesante extender las funciones sucesor y predecesor a los enteros, de forma que funciones universalmente. Así además podríamos mostrar que la función sucesora restringida a los naturales es la función sucesora de los naturales, y la función predecesora retringida a los naturales no nulos es la función predecesora de los naturales, y que la función predecesora retringida a 0 es la función predecesora de 0, es decir, la función que devuelve 0. Esto nos permitiría mostrar que el inverso aditivo de cualquier entero es simplemente su predecesor aplicado tantas veces como su valor absoluto, es decir, `neg z = iterate (toNat z) pred z` si `z ≥ 0` y `neg z = iterate (toNat z) succ z` si `z < 0`.
-- Definir la operación de multiplicación sobre $\mathbb{Z}_0$ y demostrar que es compatible con la relación de equivalencia, y con la relación de orden. Demostrar que conforma un anillo conmutativo con unidad, y que `toInt` es un homomorfismo de anillos inyectivo (no totalmente porque $\mathbb{N}_0$ no es un anillo, sino un semianillo conmutativo). Mostrar cual es el neutro multiplicativo. Mostrar que el producto de dos enteros negativos es positivo, el producto de un entero negativo por uno positivo es negativo, y el producto de dos enteros positivos es positivo.
-- Definir la función `neg`, `abs`, `sign` y `square` sobre $\mathbb{Z}_0$, y las principales propiedades de estas funciones. Mostrar que `neg` es un homomorfismo de grupos, que `abs` es un homomorfismo de monoides conmutativos, y que `sign` es un homomorfismo de monoides conmutativos a la multiplicación de signos. Mostrar que `square` es una función que preserva el orden, y que el cuadrado de cualquier entero es positivo o cero.
-- Definir unala función `pow` sobre $\mathbb{Z}_0$ para exponentes naturales, y demostrar sus propiedades. Mostrar que `pow` es un homomorfismo de monoides conmutativos en el exponente, y que preserva el orden en la base para exponentes naturales. Mostrar que `pow` es compatible con la función `toInt`, es decir, que para cada $n ∈ \mathbb{N}_0$ y cada $a ∈ \mathbb{Z}_0$, `toInt n ^ a = toInt (n ^ toNat a)`.
-- Definir la función `div` y `mod` sobre $\mathbb{Z}_0$ para divisores naturales, y demostrar sus propiedades. Mostrar que `div` y `mod` son compatibles con la función `toInt`, es decir, que para cada $n ∈ \mathbb{N}_0$ y cada $a ∈ \mathbb{Z}_0$, `toInt a div n = toInt (toNat a div n)` y `toInt a mod n = toInt (toNat a mod n)`.
-- Definir la función `gcd` y `lcm` sobre $\mathbb{Z}_0$ para divisores naturales, y demostrar sus propiedades. Mostrar que `gcd` y `lcm` son compatibles con la función `toInt`, es decir, que para cada $a, b ∈ \mathbb{Z}_0$ y cada $n ∈ \mathbb{N}_0$, `toInt a gcd n = toInt (toNat a gcd n)` y `toInt a lcm n = toInt (toNat a lcm n)`.
-- Definir la función `isPrime` sobre $\mathbb{Z}_0$ para números enteros, y demostrar sus propiedades. Mostrar que `isPrime` es compatible con la función `toInt`, es decir, que para cada $n ∈ \mathbb{N}_0$, `isPrime (toInt n) = isPrime n`.
-- Definir la función `factorize` sobre $\mathbb{Z}_0$ para números enteros, y demostrar sus propiedades. Mostrar que `factorize` es compatible con la función `toInt`, es decir, que para cada $n ∈ \mathbb{N}_0$, `toInt n factorize = toInt (factorize n)`.
-- Ahora hay que mostrar una biyección entre $\mathbb{Z}_0$ y $\mathbb{N}_0$ para que se vea claro que se trata de una extensión de $\mathbb{N}_0$ con el mismo cardinal. Se puede hacer mapeando cada natural `2⋅n` a su representante canónico `toInt n` en $\mathbb{Z}_0$, y cada entero negativo `2⋅n+1` a su representante canónico `neg toInt (n)` en $\mathbb{Z}_0$. Esto nos da una biyección de $\mathbb{Z}_0$ a $\mathbb{N}_0$. La inversa la podemos calcular directamente, si $z ∈ \mathbb{Z}_0, z = [⟨0,0⟩]_{mathbb{Z}_0}, inv biy z → 0$, si $z ∈ \mathbb{Z}_0, z = [⟨n,0⟩]_{mathbb{Z}_0}, inv biy z → 2⋅n$ y por último si $z ∈ \mathbb{Z}_0, z = [⟨0,n⟩]_{mathbb{Z}_0}, inv biy z → 2⋅n+1$.
-- Demostrar que si `(B : HFSet)` una función $f : \mathbb{N}_0 → B$ es necesariamente no inyectiva, y que por lo tanto, tampoco será inyectiva $g : \mathbb{Z}_0 → B$. Igualmente, demostrar que si `(B : HFSet)` una función $f : B → \mathbb{N}_0$ es necesariamente no sobreyectiva, y que por lo tanto, tampoco será sobreyectiva $g : B → \mathbb{Z}_0$.
+Queda pendiente (no prioritario): `div`/`mod` para divisores negativos, extensión plena de `factorize` a ℤ.
 
-### PENSAMIENTOS DE JULIÁN SOBRE SOBREES TRUCTURAS ALGEBRAICAS Y SU INFRAESTRUCTURA
+### Infraestructura algebraica — Estado y plan
 
-Deberíamos tener las definiciones de las principalesest ructuras algebraicasdeunc o nj untosobre  una od osoper aciones:
+#### Estado actual (`Algebra/`)
 
-- Usamos notación aditiva si la operación es conmutativa, usando para este caso la notación de elemento neutro `e`, mientras que si la notación es multiplicativa (más general) usamos la notación de elemento neutro `u`.
+| Módulo | Estructura | Lemas clave | Estado |
+| ------- | ---------- | ------------ | ------ |
+| `Group.lean` | `HFGroup` (axiomas izquierdos mínimos) | cancelación, `inv_inv`, `inv_op`, neutro único, inverso único | ✅ |
+| `GroupHom.lean` | `HFGroupHom` | `hom_e`, `hom_inv`, `ker`, `image` | ✅ |
+| `Subgroup.lean` | `HFSubgroup` | `rightCoset`, `eq_or_disjoint` | ✅ |
+| `Ring.lean` | `HFRing` (unitario, no necesariamente conmutativo) | `neg_neg`, `zero_mul`, `neg_mul`, `toAdditiveHFGroup` | ✅ |
+| `CosetCount.lean` | — | `card_subgroup_dvd_card_group` (Lagrange) | ✅ |
 
-- Magmas $⟨ A, ⋅ ⟩$, dónde  `⋅` es una operación binaria interna (cerrada) sobre $A$.
-- Homomorfismos de magmas $f : A → B$ tal que $f(a ⋅ a′) = f(a) ⋅ f(a′)$ para cada $a, a′ ∈ A$.
-- Submagmas, etc.
-- Semigrupos $⟨ A, ⋅ ⟩$, dónde `⋅` es una operación binaria interna (cerrada) sobre $A$ y es asociativa.
-- Homomorfismos de semigrupos $f : A → B$ tal que $f(a ⋅ a′) = f(a) ⋅ f(a′)$ para cada $a, a′ ∈ A$.
-- Subsemigrupos, etc.
-- Monoides $⟨ A, ⋅, u ⟩$, dónde `⋅` es una operación binaria interna (cerrada) sobre $A$, es asociativa y tiene un elemento neutro $u$ bilateral.
-- Homomorfismos de monoides $f : A → B$ tal que $f(a ⋅ a′) = f(a) ⋅ f(a′)$ para cada $a, a′ ∈ A$ y $f(u) = u$. Además $f(u) = u$ es una consecuencia de la condición de homomorfismo, ya que $f(u) = f(u ⋅ u) = f(u) ⋅ f(u)$, y por lo tanto $f(u)$ es un elemento neutro en $B$. Si el elemento neutro en $B$ es único, entonces necesariamente $f(u) = u$.
-- Submonoides, etc.
-- Bucles $⟨ A, ⋅, u ⟩$, dónde `⋅` es una operación binaria interna (cerrada) sobre $A$, tiene un elemento neutro $u$ bilateral y tiene inverso único por la derecha e inverso único por la izquierda para cada elemento.
-- Homomorfismos de bucles $f : A → B$ tal que $f(a ⋅ a′) = f(a) ⋅ f(a′)$ para cada $a, a′ ∈ A$ y $f(u) = u$. Además $f(u) = u$ es una consecuencia de la condición de homomorfismo, ya que $f(u) = f(u ⋅ u) = f(u) ⋅ f(u)$, y por lo tanto $f(u)$ es un elemento neutro en $B$. Si el elemento neutro en $B$ es único, entonces necesariamente $f(u) = u$.
-- Subbucles, etc.
-- Grupos $⟨ A, ⋅, u ⟩$, dónde `⋅` es una operación binaria interna (cerrada) sobre $A$, es asociativa, tiene un elemento neutro $u$ bilateral y tiene inverso para cada elemento.
-- Homomorfismos de grupos $f : A → B$ tal que $f(a ⋅ a′) = f(a) ⋅ f(a′)$ para cada $a, a′ ∈ A$ y $f(u) = u$. Además $f(u) = u$ es una consecuencia de la condición de homomorfismo, ya que $f(u) = f(u ⋅ u) = f(u) ⋅ f(u)$, y por lo tanto $f(u)$ es un elemento neutro en $B$. Si el elemento neutro en $B$ es único, entonces necesariamente $f(u) = u$.
-- Grupos abelianos $⟨ A, +, e ⟩$, dónde `+` es una operación binaria interna (cerrada) sobre $A$, es asociativa, conmutativa, tiene un elemento neutro $e$ bilateral y tiene inverso para cada elemento.
-- Homomorfismos de grupos abelianos $f : A → B$ tal que $f(a + a′) = f(a) + f(a′)$ para cada $a, a′ ∈ A$
-- Subgrupos, subgrupos normales, característicos y demás.
-- Anillos $⟨ A, +, e, ⋅, u ⟩$, dónde `+` es una operación binaria interna (cerrada) sobre $A$, es asociativa, tiene un elemento neutro $e$ bilateral y tiene inverso para cada elemento, y `⋅` es una operación binaria interna (cerrada) sobre $A$, es asociativa, tiene un elemento neutro $u$ bilateral y distribuye sobre `+`.
-  - $r ⋅ (m + m′) = r ⋅ m + r ⋅ m′$
-  - $(r + r′) ⋅ m = r ⋅ m + r′ ⋅ m$
-  - $(r ⋅ r′) ⋅ m = r ⋅ (r′ ⋅ m)$
-  - $u_A ⋅ m = m$
-- Homomorfismos de anillos $f : A → B$ tal que $f(a + a′) = f(a) + f(a′)$ para cada $a, a′ ∈ A$, $f(e) = e$, $f(a ⋅ a′) = f(a) ⋅ f(a′)$ para cada $a, a′ ∈ A\{e\}$ y $f(u) = u$. Además $f(e) = e$ es una consecuencia de la condición de homomorfismo, ya que $f(e) = f(e + e) = f(e) + f(e)$, y por lo tanto $f(e)$ es un elemento neutro aditivo en $B$. Además, como `⋅` distribuye sobre `+` en $A$, y $f$ es un homomorfismo de anillos, entonces `⋅` también distribuye sobre `+` en $B$.
-- Subanillos, ideales laterales, etc.
-- Homomorfismos de módulos por la izquierda $f : A → B$ tal que $f(a + a′) = f(a) + f(a′)$ para cada $a, a′ ∈ A$, $f(e) = e$, $f(a ⋅ a′) = f(a) ⋅ f(a′)$ para cada $a, a′ ∈ A\{e\}$ y $f(u) = u$. Además $f(e) = e$ es una consecuencia de la condición de homomorfismo, ya que $f(e) = f(e + e) = f(e) + f(e)$, y por lo tanto $f(e)$ es un elemento neutro aditivo en $B$. Además, como `⋅` distribuye sobre `+` en $A$, y $f$ es un homomorfismo de módulos por la izquierda, entonces `⋅` también distribuye sobre `+` en $B$.
-- Módulos por la derecha $⟨ M, \hat{+}, \hat{e}, A, +, ⋅ , e, u  ⟩$, dónde $\hat{+}$ es una operación binaria interna (cerrada) sobre $M$, asociativa, con elemento neutro $\hat{e}$ bilateral. Además $⟨ A, +, ⋅ , e, u  ⟩$ es un anillo ya demás tendremos $\circ$ es una operación binaria externa que asigna a cada par $(m, r) ∈ M × A$ un elemento $m ⋅ r ∈ M$, tal que para cada $r, r′ ∈ A$ y cada $m, m′ ∈ M$, se cumplen las siguientes propiedades:
-  - $(m + m′) ⋅ r = m ⋅ r + m′ ⋅ r$
-  - $m ⋅ (r + r′) = m ⋅ r + m ⋅ r′$
-  - $m ⋅ (r ⋅ r′) = (m ⋅ r) ⋅ r′$
-  - $m ⋅ u_A = m$
-- Homomorfismos de módulos por la derecha $f : A → B$ tal que $f(a + a′) = f(a) + f(a′)$ para cada $a, a′ ∈ A$, $f(e) = e$, $f(a ⋅ a′) = f(a) ⋅ f(a′)$ para cada $a, a′ ∈ A\{e\}$ y $f(u) = u$. Además $f(e) = e$ es una consecuencia de la condición de homomorfismo, ya que $f(e) = f(e + e) = f(e) + f(e)$, y por lo tanto $f(e)$ es un elemento neutro aditivo en $B$. Además, como `⋅` distribuye sobre `+` en $A$, y $f$ es un homomorfismo de módulos por la derecha, entonces `⋅` también distribuye sobre `+` en $B$.
-- Submódulos por la derecha, etc.
-- Espacios Vectoriales $⟨ V, \hat{+}, \hat{e}, K, +, ⋅ , e, u  ⟩$, dónde $\hat{+}$ es una operación binaria interna (cerrada) sobre $V$, asociativa, con elemento neutro $\hat{e}$ bilateral. Además $⟨ K, +, ⋅ , e, u  ⟩$ es un cuerpo ya demás tendremos $\circ$ es una operación binaria externa que asigna a cada par $(r, v) ∈ K × V$ un elemento $r ⋅ v ∈ V$, tal que para cada $r, r′ ∈ K$ y cada $v, v′ ∈ V$, se cumplen las siguientes propiedades:
-  - $r ⋅ (v + v′) = r ⋅ v + r ⋅ v′$
-  - $(r + r′) ⋅ v = r ⋅ v + r′ ⋅ v$
-  - $(r ⋅ r′) ⋅ v = r ⋅ (r′ ⋅ v)$
-  - $u_K ⋅ v = v$
-- Homomorfismos de espacios vectoriales $f : A → B$ tal que $f(a + a′) = f(a) + f(a′)$ para cada $a, a′ ∈ A$, $f(e) = e$, $f(a ⋅ a′) = f(a) ⋅ f(a′)$ para cada $a, a′ ∈ A\{e\}$ y $f(u) = u$. Además $f(e) = e$ es una consecuencia de la condición de homomorfismo, ya que $f(e) = f(e + e) = f(e) + f(e)$, y por lo tanto $f(e)$ es un elemento neutro aditivo en $B$. Además, como `⋅` distribuye sobre `+` en $A$, y $f$ es un homomorfismo de espacios vectoriales, entonces `⋅` también distribuye sobre `+` en $B$.
-- Subespacios Vectoriales, etc.
-- Álgebras sobre Módulos izquierdos $⟨ M, \hat{+}, \hat{e}, A, +, ⋅ , e, u  ⟩$, que añade una 'multiplicación' sobre  dónde $\hat{\cdot}$ es una operación binaria interna (cerrada) sobre $M$, que puede ser asociativa o no, tener elemento neutro multiplicativo ($\hat{u}$) o no, y que distribuye sobre $\hat{+}$, y es compatible con la operación de módulo por la izquierda.
-- Homomorfismos de álgebras sobre módulos izquierdos $f : A → B$ tal que $f(a + a′) = f(a) + f(a′)$ para cada $a, a′ ∈ A$, $f(e) = e$, $f(a ⋅ a′) = f(a) ⋅ f(a′)$ para cada $a, a′ ∈ A\{e\}$ y $f(u) = u$. Además $f(e) = e$ es una consecuencia de la condición de homomorfismo, ya que $f(e) = f(e + e) = f(e) + f(e)$, y por lo tanto $f(e)$ es un elemento neutro aditivo en $B$. Además, como `⋅` distribuye sobre `+` en $A$, y $f$ es un homomorfismo de álgebras sobre módulos izquierdos, entonces `⋅` también distribuye sobre `+` en $B$. Además, como $\hat{\cdot}$ distribuye sobre $\hat{+}$ en $A$, y $f$ es un homomorfismo de álgebras sobre módulos izquierdos, entonces $\hat{\cdot}$ también distribuye sobre $\hat{+}$ en $B$. Además, si $\hat{u}$ es un elemento neutro multiplicativo para $\hat{\cdot}$ en $A$, entonces necesariamente $f(\hat{u})$ es un elemento neutro multiplicativo para $\hat{\cdot}$ en $B$.
-- Álgebras sobre Módulos derechos $⟨ M, \hat{+}, \hat{e}, A, +, ⋅ , e, u  ⟩$, que añade una 'multiplicación' sobre  dónde $\hat{\cdot}$ es una operación binaria interna (cerrada) sobre $M$, que puede ser asociativa o no, tener elemento neutro multiplicativo ($\hat{u}$) o no, y que distribuye sobre $\hat{+}$, y es compatible con la operación de módulo por la derecha.
-- Homomorfismos de álgebras sobre módulos derechos $f : A → B$ tal que $f(a + a′) = f(a) + f(a′)$ para cada $a, a′ ∈ A$, $f(e) = e$, $f(a ⋅ a′) = f(a) ⋅ f(a′)$ para cada $a, a′ ∈ A\{e\}$ y $f(u) = u$. Además $f(e) = e$ es una consecuencia de la condición de homomorfismo, ya que $f(e) = f(e + e) = f(e) + f(e)$, y por lo tanto $f(e)$ es un elemento neutro aditivo en $B$. Además, como `⋅` distribuye sobre `+` en $A$, y $f$ es un homomorfismo de álgebras sobre módulos derechos, entonces `⋅` también distribuye sobre `+` en $B$. Además, como $\hat{\cdot}$ distribuye sobre $\hat{+}$ en $A$, y $f$ es un homomorfismo de álgebras sobre módulos derechos, entonces $\hat{\cdot}$ también distribuye sobre $\hat{+}$ en $B$. Además, si $\hat{u}$ es un elemento neutro multiplicativo para $\hat{\cdot}$ en $A$, entonces necesariamente $f(\hat{u})$ es un elemento neutro multiplicativo para $\hat{\cdot}$ en $B$.
-- Álgebras sobre bimódulos $⟨ M, \hat{+}, \hat{e}, A, +, ⋅ , e, u  ⟩$, que añade una 'multiplicación' sobre  dónde $\hat{\cdot}$ es una operación binaria interna (cerrada) sobre $M$, que puede ser asociativa o no, tener elemento neutro multiplicativo ($\hat{u}$) o no, y que distribuye sobre $\hat{+}$, y es compatible con la operación de módulo por la izquierda y por la derecha.
-- Homomorfismos de álgebras sobre bimódulos $f : A → B$ tal que $f(a + a′) = f(a) + f(a′)$ para cada $a, a′ ∈ A$, $f(e) = e$, $f(a ⋅ a′) = f(a) ⋅ f(a′)$ para cada $a, a′ ∈ A\{e\}$ y $f(u) = u$. Además $f(e) = e$ es una consecuencia de la condición de homomorfismo, ya que $f(e) = f(e + e) = f(e) + f(e)$, y por lo tanto $f(e)$ es un elemento neutro aditivo en $B$. Además, como `⋅` distribuye sobre `+` en $A$, y $f$ es un homomorfismo de álgebras sobre bimódulos, entonces `⋅` también distribuye sobre `+` en $B$. Además, como $\hat{\cdot}$ distribuye sobre $\hat{+}$ en $A$, y $f$ es un homomorfismo de álgebras sobre bimódulos, entonces $\hat{\cdot}$ también distribuye sobre $\hat{+}$ en $B$. Además, si $\hat{u}$ es un elemento neutro multiplicativo para $\hat{\cdot}$ en $A$, entonces necesariamente $f(\hat{u})$ es un elemento neutro multiplicativo para $\hat{\cdot}$ en $B$.
-- Álgebras no asociativas (de Lie, de Jordan, etc.) junto con los homomorfismos elegidos.
-- Álgebras sobre espacios vectoriales, junto con los homomorfismos elegidos.
-- Álgebras de Cayley-Dickson, junto con los homomorfismos elegidos.
+Nota de diseño: todas las estructuras son `structure` HFSet-nativas (no typeclasses de Lean). Elección intencional: el proyecto trabaja con conjuntos HFSet concretos como portadores, no con tipos abstractos.
+
+#### Jerarquía propuesta
+
+| # | Estructura | Notación | Nombre propuesto | Prioridad |
+| - | ---------- | -------- | ---------------- | --------- |
+| 1 | Magma $\langle A, \cdot\rangle$ | mult. | `HFMagma` | Baja |
+| 2 | Semigrupo $\langle A, \cdot\rangle$ | mult. | `HFSemigroup` | Baja |
+| 3 | Monoide $\langle A, \cdot, u\rangle$ | mult. | `HFMonoid` | **Media** — útil para `IsMultiplicative` (C4) |
+| 4 | Bucle $\langle A, \cdot, u\rangle$ | mult. | `HFLoop` | Muy baja |
+| 5 | Grupo $\langle A, \cdot, u, \mathrm{inv}\rangle$ | mult. | ✅ `HFGroup` | — |
+| 6 | Grupo abeliano $\langle A, +, e\rangle$ | adit. | ✅ (vía `HFRing.add`) | — |
+| 7 | Anillo $\langle A, +, \cdot, 0, 1\rangle$ | ambas | ✅ `HFRing` | — |
+| 8 | Cuerpo $\langle A, +, \cdot, 0, 1, \mathrm{inv}_\times\rangle$ | ambas | `HFField` | Baja |
+| 9 | Módulo izquierdo $\langle M, \hat{+}, R, \circ\rangle$ | ambas | `HFModuleLeft` | Baja |
+| 10 | Espacio vectorial $\langle V, \hat{+}, K, \circ\rangle$ | ambas | `HFVectorSpace` | Muy baja |
+| 11 | Álgebra asociativa | ambas | `HFAlgebra` | Muy baja |
+| 12 | Álgebra de Lie $\langle A, [\cdot,\cdot]\rangle$ | — | `HFLieAlgebra` | Ninguna |
+| 13 | Álgebra de Jordan | — | `HFJordanAlgebra` | Ninguna |
+| 14 | Álgebra de Cayley-Dickson | — | `HFCayleyDickson` | Ninguna |
+
+Notación: **aditiva** (`+`, `e`, `-`) para operaciones conmutativas; **multiplicativa** (`·`, `u`, `inv`) para el caso general. Regla general: `f(u) = u` se deduce de `f(u·u) = f(u)·f(u)` si el neutro es único en el codominio.
+
+#### Prioridades para el proyecto
+
+**A corto plazo:**
+
+- `HFMonoid` — base para `IsMultiplicative` y convolución de Dirichlet (C4). El espacio de funciones $\mathbb{N}_0 \to \mathbb{Z}_0$ con multiplicación puntual y convolución de Dirichlet tiene estructura de monoide.
+
+**A medio plazo — opcional:**
+
+- `HFField` y `HFVectorSpace` solo si se desarrolla álgebra lineal sobre $\mathbb{Z}/p\mathbb{Z}$ u otro cuerpo finito; actualmente no hay objetivo concreto.
+
+**Fuera del alcance del proyecto actual:**
+
+- Módulos en general (necesitan anillo de escalares externo, complica la infraestructura HFSet).
+- Álgebras de Lie, Jordan, Cayley-Dickson.
 
 ---
 

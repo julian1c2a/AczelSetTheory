@@ -3,3 +3,8 @@ import AczelSetTheory.Algebra.Subgroup
 import AczelSetTheory.Algebra.GroupHom
 import AczelSetTheory.Algebra.Ring
 import AczelSetTheory.Algebra.CosetCount
+import AczelSetTheory.Algebra.Monoid
+import AczelSetTheory.Algebra.RingHom
+import AczelSetTheory.Algebra.Field
+import AczelSetTheory.Algebra.Module
+import AczelSetTheory.Algebra.LinearSpace
