@@ -6,21 +6,6 @@ License: MIT
 
 -- AczelSetTheory/Algebra/CosetCount.lean
 -- Conteo de cosetes y Teorema de Lagrange.
---
--- Público (HFSet):
---   HFSet.sUnion_insert               : sUnion (insert C F) = union C (sUnion F)
---   HFSet.card_sUnion_uniform_partition : partición uniforme → card(⋃F) = card(F) · k
---
--- Público (HFSubgroup):
---   HFSubgroup.card_rightCoset_eq_card_H  : card(Ha) = card(H)  (a ∈ G general)
---   HFSubgroup.cosets                     : conjunto de cosetes derechos
---   HFSubgroup.mem_cosets                 : C ∈ cosets ↔ ∃ a ∈ G, C = Ha
---   HFSubgroup.index                      : card(cosets)
---   HFSubgroup.cosets_cover               : sUnion(cosets) = G
---   HFSubgroup.cosets_pairwise_disjoint   : cosetes distintos son disjuntos
---   HFSubgroup.coset_card_eq              : ∀ C ∈ cosets, card C = card H
---   HFSubgroup.card_G_eq_card_H_mul_index : card G = card(cosets) · card H  (9)
---   HFSubgroup.card_subgroup_dvd_card_group : card H ∣ card G  (Lagrange, 10)
 
 import AczelSetTheory.Algebra.Subgroup
 import AczelSetTheory.Axioms.OrdinalNat
@@ -290,3 +275,22 @@ theorem card_subgroup_dvd_card_group (sub : HFSubgroup grp) :
 end HFSubgroup
 
 end HFAlgebra
+
+-- ======================================================================
+-- Exports
+-- ======================================================================
+--
+-- Público (HFSet):
+--   HFSet.sUnion_insert               : sUnion (insert C F) = union C (sUnion F)
+--   HFSet.card_sUnion_uniform_partition : partición uniforme → card(⋃F) = card(F) · k
+--
+-- Público (HFAlgebra.HFSubgroup):
+--   HFSubgroup.card_rightCoset_eq_card_H    : card(Ha) = card(H)  (a ∈ G general)
+--   HFSubgroup.cosets                       : conjunto de cosetes derechos
+--   HFSubgroup.mem_cosets                   : C ∈ cosets ↔ ∃ a ∈ G, C = Ha
+--   HFSubgroup.index                        : card(cosets)
+--   HFSubgroup.cosets_cover                 : sUnion(cosets) = G
+--   HFSubgroup.cosets_pairwise_disjoint     : cosetes distintos son disjuntos
+--   HFSubgroup.coset_card_eq                : ∀ C ∈ cosets, card C = card H
+--   HFSubgroup.card_G_eq_card_H_mul_index   : card G = card(cosets) · card H  (9)
+--   HFSubgroup.card_subgroup_dvd_card_group : card H ∣ card G  (Lagrange, 10)

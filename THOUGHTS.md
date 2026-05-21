@@ -1192,42 +1192,63 @@ padicVal p n          ← base de todo
             └── σ_k(n)         (suma de d^k)
 ```
 
-#### Funciones con signo: decisión abierta
+#### Funciones con signo: decisión tomada ✅
 
-| Función | Valores | ¿Hay ℤ en Peano? |
+| Función | Valores | Implementación |
 | --------- | --------- | ------------------ |
-| μ(n) | −1, 0, 1 | **No** — solo ℕ₀ |
-| λ(n) | −1, 1 | **No** |
+| μ(n) | −1, 0, 1 | **`ℤ₀`** — tipo enteros del proyecto (`Integers/Basic.lean`) |
+| λ(n) | −1, 1 | **`ℤ₀`** — `negOnePow (Omega_prime n)` |
 
-Para μ y λ hay tres caminos:
-
-- **(a)** Usar el `Int` nativo de Lean: `μ : ℕ₀ → ℤ`, transporte directo.
-- **(b)** Codificación `Bool × ℕ₀` (signo + magnitud). Más engorroso.
-- **(c)** Definir solo predicados (`μ_pos`, `μ_neg`, `μ_zero`) como `Prop`. Sin extraer el entero.
-
-Los caminos (a) y (c) son los limpios. El proyecto hasta ahora es 100% ℕ₀; entrar en ℤ es un cambio de registro.
+Se eligió el camino **(a-prima)**: usar `ℤ₀`, el tipo de enteros propio del proyecto (cociente `Quotient intSetoid`), no el `Int` nativo de Lean. Esto mantiene la coherencia total con el resto del proyecto y permitió demostrar `liouville_mul` y `liouville_prime_pow` directamente en el universo `ℤ₀`. Ambos módulos (`PadicVal.lean` #97, `MobiusLiouville.lean` #98) compilan sin sorry desde el 2026-05-21.
 
 #### Propuesta de fases
 
-| Fase | Contenido | Dificultad |
-| ------ | ----------- | ------------ |
-| **C1** | `padicVal`, `squarefree`, `rad`, `ω`, `Ω` | Media |
-| **C2** | `divisors`, `d(n)=τ`, `σ`, `σ_k` | Media |
-| **C3** | `μ` y `λ` (con decisión de signo) | Alta |
-| **C4** | `IsMultiplicative`, convolución de Dirichlet, inversión de Möbius | Muy alta |
-| **C5** | Transport de todo lo anterior a HFSet vía vN | Baja (patrón establecido) |
+| Fase | Contenido | Dificultad | Estado |
+| ------ | ----------- | ------------ | ------ |
+| **C1** | `padicVal`, `squarefree`, `Ω` | Media | ✅ Completo — `Integers/PadicVal.lean` (#97) |
+| **C1'** | `rad` (radical), `ω` (# primos distintos) | Media | ⏳ Pendiente |
+| **C2** | `divisors`, `d(n)=τ`, `σ`, `σ_k` | Media | ⏳ Pendiente |
+| **C3** | `μ` y `λ` en `ℤ₀` | Alta | ✅ Completo — `Integers/MobiusLiouville.lean` (#98) |
+| **C4** | `IsMultiplicative`, convolución de Dirichlet, inversión de Möbius | Muy alta | ⏳ Pendiente |
+| **C5** | Transport de todo lo anterior a HFSet vía vN | Baja (patrón establecido) | ⏳ Pendiente |
 
-C1+C2 son directamente factibles con lo que ya hay. C3 depende de la decisión sobre ℤ. C4 es territorio de formalización seria (Mathlib-level).
+C1 y C3 están completos. C1' y C2 son factibles con los primitivos de Peano disponibles. C4 es territorio de formalización seria (Mathlib-level).
 
 #### Decisiones de diseño pendientes
 
 1. **¿Dónde implementar `padicVal`, `divisors`, `d`, `σ`?**
    - **Opción A — En Peano** (añadir módulos a peanolib): garantiza que los resultados son lemas Peano transportables con el patrón `congrArg vN`. Consistente con Fermat, Wilson y CRT.
    - **Opción B — Directamente en AczelSetTheory** usando los primitivos de HFSet (`filter`, `card`, etc.): más rápido, pero rompe la simetría del proyecto.
+   - **Estado (2026-05-21):** `padicVal` y `Omega_prime` se implementaron directamente en AczelSetTheory (Opción B), usando los primitivos de `Peano.PeanoNat.{Arith,Primes,WellFounded,Div}`. Funciona bien.
 
-2. **Para μ y λ: ¿`Int` nativo de Lean o solo predicados?**
+2. ~~**Para μ y λ: ¿`Int` nativo de Lean o solo predicados?**~~ → **Resuelto:** se usa `ℤ₀` propio del proyecto.
 
-3. **¿Llegar hasta la inversión de Möbius (C4), o solo las funciones individuales con sus propiedades clave?**
+3. **¿Llegar hasta la inversión de Möbius (C4), o solo las funciones individuales con sus propiedades clave?** → Abierto.
+
+---
+
+#### Actualización: estado 2026-05-21 ✅
+
+Los módulos `Integers/PadicVal.lean` (#97) y `Integers/MobiusLiouville.lean` (#98) están **completamente libres de sorry**.
+
+**Logros en C1 — `Integers/PadicVal.lean`:**
+
+- `padicVal p n` — valuación p-ádica, recursión `n / p` con terminación demostrada.
+- `squarefree n` — predicado ∀p primo, `padicVal p n ≤ 1`.
+- `Omega_prime n` — Ω(n), factores primos con multiplicidad; recursión sobre `smallestDivisor`.
+- **`Omega_prime_mul`** — **probado sin sorry** mediante inducción fuerte sobre `n`, descomponiendo `n = smallestDivisor n · (n / smallestDivisor n)` y analizando si `smallestDivisor (m·n)` divide a `m` o a `n`. Era el sorry crítico que bloqueaba toda la Capa 2.
+- **`Omega_prime_mul_prime`** — caso especial Ω(m·p) = 1 + Ω(m), probado por inducción fuerte independiente.
+
+**Logros en C3 — `Integers/MobiusLiouville.lean`:**
+
+- `negOnePow k` — (−1)^k ∈ ℤ₀ por recursión estructural; `negOnePow_add`, `negOnePow_mul_self`.
+- `mobius n` — μ(n) = (−1)^Ω(n) si squarefree, 0 si no (noncomputable).
+- `liouville n` — λ(n) = (−1)^Ω(n) (noncomputable).
+- **`liouville_mul`** — λ(m·n) = λ(m)·λ(n) para m,n ≠ 0; se apoya directamente en `Omega_prime_mul`.
+- **`liouville_prime_pow`** — λ(p^k) = (−1)^k para p primo; por inducción sobre k.
+- `mobius_eq_liouville_of_squarefree`, `mobius_sq`, `liouville_sq`, `liouville_ne_zero`.
+
+**Pendiente:**  `rad` (radical), `ω` (# de primos distintos), `divisors`, `τ`, `σ`, convolución de Dirichlet.
 
 ---
 

@@ -132,8 +132,8 @@ Below are the keys for reading and searching theorems.
 | 94 | `AczelSetTheory/Integers/Functions.lean` | `ℤ₀` | ✅ Complete | Integers/Order | Integers/Arithmetic, Integers/Bijection |
 | 95 | `AczelSetTheory/Integers/Arithmetic.lean` | `ℤ₀` | ✅ Complete | Integers/Functions, `Peano.PeanoNat.{Div,Arith}` | Integers.lean |
 | 96 | `AczelSetTheory/Integers/Bijection.lean` | `ℤ₀` | ✅ Complete | Integers/Functions, `Peano.PeanoNat.Pairing` | Integers.lean |
-| 97 | `AczelSetTheory/Integers/PadicVal.lean` | `ℤ₀` | ⚠ 1 sorry | PList/Omega0, `Peano.PeanoNat.{Arith,Primes,WellFounded,Div}` | Integers/MobiusLiouville |
-| 98 | `AczelSetTheory/Integers/MobiusLiouville.lean` | `ℤ₀` | ⚠ 1 sorry | Integers/Basic, Integers/PadicVal | Integers.lean |
+| 97 | `AczelSetTheory/Integers/PadicVal.lean` | `ℤ₀` | ✅ Complete | PList/Omega0, `Peano.PeanoNat.{Arith,Primes,WellFounded,Div}` | Integers/MobiusLiouville |
+| 98 | `AczelSetTheory/Integers/MobiusLiouville.lean` | `ℤ₀` | ✅ Complete | Integers/Basic, Integers/PadicVal | Integers.lean |
 | — | `AczelSetTheory/VN.lean` | — | ✅ Complete | VN/{Basic,Injective,IsNat,Arithmetic,FSet,PeanoAxioms,PeanoArith,PowVN,SubVN,DivVN,FactorialVN,CardVN,RankVN} | AczelSetTheory.lean |
 | — | `AczelSetTheory/PList.lean` | — | ✅ Complete | PList/{Basic,Lemmas,Omega0} | AczelSetTheory.lean |
 | — | `AczelSetTheory/Integers.lean` | — | ✅ Complete | Integers/{Basic,Order,Functions,Arithmetic,Bijection,PadicVal,MobiusLiouville} | AczelSetTheory.lean |
@@ -180,7 +180,7 @@ PList/Omega0 + Peano.PeanoNat.{Sub,Mul,Decidable}
                  └─ Integers/Bijection.lean ───────────┤
                                                        └─ Integers.lean
 PList/Omega0 + Peano.PeanoNat.{Arith,Primes,WellFounded,Div}
-  └─ Integers/PadicVal.lean  ⚠ Omega_prime_mul: sorry
+  └─ Integers/PadicVal.lean  ✅ Complete
        └─ Integers/MobiusLiouville.lean ─────────────── Integers.lean
             (also imports Integers/Basic)
 ```
@@ -483,7 +483,7 @@ Key proven theorems (non-sorry):
 `negOnePow`, `negOnePow_zero`, `negOnePow_succ`, `negOnePow_one`, `negOnePow_two`, `negOnePow_add`, `negOnePow_mul_self`, `mobius`, `mobius_one`, `mobius_prime`, `mobius_prime_sq`, `liouville`, `liouville_one`, `liouville_prime`, `liouville_sq`, `liouville_ne_zero`, `mobius_eq_liouville_of_squarefree`, `mobius_sq`, `liouville_mul`, `liouville_prime_pow`
 
 **`Integers/PadicVal.lean` (public API):**
-`squarefree`, `padicVal`, `Omega_prime`, `Omega_prime_mul_prime`, `Omega_prime_mul` ⚠ sorry
+`padicVal`, `padicVal_zero_right`, `padicVal_of_not_cond`, `padicVal_succ_dvd`, `padicVal_prime_self`, `padicVal_prime_of_ndvd`, `squarefree`, `squarefree_one`, `squarefree_prime`, `not_squarefree_prime_sq`, `Omega_prime`, `Omega_prime_zero`, `Omega_prime_one`, `Omega_prime_prime`, `Omega_prime_mul`, `Omega_prime_mul_prime`
 
 ---
 
@@ -530,6 +530,7 @@ Key proven theorems (non-sorry):
 | 2026-05-17 | Axioms/NPow (#86): `mem_nPow_zero`, `mem_nPow_succ` — caracterización axiomática de membresía en `nPow` (Phase 7g) | Claude (AI assistant) |
 | 2026-05-17 | VN/PowVN (#79): `powVN`, `vN_pow` y 13 teoremas de potenciación; VN/SubVN (#80): 12 teoremas de sustracción acotada; VN/DivVN (#81): 6 teoremas de división euclidiana; VN/FactorialVN (#82): `factVN`, `vN_factorial_succ` y 8 teoremas de factorial — fases A1–A3, C1 | Claude (AI assistant) |
 | 2026-05-17 | Axioms/Rank (#83): `HFSet.rank`, `rank_empty`, `rank_insert` (rango de Von Neumann); VN/RankVN (#84): `VN.rank_vN` — fase B1 | Claude (AI assistant) |
+| 2026-05-21 | `Integers/PadicVal.lean` (#97), `Integers/MobiusLiouville.lean` (#98): `Omega_prime_mul` y `Omega_prime_mul_prime` probados sin sorry; `liouville_mul`, `liouville_prime_pow` ahora sorry-free; estado de módulos #97 y #98 actualizado a `✅ Complete`; API de PadicVal ampliada con todos los lemas (`padicVal_zero_right`, `padicVal_of_not_cond`, `padicVal_succ_dvd`, `padicVal_prime_self`, `padicVal_prime_of_ndvd`, `squarefree_one`, `squarefree_prime`, `not_squarefree_prime_sq`, `Omega_prime_zero`, `Omega_prime_one`, `Omega_prime_prime`); tabla §6.66 ampliada con 13 nuevos teoremas de PadicVal | Claude (AI assistant) |
 | 2026-05-22 | Integers/{Basic,Order,Functions,Arithmetic,Bijection,PadicVal,MobiusLiouville}.lean (#92–#98): entradas de módulos, cadena de dependencias, namespace `ℤ₀`, definiciones clave (negOnePow, mobius, liouville, Omega_prime), 17 teoremas incluyendo `liouville_prime_pow` — actualización_documentación completa de Integers/ | Claude (AI assistant) |
 
 > To project a file: read it fully, then update sections 1–8 above following AI-GUIDE.md §4–14.
