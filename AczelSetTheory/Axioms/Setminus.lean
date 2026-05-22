@@ -54,4 +54,14 @@ theorem mem_setminus
 theorem setminus_subset (A B : HFSet) : setminus A B ⊆ A :=
   fun x hx => ((mem_setminus A B x).mp hx).1
 
+theorem setminus_setminus_of_subset {A X : HFSet} (h : A ⊆ X) :
+    setminus X (setminus X A) = A := by
+  apply extensionality; intro x
+  rw [mem_setminus, mem_setminus]
+  constructor
+  · rintro ⟨hxX, hnot⟩
+    exact Classical.byContradiction (fun hna => hnot ⟨hxX, hna⟩)
+  · intro hxA
+    exact ⟨h x hxA, fun ⟨_, hna⟩ => hna hxA⟩
+
 end HFSet

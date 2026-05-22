@@ -86,8 +86,12 @@ noncomputable def HFTopSpace.closure (ts : HFTopSpace) (A : HFSet) : HFSet :=
 /-- La clausura es un cerrado, i.e., su complemento es abierto. -/
 theorem HFTopSpace.closure_closed (ts : HFTopSpace) (A : HFSet) :
     HFSet.setminus ts.X (ts.closure A) ∈ ts.τ := by
-  -- X \ cl(A) = int(X \ A), que es abierto
-  exact sorry
+  -- X \ cl(A) = X \ (X \ int(X\A)) = int(X\A), que es abierto
+  have hsub : ts.interior (HFSet.setminus ts.X A) ⊆ ts.X :=
+    fun x hx => (HFSet.mem_setminus ts.X A x).mp (ts.interior_subset _ x hx) |>.1
+  unfold closure
+  rw [HFSet.setminus_setminus_of_subset hsub]
+  exact ts.interior_open _
 
 /-- `A` está contenido en su clausura. -/
 theorem HFTopSpace.subset_closure (ts : HFTopSpace) {A : HFSet} (hA : A ⊆ ts.X) :
@@ -105,9 +109,13 @@ theorem HFTopSpace.subset_closure (ts : HFTopSpace) {A : HFSet} (hA : A ⊆ ts.X
     exact hmem.2 hxA
 
 /-- Si `A` es cerrado entonces `cl(A) = A`. -/
-theorem HFTopSpace.closure_eq_of_closed (ts : HFTopSpace) {A : HFSet} (hcl : ts.isClosed A) :
+theorem HFTopSpace.closure_eq_of_closed (ts : HFTopSpace) {A : HFSet}
+    (hcl : ts.isClosed A) (hA : A ⊆ ts.X) :
     ts.closure A = A := by
-  exact sorry
+  -- interior(X\A) = X\A (por isClosed); luego X\(X\A) = A (por hA)
+  unfold closure
+  rw [ts.interior_eq_of_open hcl]
+  exact HFSet.setminus_setminus_of_subset hA
 
 /-! ## Exterior -/
 
@@ -196,9 +204,13 @@ theorem HFTopSpace.isAdherencePt_iff_mem_closure (ts : HFTopSpace) {x A : HFSet}
   · intro ⟨hxX, hni⟩
     refine ⟨hxX, ?_⟩
     intro U hUτ hxU
-    -- Dirección mpr: si x ∈ cl(A), todo abierto U ∋ x intersecta A
-    -- Si U ∩ A = ∅, entonces U ⊆ X\A, luego x ∈ int(X\A), contradicción
-    exact sorry
+    -- Si U ∩ A = ∅ entonces U ⊆ X\A, luego x ∈ int(X\A); contradice hni
+    apply Classical.byContradiction; intro hna
+    have hUsub : U ⊆ HFSet.setminus ts.X A := by
+      intro y hyU
+      rw [HFSet.mem_setminus]
+      exact ⟨ts.τ_sub hUτ y hyU, fun hyA => hna ⟨y, hyA, hyU⟩⟩
+    exact hni (ts.interior_largest (HFSet.setminus ts.X A) hUτ hUsub x hxU)
 
 /-! ### Partición: interior ∪ exterior ∪ frontera = X -/
 

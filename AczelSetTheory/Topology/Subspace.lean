@@ -42,12 +42,19 @@ noncomputable def HFTopSpace.subspace (ts : HFTopSpace) (A : HFSet) (hA : A ⊆ 
     rw [HFSet.mem_sep]
     refine ⟨(HFSet.mem_powerset A HFSet.empty).mpr (HFSet.empty_subset A),
            HFSet.empty, ts.empty_mem, ?_⟩
-    exact sorry
+    -- ∅ = inter ∅ A: ambos lados son vacíos
+    apply HFSet.extensionality; intro x
+    rw [HFSet.mem_inter]
+    exact ⟨fun h => absurd h (HFSet.not_mem_empty x),
+           fun ⟨h, _⟩ => absurd h (HFSet.not_mem_empty x)⟩
   univ_mem   := by
     rw [HFSet.mem_sep]
     refine ⟨(HFSet.mem_powerset A A).mpr (HFSet.subset_refl A),
            ts.X, ts.univ_mem, ?_⟩
-    exact sorry
+    -- A = inter X A porque A ⊆ X
+    apply HFSet.extensionality; intro x
+    rw [HFSet.mem_inter]
+    exact ⟨fun h => ⟨hA x h, h⟩, And.right⟩
   sUnion_mem := by
     intro F hFτ
     rw [HFSet.subset_iff] at hFτ
@@ -68,7 +75,19 @@ noncomputable def HFTopSpace.subspace (ts : HFTopSpace) (A : HFSet) (hA : A ⊆ 
         rw [HFSet.subset_iff]; intro U hU
         rw [HFSet.mem_sep] at hU; exact hU.1
       · apply HFSet.extensionality; intro x
-        exact sorry
+        -- sUnion F = inter (sUnion G) A
+        rw [HFSet.mem_inter, HFSet.mem_sUnion, HFSet.mem_sUnion]
+        constructor
+        · rintro ⟨V, hVF, hxV⟩
+          -- V ∈ F y F ⊆ subτ, luego V = inter U₀ A para algún U₀ ∈ ts.τ
+          have hVsep := hFτ V hVF
+          rw [HFSet.mem_sep] at hVsep
+          obtain ⟨_, U₀, hU₀τ, rfl⟩ := hVsep
+          rw [HFSet.mem_inter] at hxV
+          exact ⟨⟨U₀, by rw [HFSet.mem_sep]; exact ⟨hU₀τ, hVF⟩, hxV.1⟩, hxV.2⟩
+        · rintro ⟨⟨U, hUG, hxU⟩, hxA⟩
+          rw [HFSet.mem_sep] at hUG
+          exact ⟨HFSet.inter U A, hUG.2, by rw [HFSet.mem_inter]; exact ⟨hxU, hxA⟩⟩
   inter_mem  := by
     intro U V hU hV
     rw [HFSet.mem_sep] at hU hV ⊢
@@ -80,7 +99,15 @@ noncomputable def HFTopSpace.subspace (ts : HFTopSpace) (A : HFSet) (hA : A ⊆ 
       rw [HFSet.mem_inter, HFSet.mem_inter] at hz
       exact hz.1.2
     · refine ⟨HFSet.inter U₀ V₀, ts.inter_mem hU₀τ hV₀τ, ?_⟩
-      exact sorry
+      -- (U₀∩A) ∩ (V₀∩A) = (U₀∩V₀) ∩ A
+      apply HFSet.extensionality; intro z
+      rw [HFSet.mem_inter, HFSet.mem_inter, HFSet.mem_inter,
+          HFSet.mem_inter, HFSet.mem_inter]
+      constructor
+      · rintro ⟨⟨hzU, hzA⟩, hzV, _⟩
+        exact ⟨⟨hzU, hzV⟩, hzA⟩
+      · rintro ⟨⟨hzU, hzV⟩, hzA⟩
+        exact ⟨⟨hzU, hzA⟩, hzV, hzA⟩
 
 /-! ## Aplicaciones continuas -/
 
@@ -143,7 +170,15 @@ theorem preimage_inter (ts₁ ts₂ : HFTopSpace) (f : HFContinuous ts₁ ts₂)
     ts₁.preimage f.f (HFSet.inter V₁ V₂) =
     HFSet.inter (ts₁.preimage f.f V₁) (ts₁.preimage f.f V₂) := by
   apply HFSet.extensionality; intro x
-  exact sorry
+  -- Expandir en orden: preimage del inter, luego inter de preimages
+  rw [HFTopSpace.mem_preimage, HFSet.mem_inter,  -- LHS: x∈X ∧ f(x)∈V₁ ∧ f(x)∈V₂
+      HFSet.mem_inter,                           -- RHS: x∈preimage V₁ ∧ x∈preimage V₂
+      HFTopSpace.mem_preimage, HFTopSpace.mem_preimage]  -- x∈preimage Vⱼ ↔ x∈X ∧ f(x)∈Vⱼ
+  constructor
+  · rintro ⟨hxX, hf1, hf2⟩
+    exact ⟨⟨hxX, hf1⟩, hxX, hf2⟩
+  · rintro ⟨⟨hxX, hf1⟩, _, hf2⟩
+    exact ⟨hxX, hf1, hf2⟩
 
 end HFContinuous
 

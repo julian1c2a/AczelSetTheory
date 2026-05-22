@@ -180,9 +180,24 @@ theorem toNeighborSpace_toTopSpace_τ (ts : HFTopSpace) :
   rw [HFSet.mem_sep]
   constructor
   · rintro ⟨_, hopen⟩
-    -- Si todo punto tiene U como entorno (con abierto U ⊆ U en τ), entonces U ∈ τ
-    -- Recuperamos: U ∈ τ directamente de que U es el abierto testigo
-    sorry
+    -- U = sUnion {τ ’ | V ⊆ U}: para x ∈ U hay V ∈ τ con x ∈ V ⊆ U
+    have hU_eq : U = HFSet.sUnion (HFSet.sep ts.τ (fun V => V ⊆ U)) := by
+      apply HFSet.extensionality; intro x
+      rw [HFSet.mem_sUnion]
+      constructor
+      · intro hxU
+        have hxN := hopen x hxU
+        rw [HFSet.mem_sep] at hxN
+        obtain ⟨_, V, hVτ, hxV, hVU⟩ := hxN
+        exact ⟨V, by rw [HFSet.mem_sep]; exact ⟨hVτ, hVU⟩, hxV⟩
+      · rintro ⟨V, hVsep, hxV⟩
+        rw [HFSet.mem_sep] at hVsep
+        exact hVsep.2 x hxV
+    rw [hU_eq]
+    apply ts.sUnion_mem
+    intro V hV
+    rw [HFSet.mem_sep] at hV
+    exact hV.1
   · intro hUτ
     exact ⟨(HFSet.mem_powerset ts.X U).mpr (ts.τ_sub hUτ),
            fun x hx => by
@@ -198,13 +213,33 @@ theorem toTopSpace_toNeighborSpace_𝒩 (ns : HFNeighborSpace) (x : HFSet) (hx :
   simp only [HFTopSpace.toNeighborSpace, HFNeighborSpace.toTopSpace]
   rw [HFSet.mem_sep]
   constructor
-  · rintro ⟨_, U, hUτ, hxU, hUN⟩
+  · rintro ⟨hNX, U, hUτ, hxU, hUN⟩
     rw [HFSet.mem_sep] at hUτ
-    -- U ∈ 𝒩(x) (por hUτ.2 x hxU), y U ⊆ N, y N ⊆ X (por τ_sub)
-    apply ns.up_closed hx (hUτ.2 x hxU) hUN
-    exact (HFSet.mem_powerset ns.X N).mp (by
-      have := hUτ.1; exact sorry)
+    -- U ∈ 𝒩(x) (de hUτ.2), N ⊇ U y N ⊆ X (de hNX)
+    exact ns.up_closed hx (hUτ.2 x hxU) hUN ((HFSet.mem_powerset ns.X N).mp hNX)
   · intro hN
-    sorry
+    -- La meta ya está expandida por el rw [HFSet.mem_sep] externo:
+    -- N ∈ HFSet.powerset ns.X ∧ ∃ U, U ∈ sep(...) ∧ x ∈ U ∧ U ⊆ N
+    refine ⟨(HFSet.mem_powerset ns.X N).mpr (ns.𝒩_sub hx hN), ?_⟩
+    -- Testigo: V = {y ∈ X | N ∈ 𝒩(y)}
+    refine ⟨HFSet.sep ns.X (fun y => N ∈ ns.𝒩 y), ?_, ?_, ?_⟩
+    · -- V ∈ τ_ns: HFSet.sep ns.X (...) ∈ HFSet.sep (powerset ns.X) (...)
+      rw [HFSet.mem_sep]
+      constructor
+      · rw [HFSet.mem_powerset]
+        intro y hy; rw [HFSet.mem_sep] at hy; exact hy.1
+      · intro y hy
+        rw [HFSet.mem_sep] at hy
+        obtain ⟨hyX, hNy⟩ := hy
+        obtain ⟨M, hMy, _, hMint⟩ := ns.interior hyX hNy
+        apply ns.up_closed hyX hMy
+        · intro z hzM
+          rw [HFSet.mem_sep]
+          exact ⟨ns.𝒩_sub hyX hMy z hzM, hMint hzM⟩
+        · intro z hz; rw [HFSet.mem_sep] at hz; exact hz.1
+    · -- x ∈ V
+      rw [HFSet.mem_sep]; exact ⟨hx, hN⟩
+    · -- V ⊆ N
+      intro y hy; rw [HFSet.mem_sep] at hy; exact ns.point_mem hy.1 hy.2
 
 end HFTopology

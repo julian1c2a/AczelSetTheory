@@ -214,7 +214,25 @@ variable (dl : HFDistributiveLattice)
 /-- Ley distributiva dual: `a ⊔ (b ⊓ c) = (a ⊔ b) ⊓ (a ⊔ c)`. -/
 theorem join_distrib {a b c : HFSet} (ha : a ∈ dl.L) (hb : b ∈ dl.L) (hc : c ∈ dl.L) :
     dl.join a (dl.meet b c) = dl.meet (dl.join a b) (dl.join a c) := by
-  sorry
+  symm
+  -- Probamos: (a⊔b)⊓(a⊔c) = a⊔(b⊓c)
+  calc dl.meet (dl.join a b) (dl.join a c)
+      -- Paso 1: distribuir meet sobre join (aplicado a (a⊔b), a, c)
+      = dl.join (dl.meet (dl.join a b) a) (dl.meet (dl.join a b) c) :=
+            dl.meet_distrib (dl.join_closed ha hb) ha hc
+      -- Paso 2: (a⊔b)⊓a = a por conmut. + absorción
+    _ = dl.join a (dl.meet (dl.join a b) c) := by
+            rw [dl.meet_comm (dl.join_closed ha hb) ha, dl.meet_absorb ha hb]
+      -- Paso 3: (a⊔b)⊓c = (a⊓c)⊔(b⊓c) por conmut. + meet_distrib + conmut.
+    _ = dl.join a (dl.join (dl.meet a c) (dl.meet b c)) := by
+            congr 1
+            rw [dl.meet_comm (dl.join_closed ha hb) hc, dl.meet_distrib hc ha hb,
+                dl.meet_comm hc ha, dl.meet_comm hc hb]
+      -- Paso 4: asociatividad del join
+    _ = dl.join (dl.join a (dl.meet a c)) (dl.meet b c) :=
+            (dl.join_assoc ha (dl.meet_closed ha hc) (dl.meet_closed hb hc)).symm
+      -- Paso 5: a⊔(a⊓c) = a por absorción
+    _ = dl.join a (dl.meet b c) := by rw [dl.join_absorb ha hc]
 
 end Derived
 
