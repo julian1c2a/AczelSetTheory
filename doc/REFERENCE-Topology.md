@@ -87,9 +87,9 @@ def HFTopSpace.isIsolatedPt (ts : HFTopSpace) (x A : HFSet) : Prop :=
 
 | Nombre | Enunciado |
 |--------|-----------|
-| `closure_closed` | `ts.isClosed (ts.closure A)` ⚠️ sorry |
+| `closure_closed` | `ts.isClosed (ts.closure A)` |
 | `subset_closure` | `A ⊆ ts.X → A ⊆ ts.closure A` |
-| `closure_eq_of_closed` | `ts.isClosed A → ts.closure A = A` ⚠️ sorry |
+| `closure_eq_of_closed` | `ts.isClosed A → A ⊆ ts.X → ts.closure A = A` |
 
 ### Teoremas — Exterior
 
@@ -101,10 +101,10 @@ def HFTopSpace.isIsolatedPt (ts : HFTopSpace) (x A : HFSet) : Prop :=
 
 | Nombre | Enunciado |
 |--------|-----------|
-| `isInteriorPt_iff` | `ts.isInteriorPt x A ↔ ∃ U ∈ ts.τ, U ⊆ A ∧ x ∈ U` |
+| `isInteriorPt_iff` | `ts.isInteriorPt x A ↔ x ∈ ts.interior A` |
 | `accumulation_is_adherence` | `ts.isAccumulationPt x A → ts.isAdherencePt x A` |
 | `isolated_not_accumulation` | `ts.isIsolatedPt x A → ¬ts.isAccumulationPt x A` |
-| `isAdherencePt_iff_mem_closure` | `ts.isAdherencePt x A ↔ x ∈ ts.closure A` (mp ✓, mpr ⚠️ sorry) |
+| `isAdherencePt_iff_mem_closure` | `(hA : A ⊆ ts.X) → ts.isAdherencePt x A ↔ x ∈ ts.closure A` |
 | `interior_exterior_boundary_partition` | `A ⊆ ts.X → ∀ x ∈ ts.X, exactamente uno de: interior/exterior/frontera` |
 
 ---
@@ -119,13 +119,13 @@ def HFTopSpace.isIsolatedPt (ts : HFTopSpace) (x A : HFSet) : Prop :=
 structure HFNeighborSpace where
   X         : HFSet
   𝒩         : HFSet → HFSet          -- sistema de entornos: x ↦ 𝒩(x)
-  𝒩_sub     : ∀ {x}, x ∈ X → 𝒩 x ⊆ HFSet.powerset X
-  point_mem : ∀ {x N}, x ∈ X → N ∈ 𝒩 x → x ∈ N
-  univ_mem  : ∀ {x}, x ∈ X → X ∈ 𝒩 x
-  up_closed : ∀ {x N M}, x ∈ X → N ∈ 𝒩 x → N ⊆ M → M ⊆ X → M ∈ 𝒩 x
-  inter_mem : ∀ {x N M}, x ∈ X → N ∈ 𝒩 x → M ∈ 𝒩 x → HFSet.inter N M ∈ 𝒩 x
-  interior  : ∀ {x N}, x ∈ X → N ∈ 𝒩 x →
-              ∃ U, U ∈ 𝒩 x ∧ U ⊆ N ∧ ∀ y ∈ U, N ∈ 𝒩 y
+  𝒩_sub     : ∀ {x N : HFSet}, x ∈ X → N ∈ 𝒩 x → N ⊆ X
+  point_mem : ∀ {x N : HFSet}, x ∈ X → N ∈ 𝒩 x → x ∈ N
+  univ_mem  : ∀ {x : HFSet}, x ∈ X → X ∈ 𝒩 x
+  up_closed : ∀ {x N M : HFSet}, x ∈ X → N ∈ 𝒩 x → N ⊆ M → M ⊆ X → M ∈ 𝒩 x
+  inter_mem : ∀ {x N M : HFSet}, x ∈ X → N ∈ 𝒩 x → M ∈ 𝒩 x → HFSet.inter N M ∈ 𝒩 x
+  interior  : ∀ {x N : HFSet}, x ∈ X → N ∈ 𝒩 x →
+                ∃ M, M ∈ 𝒩 x ∧ M ⊆ N ∧ ∀ {y : HFSet}, y ∈ M → N ∈ 𝒩 y
 ```
 
 ### Conversiones
@@ -142,8 +142,8 @@ noncomputable def HFNeighborSpace.toTopSpace (ns : HFNeighborSpace) : HFTopSpace
 
 | Nombre | Enunciado |
 |--------|-----------|
-| `toNeighborSpace_toTopSpace_τ` | `ts.toNeighborSpace.toTopSpace.τ = ts.τ` ⚠️ sorry |
-| `toTopSpace_toNeighborSpace_𝒩` | `ns.toTopSpace.toNeighborSpace.𝒩 x = ns.𝒩 x` ⚠️ sorry |
+| `toNeighborSpace_toTopSpace_τ` | `ts.toNeighborSpace.toTopSpace.τ = ts.τ` |
+| `toTopSpace_toNeighborSpace_𝒩` | `(hx : x ∈ ns.X) → ns.toTopSpace.toNeighborSpace.𝒩 x = ns.𝒩 x` |
 
 ---
 
@@ -158,7 +158,7 @@ noncomputable def HFTopSpace.preimage (ts : HFTopSpace) (f : HFSet → HFSet) (V
   HFSet.sep ts.X (fun x => f x ∈ V)
 
 noncomputable def HFTopSpace.subspace (ts : HFTopSpace) (A : HFSet) (hA : A ⊆ ts.X) : HFTopSpace
--- τ_A = {V ⊆ A | ∃ U ∈ τ, V = U ∩ A}   ⚠️ sorry en empty_mem, univ_mem, sUnion_mem
+-- τ_A = {V ⊆ A | ∃ U ∈ τ, V = U ∩ A}
 
 structure HFContinuous (ts₁ ts₂ : HFTopSpace) where
   f             : HFSet → HFSet
@@ -173,18 +173,10 @@ structure HFContinuous (ts₁ ts₂ : HFTopSpace) where
 | `mem_preimage` | `x ∈ ts.preimage f V ↔ x ∈ ts.X ∧ f x ∈ V` |
 | `HFContinuous.id` | Aplicación identidad es continua |
 | `HFContinuous.comp` | Composición de continuas es continua |
-| `preimage_inter` | `ts₁.preimage f (V₁ ∩ V₂) = ts₁.preimage f V₁ ∩ ts₁.preimage f V₂` ⚠️ sorry |
+| `preimage_inter` | `ts₁.preimage f (V₁ ∩ V₂) = ts₁.preimage f V₁ ∩ ts₁.preimage f V₂` |
 
 ---
 
-## Estado de sorries
+## Estado
 
-| Fichero | Nombre | Motivo |
-|---------|--------|--------|
-| `Interior.lean` | `closure_closed` | elaboración constructor+by_contra |
-| `Interior.lean` | `closure_eq_of_closed` | ídem |
-| `Interior.lean` | `isAdherencePt_iff_mem_closure` (mpr) | ídem |
-| `Neighborhoods.lean` | `toNeighborSpace_toTopSpace_τ` | prueba compleja pendiente |
-| `Neighborhoods.lean` | `toTopSpace_toNeighborSpace_𝒩` | prueba compleja pendiente |
-| `Subspace.lean` | `subspace` (empty_mem, univ_mem, sUnion_mem, inter_mem) | API HFSet.inter membership |
-| `Subspace.lean` | `preimage_inter` | ídem |
+**0 sorries.** Módulo completo. Última actualización: 2026-05-22.

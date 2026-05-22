@@ -1,6 +1,6 @@
 # Current Project Status — AczelSetTheory
 
-**Last updated:** 2026-05-21
+**Last updated:** 2026-05-22
 **Author**: Julián Calderón Almendros
 
 ---
@@ -9,9 +9,9 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules (non-barrel) | 118 |
-| Total modules (incl. barrels) | 127 |
-| Modules with 0 sorry | 118 / 118 |
+| Total modules (non-barrel) | 132 |
+| Total modules (incl. barrels) | 141 |
+| Modules with 0 sorry | 132 / 132 |
 | Total sorry | 0 |
 | Build status | ✅ Passing — 0 errors, 0 warnings |
 | Lean version | v4.29.0 |
@@ -163,7 +163,7 @@
 | VN/FermatVN.lean | `vN_fermat_little`, `vN_wilson` | ✅ |
 | VN/CRTVN.lean | `vN_chinese_remainder` | ✅ |
 
-### Algebra/ (5 modules)
+### Algebra/ (9 modules)
 
 | Module | Key exports | Status |
 |--------|-------------|--------|
@@ -172,12 +172,31 @@
 | Algebra/GroupHom.lean | `HFGroupHom`, `hom_e`, `hom_inv`, `ker`, `image` | ✅ |
 | Algebra/Ring.lean | `HFRing`, `toAdditiveHFGroup`, 7 lemas derivados | ✅ |
 | Algebra/CosetCount.lean | `cosets`, `index`, `card_sUnion_uniform_partition`, Lagrange (9 teoremas) | ✅ |
+| Algebra/Monoid.lean | `HFMonoid`, lemas de monoid | ✅ |
+| Algebra/RingHom.lean | `HFRingHom`, `hom_zero`, `hom_one`, `ker`, `image` | ✅ |
+| Algebra/Field.lean | `HFField`, cociente de campos | ✅ |
+| Algebra/Module.lean | `HFModule`, módulo sobre anillo | ✅ |
 
-### Integers/ (1 module)
+### Integers/ (7 modules)
 
 | Module | Key exports | Status |
 |--------|-------------|--------|
 | Integers/Basic.lean | `ℤ₀`, ring instances, 18 ring laws, `ofNat` | ✅ |
+| Integers/Order.lean | orden en ℤ₀, `≤`, `<`, compatibilidad con operaciones | ✅ |
+| Integers/Functions.lean | homomorfismos ℤ₀ → ℤ₀ | ✅ |
+| Integers/Arithmetic.lean | GCD, divisibilidad, lemas aritméticos en ℤ₀ | ✅ |
+| Integers/Bijection.lean | biyecciones entre ℤ₀ y ℕ₀ | ✅ |
+| Integers/PadicVal.lean | `padic_val`, `Omega_prime`, multiplicatividad | ✅ |
+| Integers/MobiusLiouville.lean | `μ` (Möbius), `λ` (Liouville), multiplicatividad | ✅ |
+
+### Topology/ (4 modules)
+
+| Module | Key exports | Status |
+|--------|-------------|--------|
+| Topology/Basic.lean | `HFTopSpace`, `isClosed`, axiomas topológicos | ✅ |
+| Topology/Interior.lean | `interior`, `closure`, `exterior`, `boundary`, 15+ teoremas | ✅ |
+| Topology/Subspace.lean | `subspace`, `preimage`, `HFContinuous`, `HFContinuous.comp` | ✅ |
+| Topology/Neighborhoods.lean | `HFNeighborSpace`, `toNeighborSpace`, `toTopSpace`, equivalencia τ↔𝒩 | ✅ |
 
 ---
 
@@ -187,7 +206,17 @@ None — **0 sorry** across the entire project.
 
 ---
 
-## Recent Achievements (2026-05-21)
+## Recent Achievements (2026-05-22) — Topology completo
+
+- ✅ **Topology/Basic.lean** — `HFTopSpace` con axiomas mínimos; `isClosed`; teoremas de clausura de abiertos finitos bajo unión e intersección.
+- ✅ **Topology/Interior.lean** — `interior`, `closure`, `exterior`, `boundary`; clasificación de puntos (`isInteriorPt`, `isExteriorPt`, `isBoundaryPt`, `isAccumulationPt`, `isAdherencePt`, `isIsolatedPt`); 3 sorries eliminados: `closure_closed`, `closure_eq_of_closed` (+ `hA`), `isAdherencePt_iff_mem_closure` (mpr con `Classical.byContradiction` + `interior_largest`).
+- ✅ **Topology/Subspace.lean** — `subspace` τ_A; `preimage`; `HFContinuous` (id + comp); 5 sorries eliminados: 4 campos de `subspace` + `preimage_inter`.
+- ✅ **Topology/Neighborhoods.lean** — `HFNeighborSpace`; `toNeighborSpace`, `toTopSpace`; equivalencia completa `τ ↔ 𝒩`; 3 sorries eliminados: `toNeighborSpace_toTopSpace_τ` (→), `toTopSpace_toNeighborSpace_𝒩` (→ y ←). Testigo para ← : `HFSet.sep ns.X (fun y => N ∈ ns.𝒩 y)` inline (let-binding opaco eliminado).
+- ✅ **Axioms/Setminus.lean** — `setminus_setminus_of_subset {A X} (h : A ⊆ X) : X \ (X \ A) = A` (lema auxiliar para clausura).
+- ✅ **Algebra/** — 4 módulos adicionales integrados en barrel: Monoid, RingHom, Field, Module.
+- ✅ **Integers/** — 6 módulos adicionales integrados en barrel: Order, Functions, Arithmetic, Bijection, PadicVal, MobiusLiouville.
+
+## Recent Achievements (2026-05-21) — Álgebra: Subgroup, GroupHom, Ring, CosetCount
 
 - ✅ **Algebra/Subgroup.lean** — `HFAlgebra.HFSubgroup`: subgrupo como estructura, `toHFGroup`, `inter` (intersección), `rightCoset` (cosete derecho Ha), `cosetEq` (relación a ~_H b). 16 teoremas: refl/symm/trans de `cosetEq`, equivalencia con igualdad de cosetes, cubrimiento de G, disyunción de cosetes, cardinalidad de Ha.
 - ✅ **Algebra/GroupHom.lean** — `HFAlgebra.HFGroupHom`: φ : G →ₕ H; `hom_e` (φ(e_G) = e_H), `hom_inv` (φ(a⁻¹) = φ(a)⁻¹); `ker` (subgrupo de G), `image` (subgrupo de H).
@@ -216,8 +245,9 @@ AczelSetTheory/
   Operations/     — Constructors and definitions over HFSet (21 modules)
   Axioms/         — Axiomatic properties and theorems over HFSet (41 modules)
   VN/             — Von Neumann embedding vN : ℕ₀ → HFSet (35 modules)
-  Algebra/        — Algebraic structures native in HFSet (5 modules)
-  Integers/       — Integer type ℤ₀ as quotient of ℕ₀ × ℕ₀ (1 module)
+  Algebra/        — Algebraic structures native in HFSet (9 modules)
+  Integers/       — Integer type ℤ₀ as quotient of ℕ₀ × ℕ₀ (7 modules)
+  Topology/       — Topological spaces over HFSet (4 modules)
   HFSets.lean     — Core HFSet quotient type
   HFList.lean     — Ordered sequences of HFSets (PList HFSet)
   HFListOps.lean  — toHFSet conversions (FinList/HFList → HFSet)
@@ -253,7 +283,8 @@ AczelSetTheory/
 | Fase A | ModEqVN (ext.), TotientVN (ext.), PrimeVN, FermatVN, CRTVN | ✅ |
 | Algebra | `HFAlgebra.HFGroup` with 10 derived lemmas | ✅ |
 | LinearOrder | `LT HFSet`, `StrictLinearOrder HFSet` | ✅ |
-| Integers | `ℤ₀` commutative ring (quotient ℕ₀ × ℕ₀) | ✅ |
+| Integers | `ℤ₀` commutative ring (quotient ℕ₀ × ℕ₀) + Order, Functions, Arithmetic, Bijection, PadicVal, MobiusLiouville | ✅ |
+| Topology | `HFTopSpace`, topología de entornos, subespacio, aplicaciones continuas | ✅ |
 
 > See [NEXT_STEPS.md](NEXT_STEPS.md) for detailed planning and next priorities.
 
@@ -264,7 +295,7 @@ AczelSetTheory/
 | Recurso | Descripción |
 |---------|-------------|
 | `REFERENCE.md` | Índice raíz — catálogo completo de módulos |
-| `doc/REFERENCE-*.md` (7 propios) | CList, HFList, HFSets, PList, Relations, Algebra, VN |
+| `doc/REFERENCE-*.md` (8 propios) | CList, HFList, HFSets, PList, Relations, Algebra, VN, Topology |
 | `doc/REFERENCE-*.md` (7 Peano) | Arithmetic, Combinatorics, Foundation, GroupTheory, ListsAndSets, NumberTheory, Prelim |
 | `doc/peano/` | 6 documentos de diseño heredados de Peano + README |
 | `CHANGELOG-PEANO.md` | Historial completo del proyecto predecesor Peano |

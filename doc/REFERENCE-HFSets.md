@@ -472,6 +472,8 @@ All **Zermelo axioms** are proven as theorems (not postulated):
 | 4 | `mem_inter` | Axioms/Intersection | `(A B : HFSet) (x : HFSet) : x ∈ inter A B ↔ x ∈ A ∧ x ∈ B` |
 | 5 | `mem_setminusCList_iff` | Axioms/Setminus | `(a b xc : CList) : CList.mem xc (setminusCList a b) = true ↔ CList.mem xc a = true ∧ CList.mem xc b = false` |
 | 6 | `mem_setminus` | Axioms/Setminus | `(A B : HFSet) (x : HFSet) : x ∈ setminus A B ↔ x ∈ A ∧ ¬ (x ∈ B)` |
+| 6b | `setminus_subset` | Axioms/Setminus | `(A B : HFSet) : setminus A B ⊆ A` |
+| 6c | `setminus_setminus_of_subset` | Axioms/Setminus | `{A X : HFSet} (h : A ⊆ X) : setminus X (setminus X A) = A` |
 | 7 | `mem_filterCList_iff` | Axioms/Separation | `(a xc : CList) (P : HFSet → Prop) [DecidablePred P] : CList.mem xc (filterCList P a) = true ↔ CList.mem xc a = true ∧ P (Quotient.mk CList.Setoid xc)` |
 | 8 | `mem_sep` | Axioms/Separation | `(A : HFSet) (P : HFSet → Prop) [DecidablePred P] (x : HFSet) : x ∈ sep A P ↔ x ∈ A ∧ P x` |
 | 9 | `mem_pair` | Axioms/Pair | `(x a b : HFSet) : x ∈ pair a b ↔ x = a ∨ x = b` |
@@ -550,7 +552,8 @@ All **Zermelo axioms** are proven as theorems (not postulated):
 
 ### Axioms/Setminus.lean
 
-`HFSet.mem_setminusCList_iff`, `HFSet.mem_setminus`
+`HFSet.mem_setminusCList_iff`, `HFSet.mem_setminus`, `HFSet.setminus_subset`,
+`HFSet.setminus_setminus_of_subset`
 
 ### Axioms/Separation.lean
 

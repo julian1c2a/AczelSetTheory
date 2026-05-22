@@ -6,6 +6,37 @@ All notable changes to this project are documented here.
 
 ---
 
+## [2026-05-22] — Topology completo: 0 sorries en 4 módulos, lema setminus_setminus_of_subset
+
+### Added / Fixed
+
+- **`Axioms/Setminus.lean`**:
+  - Añadido `setminus_setminus_of_subset {A X : HFSet} (h : A ⊆ X) : X \ (X \ A) = A`.
+    Usado internamente por `Interior.lean` (clausura) y exportado a `doc/REFERENCE-HFSets.md`.
+
+- **`Topology/Interior.lean`** (3 sorries eliminados):
+  - `closure_closed`: `X \ cl(A) = int(X\A)` ∈ τ. Usa `setminus_setminus_of_subset` + `interior_open`.
+  - `closure_eq_of_closed`: firma extendida con `(hA : A ⊆ ts.X)`; prueba: `interior_eq_of_open hcl` + `setminus_setminus_of_subset hA`.
+  - `isAdherencePt_iff_mem_closure` (mpr): `Classical.byContradiction` + `interior_largest` para la dirección difícil. Firma extendida con `(hA : A ⊆ ts.X)`.
+
+- **`Topology/Subspace.lean`** (5 sorries eliminados):
+  - `subspace` (`empty_mem`, `univ_mem`, `sUnion_mem`, `inter_mem`): se probaron usando `HFSet.mem_sep`, `HFSet.mem_inter`, `HFSet.mem_powerset` directamente sin `by_contra`.
+  - `HFContinuous.preimage_inter`: reordenamiento de `rw` (preimage → inter LHS → inter RHS → preimage × 2).
+
+- **`Topology/Neighborhoods.lean`** (3 sorries eliminados):
+  - `toNeighborSpace_toTopSpace_τ` (→): demostrado expresando `U = sUnion {V ∈ τ | V ⊆ U}`.
+  - `toTopSpace_toNeighborSpace_𝒩` (→): nombrar `hNX` para `ns.up_closed`.
+  - `toTopSpace_toNeighborSpace_𝒩` (←): testigo `V = {y ∈ X | N ∈ 𝒩(y)}`; se eliminaron `rw` redundante y `let V` (opaco) usando `HFSet.sep ns.X (fun y => N ∈ ns.𝒩 y)` directamente.
+
+### Documentation
+
+- **`doc/REFERENCE-Topology.md`**: eliminados todos los `⚠️ sorry`; corregidas firmas de `𝒩_sub` (tipo real: `N ∈ 𝒩 x → N ⊆ X`), `interior` (axioma: `∀ {y}, y ∈ M → N ∈ 𝒩 y`), `closure_eq_of_closed` (+ `hA`), `isAdherencePt_iff_mem_closure` (+ `hA`); tabla de sorries reemplazada por "0 sorries".
+- **`doc/REFERENCE-HFSets.md`**: añadidos `setminus_subset` y `setminus_setminus_of_subset` al catálogo de `Axioms/Setminus.lean`.
+
+**Project status: 0 sorry, 0 errors. 122 non-barrel modules (132 total).**
+
+---
+
 ## [2026-05-22] — PadicVal + MobiusLiouville: multiplicatividad de Ω y λ, corrección de bugs pre-existentes
 
 ### Added / Fixed

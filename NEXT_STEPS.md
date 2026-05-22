@@ -42,6 +42,32 @@ Antes de implementar, planear la arquitectura:
 
 ---
 
+## ✅ COMPLETED (2026-05-22) — Topology completo: 4 módulos, 0 sorry
+
+- **`Axioms/Setminus.lean`** ✅: `setminus_setminus_of_subset {A X} (h : A ⊆ X) : X \ (X \ A) = A`.
+- **`Topology/Basic.lean`** ✅: `HFTopSpace`, `isClosed`, axiomas, clausura bajo τ.
+- **`Topology/Interior.lean`** ✅: `interior`, `closure`, `exterior`, `boundary`; 6 clases de puntos; 3 sorries eliminados (`closure_closed`, `closure_eq_of_closed`+`hA`, `isAdherencePt_iff_mem_closure`-mpr).
+- **`Topology/Subspace.lean`** ✅: `subspace` τ_A, `preimage`, `HFContinuous` (id, comp); 5 sorries eliminados.
+- **`Topology/Neighborhoods.lean`** ✅: `HFNeighborSpace`, equivalencia `τ ↔ 𝒩`; 3 sorries eliminados.
+
+---
+
+## ✅ COMPLETED (2026-05-22) — Integers + Algebra: módulos adicionales en barrel
+
+- **`Integers/`** ✅: 6 módulos integrados: Order, Functions, Arithmetic, Bijection, PadicVal, MobiusLiouville. 0 sorry total.
+- **`Algebra/`** ✅: 4 módulos integrados en barrel: Monoid, RingHom, Field, Module.
+
+---
+
+## ✅ COMPLETED (2026-05-21) — Álgebra: Subgrupo, Homomorfismo, Anillo, Cosetes
+
+- **`Algebra/Subgroup.lean`** ✅: `HFSubgroup`, `rightCoset`, `cosetEq`, 16 teoremas incluyendo disyunción de cosetes.
+- **`Algebra/GroupHom.lean`** ✅: `HFGroupHom`, `ker`, `image`, `hom_e`, `hom_inv`.
+- **`Algebra/Ring.lean`** ✅: `HFRing`, `toAdditiveHFGroup`, 7 lemas.
+- **`Algebra/CosetCount.lean`** ✅: partición uniforme + **Teorema de Lagrange** `|H| ∣ |G|`.
+
+---
+
 ## ✅ COMPLETED (2026-05-20) — Integers/Basic.lean: ℤ₀ como cociente
 
 - **`Integers/Basic.lean`**: `ℤ₀ = Quotient intSetoid` donde `intEq (a,b) (c,d) ↔ a+d = b+c`.
