@@ -1,6 +1,6 @@
 # Current Project Status — AczelSetTheory
 
-**Last updated:** 2026-05-22
+**Last updated:** 2026-05-23
 **Author**: Julián Calderón Almendros
 
 ---
@@ -9,9 +9,9 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules (non-barrel) | 132 |
-| Total modules (incl. barrels) | 141 |
-| Modules with 0 sorry | 132 / 132 |
+| Total modules (non-barrel) | 133 |
+| Total modules (incl. barrels) | 142 |
+| Modules with 0 sorry | 133 / 133 |
 | Total sorry | 0 |
 | Build status | ✅ Passing — 0 errors, 0 warnings |
 | Lean version | v4.29.0 |
@@ -189,7 +189,7 @@
 | Integers/PadicVal.lean | `padic_val`, `Omega_prime`, multiplicatividad | ✅ |
 | Integers/MobiusLiouville.lean | `μ` (Möbius), `λ` (Liouville), multiplicatividad | ✅ |
 
-### Topology/ (4 modules)
+### Topology/ (5 modules)
 
 | Module | Key exports | Status |
 |--------|-------------|--------|
@@ -197,12 +197,20 @@
 | Topology/Interior.lean | `interior`, `closure`, `exterior`, `boundary`, 15+ teoremas | ✅ |
 | Topology/Subspace.lean | `subspace`, `preimage`, `HFContinuous`, `HFContinuous.comp` | ✅ |
 | Topology/Neighborhoods.lean | `HFNeighborSpace`, `toNeighborSpace`, `toTopSpace`, equivalencia τ↔𝒩 | ✅ |
+| Topology/Separation.lean | `isT0`–`isT4`, `isRegular`, `isNormal`, cadena T₄→…→T₀, `T1_iff_singletons_closed` | ✅ |
 
 ---
 
 ## Known Sorry Locations
 
 None — **0 sorry** across the entire project.
+
+---
+
+## Recent Achievements (2026-05-23) — Topology/Separation.lean
+
+- ✅ **Topology/Separation.lean** — axiomas de separación T₀–T₄: `isT0`, `isT1`, `isT2`, `isRegular`, `isT3`, `isNormal`, `isT4`; cadena de implicaciones `T4_implies_T3_implies_T2_implies_T1_implies_T0`; caracterización `T1_iff_singletons_closed`. Técnica clave: `X \ {x} = ⋃{U ∈ τ | x ∉ U}` via `HFSet.sep` + `sUnion_mem`.
+- ✅ **Topology.lean** (barrel): añadido import de `Topology.Separation`.
 
 ---
 

@@ -6,6 +6,19 @@ All notable changes to this project are documented here.
 
 ---
 
+## [2026-05-23] — Topology/Separation.lean: axiomas T₀–T₄ (0 sorries)
+
+### Added
+
+- **`Topology/Separation.lean`** — nuevo módulo con axiomas de separación:
+  - **Definiciones**: `isT0`, `isT1`, `isT2`, `isRegular`, `isT3`, `isNormal`, `isT4`.
+  - **Cadena de implicaciones**: `T2_implies_T1`, `T1_implies_T0`, `T3_implies_T2`, `T4_implies_T3`.
+  - **Transitivas**: `T4_implies_T2`, `T3_implies_T1`, `T4_implies_T1`, `T2_implies_T0`, `T3_implies_T0`, `T4_implies_T0`.
+  - **Caracterización de T₁**: `singletons_closed_of_T1`, `T1_of_singletons_closed`, `T1_iff_singletons_closed`.
+  - Técnica clave: `X \ {x} = ⋃{U ∈ τ | x ∉ U}` con `HFSet.sep` + `sUnion_mem`.
+- **`Topology.lean`** (barrel): añadido `import AczelSetTheory.Topology.Separation`.
+- **`doc/REFERENCE-Topology.md`**: sección `Topology.Separation` añadida.
+
 ## [2026-05-22] — Topology completo: 0 sorries en 4 módulos, lema setminus_setminus_of_subset
 
 ### Added / Fixed

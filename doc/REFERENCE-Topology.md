@@ -177,6 +177,68 @@ structure HFContinuous (ts₁ ts₂ : HFTopSpace) where
 
 ---
 
+## Topology.Separation
+
+**Fuente:** `AczelSetTheory/Topology/Separation.lean`
+
+### Definiciones
+
+```lean
+def HFTopSpace.isT0 (ts : HFTopSpace) : Prop :=
+  ∀ {x y}, x ∈ ts.X → y ∈ ts.X → x ≠ y →
+    ∃ U, U ∈ ts.τ ∧ ((x ∈ U ∧ y ∉ U) ∨ (y ∈ U ∧ x ∉ U))
+
+def HFTopSpace.isT1 (ts : HFTopSpace) : Prop :=
+  ∀ {x y}, x ∈ ts.X → y ∈ ts.X → x ≠ y →
+    ∃ U V, U ∈ ts.τ ∧ V ∈ ts.τ ∧ x ∈ U ∧ y ∉ U ∧ y ∈ V ∧ x ∉ V
+
+def HFTopSpace.isT2 (ts : HFTopSpace) : Prop :=
+  ∀ {x y}, x ∈ ts.X → y ∈ ts.X → x ≠ y →
+    ∃ U V, U ∈ ts.τ ∧ V ∈ ts.τ ∧ x ∈ U ∧ y ∈ V ∧ HFSet.inter U V = HFSet.empty
+
+def HFTopSpace.isRegular (ts : HFTopSpace) : Prop :=
+  ∀ {x A}, x ∈ ts.X → ts.isClosed A → x ∉ A →
+    ∃ U V, U ∈ ts.τ ∧ V ∈ ts.τ ∧ x ∈ U ∧ A ⊆ V ∧ HFSet.inter U V = HFSet.empty
+
+def HFTopSpace.isT3 (ts : HFTopSpace) : Prop := ts.isT1 ∧ ts.isRegular
+
+def HFTopSpace.isNormal (ts : HFTopSpace) : Prop :=
+  ∀ {A B}, ts.isClosed A → ts.isClosed B → HFSet.inter A B = HFSet.empty →
+    ∃ U V, U ∈ ts.τ ∧ V ∈ ts.τ ∧ A ⊆ U ∧ B ⊆ V ∧ HFSet.inter U V = HFSet.empty
+
+def HFTopSpace.isT4 (ts : HFTopSpace) : Prop := ts.isT1 ∧ ts.isNormal
+```
+
+### Implicaciones directas
+
+| Nombre | Enunciado |
+|--------|-----------|
+| `T2_implies_T1` | `ts.isT2 → ts.isT1` |
+| `T1_implies_T0` | `ts.isT1 → ts.isT0` |
+| `T3_implies_T2` | `ts.isT3 → ts.isT2` |
+| `T4_implies_T3` | `ts.isT4 → ts.isT3` |
+
+### Implicaciones transitivas
+
+| Nombre | Enunciado |
+|--------|-----------|
+| `T4_implies_T2` | `ts.isT4 → ts.isT2` |
+| `T3_implies_T1` | `ts.isT3 → ts.isT1` |
+| `T4_implies_T1` | `ts.isT4 → ts.isT1` |
+| `T2_implies_T0` | `ts.isT2 → ts.isT0` |
+| `T3_implies_T0` | `ts.isT3 → ts.isT0` |
+| `T4_implies_T0` | `ts.isT4 → ts.isT0` |
+
+### Caracterización de T₁
+
+| Nombre | Enunciado |
+|--------|-----------|
+| `singletons_closed_of_T1` | `ts.isT1 → x ∈ ts.X → ts.isClosed (HFSet.singleton x)` |
+| `T1_of_singletons_closed` | `(∀ {x}, x ∈ ts.X → ts.isClosed {x}) → ts.isT1` |
+| `T1_iff_singletons_closed` | `ts.isT1 ↔ ∀ {x}, x ∈ ts.X → ts.isClosed (HFSet.singleton x)` |
+
+---
+
 ## Estado
 
-**0 sorries.** Módulo completo. Última actualización: 2026-05-22.
+**0 sorries.** Módulo completo. Última actualización: 2026-05-23.

@@ -1,9 +1,9 @@
 # Next Steps
 
-**Last updated:** 2026-05-21
+**Last updated:** 2026-05-23
 
-The project compiles on Lean 4.29.0 with **0 sorry, 118 non-barrel modules**.
-Full Zermelo axioms derived. Architecture: CList/ + Operations/ + Axioms/ + PList/ + VN/ + Algebra/ + Integers/.
+The project compiles on Lean 4.29.0 with **0 sorry, 133 non-barrel modules**.
+Full Zermelo axioms derived. Architecture: CList/ + Operations/ + Axioms/ + PList/ + VN/ + Algebra/ + Integers/ + Topology/.
 See PLANNING.md for the long-term roadmap.
 
 ---
@@ -39,6 +39,14 @@ Antes de implementar, planear la arquitectura:
 - Definición de `extEq₁`, `normalize₁`, `ASet₁ = Quotient CList₁.Setoid`
 - Qué infraestructura se reutiliza vs. se generaliza
 - Cómo representar ω = `inf (fun _ => true)` y los conjuntos Δ⁰₁
+
+---
+
+## ✅ COMPLETED (2026-05-23) — Topology/Separation.lean: axiomas T₀–T₄
+
+- **`Topology/Separation.lean`** ✅: `isT0`, `isT1`, `isT2`, `isRegular`, `isT3`, `isNormal`, `isT4`; cadena `T4→T3→T2→T1→T0`; `T1_iff_singletons_closed`. Técnica: `X \ {x} = ⋃{U ∈ τ | x ∉ U}`.
+- **`Topology.lean`** (barrel) ✅: import de `Topology.Separation` añadido.
+- Build: 0 errores, 0 sorry.
 
 ---
 
