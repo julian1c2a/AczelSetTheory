@@ -2,6 +2,8 @@
 
 All notable changes to this project are documented here.
 
+> Para el historial del proyecto predecesor (Peano), ver [CHANGELOG-PEANO.md](CHANGELOG-PEANO.md).
+
 ---
 
 ## [2026-05-22] — PadicVal + MobiusLiouville: multiplicatividad de Ω y λ, corrección de bugs pre-existentes

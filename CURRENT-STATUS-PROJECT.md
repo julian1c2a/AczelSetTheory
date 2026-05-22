@@ -259,7 +259,21 @@ AczelSetTheory/
 
 ---
 
+## Documentation (2026-05-22)
+
+| Recurso | Descripción |
+|---------|-------------|
+| `REFERENCE.md` | Índice raíz — catálogo completo de módulos |
+| `doc/REFERENCE-*.md` (7 propios) | CList, HFList, HFSets, PList, Relations, Algebra, VN |
+| `doc/REFERENCE-*.md` (7 Peano) | Arithmetic, Combinatorics, Foundation, GroupTheory, ListsAndSets, NumberTheory, Prelim |
+| `doc/peano/` | 6 documentos de diseño heredados de Peano + README |
+| `CHANGELOG-PEANO.md` | Historial completo del proyecto predecesor Peano |
+| `DECISIONS.md` | 11 ADRs con plantilla completa (fecha, estado, rationale) |
+| `THOUGHTS.md` | Diario de diseño (1060 líneas, incluye herencia de Peano) |
+
+---
+
 **Author**: Julián Calderón Almendros
-*Last updated: 2026-05-20*
+*Last updated: 2026-05-22*
 
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)

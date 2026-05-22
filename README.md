@@ -117,6 +117,32 @@ lake build Main && lake env lean --run Main.lean
 - [DEPENDENCIES.md](DEPENDENCIES.md) — Module dependency diagram
 - [NEXT_STEPS.md](NEXT_STEPS.md) — Development roadmap
 
+### Documentación heredada de Peano
+
+AczelSetTheory es el continuador natural del proyecto [Peano](https://github.com/julian1c2a/Peano) (en feature-freeze desde 2026-05-10). La documentación de referencia de Peano se ha integrado en `doc/`:
+
+**Referencias temáticas (doc/):**
+
+- [doc/REFERENCE-Arithmetic.md](doc/REFERENCE-Arithmetic.md) — Add, Sub, Mul, Div, Pow, Primos
+- [doc/REFERENCE-Combinatorics.md](doc/REFERENCE-Combinatorics.md) — Factorial, Binom, Newton
+- [doc/REFERENCE-Foundation.md](doc/REFERENCE-Foundation.md) — PureAxioms, CantorPairing, GodelBeta
+- [doc/REFERENCE-GroupTheory.md](doc/REFERENCE-GroupTheory.md) — Group, Subgroup, Cosets, Sylow I–III
+- [doc/REFERENCE-ListsAndSets.md](doc/REFERENCE-ListsAndSets.md) — FSet, FSetFunction, EquivRel
+- [doc/REFERENCE-NumberTheory.md](doc/REFERENCE-NumberTheory.md) — ModEq, Totient, CRT, Fermat, Wilson
+- [doc/REFERENCE-Prelim.md](doc/REFERENCE-Prelim.md) — Prelim, ExistsUnique, Tuples
+
+**Documentos de diseño únicos (doc/peano/):**
+
+- [doc/peano/README.md](doc/peano/README.md) — Índice y contexto del directorio
+- [doc/peano/INTUICIONES.md](doc/peano/INTUICIONES.md) — Intuiciones matemáticas y filosóficas
+- [doc/peano/PEANO_MATHLIB_COMPARE.md](doc/peano/PEANO_MATHLIB_COMPARE.md) — Comparativa con Mathlib
+- [doc/peano/CAUCHY_MCKAY_PROOF.md](doc/peano/CAUCHY_MCKAY_PROOF.md) — Prueba de Cauchy vía McKay
+- [doc/peano/FERMAT_PROOF.md](doc/peano/FERMAT_PROOF.md) — Prueba del pequeño teorema de Fermat
+
+**Historial completo de Peano:** [CHANGELOG-PEANO.md](CHANGELOG-PEANO.md)
+
+---
+
 ### Credits
 
 - Peter Aczel — *Non-Well-Founded Sets* (foundational theory)

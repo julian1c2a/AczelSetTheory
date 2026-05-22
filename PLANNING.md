@@ -1,11 +1,17 @@
 # PLANNING — AczelSetTheory
 
-**Last updated:** 2026-05-18
+**Last updated:** 2026-05-22
 **Author:** Julián Calderón Almendros
 
 > Plan de largo plazo para AczelSetTheory. Cada fase es ejecutable de forma
 > independiente. Las dependencias entre fases están marcadas explícitamente.
 > El detalle inmediato vive en NEXT_STEPS.md.
+>
+> **Contexto histórico**: El proyecto predecesor Peano fue puesto en feature-freeze
+> el 2026-05-10. Su hoja de ruta original se conserva en
+> [doc/peano/INTUICIONES.md](doc/peano/INTUICIONES.md) y la documentación de
+> referencia de sus módulos en `doc/REFERENCE-{Arithmetic,Combinatorics,Foundation,
+> GroupTheory,ListsAndSets,NumberTheory,Prelim}.md`.
 
 ---
 

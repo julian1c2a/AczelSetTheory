@@ -1303,3 +1303,153 @@ def dividesb_HF  (a b : HFSet) : Bool
 ```
 
 Esto permitiría usar `decide` y `#eval` directamente sobre predicados HFSet.
+
+---
+
+## Herencia de Peano — Filosofía y enfoque original
+
+> *Sección migrada del diario de diseño del proyecto Peano (predecesor), 2026-05-22.*
+
+### Filosofía de diseño original
+
+El proyecto Peano formalizó la aritmética de Peano desde cero en Lean 4, derivando los
+8 axiomas de Peano como teoremas a partir del tipo inductivo `ℕ₀`. Sin dependencias externas
+(ni siquiera Mathlib). El objetivo: una biblioteca aritmética completa y autocontenida que
+cubriese: orden, operaciones (add, sub, mul, div, mod, pow), primos, factorial, coeficientes
+binomiales, teorema de Newton, teoría de grupos y los tres teoremas de Sylow.
+
+Este enfoque —derivar axiomas en lugar de postularlos— es el mismo que sigue AczelSetTheory
+con los axiomas de Zermelo sobre `HFSet`.
+
+### Decisiones arquitectónicas (Peano → AczelSetTheory, 2026-05-02)
+
+**¿Puede AczelSetTheory definir `Nat` a partir de `HFSet` solo?**
+
+Sí: una vez que el embedding Peano → Aczel es lógicamente completo, el desarrollo
+matemático nuevo ocurre en AczelSetTheory — por ejemplo `def Nat := List Unit` o
+directamente sobre `HFSet`. Todo lo computable en Peano es computable en AczelSetTheory;
+Peano pasa a modo mantenimiento.
+
+**Documentación**: La migración de `REFERENCE.md` monolítico a `REFERENCE-{Tema}.md`
+en árbol bajo `/doc/` es importante para que los asistentes de IA puedan navegar sin
+perder contexto. Cada nodo de documentación debe ofrecer enlaces hacia los nodos adyacentes.
+
+---
+
+## Herencia de Peano — Lecciones aprendidas
+
+> *Sección migrada del proyecto Peano (predecesor), 2026-05-22.*
+
+### Sobre el tipo inductivo como base
+
+- Definir `ℕ₀` como tipo inductivo da todos los axiomas de Peano gratis como teoremas probados.
+- El principio de recursión es la herramienta más poderosa — toda la aritmética fluye de él.
+- Las pruebas de buena fundamentación (`WellFounded`) son necesarias para la terminación de
+  definiciones recursivas.
+- **Paralelo en AczelSetTheory**: `HFSet` como cociente sobre `CList` da los axiomas de
+  Zermelo gratis como teoremas probados; `Quotient.lift` es el análogo al principio de recursión.
+
+### Sobre la organización de módulos
+
+- La cadena lineal de dependencias (Axioms → Order → Arithmetic → Advanced) funciona bien.
+- Cada módulo construye estrictamente sobre los anteriores — sin dependencias circulares.
+- 64 build jobs en Peano; `FSetFunction.lean` era el módulo más grande (~1500 líneas, ~92 exports).
+- **Paralelo en AczelSetTheory**: la cadena CList → Operations → Axioms → HFSets sigue el
+  mismo principio; 118+ módulos con dependencias acíclicas.
+
+### Sobre documentación
+
+- `REFERENCE.md` debe ser autosuficiente para asistentes de IA.
+- El protocolo "proyectar" (AI-GUIDE.md §11–14) previene la deriva de documentación.
+- El árbol `doc/REFERENCE-{tema}.md` (ADR-010) es esencial para escalar con más de 50 módulos.
+
+---
+
+## Prueba del Lema de Zassenhaus (referencia matemática)
+
+> *Sección migrada del proyecto Peano (predecesor), 2026-05-22.*
+> *Zassenhaus (1934), también llamado "lema de la mariposa".*
+
+### Enunciado
+
+Sea $G$ un grupo, $H, K \leq G$ subgrupos, $N \unlhd H$ y $M \unlhd K$. Entonces:
+
+$$
+\begin{aligned}
+& N \cap K \quad \unlhd \quad H \cap K \\
+& H \cap M \quad \unlhd \quad H \cap K \\
+& (N \cap K)(H \cap M) \quad \unlhd \quad H \cap K \\
+& N (H \cap M) \quad \unlhd \quad N (H \cap K) \\
+& M (N \cap K) \quad \unlhd \quad M (H \cap K) \\
+& \frac{N(H \cap K)}{N(H \cap M)} \;\cong\; \frac{H \cap K}{(N \cap K)(H \cap M)} \;\cong\; \frac{M(H \cap K)}{M(N \cap K)}
+\end{aligned}
+$$
+
+Las cinco normalidades son prerrequisitos del isomorfismo final; los tres cocientes centrales
+son consecuencia del Primer Teorema de Isomorfismo aplicado a un único homomorfismo bien elegido.
+
+### Prueba detallada
+
+Trabajamos en notación multiplicativa. $e$ es el neutro de $G$.
+Recordamos que $N \unlhd H$ equivale a: $N \leq H$ y $hNh^{-1} = N$ para todo $h \in H$.
+
+#### Paso 1 — $N \cap K \unlhd H \cap K$
+
+**1a. $N \cap K$ es subgrupo de $H \cap K$:**
+
+- *Neutro*: $e \in N$ (pues $N \leq H$) y $e \in K$, luego $e \in N \cap K \subseteq H \cap K$.
+- *Producto*: $a, b \in N \cap K \Rightarrow ab \in N$ y $ab \in K$, luego $ab \in N \cap K$.
+- *Inverso*: $a \in N \cap K \Rightarrow a^{-1} \in N$ y $a^{-1} \in K$, luego $a^{-1} \in N \cap K$.
+
+**1b. $N \cap K \unlhd H \cap K$:**
+
+Sea $x \in H \cap K$ y $a \in N \cap K$.
+- *Parte $N$*: $x \in H$, $a \in N \leq H$ y $N \unlhd H$, luego $xax^{-1} \in N$.
+- *Parte $K$*: $x, a, x^{-1} \in K$ y $K$ subgrupo, luego $xax^{-1} \in K$.
+
+Por tanto $xax^{-1} \in N \cap K$. ∎
+
+#### Paso 2 — $H \cap M \unlhd H \cap K$
+
+**2a. $H \cap M$ es subgrupo de $H \cap K$:**
+
+- $e \in H \cap M$ (ambos subgrupos). Y $H \cap M \subseteq H \cap K$ pues $M \leq K$.
+- *Producto y clausura por inverso*: análogos al Paso 1a.
+
+**2b. $H \cap M \unlhd H \cap K$:**
+
+Sea $x \in H \cap K$ y $b \in H \cap M$.
+- *Parte $H$*: $x, b, x^{-1} \in H$, luego $xbx^{-1} \in H$.
+- *Parte $M$*: $x \in K$, $b \in M \leq K$ y $M \unlhd K$, luego $xbx^{-1} \in M$.
+
+Por tanto $xbx^{-1} \in H \cap M$. ∎
+
+#### Paso 3 — $(N \cap K)(H \cap M) \unlhd H \cap K$
+
+Escribimos $A := N \cap K$, $B := H \cap M$, $L := H \cap K$.
+
+**3a. $AB = BA$:** Sea $a \in A$, $b \in B$. Como $b \in L$ y $A \unlhd L$, tenemos
+$b^{-1}ab \in A$, luego $ab = b(b^{-1}ab) \in BA$. Por simetría $AB = BA$.
+
+**3b. $AB$ es subgrupo de $L$:**
+
+- *Neutro*: $e = e \cdot e \in AB$.
+- *Producto*: $(a_1 b_1)(a_2 b_2) = a_1(b_1 a_2 b_1^{-1})(b_1 b_2)$ con $b_1 a_2 b_1^{-1} \in A$ (pues $b_1 \in L$ y $A \unlhd L$), luego el producto $\in AB$.
+- *Inverso*: $(ab)^{-1} = b^{-1}a^{-1} = (b^{-1}a^{-1}b)b^{-1} \in AB$.
+
+**3c. $AB \unlhd L$:** $x(ab)x^{-1} = (xax^{-1})(xbx^{-1})$ con $xax^{-1} \in A$ (Paso 1) y $xbx^{-1} \in B$ (Paso 2). ∎
+
+#### Paso 4 — $N \unlhd H$, $S \leq H$ ⟹ $NS$ es subgrupo de $H$ (criterio auxiliar)
+
+- *Neutro*: $e = e \cdot e \in NS$.
+- *Producto*: $(n_1 s_1)(n_2 s_2) = n_1(s_1 n_2 s_1^{-1})(s_1 s_2)$. Puesto que $s_1 \in H$ y $N \unlhd H$, $n_3 := s_1 n_2 s_1^{-1} \in N$. Luego el producto es $(n_1 n_3)(s_1 s_2) \in NS$.
+- *Inverso*: $(ns)^{-1} = s^{-1}n^{-1} = (s^{-1}n^{-1}s)s^{-1}$. El primer factor $\in N$ y el segundo $\in S$.
+
+**Consecuencias**:
+- $N(H \cap M) \leq H$ (tomar $S = H \cap M$).
+- $N(H \cap K) \leq H$ (tomar $S = H \cap K$).
+- $N(H \cap M) \leq N(H \cap K)$ pues $H \cap M \leq H \cap K$. ∎
+
+*(Pasos 5–7: normalidades de $N(H \cap M) \unlhd N(H \cap K)$ y $M(N \cap K) \unlhd M(H \cap K)$,
+y el isomorfismo final por Primer Teorema de Isomorfismo — pendiente de completar en esta
+referencia.)*

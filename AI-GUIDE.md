@@ -185,6 +185,8 @@ La documentación del proyecto se divide en los siguientes archivos complementar
 
 REFERENCE.md & doc/REFERENCE-*.md: Sistema de referencia en árbol interconectado.
 
+doc/peano/: Documentación de diseño heredada del proyecto predecesor Peano (ver doc/peano/README.md para el índice). Los 7 archivos doc/REFERENCE-*.md correspondientes a módulos de Peano (Arithmetic, Combinatorics, Foundation, GroupTheory, ListsAndSets, NumberTheory, Prelim) también están en doc/.
+
 NAMING-CONVENTIONS.md: Reglas estrictas de nomenclatura estilo Mathlib.
 
 PLANNING.md: Visión a largo plazo y hoja de ruta extendida (actúa como un NEXT-STEPS.md de alto nivel).
