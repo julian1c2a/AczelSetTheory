@@ -44,4 +44,28 @@ instance existsMem_decidable
         have hfy : f y = true := decide_eq_true hx_p
         exact h ((PList.any_eq_true _ _).mpr ⟨y, hy_mem, hfy⟩))
 
+/-- Cuantificador universal acotado decidible para HFSet.
+    Dado que `HFSet` es hereditariamente finito, podemos recorrer
+    todos los elementos de `A` y verificar `P` en cada uno. -/
+instance forallMem_decidable
+    (A : HFSet) (P : HFSet → Prop) [DecidablePred P] :
+    Decidable (∀ x, x ∈ A → P x) :=
+  -- ¬∃ x ∈ A, ¬P x  es decidible por existsMem_decidable con ¬P
+  match (inferInstance : Decidable (∃ x, x ∈ A ∧ ¬ P x)) with
+  | isTrue  h => isFalse fun hall =>
+      let ⟨x, hx, hnp⟩ := h; hnp (hall x hx)
+  | isFalse h => isTrue fun x hx =>
+      -- P x es decidible por [DecidablePred P]
+      match (inferInstance : Decidable (P x)) with
+      | isTrue  hp  => hp
+      | isFalse hnp => absurd ⟨x, hx, hnp⟩ h
+
+/-- La igualdad en HFSet es decidible (heredada de CList.extEq : Bool). -/
+instance instDecidableEqHFSet : DecidableEq HFSet :=
+  fun x y => Quotient.recOnSubsingleton₂ x y fun xc yc =>
+    if h : CList.extEq xc yc = true then
+      isTrue (Quotient.sound h)
+    else
+      isFalse (fun heq => h (Quotient.exact heq))
+
 end HFSet

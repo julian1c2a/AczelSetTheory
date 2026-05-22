@@ -81,10 +81,62 @@ theorem negOnePow_mul_self (k : ℕ₀) :
 -- Función de Möbius
 -- ─────────────────────────────────────────────────────────────────────────────
 
-private noncomputable instance (n : ℕ₀) : Decidable (squarefree n) := Classical.propDecidable _
+-- `p ∤ n` cuando `p > n` y `n ≠ 0`, por tanto `padicVal p n = 0`.
+private theorem padicVal_zero_of_not_le {p n : ℕ₀} (hgt : ¬ le₀ p n) (hn : n ≠ 𝟘) :
+    padicVal p n = 𝟘 :=
+  padicVal_of_not_cond (fun ⟨_, _, hdvd⟩ => hgt (divides_le hdvd hn))
+
+-- Solo los primos `p ≤ n` pueden tener `padicVal p n > 0`.
+private theorem squarefree_iff_bounded {n : ℕ₀} (hn : n ≠ 𝟘) :
+    squarefree n ↔ ∀ p, le₀ p n → Peano.Arith.Prime p → le₀ (padicVal p n) 𝟙 := by
+  constructor
+  · intro ⟨_, hall⟩ p _ hp; exact hall p hp
+  · intro bounded
+    refine ⟨hn, fun p hp => ?_⟩
+    by_cases hle : le₀ p n
+    · exact bounded p hle hp
+    · rw [padicVal_zero_of_not_le hle hn]; exact zero_le 𝟙
+
+private instance (n : ℕ₀) : Decidable (squarefree n) :=
+  if hn : n = 𝟘 then
+    isFalse (fun h => h.1 hn)
+  else
+    let witnessBool : ℕ₀ → Bool := fun k => isPrimeb k && !ble₀ (padicVal k n) 𝟙
+    have h_iff : ∀ k, witnessBool k = true ↔ (Peano.Arith.Prime k ∧ ¬ le₀ (padicVal k n) 𝟙) := fun k => by
+      constructor
+      · intro h
+        -- extraer isPrimeb k = true del &&
+        have hpb : isPrimeb k = true := by
+          cases hb : isPrimeb k with
+          | false =>
+            have : witnessBool k = false := by simp [witnessBool, hb]
+            exact absurd (this ▸ h) (by decide)
+          | true => rfl
+        -- extraer ble₀ ... = false del !
+        have hnble : ble₀ (padicVal k n) 𝟙 = false := by
+          cases hb : ble₀ (padicVal k n) 𝟙 with
+          | false => rfl
+          | true =>
+            have : witnessBool k = false := by simp [witnessBool, hpb, hb]
+            exact absurd (this ▸ h) (by decide)
+        exact ⟨isPrimeb_iff.mp hpb,
+               fun hle => Bool.noConfusion (hnble.symm.trans ((ble_iff_Le _ _).mpr hle))⟩
+      · intro ⟨hp, hnle⟩
+        simp only [witnessBool, isPrimeb_iff.mpr hp, Bool.true_and]
+        cases hb : ble₀ (padicVal k n) 𝟙 with
+        | false => rfl
+        | true  => exact False.elim (hnle ((ble_iff_Le _ _).mp hb))
+    match decidableBExLe_of_bool _ witnessBool h_iff n with
+    | isTrue hw =>
+        isFalse (fun hsq =>
+          let ⟨k, _, hkp, hknle⟩ := hw
+          hknle (hsq.2 k hkp))
+    | isFalse hnw =>
+        isTrue ((squarefree_iff_bounded hn).mpr (fun p hle hp =>
+          Classical.byContradiction (fun h => hnw ⟨p, hle, hp, h⟩)))
 
 /-- μ(n) = (-1)^Ω(n) si n es libre de cuadrados, 0 en otro caso. -/
-noncomputable def mobius (n : ℕ₀) : ℤ₀ :=
+def mobius (n : ℕ₀) : ℤ₀ :=
   if squarefree n then negOnePow (Omega_prime n) else 0
 
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -92,7 +144,7 @@ noncomputable def mobius (n : ℕ₀) : ℤ₀ :=
 -- ─────────────────────────────────────────────────────────────────────────────
 
 /-- λ(n) = (-1)^Ω(n), donde Ω(n) es el número de factores primos con multiplicidad. -/
-noncomputable def liouville (n : ℕ₀) : ℤ₀ :=
+def liouville (n : ℕ₀) : ℤ₀ :=
   negOnePow (Omega_prime n)
 
 -- ─────────────────────────────────────────────────────────────────────────────

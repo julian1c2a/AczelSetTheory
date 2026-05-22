@@ -2,8 +2,6 @@ import AczelSetTheory.Topology.Basic
 import AczelSetTheory.Axioms.Separation
 import AczelSetTheory.Axioms.Powerset
 
-open Classical
-
 namespace HFTopology
 
 /-!
@@ -19,7 +17,7 @@ preimagen de todo abierto es abierta.
 /-! ## Preimagen -/
 
 /-- Preimagen de `V` bajo `f` respecto al dominio `X`. -/
-noncomputable def HFTopSpace.preimage (ts : HFTopSpace) (f : HFSet → HFSet) (V : HFSet) : HFSet :=
+def HFTopSpace.preimage (ts : HFTopSpace) (f : HFSet → HFSet) (V : HFSet) : HFSet :=
   HFSet.sep ts.X (fun x => f x ∈ V)
 
 theorem HFTopSpace.mem_preimage (ts : HFTopSpace) (f : HFSet → HFSet) (V x : HFSet) :
@@ -30,7 +28,7 @@ theorem HFTopSpace.mem_preimage (ts : HFTopSpace) (f : HFSet → HFSet) (V x : H
 /-! ## Topología subespacio -/
 
 /-- Topología inducida sobre `A ⊆ X`: los abiertos son las intersecciones `U ∩ A` con `U ∈ τ`. -/
-noncomputable def HFTopSpace.subspace (ts : HFTopSpace) (A : HFSet) (hA : A ⊆ ts.X) :
+def HFTopSpace.subspace (ts : HFTopSpace) (A : HFSet) (hA : A ⊆ ts.X) :
     HFTopSpace where
   X          := A
   τ          := HFSet.sep (HFSet.powerset A) (fun V => ∃ U, U ∈ ts.τ ∧ V = HFSet.inter U A)
@@ -123,7 +121,7 @@ structure HFContinuous (ts₁ ts₂ : HFTopSpace) where
 namespace HFContinuous
 
 /-- La aplicación identidad es continua. -/
-noncomputable def id (ts : HFTopSpace) : HFContinuous ts ts where
+def id (ts : HFTopSpace) : HFContinuous ts ts where
   f             := fun x => x
   f_mem         := fun hx => hx
   preimage_open := by
@@ -141,7 +139,7 @@ noncomputable def id (ts : HFTopSpace) : HFContinuous ts ts where
     rw [this]; exact hV
 
 /-- Composición de aplicaciones continuas. -/
-noncomputable def comp {ts₁ ts₂ ts₃ : HFTopSpace}
+def comp {ts₁ ts₂ ts₃ : HFTopSpace}
     (g : HFContinuous ts₂ ts₃) (f : HFContinuous ts₁ ts₂) : HFContinuous ts₁ ts₃ where
   f             := fun x => g.f (f.f x)
   f_mem         := fun hx => g.f_mem (f.f_mem hx)

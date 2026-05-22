@@ -1,6 +1,7 @@
 import AczelSetTheory.Algebra.Group
 import AczelSetTheory.Algebra.Subgroup
 import AczelSetTheory.Algebra.GroupHom
+import AczelSetTheory.Algebra.NormalSubgroup
 import AczelSetTheory.Algebra.Ring
 import AczelSetTheory.Algebra.CosetCount
 import AczelSetTheory.Algebra.Monoid

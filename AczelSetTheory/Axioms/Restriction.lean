@@ -21,6 +21,11 @@ theorem mem_restrict {R A p : HFSet} :
     p ∈ (R ↾ A) ↔ p ∈ R ∧ ∃ a b, p = ⟪a, b⟫ ∧ a ∈ A := by
   unfold HFSet.restrict
   rw [mem_sep]
+  constructor
+  · rintro ⟨hpR, a, haA, b, _, heq⟩
+    exact ⟨hpR, a, b, heq, haA⟩
+  · rintro ⟨hpR, a, b, heq, haA⟩
+    exact ⟨hpR, a, haA, b, snd_in a b R (heq ▸ hpR), heq⟩
 
 /-- La restricción preserva la pertenencia a R. -/
 theorem restrict_subset {R A : HFSet} : (R ↾ A) ⊆ R := by

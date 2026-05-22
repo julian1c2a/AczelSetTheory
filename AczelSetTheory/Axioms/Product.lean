@@ -52,8 +52,8 @@ theorem mem_prodHF {A B p : HFSet} :
   unfold HFSet.prodHF
   rw [mem_sep]
   constructor
-  · rintro ⟨_, a, b, ha, hb, rfl⟩; exact ⟨a, b, ha, hb, rfl⟩
-  · rintro ⟨a, b, ha, hb, rfl⟩; exact ⟨prodHF_mem_universe ha hb, a, b, ha, hb, rfl⟩
+  · rintro ⟨_, a, ha, b, hb, rfl⟩; exact ⟨a, b, ha, hb, rfl⟩
+  · rintro ⟨a, b, ha, hb, rfl⟩; exact ⟨prodHF_mem_universe ha hb, a, ha, b, hb, rfl⟩
 
 /-- Membresía en forma de par ordenado:
     ⟪a, b⟫ ∈ A ×ₛ B ↔ a ∈ A ∧ b ∈ B. -/

@@ -59,11 +59,11 @@ theorem image_subset_range
 
 /-- Si f es función y x ∈ A ∩ domain f, entonces apply f x ∈ image f A. -/
 theorem apply_mem_image
-  (f A x : HFSet) (_hf : isFunction f) (hxA : x ∈ A) (hx : ∃ b, ⟪x, b⟫ ∈ f) :
-    apply f x hx ∈ image f A
+  (f A x : HFSet) (hf : isFunction f) (hxA : x ∈ A) (hx : ∃ b, ⟪x, b⟫ ∈ f) :
+    apply f x ∈ image f A
       := by
   rw [mem_image]
-  exact ⟨x, hxA, apply_mem f x hx⟩
+  exact ⟨x, hxA, apply_mem f x hf hx⟩
 
 /-- Si f es función total de A en B, la imagen de A es un subconjunto de B. -/
 theorem image_totalFunction_subset

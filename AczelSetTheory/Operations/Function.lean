@@ -23,11 +23,9 @@ def isTotalFunction
   isFunction f ∧ domain f = A ∧ ∀ b, b ∈ range f → b ∈ B
 
 /-- Aplicación de una función f a un argumento a.
-    Requiere prueba de que a está en el dominio. Noncomputable (Classical.choose). -/
-noncomputable def apply
-  (f a : HFSet) (h : ∃ b, ⟪a, b⟫ ∈ f) :
-    HFSet
-      :=
-  Classical.choose h
+    Busca el único b tal que ⟪a, b⟫ ∈ f y lo devuelve.
+    Devuelve ∅ si a no está en el dominio (función total sobre su dominio). -/
+def apply (f a : HFSet) : HFSet :=
+  HFSet.snd (HFSet.sInter (HFSet.sep f (fun p => HFSet.fst p = a)))
 
 end HFSet

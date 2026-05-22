@@ -28,18 +28,6 @@ open Peano
 namespace HFSet
 
 -- ==================================================================
--- Instancia DecidableEq HFSet
--- ==================================================================
-
-/-- La igualdad en HFSet es decidible (heredada de CList.extEq : Bool). -/
-instance : DecidableEq HFSet :=
-  fun x y => Quotient.recOnSubsingleton₂ x y fun xc yc =>
-    if h : CList.extEq xc yc = true then
-      isTrue (Quotient.sound h)
-    else
-      isFalse (fun heq => h (Quotient.exact heq))
-
--- ==================================================================
 -- Lema auxiliar: insert b A = A cuando b ∈ A
 -- ==================================================================
 

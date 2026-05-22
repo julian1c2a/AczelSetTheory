@@ -1,5 +1,6 @@
 import AczelSetTheory.HFSets
 import AczelSetTheory.Operations.Separation
+import AczelSetTheory.Axioms.Decidable
 
 namespace HFSet
 

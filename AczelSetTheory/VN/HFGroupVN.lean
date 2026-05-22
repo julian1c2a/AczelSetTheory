@@ -54,7 +54,7 @@ private theorem mem_imageVN {G : ℕ₀FinGroup} {n : ℕ₀}
 
 /-- Transporta un grupo finito sobre ℕ₀ a FinGroup HFSet vía vN.
     El portador es la imagen de G.carrier bajo vN. -/
-noncomputable def imageGroup (G : ℕ₀FinGroup) : FinGroup HFSet where
+def imageGroup (G : ℕ₀FinGroup) : FinGroup HFSet where
   carrier := FSet.image vN G.carrier
   id      := vN G.id
   op      :=

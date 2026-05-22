@@ -3,8 +3,6 @@ import AczelSetTheory.Axioms.Separation
 import AczelSetTheory.Axioms.Intersection
 import AczelSetTheory.Axioms.Setminus
 
-open Classical
-
 namespace HFTopology
 
 /-!
@@ -31,7 +29,7 @@ variable {ts : HFTopSpace}
 /-! ## Interior -/
 
 /-- Interior de `A`: mayor abierto contenido en `A`. -/
-noncomputable def HFTopSpace.interior (ts : HFTopSpace) (A : HFSet) : HFSet :=
+def HFTopSpace.interior (ts : HFTopSpace) (A : HFSet) : HFSet :=
   HFSet.sUnion (HFSet.sep ts.τ (fun U => U ⊆ A))
 
 theorem HFTopSpace.mem_interior (ts : HFTopSpace) (A x : HFSet) :
@@ -80,7 +78,7 @@ theorem HFTopSpace.interior_eq_of_open (ts : HFTopSpace) {A : HFSet} (hA : A ∈
 /-! ## Clausura -/
 
 /-- Clausura (adherencia) de `A`: menor cerrado que contiene a `A`. -/
-noncomputable def HFTopSpace.closure (ts : HFTopSpace) (A : HFSet) : HFSet :=
+def HFTopSpace.closure (ts : HFTopSpace) (A : HFSet) : HFSet :=
   HFSet.setminus ts.X (ts.interior (HFSet.setminus ts.X A))
 
 /-- La clausura es un cerrado, i.e., su complemento es abierto. -/
@@ -120,7 +118,7 @@ theorem HFTopSpace.closure_eq_of_closed (ts : HFTopSpace) {A : HFSet}
 /-! ## Exterior -/
 
 /-- Exterior de `A`: interior del complemento. -/
-noncomputable def HFTopSpace.exterior (ts : HFTopSpace) (A : HFSet) : HFSet :=
+def HFTopSpace.exterior (ts : HFTopSpace) (A : HFSet) : HFSet :=
   ts.interior (HFSet.setminus ts.X A)
 
 /-- El exterior es abierto. -/
@@ -130,7 +128,7 @@ theorem HFTopSpace.exterior_open (ts : HFTopSpace) (A : HFSet) : ts.exterior A �
 /-! ## Frontera -/
 
 /-- Frontera de `A`: clausura menos interior. -/
-noncomputable def HFTopSpace.boundary (ts : HFTopSpace) (A : HFSet) : HFSet :=
+def HFTopSpace.boundary (ts : HFTopSpace) (A : HFSet) : HFSet :=
   HFSet.setminus (ts.closure A) (ts.interior A)
 
 /-! ## Clasificación de puntos -/

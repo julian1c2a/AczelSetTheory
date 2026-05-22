@@ -70,10 +70,10 @@ theorem mem_relComp {R S c : HFSet} :
   unfold HFSet.relComp
   rw [mem_sep]
   constructor
-  · rintro ⟨_, a, b, habR, hbcS⟩
+  · rintro ⟨_, a, _, b, _, habR, hbcS⟩
     exact ⟨a, b, habR, hbcS⟩
   · rintro ⟨a, b, habR, hbcS⟩
-    exact ⟨snd_in b c S hbcS, a, b, habR, hbcS⟩
+    exact ⟨snd_in b c S hbcS, a, fst_in a b R habR, b, snd_in a b R habR, habR, hbcS⟩
 
 /-- La composición con ∅ a la izquierda es vacía. -/
 theorem relComp_empty_left {R : HFSet} : empty ∘ᵣ R = empty := by

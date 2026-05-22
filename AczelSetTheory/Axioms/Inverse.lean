@@ -50,8 +50,8 @@ theorem mem_relInv {R p : HFSet} :
   unfold HFSet.relInv
   rw [mem_sep]
   constructor
-  · rintro ⟨_, a, b, hab, rfl⟩; exact ⟨a, b, hab, rfl⟩
-  · rintro ⟨a, b, hab, rfl⟩; exact ⟨relInv_mem_universe a b R hab, a, b, hab, rfl⟩
+  · rintro ⟨_, a, _, b, _, hab, rfl⟩; exact ⟨a, b, hab, rfl⟩
+  · rintro ⟨a, b, hab, rfl⟩; exact ⟨relInv_mem_universe a b R hab, a, fst_mem_sUnion_sUnion a b R hab, b, snd_mem_sUnion_sUnion a b R hab, hab, rfl⟩
 
 /-- Membresía en forma de par ordenado:
     ⟪b, a⟫ ∈ R⁻¹ᵣ ↔ ⟪a, b⟫ ∈ R. -/

@@ -1,6 +1,7 @@
 import AczelSetTheory.HFSets
 import AczelSetTheory.Axioms.Union
 import AczelSetTheory.Axioms.Intersection
+import AczelSetTheory.Axioms.Decidable
 
 namespace HFSet
 
@@ -9,6 +10,10 @@ instance : HasSubset HFSet where
   Subset A B := ∀ x, x ∈ A → x ∈ B
 
 theorem subset_iff (A B : HFSet) : A ⊆ B ↔ ∀ x, x ∈ A → x ∈ B := Iff.rfl
+
+/-- `A ⊆ B` es decidible: se verifica elemento a elemento sobre el finito `A`. -/
+instance subsetDecidable (A B : HFSet) : Decidable (A ⊆ B) :=
+  forallMem_decidable A (fun x => x ∈ B)
 
 theorem subset_refl (A : HFSet) : A ⊆ A :=
   fun _ h => h

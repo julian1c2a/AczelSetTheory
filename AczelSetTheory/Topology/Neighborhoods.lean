@@ -2,8 +2,6 @@ import AczelSetTheory.Topology.Basic
 import AczelSetTheory.Axioms.Separation
 import AczelSetTheory.Axioms.Powerset
 
-open Classical
-
 namespace HFTopology
 
 /-!
@@ -47,7 +45,7 @@ structure HFNeighborSpace where
 Dado `ts : HFTopSpace`, se define `𝒩_ts(x) = {N ⊆ X | ∃ U ∈ τ, x ∈ U ∧ U ⊆ N}`.
 -/
 
-noncomputable def HFTopSpace.toNeighborSpace (ts : HFTopSpace) : HFNeighborSpace where
+def HFTopSpace.toNeighborSpace (ts : HFTopSpace) : HFNeighborSpace where
   X         := ts.X
   𝒩         := fun x =>
                   HFSet.sep (HFSet.powerset ts.X)
@@ -108,7 +106,7 @@ noncomputable def HFTopSpace.toNeighborSpace (ts : HFTopSpace) : HFNeighborSpace
 Dado `ns : HFNeighborSpace`, se define `τ_ns = {U ⊆ X | ∀ x ∈ U, U ∈ 𝒩(x)}`.
 -/
 
-noncomputable def HFNeighborSpace.toTopSpace (ns : HFNeighborSpace) : HFTopSpace where
+def HFNeighborSpace.toTopSpace (ns : HFNeighborSpace) : HFTopSpace where
   X          := ns.X
   τ          := HFSet.sep (HFSet.powerset ns.X) (fun U => ∀ x, x ∈ U → U ∈ ns.𝒩 x)
   τ_sub      := by
