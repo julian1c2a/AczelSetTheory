@@ -39,9 +39,11 @@
 ### Completado
 
 **CList** (8 módulos): Basic, ExtEq, Filter, SetEquiv, Order, Sort, Normalize, barrel.
+
 - Refactorizado completamente a `PList CList` / `ℕ₀` (Fase 2 ✅).
 
 **PList** (4 módulos): Basic, Lemmas, Omega0, Fin0.
+
 - `omega₀` tactic disponible. Fase 1 ✅.
 
 **HFSet** (1 módulo): cociente extensional sobre CList.
@@ -97,6 +99,7 @@ require peanolib from git
 Verificar: `lake update && lake build` compila 0 errores.
 
 **Qué importamos de Peano:**
+
 - `ℕ₀` (tipo inductivo con `𝟘` y `σ`)
 - `PeanoNatArith` (suma `+₀`, producto `*₀`, orden `≤₀`)
 - `Isomorph` (isomorfismo `Λ : ℕ₀ → ℕ`, `Ψ : ℕ → ℕ₀` con preservación de operaciones)
@@ -145,6 +148,7 @@ end PList
 ```
 
 Lemas necesarios (en `PList/Lemmas.lean`):
+
 - `length_nil`, `length_cons`
 - `mem_cons`, `mem_nil` (predicado `PList.Mem`)
 - `map_cons`, `filter_cons`
@@ -207,6 +211,7 @@ es un tipo polimórfico ya definido — no hay violación de positividad.
 ### 2.1 CList/Basic.lean
 
 Cambios:
+
 - Eliminar `import Init.Data.List.Basic`
 - Añadir `import AczelSetTheory.PList.Basic`
 - `mk : PList CList → CList`
@@ -216,6 +221,7 @@ Cambios:
 - Pruebas de terminación: `omega₀` en lugar de `omega`
 
 Funciones afectadas:
+
 - `cSize` / `cSizeList` → `cSize` / `cSizePList`
 - `dedupAux`, `dedup`
 - `orderedInsert`, `insertionSort`
@@ -225,6 +231,7 @@ Funciones afectadas:
 ### 2.2 CList/ExtEq.lean
 
 Cambios:
+
 - Lemas que usan `List.mem_cons` → `PList.mem_cons`
 - Lemas de tamaño que usan `Nat.lt` → `ℕ₀.lt` (o `<₀`)
 
@@ -397,6 +404,7 @@ end VN
 Archivo: `AczelSetTheory/VN/PeanoArith.lean`
 
 Transporte sistemático de:
+
 - `add_comm`, `add_assoc`, `add_zero`, `zero_add`
 - `mul_comm`, `mul_assoc`, `mul_zero`, `zero_mul`, `mul_one`
 - `add_mul`, `mul_add` (distributividad)
