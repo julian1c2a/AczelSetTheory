@@ -1,6 +1,6 @@
 # Technical Reference — HFList (Hereditarily Finite Lists)
 
-**Last updated:** 2026-05-18
+**Last updated:** 2026-05-27
 **Parent:** [../REFERENCE.md](../REFERENCE.md)
 **Related:** [REFERENCE-PList.md](REFERENCE-PList.md) | [REFERENCE-HFSets.md](REFERENCE-HFSets.md)
 
@@ -56,6 +56,8 @@ Concrete aliases defined inside `namespace HFList`:
 | `HFList.get?` | `PList.get?` | `HFList → ℕ₀ → Option HFSet` |
 | `HFList.get` | `PList.get` | `(l : HFList) → Fin₀ (l.length) → HFSet` |
 | `HFList.Mem` | `PList.Mem` | `HFSet → HFList → Prop` |
+| `HFList.take` | `PList.take` | `ℕ₀ → HFList → HFList` — first `k` elements |
+| `HFList.drop` | `PList.drop` | `ℕ₀ → HFList → HFList` — skip first `k` elements |
 
 `Append HFList` and `Membership HFSet HFList` instances are provided.
 
@@ -91,6 +93,8 @@ Statically-sized n-tuple of HFSets.
 | `FinList.append` | `FinList n → FinList m → FinList (add n m)` | Concatenation |
 | `FinList.map` | `(HFSet → HFSet) → FinList n → FinList n` | Pointwise unary op |
 | `FinList.zipWith` | `(HFSet → HFSet → HFSet) → FinList n → FinList n → FinList n` | Pointwise binary op |
+| `FinList.take` | `(k : ℕ₀) → FinList n → k ≤ n → FinList k` | First `k` components |
+| `FinList.drop` | `(k : ℕ₀) → FinList n → k ≤ n → FinList (sub n k)` | Skip first `k` components |
 
 ---
 
@@ -143,6 +147,14 @@ Converts a static n-tuple to an `HFSet`.
 | 7 | `get?_cons_zero` | `@[simp] (h : HFSet) (t : HFList) : (cons h t).get? 𝟘 = some h` |
 | 8 | `get?_cons_succ` | `@[simp] (h : HFSet) (t : HFList) (i : ℕ₀) : (cons h t).get? (σ i) = get? t i` |
 
+**take / drop**
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 9 | `length_take_le` | `(k : ℕ₀) (l : HFList) (h : k ≤ length l) : length (take k l) = k` |
+| 10 | `add_length_drop` | `(k : ℕ₀) (l : HFList) (h : k ≤ length l) : Peano.Add.add k (length (drop k l)) = length l` |
+| 11 | `length_drop_le` | `(k : ℕ₀) (l : HFList) (h : k ≤ length l) : length (drop k l) = Peano.Sub.sub (length l) k` |
+
 ---
 
 ### 6.44 HFList.lean — `namespace FinList`
@@ -154,6 +166,7 @@ Converts a static n-tuple to an `HFSet`.
 | 9 | `ext` | `{t s : FinList n} → t.val = s.val → t = s` |
 | 10 | `ext_iff` | `{t s : FinList n} : t = s ↔ t.val = s.val` |
 | 11 | `length_eq` | `(t : FinList n) : t.val.length = n` |
+| 12 | `extEq` | `{t s : FinList n} → (∀ i : Fin₀ n, t.get i = s.get i) → t = s` |
 
 **Append**
 

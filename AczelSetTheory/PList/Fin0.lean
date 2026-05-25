@@ -145,4 +145,21 @@ theorem get_eq_get? (l : PList α) (i : Fin₀ (l.length)) :
           simp only [PList.Omega0.ψ_lt_iff]
           omega⟩
 
+/-- Igualdad extensional de `PList`: si dos listas tienen igual longitud y
+    coinciden en cada índice `Fin₀`, entonces son iguales. -/
+theorem get_ext (l₁ l₂ : PList α) (heq : l₁.length = l₂.length)
+    (h : ∀ i : Fin₀ (l₁.length), l₁.get i = l₂.get ⟨i.val, heq ▸ i.isLt⟩) :
+    l₁ = l₂ := by
+  apply plist_ext_get?
+  intro i
+  by_cases hlt : i < l₁.length
+  · have hlt₂ : i < l₂.length := heq ▸ hlt
+    rw [get_eq_get? l₁ ⟨i, hlt⟩, get_eq_get? l₂ ⟨i, hlt₂⟩]
+    congr 1
+    exact h ⟨i, hlt⟩
+  · have hge : l₁.length ≤ i := by
+      simp only [PList.Omega0.ψ_lt_iff, PList.Omega0.ψ_le_iff] at *
+      omega
+    rw [get?_none_of_ge l₁ i hge, get?_none_of_ge l₂ i (heq ▸ hge)]
+
 end PList

@@ -17,8 +17,169 @@
 - **El reto de Powerset**: Al contrario que con Union que requiere "aplanar" listas, o Intersection que descarta elementos, el Conjunto Potencia (powersetCList) es constructivamente intensivo porque requiere construir explícitamente $2^N$ sublistas y probar que extensionalmente se corresponden. Requerirá su propio módulo auxiliar.
 - **Axioma de Elección**: Sigue estando la duda si el Axioma de Elección es derivable en sets hereditariamente finitos, tal cual pasa en ZF con modelos restringidos. Veremos.
 
-- **[1.] Posible ampliación del esquema de conjuntos** Supongamos que definimos de forma inductiva un tipo de conjuntos que son o bien un HFSet
-o bien un conjunto extensional de HFSets más una predicado de pertenencia de HFSets o los nuevos Sets construidos que cumplan con ese predicado de pertenencia. ¿Esto daría lugar a conjuntos computables, aunque posiblemente infinitos? Por ejemplo, podemos definir $V_ω := \{[ x | x \text{ es un } HFSet ]\}$ y luego $V_{Succ(ω)} := \{[ x | x ∈ V_ω ∨ x = V_ω ]\}$
+- **[1.] Posible ampliación del esquema de conjuntos** Supongamos que definimos de forma inductiva un tipo de conjuntos que son o bien un HFSet o bien un conjunto extensional de HFSets más una predicado de pertenencia de HFSets o los nuevos Sets construidos que cumplan con ese predicado de pertenencia. ¿Esto daría lugar a conjuntos computables, aunque posiblemente infinitos? Por ejemplo, podemos definir $V_ω := \{[ x | x \text{ es un } HFSet ]\}$ y luego $V_{Succ(ω)} := \{[ x | x ∈ V_ω ∨ x = V_ω ]\}$
+
+- **[2.] Preguntas sobre los esquemas probados en Aczel**
+  - [2.1.] ¿Hemos probado que los HFSet son bien fundados como teorema?
+    > **[Respuesta — 2026-05-25]** Sí. `Axioms/Foundation.lean` contiene el teorema `foundation`:
+    > todo conjunto no vacío A tiene un elemento x tal que x ∩ A = ∅ — el Axioma de Regularidad.
+    > Esto es equivalente a la buena fundación de ∈ sobre HFSet (no existen cadenas descendentes ε-infinitas).
+    > Además, `Axioms/WellOrder.lean` tiene `wf_induction` y `no_infinite_descent`, que
+    > son las herramientas de inducción bien fundada para relaciones HFSet genéricas.
+    > Lo que NO tenemos es una instancia `WellFounded` de Lean 4 directamente sobre HFSet
+    > (que permitiría usar `termination_by` automáticamente). Eso sería una extensión interesante.
+    - RESOLUCIÓN: se ha de definir `instance : WellFounded (∈ : HFSet → HFSet → Prop)` usando `foundation` y luego se podrían usar inducciones bien fundadas directas sobre HFSet sin necesidad de `wf_induction`. Esto es una tarea concreta de desarrollo.
+    > **[Resp. IA — 2026-05-25]** Correcto. La ruta más directa NO pasa por `foundation` sino
+    > por la inducción estructural sobre CList: dado que HFSet = Quotient CList, y CList es un
+    > tipo inductivo con profundidad finita, la accesibilidad de cada elemento es un teorema
+    > estructural. El esquema concreto:
+>
+    > ```lean
+    > private def CList.mem_acc : ∀ c : CList, Acc (fun a b => a ∈ (⟦b⟧ : HFSet)) c
+    >   | CList.nil    => Acc.intro _ (fun _ h => absurd h (by simp [HFSet.mem_empty]))
+    >   | CList.mk as  => ...  -- inducción sobre PList
+    > instance : WellFounded (· ∈ · : HFSet → HFSet → Prop) :=
+    >   ⟨fun a => Quotient.inductionOn a CList.mem_acc⟩
+    > ```
+>
+    > Alternativamente, si ya tenemos `Axioms/Rank.lean` con `rank : HFSet → ℕ₀` y
+    > `mem_rank_lt : a ∈ b → rank a < rank b`, entonces:
+>
+    > ```lean
+    > instance : WellFounded (· ∈ · : HFSet → HFSet → Prop) :=
+    >   Subrelation.wf mem_rank_lt (measure rank).wf
+    > ```
+>
+    > Esta segunda forma es más limpia y reutiliza `Rank.lean`. **`mem_rank_lt` NO existe
+    > todavía en `Axioms/Rank.lean`** (que solo tiene `rank_empty` y `rank_insert`).
+    > Habría que añadirlo primero. La **ruta más directa hoy** es la inducción estructural
+    > sobre CList.
+
+  - [2.2.] ¿Hemos probado el axioma de elección para HFSet?
+    > **[Respuesta — 2026-05-25]** Sí. `Axioms/Choice.lean` tiene:
+    > - `choose (A : HFSet) (_ : A ≠ empty) : HFSet` — función de elección total.
+    > - `choose_mem` — prueba que el elemento elegido pertenece a A.
+    > - `choice_principle` — el principio de elección en su forma axiomática.
+    > Para HFSet el AC es en efecto *derivable* (no un axioma independiente), porque todos los
+    > conjuntos son finitos: la elección se realiza tomando el primer elemento del CList canónico.
+    > Esto confirma la hipótesis del bullet anterior de THOUGHTS.
+    - RESOLUCIÓN: se ha de formalizar la instancia `instance : Choice HFSet` usando `choose` y `choose_mem`, lo que permitirá usar la notación de elección de Lean 4 (`∃ x ∈ A, P x → P (choose A _)`) directamente sobre HFSet. Esto es una tarea concreta de desarrollo. Ha de ser computable, derivable y decidible, lo que es posible gracias a la finitud de los conjuntos.
+    > **[Resp. IA — 2026-05-25]** Importante aclaración: en Lean 4 no existe un typeclass
+    > estándar `Choice`. El `Classical.choice` es una función global (no es una instancia de
+    > clase) y NO es computable. Para HFSet los tres objetivos se logran así:
+    >
+    > **Computable** — `HFSet.choose` ya es `def` (no `noncomputable`), porque usa `CList.reprHead`
+    > directamente sobre el representante canónico. Este punto ya está cumplido.
+    >
+    > **Derivable** — `choose_mem` ya es un teorema, no un axioma. También cumplido.
+    >
+    > **Decidible** — lo que falta es la instancia `DecidableEq HFSet` (o equivalentemente
+    > `Decidable (a ∈ b)` para todo `a b : HFSet`). Esto debería seguir de `CList.extEq_def`
+    > y de la decidibilidad de `Bool`-valued `CList.mem`. Verificar si ya existe en `HFSets.lean`.
+    >
+    > En lugar de `instance : Choice HFSet`, lo más útil sería:
+>
+    > ```lean
+    > instance : DecidableEq HFSet  -- si no existe ya
+    > instance : ∀ A : HFSet, Decidable (A = empty)  -- para usar choose sin sorry
+    > ```
+>
+    > Con estos dos, `HFSet.choose` ya funciona plenamente como elección computable.
+
+  - [2.3.] ¿Tenemos implementado el axioma de reemplazo en HFSet?
+    > **[Respuesta — 2026-05-25]** Sí. `Axioms/Replacement.lean` lo implementa como la operación
+    > `image` (imagen de una función `HFSet → HFSet` aplicada a un conjunto):
+    > `mem_image`, `image_empty`, `image_of_empty`, `apply_mem_image`, `image_subset_range`,
+    > `image_totalFunction_subset`. El esquema de reemplazo completo (para funciones definidas
+    > por fórmulas) no se puede enunciar directamente en Lean 4 sin metaprogramación, pero
+    > la versión funcional es suficiente para toda la matemática que hacemos aquí.
+    - CONCLUIDO
+
+  - [2.4.] ¿Tenemos el axioma de powerset para HFSet? (creo que no, pero es importante)
+    > **[Respuesta — 2026-05-25]** Sí, sí está. `Axioms/Powerset.lean` tiene `mem_powerset`
+    > y prueba extensional completa del conjunto potencia. Fue el resultado más difícil de la
+    > fase inicial (ver el primer bullet de este archivo: la clave fue `filter` como testigo de
+    > sublistas + `powersetCList_extEq`). Así que los 6 axiomas de ZF$^{-\infty}$ (vacío,
+    > par, unión, separación, powerset, fundación) + reemplazo + elección están todos formalizados.
+    - CONCLUIDO
+
+  - [2.5.] El camino previo de Peano a Aczel, ROBINSON_PlusPlus a Peano, está siendo el proceso por el que recuperamos desde los cimientos la teoría de listas y tuplas, basados exclusivamente en la teoría de Peano. Con el paso del tiempo y la cimentación de ese proyecto constituirá la fundamentación de la teoría de conjuntos desde los axiomas de Peano. Así las herramientas usadas en este proyecto estarán basadas exclusivamente en FOL⁼ + Peano, sin usar ningún resultado de la teoría de conjuntos.
+    > **[Comentario — 2026-05-25]** Esta es exactamente la arquitectura correcta y es una de las
+    > contribuciones más originales del proyecto. La cadena completa es:
+    > FOL= → PA (axiomas de Peano) → ℕ₀ con aritmética → PLists/CLists → HFSet → ZF$^{-\infty}$.
+    > El transporte VN (módulos `VN/`) cierra el bucle: recupera los resultados de aritmética
+    > *dentro* del universo HFSet, usando los Von Neumann naturales. Esto es una versión formal
+    > del programa de Aczel de fundamentación predicativa de las matemáticas.
+    - CONCLUIDO
+
+  - [2.6.] ¿Sería bueno, en vez de seguir con un incremento hacia Aset₁, implementar W-types tomando como tipo base nuestros HFSets?
+    > **[Comentario — 2026-05-25]** Los W-types en Lean 4 son `W (α : Type) (β : α → Type)`,
+    > árboles bien fundados donde α es el tipo de los constructores y β los subárboles de cada nodo.
+    > HFSet YA ES el W-type especial con α = CList y β = PList (= lista de hijos). Por tanto
+    > implementar W-types *genéricos parametrizados por HFSet* no es redundante, pero es más
+    > complejo porque requeriría definir α : HFSet y β : HFSet → HFSet como parámetros.
+    > El resultado sería un tipo de *árboles extensionales bien fundados* sobre HFSet — equivalente
+    > a conjuntos de Aczel no necesariamente finitos (ASet₁ sin quotient).
+    > **Recomendación**: antes de W-types, completar ASet₁ (quotient de CList₁), que es el paso
+    > natural siguiente. Los W-types vendrían después como generalización.
+
+  - [2.7.] Tengo de hecho un esquema de conjuntos que alcanzan grandes cardinales, pero no estoy seguro de lo que puede ser axioma y lo que puede ser teorema.
+    > **[Comentario — 2026-05-25]** Los grandes cardinales (inaccesibles, Mahlo, compactos, etc.)
+    > son consistentes con ZFC pero no derivables de ZFC — es decir, son axiomas independientes.
+    > En Lean 4 sin `sorry`, para añadirlos necesitarías `axiom` explícitos. Dentro del esquema
+    > ASet₁/ASet₂... lo que sí es derivable es la existencia de ω, ω₁^{CK} (el primer ordinal
+    > no computable), y cardinales "pequeños". Los grandes cardinales genuinos requieren postularlos.
+    > Una guía útil: si tu esquema da un cardinal κ tal que V_κ ⊨ ZFC, tienes un inaccessible —
+    > eso ya no es derivable en ZFC, es un axioma adicional.
+
+  - [2.8.] Quiero recuperar todo lo especulado sobre cuerpos racionales y su avance hacia los reales, con computabilidad, que habíamos discutido en Peano, pero ahora con el nuevo esquema de conjuntos que tengo en mente. ¿Podemos recuperarlo? Hablábamos de definir primero los racionales como un par de un entero y un natural no nulo, y luego seguir por las sucesiones de Cauchy. Después defníamos el cuerpo de los números constructibles, luego el de los radicales de la unidad, luego el del os agebráicos y finalmente eld e los computables.
+    > **[Comentario — 2026-05-25]** Sí, la cadena es perfectamente realizable sobre la base actual.
+    > El orden natural sería:
+    > 1. **ℚ₀** = `Integers/Basic.lean` (ℤ₀ ya está) → `Integers/Rationals.lean` como cociente
+    >    `ℤ₀ × ℕ₀⁺` por `(a,b) ~ (c,d) ↔ a·d = b·c`. Cuerpo + orden denso.
+    > 2. **ℝ_c** (reales computables / sucesiones de Cauchy): `PList ℚ₀` con condición de Cauchy.
+    >    Pero esto requiere ASet₁ (listas posiblemente infinitas) — está bloqueado hasta tener
+    >    conjuntos no finitos.
+    > 3. **Números constructibles** (torre de extensiones cuadráticas de ℚ₀): esto sí es posible
+    >    dentro de HFSet, porque son algebraicos de grado 2^k — todos finitos.
+    > 4. **Algebraicos** (clausura algebraica de ℚ₀): raíces de polinomios sobre ℚ₀. Requiere
+    >    teorema fundamental del álgebra, que en versión constructiva es complejo.
+    > 5. **Computables**: requieren ℝ_c (paso 2) → bloqueado hasta ASet₁.
+    > **Conclusión**: los pasos 1 y 3 son viables ahora. Los pasos 2, 4, 5 requieren ASet₁.
+
+  - [2.9.] *Necesitamos un documento resumen de la paridad actual de resultados de Peano vs Aczel, para ver qué se ha recuperado y qué no, y qué es lo que falta por recuperar. Esto nos ayudará a decidir qué camino seguir con el nuevo esquema de conjuntos.*
+    > **[Respuesta — 2026-05-25]** Correcto y pendiente. El documento debería llamarse
+    > `doc/REFERENCE-Paridad-Peano-Aczel.md` y listar por módulo de Peano qué resultados
+    > han sido transportados (vía `VN/`) y cuáles no. Los módulos VN ya existentes cubren:
+    > aritmética básica, potencia, raíz, logaritmo, factoriales, mcd/mcm, Fibonacci, binomios,
+    > congruencias, totient, primalidad, TFA, Fermat, Wilson, CRT, Möbius/Liouville.
+    > Lo que *no* ha sido transportado: teoría de sucesiones, análisis, cualquier cosa que
+    > requiera conjuntos infinitos. Crear este documento es una tarea concreta de documentación.
+    - DEBE SER CREADO EL DOCUMENTO `doc/REFERENCE-Paridad-Peano-Aczel.md`, de forma lo más detallada posible.
+
+  - [2.10.] ¿Qué ocurre si añadimos conjuntos que sea inductivos transfinitos por definición? Es decir, conjuntos que se construyan a través de reglas inductivas que permitan construir conjuntos a partir de conjuntos ya construidos, sin necesidad de que el proceso se detenga en un nivel finito. Al igual que definimos los ordinales de Von Neumann, pero con las PLists, CLists y HFSets. Necesitaríamos una regla inductiva `sup` que representaría los conjuntos límite que no pueden ser alcanzados a través de un número finito de aplicaciones de `mk`. De hecho se podría hacer a través de una definición de los ordinales de Von Neumann como un tipo inductivo, y luego usar ese tipo para indexar el proceso de construcción de conjuntos. También podríamos usar ese tipo suma de Lean para indexar el proceso de construcción de conjuntos, de forma que cada nivel de la jerarquía de conjuntos se corresponda con un ordinal. Esto nos permitiría construir conjuntos que sean infinitos, pero que sigan siendo computables, siempre y cuando el proceso de construcción se detenga en un ordinal computable (como ω₁^{CK}).
+    > **[Comentario — 2026-05-25]** Esta es la idea correcta y coincide con el análisis de [1.].
+    > En Lean 4 la construcción técnica tiene dos variantes:
+    >
+    > **Variante A — Tipo inductivo con `sup`**:
+>
+    > ```lean
+    > inductive ASet : Type where
+    >   | mk  : PList ASet → ASet          -- conjuntos finitos (= HFSet)
+    >   | sup : (ℕ₀ → ASet) → ASet         -- límite de sucesiones (ω-conjuntos)
+    > ```
+>
+    > Esto da conjuntos que pueden ser infinitos pero deben ser *sucesiones numerables*.
+    > Alcanza V_{ω·2} aprox., pero NO todos los niveles transfinitos.
+    >
+    > **Variante B — Indexación por ordinales propios**:
+    > Definir un tipo `Ord` (ordinales representados como listas bien ordenadas de `Ord`)
+    > y luego `ASet α` por recursión sobre `α : Ord`. Esto da la jerarquía completa de Von
+    > Neumann hasta cualquier ordinal computable. La limitación es que `Ord` debe ser un
+    > tipo bien fundado en Lean 4 (no puede ser `Type` sin cuidado).
+    >
+    > La ruta más manejable es **Variante A** para ASet₁ (conjuntos numerables),
+    > que ya es suficiente para ℝ_c y para ω₁. La Variante B es el paso a ASet₂.
 
 ---
 
@@ -1404,6 +1565,7 @@ Recordamos que $N \unlhd H$ equivale a: $N \leq H$ y $hNh^{-1} = N$ para todo $h
 **1b. $N \cap K \unlhd H \cap K$:**
 
 Sea $x \in H \cap K$ y $a \in N \cap K$.
+
 - *Parte $N$*: $x \in H$, $a \in N \leq H$ y $N \unlhd H$, luego $xax^{-1} \in N$.
 - *Parte $K$*: $x, a, x^{-1} \in K$ y $K$ subgrupo, luego $xax^{-1} \in K$.
 
@@ -1419,6 +1581,7 @@ Por tanto $xax^{-1} \in N \cap K$. ∎
 **2b. $H \cap M \unlhd H \cap K$:**
 
 Sea $x \in H \cap K$ y $b \in H \cap M$.
+
 - *Parte $H$*: $x, b, x^{-1} \in H$, luego $xbx^{-1} \in H$.
 - *Parte $M$*: $x \in K$, $b \in M \leq K$ y $M \unlhd K$, luego $xbx^{-1} \in M$.
 
@@ -1446,6 +1609,7 @@ $b^{-1}ab \in A$, luego $ab = b(b^{-1}ab) \in BA$. Por simetría $AB = BA$.
 - *Inverso*: $(ns)^{-1} = s^{-1}n^{-1} = (s^{-1}n^{-1}s)s^{-1}$. El primer factor $\in N$ y el segundo $\in S$.
 
 **Consecuencias**:
+
 - $N(H \cap M) \leq H$ (tomar $S = H \cap M$).
 - $N(H \cap K) \leq H$ (tomar $S = H \cap K$).
 - $N(H \cap M) \leq N(H \cap K)$ pues $H \cap M \leq H \cap K$. ∎

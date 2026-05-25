@@ -1,6 +1,6 @@
 # Technical Reference — PList (Peano-indexed Lists)
 
-**Last updated:** 2026-05-22
+**Last updated:** 2026-05-27
 **Parent:** [../REFERENCE.md](../REFERENCE.md)
 **Related:** [REFERENCE-HFList.md](REFERENCE-HFList.md) | [REFERENCE-VN.md](REFERENCE-VN.md)
 
@@ -72,6 +72,13 @@ All computable, structurally recursive.
 | `zipWith` | `(f : α → β → γ) → PList α → PList β → PList γ` | stops at shorter |
 
 All computable, structurally recursive.
+
+#### 4.16.5 Slicing
+
+| Name | Signature | Notes |
+|------|-----------|-------|
+| `take` | `ℕ₀ → PList α → PList α` | First `k` elements; `take 𝟘 l = nil`, `take k nil = nil` |
+| `drop` | `ℕ₀ → PList α → PList α` | Skip first `k` elements; `drop 𝟘 l = l`, `drop k nil = nil` |
 
 #### 4.16.4 Membership
 
@@ -178,6 +185,41 @@ Total bounded access. Contrast with `get? : PList α → ℕ₀ → Option α`.
 | `nil_append` | `(l : PList α) : nil ++ l = l` |
 | `append_assoc` | `(l₁ l₂ l₃ : PList α) : (l₁ ++ l₂) ++ l₃ = l₁ ++ (l₂ ++ l₃)` |
 | `length_append` | `(l₁ l₂ : PList α) : length (l₁ ++ l₂) = add (length l₁) (length l₂)` |
+
+**take / drop — simp lemmas**
+
+| Theorem | Statement |
+|---------|-----------|
+| `take_zero` | `@[simp] (l : PList α) : take 𝟘 l = nil` |
+| `drop_zero` | `@[simp] (l : PList α) : drop 𝟘 l = l` |
+| `take_nil` | `@[simp] (k : ℕ₀) : take k (nil : PList α) = nil` |
+| `drop_nil` | `@[simp] (k : ℕ₀) : drop k (nil : PList α) = nil` |
+| `take_succ_cons` | `@[simp] (k : ℕ₀) (h : α) (t : PList α) : take (σ k) (cons h t) = cons h (take k t)` |
+| `drop_succ_cons` | `@[simp] (k : ℕ₀) (h : α) (t : PList α) : drop (σ k) (cons h t) = drop k t` |
+
+**take / drop — length lemmas**
+
+| Theorem | Statement |
+|---------|-----------|
+| `length_take_le` | `(k : ℕ₀) (l : PList α) (h : k ≤ length l) : length (take k l) = k` |
+| `length_take_gt` | `(k : ℕ₀) (l : PList α) (h : length l < k) : length (take k l) = length l` |
+| `take_append_drop` | `(k : ℕ₀) (l : PList α) : (take k l).append (drop k l) = l` |
+| `add_length_drop` | `(k : ℕ₀) (l : PList α) (h : k ≤ length l) : Peano.Add.add k (length (drop k l)) = length l` |
+| `length_drop_le` | `(k : ℕ₀) (l : PList α) (h : k ≤ length l) : length (drop k l) = Peano.Sub.sub (length l) k` |
+
+**Extensional equality**
+
+| Theorem | Statement |
+|---------|-----------|
+| `get?_none_of_ge` | `(l : PList α) (i : ℕ₀) (h : length l ≤ i) : l.get? i = none` |
+| `plist_ext_get?` | `(l₁ l₂ : PList α) (h : ∀ i : ℕ₀, l₁.get? i = l₂.get? i) : l₁ = l₂` |
+
+### 6.40 PList/Fin0.lean — `namespace PList`
+
+| Theorem | Statement |
+|---------|-----------|
+| `get_eq_get?` | `(l : PList α) (i : Fin₀ (l.length)) : l.get? i.val = some (l.get i)` |
+| `get_ext` | `(l₁ l₂ : PList α) (heq : l₁.length = l₂.length) (h : ∀ i : Fin₀ (l₁.length), l₁.get i = l₂.get ⟨i.val, heq ▸ i.isLt⟩) : l₁ = l₂` |
 
 **Map**
 

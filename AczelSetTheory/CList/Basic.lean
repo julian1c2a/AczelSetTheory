@@ -72,7 +72,6 @@ def opWeight : CListOp → Nat
 | .subset => 1
 | .eq     => 2
 
-set_option linter.unusedSimpArgs false in
 /-- Motor lógico para igualdad extensional.
     Terminación por medida ponderada sobre sizeOf. -/
 def evalOp (op : CListOp) (A B : CList) : Bool :=

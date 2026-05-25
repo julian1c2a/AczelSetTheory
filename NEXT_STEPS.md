@@ -1,6 +1,6 @@
 # Next Steps
 
-**Last updated:** 2026-05-23
+**Last updated:** 2026-05-27
 
 The project compiles on Lean 4.29.0 with **0 sorry, 133 non-barrel modules**.
 Full Zermelo axioms derived. Architecture: CList/ + Operations/ + Axioms/ + PList/ + VN/ + Algebra/ + Integers/ + Topology/.
@@ -39,6 +39,17 @@ Antes de implementar, planear la arquitectura:
 - Definición de `extEq₁`, `normalize₁`, `ASet₁ = Quotient CList₁.Setoid`
 - Qué infraestructura se reutiliza vs. se generaliza
 - Cómo representar ω = `inf (fun _ => true)` y los conjuntos Δ⁰₁
+
+---
+
+## ✅ COMPLETED (2026-05-27) — PList/HFList/FinList: take/drop + extensional equality
+
+- **`PList/Basic.lean`** ✅: `take` y `drop` definitivos sobre `PList α` con `ℕ₀`.
+- **`PList/Lemmas.lean`** ✅: 6 simp lemmas (`take_zero`, `drop_zero`, `take_nil`, `drop_nil`, `take_succ_cons`, `drop_succ_cons`); 5 lemas de longitud (`length_take_le`, `length_take_gt`, `take_append_drop`, `add_length_drop`, `length_drop_le`); `get?_none_of_ge`; `plist_ext_get?` (igualdad extensional vía `get?`). Todos sin `omega₀` (evitar dependencia circular).
+- **`PList/Fin0.lean`** ✅: `PList.get_ext` — igualdad extensional vía `get` con índices `Fin₀`.
+- **`HFList.lean`** ✅: `HFList.take`, `HFList.drop`, lemas `length_take_le`, `add_length_drop`, `length_drop_le`; `FinList.extEq` (igualdad componente a componente), `FinList.take : FinList k`, `FinList.drop : FinList (sub n k)`.
+- **Build**: 0 errores, 0 sorry. `lake build` ✅.
+- **Docs**: REFERENCE-PList.md y REFERENCE-HFList.md actualizados.
 
 ---
 

@@ -104,6 +104,23 @@ def zipWith (f : α → β → γ) : PList α → PList β → PList γ
   | cons a as, cons b bs => cons (f a b) (zipWith f as bs)
 
 -- ─────────────────────────────────────────────────────────────────
+-- take y drop
+-- ─────────────────────────────────────────────────────────────────
+
+/-- Primeros `k` elementos de la lista (o toda si `k ≥ length l`). -/
+def take : ℕ₀ → PList α → PList α
+  | 𝟘,    _          => nil
+  | σ _,  nil        => nil
+  | σ k,  cons h t   => cons h (take k t)
+
+/-- Descarta los primeros `k` elementos.
+    Si `k ≥ length l` devuelve `nil`; si `k = 𝟘` devuelve `l`. -/
+def drop : ℕ₀ → PList α → PList α
+  | 𝟘,    l          => l
+  | σ _,  nil        => nil
+  | σ k,  cons _ t   => drop k t
+
+-- ─────────────────────────────────────────────────────────────────
 -- Membresía (Bool y Prop)
 -- ─────────────────────────────────────────────────────────────────
 

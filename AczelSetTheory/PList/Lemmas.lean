@@ -11,6 +11,7 @@ import AczelSetTheory.PList.Basic
 import Peano.PeanoNat.Add
 import Peano.PeanoNat.Axioms
 import Peano.PeanoNat.Order
+import Peano.PeanoNat.Sub
 
 -- Use `add` (from Peano export) rather than `+` to avoid elaboration ambiguity:
 -- `export Peano.Add(add, ...)` in Add.lean puts both the function `add` and the
@@ -301,5 +302,137 @@ theorem length_filter_le (p : α → Bool) (l : PList α) :
         exact Peano.Order.succ_le_succ_if_wp ih
       · simp [hp]
         exact Peano.Order.le_succ _ _ ih
+
+-- ─────────────────────────────────────────────────────────────────
+-- take / drop: simp lemmas básicos
+-- ─────────────────────────────────────────────────────────────────
+
+@[simp] theorem take_zero (l : PList α) : take 𝟘 l = nil := rfl
+
+@[simp] theorem drop_zero (l : PList α) : drop 𝟘 l = l := rfl
+
+@[simp] theorem take_nil (k : ℕ₀) : take k (nil : PList α) = nil := by
+  cases k <;> rfl
+
+@[simp] theorem drop_nil (k : ℕ₀) : drop k (nil : PList α) = nil := by
+  cases k <;> rfl
+
+@[simp] theorem take_succ_cons (k : ℕ₀) (h : α) (t : PList α) :
+    take (σ k) (cons h t) = cons h (take k t) := rfl
+
+@[simp] theorem drop_succ_cons (k : ℕ₀) (h : α) (t : PList α) :
+    drop (σ k) (cons h t) = drop k t := rfl
+
+-- ─────────────────────────────────────────────────────────────────
+-- take / drop: longitud
+-- ─────────────────────────────────────────────────────────────────
+
+/-- Si `k ≤ length l`, los primeros `k` elementos tienen longitud `k`. -/
+theorem length_take_le (k : ℕ₀) (l : PList α) (h : k ≤ length l) :
+    length (take k l) = k := by
+  induction k generalizing l with
+  | zero => simp [take]
+  | succ k' ih =>
+    cases l with
+    | nil => exact absurd h (Peano.Order.not_succ_le_zero k')
+    | cons head tail =>
+      simp only [take_succ_cons, length_cons]
+      congr 1
+      exact ih tail (Peano.Order.succ_le_succ_then h)
+
+/-- Si `length l < k`, `take k l` devuelve toda la lista. -/
+theorem length_take_gt (k : ℕ₀) (l : PList α) (h : length l < k) :
+    length (take k l) = length l := by
+  induction k generalizing l with
+  | zero => exact absurd h (Peano.StrictOrder.nlt_n_0 (length l))
+  | succ k' ih =>
+    cases l with
+    | nil => simp [take]
+    | cons head tail =>
+      simp only [take_succ_cons, length_cons] at *
+      congr 1
+      exact ih tail ((Peano.StrictOrder.succ_lt_succ_iff (length tail) k').mp h)
+
+/-- `take k l ++ drop k l = l` para todo `k`. -/
+theorem take_append_drop (k : ℕ₀) (l : PList α) :
+    (take k l).append (drop k l) = l := by
+  induction k generalizing l with
+  | zero => simp [take, drop]
+  | succ k' ih =>
+    cases l with
+    | nil => simp [take, drop]
+    | cons head tail =>
+      simp only [take_succ_cons, drop_succ_cons]
+      exact congrArg (cons head) (ih tail)
+
+/-- `add k (length (drop k l)) = length l` cuando `k ≤ length l`. -/
+theorem add_length_drop (k : ℕ₀) (l : PList α) (h : k ≤ length l) :
+    Peano.Add.add k (length (drop k l)) = length l := by
+  induction k generalizing l with
+  | zero =>
+    simp only [drop_zero]
+    exact Peano.Add.zero_add (length l)
+  | succ k' ih =>
+    cases l with
+    | nil => exact absurd h (Peano.Order.not_succ_le_zero k')
+    | cons head tail =>
+      simp only [drop_succ_cons, length_cons]
+      rw [Peano.Add.succ_add]
+      congr 1
+      exact ih tail (Peano.Order.succ_le_succ_then h)
+
+/-- Longitud de `drop k l` cuando `k ≤ length l`. -/
+theorem length_drop_le (k : ℕ₀) (l : PList α) (h : k ≤ length l) :
+    length (drop k l) = Peano.Sub.sub (length l) k := by
+  induction k generalizing l with
+  | zero =>
+    simp only [drop_zero]
+    exact (Peano.Sub.sub_zero (length l)).symm
+  | succ k' ih =>
+    cases l with
+    | nil => exact absurd h (Peano.Order.not_succ_le_zero k')
+    | cons head tail =>
+      simp only [drop_succ_cons, length_cons]
+      rw [ih tail (Peano.Order.succ_le_succ_then h)]
+      exact Peano.Sub.sub_succ_succ_eq (length tail) k'
+
+-- ─────────────────────────────────────────────────────────────────
+-- get?: ningún índice ≥ length devuelve valor
+-- ─────────────────────────────────────────────────────────────────
+
+/-- Si `length l ≤ i`, entonces `l.get? i = none`. -/
+theorem get?_none_of_ge (l : PList α) (i : ℕ₀) (h : length l ≤ i) :
+    l.get? i = none := by
+  induction l generalizing i with
+  | nil => rfl
+  | cons head tail ih =>
+    cases i with
+    | zero => exact absurd h (Peano.Order.not_succ_le_zero (length tail))
+    | succ i' =>
+      exact ih i' (Peano.Order.succ_le_succ_then h)
+
+-- ─────────────────────────────────────────────────────────────────
+-- Igualdad extensional vía get?
+-- ─────────────────────────────────────────────────────────────────
+
+/-- Dos `PList`s son iguales si y solo si coinciden en cada índice. -/
+theorem plist_ext_get? (l₁ l₂ : PList α)
+    (h : ∀ i : ℕ₀, l₁.get? i = l₂.get? i) : l₁ = l₂ := by
+  induction l₁ generalizing l₂ with
+  | nil =>
+    cases l₂ with
+    | nil => rfl
+    | cons head tail =>
+      have h0 := h 𝟘; simp [get?] at h0
+  | cons head₁ tail₁ ih =>
+    cases l₂ with
+    | nil =>
+      have h0 := h 𝟘; simp [get?] at h0
+    | cons head₂ tail₂ =>
+      have hhead : head₁ = head₂ := by
+        have h0 := h 𝟘; simp [get?] at h0; exact h0
+      have htail : tail₁ = tail₂ := ih tail₂ (fun i => by
+        have hi := h (σ i); simp [get?] at hi; exact hi)
+      rw [hhead, htail]
 
 end PList

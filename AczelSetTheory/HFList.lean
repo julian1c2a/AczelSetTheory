@@ -109,6 +109,28 @@ theorem mem_cons_iff (x h : HFSet) (t : HFList) :
 @[simp] theorem get?_cons_succ (h : HFSet) (t : HFList) (i : ℕ₀) :
     (cons h t).get? (σ i) = (get? t i) := rfl
 
+-- ─────────────────────────────────────────────────────────────────
+-- take / drop
+-- ─────────────────────────────────────────────────────────────────
+
+/-- Primeros `k` elementos de una `HFList`. -/
+def take (k : ℕ₀) (l : HFList) : HFList := PList.take k l
+
+/-- Descarta los primeros `k` elementos de una `HFList`. -/
+def drop (k : ℕ₀) (l : HFList) : HFList := PList.drop k l
+
+theorem length_take_le (k : ℕ₀) (l : HFList) (h : k ≤ length l) :
+    length (take k l) = k :=
+  PList.length_take_le k l h
+
+theorem add_length_drop (k : ℕ₀) (l : HFList) (h : k ≤ length l) :
+    Peano.Add.add k (length (drop k l)) = length l :=
+  PList.add_length_drop k l h
+
+theorem length_drop_le (k : ℕ₀) (l : HFList) (h : k ≤ length l) :
+    length (drop k l) = Peano.Sub.sub (length l) k :=
+  PList.length_drop_le k l h
+
 end HFList
 
 -- ─────────────────────────────────────────────────────────────────
@@ -250,5 +272,43 @@ theorem cons_head_tail (t : FinList (σ n)) : cons (head t) (tail t) = t := by
       simp only [HFList.length_nil] at hl; omega₀
   | cons x rest =>
       apply FinList.ext; rfl
+
+-- ─────────────────────────────────────────────────────────────────
+-- Igualdad extensional componente a componente
+-- ─────────────────────────────────────────────────────────────────
+
+/-- Dos n-tuplas son iguales si y solo si coinciden en cada índice. -/
+theorem extEq {t s : FinList n}
+    (h : ∀ i : Fin₀ n, t.get i = s.get i) : t = s := by
+  apply FinList.ext
+  apply PList.plist_ext_get?
+  intro i
+  by_cases hlt : i < n
+  · have htl : i < t.val.length := by rw [t.property]; exact hlt
+    have hsl : i < s.val.length := by rw [s.property]; exact hlt
+    have h' := h ⟨i, hlt⟩
+    simp only [FinList.get, HFList.get] at h'
+    rw [PList.get_eq_get? t.val ⟨i, htl⟩, PList.get_eq_get? s.val ⟨i, hsl⟩]
+    exact congrArg some h'
+  · have hge : n ≤ i := by
+      simp only [PList.Omega0.ψ_lt_iff, PList.Omega0.ψ_le_iff] at *; omega
+    have tp : PList.length t.val = n := t.property
+    have sp : PList.length s.val = n := s.property
+    rw [PList.get?_none_of_ge t.val i (by rw [tp]; exact hge),
+        PList.get?_none_of_ge s.val i (by rw [sp]; exact hge)]
+
+-- ─────────────────────────────────────────────────────────────────
+-- take / drop en FinList
+-- ─────────────────────────────────────────────────────────────────
+
+/-- Primeros `k` componentes de una n-tupla (requiere `k ≤ n`). -/
+def take (k : ℕ₀) (t : FinList n) (h : k ≤ n) : FinList k :=
+  ⟨HFList.take k t.val,
+    HFList.length_take_le k t.val (by rw [t.property]; exact h)⟩
+
+/-- Descarta los primeros `k` componentes de una n-tupla (requiere `k ≤ n`). -/
+def drop (k : ℕ₀) (t : FinList n) (h : k ≤ n) : FinList (Peano.Sub.sub n k) :=
+  ⟨HFList.drop k t.val, by
+    rw [HFList.length_drop_le k t.val (by rw [t.property]; exact h), t.property]⟩
 
 end FinList
