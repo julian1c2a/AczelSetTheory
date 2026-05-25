@@ -89,7 +89,7 @@ def evalOp (op : CListOp) (A B : CList) : Bool :=
 termination_by ((((sizeOf A + sizeOf B : Nat) * 3) + opWeight op) : Nat)
 decreasing_by
   all_goals simp_wf
-  all_goals try simp [opWeight, sizeOf]
+  all_goals try simp [sizeOf]
   all_goals try simp_arith
   all_goals try omega
 
