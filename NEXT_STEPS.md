@@ -1,6 +1,6 @@
 # Next Steps
 
-**Last updated:** 2026-05-27
+**Last updated:** 2026-05-26
 
 The project compiles on Lean 4.29.0 with **0 sorry, 133 non-barrel modules**.
 Full Zermelo axioms derived. Architecture: CList/ + Operations/ + Axioms/ + PList/ + VN/ + Algebra/ + Integers/ + Topology/.
@@ -22,8 +22,8 @@ See PLANNING.md for the long-term roadmap.
 `MobiusLiouville.lean` y `PadicVal.lean` completos. Build limpio.
 
 - **`Integers/PadicVal.lean`** ✅: `padicVal`, `Omega_prime` (nº de factores primos con mult.),
-  `Omega_prime_prime`, `Omega_prime_mul` (completamente multiplicativa, **1 sorry**
-  pendiente de acceso a `smallestDivisorAux_spec` privado de la lib Peano),
+  `Omega_prime_prime`, `Omega_prime_mul` (completamente multiplicativa, **0 sorry** —
+  probado por inducción fuerte sobre `n` usando `Omega_prime_mul_prime` y `Omega_prime_step`),
   `Omega_prime_mul_prime`. Corregidos bugs pre-existentes: `padicVal_succ_dvd`,
   `Omega_prime_prime`.
 - **`Integers/MobiusLiouville.lean`** ✅: `negOnePow`, `mobius` (μ), `liouville` (λ).
@@ -39,6 +39,15 @@ Antes de implementar, planear la arquitectura:
 - Definición de `extEq₁`, `normalize₁`, `ASet₁ = Quotient CList₁.Setoid`
 - Qué infraestructura se reutiliza vs. se generaliza
 - Cómo representar ω = `inf (fun _ => true)` y los conjuntos Δ⁰₁
+
+---
+
+## ✅ COMPLETED (2026-05-26) — Rank.lean + Decidable.lean
+
+- **`Axioms/Rank.lean`** ✅: `theorem mem_rank_lt : ∀ (a b : HFSet), a ∈ b → rank a < rank b`; `instance mem_wf : WellFounded (· ∈ · : HFSet → HFSet → Prop)`. Bug corregido: rcases `rfl` → `hax` + `rw [hax]`.
+- **`Axioms/Decidable.lean`** ✅: `instance instDecidableEmpty (A : HFSet) : Decidable (A = empty)`.
+- **`Integers/PadicVal.lean`** ✅: Confirmado 0 sorry (`Omega_prime_mul` completamente probado).
+- **Docs**: REFERENCE-Algebra.md proyectado; CURRENT-STATUS-PROJECT.md y NEXT_STEPS.md actualizados.
 
 ---
 

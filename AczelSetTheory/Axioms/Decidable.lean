@@ -68,4 +68,8 @@ instance instDecidableEqHFSet : DecidableEq HFSet :=
     else
       isFalse (fun heq => h (Quotient.exact heq))
 
+/-- Decidibilidad de `A = empty` como instancia de `instDecidableEqHFSet`. -/
+instance instDecidableEmpty (A : HFSet) : Decidable (A = empty) :=
+  instDecidableEqHFSet A empty
+
 end HFSet

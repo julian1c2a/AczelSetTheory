@@ -248,6 +248,9 @@ def HFSet.rank (A : HFSet) : ℕ₀
 | --- | ---------- | --------------- |
 | 1 | `mem_decidable` | `(x A : HFSet) → Decidable (x ∈ A)` |
 | 2 | `existsMem_decidable` | `(A : HFSet) → (P : HFSet → Prop) → [DecidablePred P] → Decidable (∃ x, x ∈ A ∧ P x)` |
+| 3 | `forallMem_decidable` | `(A : HFSet) → (P : HFSet → Prop) → [DecidablePred P] → Decidable (∀ x, x ∈ A → P x)` |
+| 4 | `instDecidableEqHFSet` | `DecidableEq HFSet` |
+| 5 | `instDecidableEmpty` | `(A : HFSet) → Decidable (A = empty)` |
 
 ### 6.35 Axioms/Succ.lean — `namespace HFSet`
 
@@ -425,7 +428,7 @@ def HFSet.rank (A : HFSet) : ℕ₀
 
 ### Axioms/Decidable.lean
 
-`HFSet.mem_decidable`, `HFSet.existsMem_decidable`
+`HFSet.mem_decidable`, `HFSet.existsMem_decidable`, `HFSet.forallMem_decidable`, `HFSet.instDecidableEqHFSet`, `HFSet.instDecidableEmpty`
 
 ### Axioms/Succ.lean
 
@@ -477,7 +480,7 @@ def HFSet.rank (A : HFSet) : ℕ₀
 
 ### Axioms/Rank.lean
 
-`HFSet.rank`, `HFSet.rank_empty`, `HFSet.rank_insert`
+`HFSet.rank`, `HFSet.rank_empty`, `HFSet.rank_insert`, `HFSet.mem_rank_lt`, `HFSet.mem_wf`
 
 ---
 

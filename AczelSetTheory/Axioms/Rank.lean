@@ -11,6 +11,8 @@ License: MIT
 --   rank        : HFSet → ℕ₀        -- función de rango
 --   rank_empty  : rank ∅ = 𝟘
 --   rank_insert : x ∉ A → rank (insert x A) = max (σ (rank x)) (rank A)
+--   mem_rank_lt : ∀ a b, a ∈ b → rank a < rank b
+--   mem_wf      : WellFounded (· ∈ · : HFSet → HFSet → Prop)
 -- Ver también: VN/RankVN.lean para rank_vN
 
 import AczelSetTheory.Operations.Cardinal

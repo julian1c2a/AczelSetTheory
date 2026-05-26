@@ -1,6 +1,6 @@
 # Current Project Status — AczelSetTheory
 
-**Last updated:** 2026-05-23
+**Last updated:** 2026-05-26
 **Author**: Julián Calderón Almendros
 
 ---
@@ -91,7 +91,7 @@
 | Axioms/SymDiff.lean | ✅ |
 | Axioms/OrderedPair.lean | ✅ |
 | Axioms/Foundation.lean | ✅ |
-| Axioms/Decidable.lean | ✅ |
+| Axioms/Decidable.lean | ✅ (`mem_decidable`, `instDecidableEqHFSet`, `instDecidableEmpty`) |
 | Axioms/Subset.lean | ✅ |
 | Axioms/Lattice.lean | ✅ |
 | Axioms/BooleanAlgebra.lean | ✅ |
@@ -118,7 +118,7 @@
 | Axioms/OrdinalNat.lean | ✅ |
 | Axioms/Fintype.lean | ✅ |
 | Axioms/NPow.lean | ✅ |
-| Axioms/Rank.lean | ✅ |
+| Axioms/Rank.lean | ✅ (`rank`, `rank_empty`, `rank_insert`, `mem_rank_lt`, `instance mem_wf`) |
 | Axioms/Order.lean | ✅ |
 | Axioms/WellOrder.lean | ✅ |
 | Axioms/LinearOrder.lean | ✅ |
@@ -206,6 +206,12 @@
 None — **0 sorry** across the entire project.
 
 ---
+
+## Recent Achievements (2026-05-26) — Rank.lean + Decidable.lean
+
+- ✅ **Axioms/Rank.lean** — `theorem mem_rank_lt : ∀ (a b : HFSet), a ∈ b → rank a < rank b` (por `eps_induction` con `lt_self_σ_self`, `lt_of_lt_of_le`, `le_max_left/right`); `instance mem_wf : WellFounded (· ∈ · : HFSet → HFSet → Prop)` vía `Subrelation.wf` + `InvImage.wf rank well_founded_lt`. Bug corregido: patrón `rfl` → `hax` + `rw [hax]` cuando dos vars lambda son fijas y distintas.
+- ✅ **Axioms/Decidable.lean** — `instance instDecidableEmpty (A : HFSet) : Decidable (A = empty) := instDecidableEqHFSet A empty`.
+- ✅ **Integers/PadicVal.lean** — Confirmado 0 sorry: `Omega_prime_mul` completamente probado (inducción fuerte sobre `n` usando `Omega_prime_mul_prime` y `Omega_prime_step`).
 
 ## Recent Achievements (2026-05-23) — Topology/Separation.lean
 
