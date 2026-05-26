@@ -31,7 +31,7 @@ mutual
   private def rankNorm : CList → ℕ₀
     | .mk xs => rankNormList xs
   private def rankNormList : PList CList → ℕ₀
-    | .nil        => 𝟘
+    | .nil        => (𝟘 : ℕ₀)
     | .cons x rest => max (σ (rankNorm x)) (rankNormList rest)
 end
 
@@ -52,8 +52,8 @@ def rank (A : HFSet) : ℕ₀ :=
 -- rank del conjunto vacío
 -- ==================================================================
 
-theorem rank_empty : rank empty = 𝟘 := by
-  show rankCList CList.empty = 𝟘
+theorem rank_empty : rank empty = (𝟘 : ℕ₀) := by
+  show rankCList CList.empty = (𝟘 : ℕ₀)
   simp only [rankCList, CList.normalize_empty]
   rfl
 

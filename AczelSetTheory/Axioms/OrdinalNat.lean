@@ -316,7 +316,7 @@ private theorem has_max_le (n : Nat) : ∀ A : HFSet,
   | zero =>
     -- Ψ(card A) ≤ 0  →  card A = 𝟘  →  A = ∅
     intro A _ _ hne hle
-    have hcard0 : card A = 𝟘 := by omega₀
+    have hcard0 : card A = (𝟘 : ℕ₀) := by omega₀
     exact False.elim (hne (card_eq_zero_iff.mp hcard0))
   | succ k ih =>
     intro A htri hord hne hle
@@ -512,7 +512,7 @@ theorem isOrdinal_le_iff {A B : HFSet} (hA : isOrdinal A) (hB : isOrdinal B) :
 -- Cardinalidad de la potencia cartesiana n-aria (E2)
 -- ==================================================================
 
-private theorem card_singleton_empty : card (singleton empty) = 𝟙 := by
+private theorem card_singleton_empty : card (singleton empty) = (𝟙 : ℕ₀) := by
   have heq : singleton empty = insert empty empty :=
     extensionality _ _ fun z => by
       rw [mem_singleton, mem_insert]

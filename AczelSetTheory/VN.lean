@@ -33,3 +33,6 @@ import AczelSetTheory.VN.ListBridgeVN
 import AczelSetTheory.VN.PrimeVN
 import AczelSetTheory.VN.FermatVN
 import AczelSetTheory.VN.CRTVN
+import AczelSetTheory.VN.LatticeVN
+import AczelSetTheory.VN.SymGroupVN
+import AczelSetTheory.VN.InitialityVN

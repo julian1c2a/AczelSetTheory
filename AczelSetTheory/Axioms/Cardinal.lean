@@ -18,8 +18,8 @@ namespace HFSet
 -- Cardinalidad del conjunto vacío
 -- ==================================================================
 
-theorem card_empty : card empty = 𝟘 := by
-  show cardCList CList.empty = 𝟘
+theorem card_empty : card empty = (𝟘 : ℕ₀) := by
+  show cardCList CList.empty = (𝟘 : ℕ₀)
   unfold cardCList
   rw [CList.normalize_empty]
   rfl
@@ -145,7 +145,7 @@ theorem card_powerset (A : HFSet) : card (powerset A) = pow 𝟚 (card A) := by
 -- Cardinalidad cero: card A = 0 ↔ A = ∅
 -- ==================================================================
 
-theorem card_eq_zero_iff {A : HFSet} : card A = 𝟘 ↔ A = empty := by
+theorem card_eq_zero_iff {A : HFSet} : card A = (𝟘 : ℕ₀) ↔ A = empty := by
   constructor
   · intro h
     rcases Quotient.exists_rep A with ⟨a, rfl⟩
@@ -155,7 +155,7 @@ theorem card_eq_zero_iff {A : HFSet} : card A = 𝟘 ↔ A = empty := by
     rw [CList.extEq_iff_normalize_eq, CList.normalize_empty]
     -- Goal: CList.normalize a = CList.empty
     cases h_norm : CList.normalize a with | mk xs =>
-    have h_len : PList.length xs = 𝟘 := by
+    have h_len : PList.length xs = (𝟘 : ℕ₀) := by
       have : cardCList a = PList.length xs := by simp only [cardCList, h_norm]
       exact this ▸ h
     have xs_nil : xs = PList.nil := (PList.length_eq_zero_iff_nil xs).mp h_len

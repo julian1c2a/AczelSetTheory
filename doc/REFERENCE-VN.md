@@ -1,6 +1,6 @@
 # Technical Reference — VN (von Neumann Embedding)
 
-**Last updated:** 2026-05-18
+**Last updated:** 2026-05-26
 **Parent:** [../REFERENCE.md](../REFERENCE.md)
 **Related:** [REFERENCE-HFSets.md](REFERENCE-HFSets.md) | [REFERENCE-Algebra.md](REFERENCE-Algebra.md) | [REFERENCE-PList.md](REFERENCE-PList.md)
 
@@ -40,6 +40,9 @@ and establishes order-preservation (`∈` ↔ `<`).
 | 85 | `AczelSetTheory/VN/GcdVN.lean` | ✅ Complete |
 | 86 | `AczelSetTheory/VN/FibVN.lean` | ✅ Complete |
 | 87 | `AczelSetTheory/VN/BinomVN.lean` | ✅ Complete |
+| 88 | `AczelSetTheory/VN/LatticeVN.lean` | ✅ Complete |
+| 89 | `AczelSetTheory/VN/SymGroupVN.lean` | ✅ Complete |
+| 90 | `AczelSetTheory/VN/InitialityVN.lean` | ✅ Complete |
 
 ---
 
@@ -104,6 +107,73 @@ def VN.factVN (n : ℕ₀) : HFSet := vN (factorial n)
 - Requires `import Peano.PeanoNat.Combinatorics.Factorial`.
 - Computable.
 - Key theorem: `factVN_def : factVN n = vN (factorial n)`
+
+#### 4.42.6 `VN.minVN` / `VN.maxVN` — `VN/LatticeVN.lean`
+
+```lean
+def VN.minVN (m n : ℕ₀) : HFSet := vN (min m n)
+def VN.maxVN (m n : ℕ₀) : HFSet := vN (max m n)
+```
+
+- **Math**: minVN(m, n) = vN(min(m, n)); maxVN(m, n) = vN(max(m, n)).
+- Transport del retículo (ℕ₀, min, max) al rango de vN.
+- Requires `import Peano.PeanoNat.Lattice`.
+- Computable.
+
+#### 4.42.7 `VN.vnSeg` — `VN/SymGroupVN.lean`
+
+```lean
+def VN.vnSeg (n : ℕ₀) : ℕ₀FSet := ℕ₀FSet.Fin₀Set n
+```
+
+- **Math**: vnSeg(n) = {0, 1, …, n−1} ⊆ ℕ₀ como `ℕ₀FSet`.
+- Requires `import Peano.PeanoNat.Combinatorics.Perm`.
+- Computable; card = n (ver `vnSeg_card`).
+
+#### 4.42.8 `VN.SymVN` — `VN/SymGroupVN.lean`
+
+```lean
+def VN.SymVN (n : ℕ₀) : Type := FunPerm (vnSeg n)
+def VN.SymVN.id  (n : ℕ₀) : SymVN n := FunPerm.id (vnSeg n)
+def VN.SymVN.comp (n : ℕ₀) (g f : SymVN n) : SymVN n := Perm.FunPerm.comp g f 𝟘
+```
+
+- **Math**: SymVN(n) = grupo simétrico Sₙ realizado como permutaciones de vnSeg(n).
+- `SymVN.id` es la permutación identidad; `SymVN.comp` es composición (g ∘ f).
+- Computable.
+
+#### 4.42.9 `VN.HFNat` — `VN/InitialityVN.lean`
+
+```lean
+def VN.HFNat : Type := {x : HFSet // HFSet.isNat x}
+def VN.HFNat.zero : HFNat := ⟨HFSet.empty, HFSet.isNat_zero⟩
+def VN.HFNat.succ (n : HFNat) : HFNat := ⟨HFSet.succ n.1, HFSet.isNat_succ n.2⟩
+```
+
+- **Math**: Los naturales de von Neumann como subtipo `{x : HFSet // isNat x}`.
+- `HFNat.zero` = ∅; `HFNat.succ n` = n ∪ {n}.
+- Satisface los tres axiomas de Peano (inyectividad del sucesor, cero ≠ sucesor, inducción).
+
+#### 4.42.10 `VN.HFNatPeanoSystem` — `VN/InitialityVN.lean`
+
+```lean
+def VN.HFNatPeanoSystem : PeanoSystem
+```
+
+- **Math**: Estructura de sistema de Peano sobre `HFNat` con cero `HFNat.zero`, sucesor `HFNat.succ`.
+- Verifica los tres axiomas de Peano vía `HFSet.isNat_induction`.
+- No computable (estructura dependiente de Type).
+
+#### 4.42.11 `VN.vN_nat` / `VN.vN_morph` — `VN/InitialityVN.lean`
+
+```lean
+def VN.vN_nat (n : ℕ₀) : HFNat := ⟨vN n, isNat_vN n⟩
+def VN.vN_morph : PeanoMorphism ℕ₀_PeanoSystem HFNatPeanoSystem
+```
+
+- **Math**: vN_nat es el embedding ℕ₀ → HFNat que preserva cero y sucesor.
+- `vN_morph` lo empaqueta como morfismo de álgebras de Peano.
+- Unicidad garantizada por `vN_morph_unique`.
 
 ---
 
@@ -345,6 +415,60 @@ def VN.factVN (n : ℕ₀) : HFSet := vN (factorial n)
 | 8 | `vN_binom_self` | `(n : ℕ₀) : vN (binom n n) = vN 𝟙` |
 | 9 | `vN_binom_eq_zero_gt` | `{n k : ℕ₀} (h : lt₀ n k) : vN (binom n k) = vN 𝟘` |
 
+### 6.67 VN/LatticeVN.lean — `namespace VN`
+
+**Imports:** `AczelSetTheory.VN.Basic`, `Peano.PeanoNat.Lattice`
+**Opens:** `Peano`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `minVN_def` | `(m n : ℕ₀) : minVN m n = vN (min m n)` |
+| 2 | `maxVN_def` | `(m n : ℕ₀) : maxVN m n = vN (max m n)` |
+| 3 | `vN_min_idem` | `(n : ℕ₀) : vN (min n n) = vN n` |
+| 4 | `vN_max_idem` | `(n : ℕ₀) : vN (max n n) = vN n` |
+| 5 | `vN_min_zero_left` | `(n : ℕ₀) : vN (min 𝟘 n) = vN 𝟘` |
+| 6 | `vN_min_zero_right` | `(n : ℕ₀) : vN (min n 𝟘) = vN 𝟘` |
+| 7 | `vN_max_zero_left` | `(n : ℕ₀) : vN (max 𝟘 n) = vN n` |
+| 8 | `vN_max_zero_right` | `(n : ℕ₀) : vN (max n 𝟘) = vN n` |
+| 9 | `vN_min_comm` | `(m n : ℕ₀) : vN (min m n) = vN (min n m)` |
+| 10 | `vN_max_comm` | `(m n : ℕ₀) : vN (max m n) = vN (max n m)` |
+| 11 | `vN_min_assoc` | `(m n k : ℕ₀) : vN (min (min m n) k) = vN (min m (min n k))` |
+| 12 | `vN_max_assoc` | `(m n k : ℕ₀) : vN (max (max m n) k) = vN (max m (max n k))` |
+| 13 | `vN_eq_of_max_eq_min` | `(m n : ℕ₀) : max m n = min m n → vN m = vN n` |
+| 14 | `vN_le_then_max_eq_right` | `(m n : ℕ₀) (h : le₀ m n) : vN (max m n) = vN n` |
+| 15 | `vN_le_then_max_eq_left` | `(m n : ℕ₀) (h : le₀ n m) : vN (max m n) = vN m` |
+| 16 | `vN_le_then_min_eq_left` | `(m n : ℕ₀) (h : le₀ m n) : vN (min m n) = vN m` |
+| 17 | `vN_le_then_min_eq_right` | `(m n : ℕ₀) (h : le₀ n m) : vN (min m n) = vN n` |
+| 18 | `vN_le_max_left` | `(n m : ℕ₀) : le₀ n (max n m)` |
+| 19 | `vN_le_max_right` | `(n m : ℕ₀) : le₀ m (max n m)` |
+| 20 | `vN_min_le_left` | `(n m : ℕ₀) : le₀ (min n m) n` |
+| 21 | `vN_min_le_right` | `(n m : ℕ₀) : le₀ (min n m) m` |
+
+### 6.68 VN/SymGroupVN.lean — `namespace VN`
+
+**Imports:** `AczelSetTheory.VN.Basic`, `Peano.PeanoNat.Combinatorics.Perm`
+**Opens:** `Peano`, `Peano.FSet`, `Peano.FSetFunction`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `mem_vnSeg_iff` | `(n k : ℕ₀) : k ∈ (vnSeg n).elems ↔ lt₀ k n` |
+| 2 | `vnSeg_card` | `(n : ℕ₀) : (vnSeg n).card = n` |
+| 3 | `SymVN.comp_def` | `(n : ℕ₀) (g f : SymVN n) : SymVN.comp n g f = Perm.FunPerm.comp g f 𝟘` |
+
+### 6.69 VN/InitialityVN.lean — `namespace VN`
+
+**Imports:** `AczelSetTheory.VN.IsNat`, `AczelSetTheory.VN.Injective`, `AczelSetTheory.VN.CardVN`,
+`Peano.PeanoNat.Foundation.PeanoSystem`, `Peano.PeanoNat.Foundation.Initiality`
+**Opens:** `Peano`, `Peano.Foundation`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `HFNat.succ_injective` | `∀ a b : HFNat, HFNat.succ a = HFNat.succ b → a = b` |
+| 2 | `HFNat.zero_ne_succ` | `∀ n : HFNat, HFNat.zero ≠ HFNat.succ n` |
+| 3 | `vN_nat_zero` | `vN_nat 𝟘 = HFNat.zero` |
+| 4 | `vN_nat_succ` | `(n : ℕ₀) : vN_nat (σ n) = HFNat.succ (vN_nat n)` |
+| 5 | `vN_morph_unique` | `(h : ℕ₀ → HFNat) → h 𝟘 = HFNat.zero → (∀ n, h (σ n) = HFNat.succ (h n)) → h = vN_nat` |
+
 ---
 
 ## 7. Exports per Module
@@ -435,3 +559,30 @@ def VN.factVN (n : ℕ₀) : HFSet := vN (factorial n)
 `VN.vN_binom_zero_zero`, `VN.vN_binom_zero_succ`, `VN.vN_binom_succ_zero`,
 `VN.vN_binom_pascal`, `VN.vN_binom_n_zero`, `VN.vN_binom_n_one`,
 `VN.vN_binom_self`, `VN.vN_binom_eq_zero_gt`
+
+### VN/LatticeVN.lean
+
+`VN.minVN`, `VN.maxVN`, `VN.minVN_def`, `VN.maxVN_def`,
+`VN.vN_min_idem`, `VN.vN_max_idem`,
+`VN.vN_min_zero_left`, `VN.vN_min_zero_right`,
+`VN.vN_max_zero_left`, `VN.vN_max_zero_right`,
+`VN.vN_min_comm`, `VN.vN_max_comm`,
+`VN.vN_min_assoc`, `VN.vN_max_assoc`,
+`VN.vN_eq_of_max_eq_min`,
+`VN.vN_le_then_max_eq_right`, `VN.vN_le_then_max_eq_left`,
+`VN.vN_le_then_min_eq_left`, `VN.vN_le_then_min_eq_right`,
+`VN.vN_le_max_left`, `VN.vN_le_max_right`,
+`VN.vN_min_le_left`, `VN.vN_min_le_right`
+
+### VN/SymGroupVN.lean
+
+`VN.vnSeg`, `VN.SymVN`, `VN.SymVN.id`, `VN.SymVN.comp`,
+`VN.mem_vnSeg_iff`, `VN.vnSeg_card`, `VN.SymVN.comp_def`
+
+### VN/InitialityVN.lean
+
+`VN.HFNat`, `VN.HFNat.zero`, `VN.HFNat.succ`,
+`VN.HFNat.succ_injective`, `VN.HFNat.zero_ne_succ`,
+`VN.HFNatPeanoSystem`,
+`VN.vN_nat`, `VN.vN_nat_zero`, `VN.vN_nat_succ`,
+`VN.vN_morph`, `VN.vN_morph_unique`

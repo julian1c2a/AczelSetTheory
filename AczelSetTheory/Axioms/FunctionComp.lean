@@ -52,9 +52,11 @@ theorem mem_funComp {f g p : HFSet} :
   unfold HFSet.funComp
   rw [mem_sep]
   constructor
-  · rintro ⟨_, a, b, c, rfl, hg, hf⟩; exact ⟨a, b, c, rfl, hg, hf⟩
+  · rintro ⟨_, a, _, b, _, c, _, rfl, hg, hf⟩; exact ⟨a, b, c, rfl, hg, hf⟩
   · rintro ⟨a, b, c, rfl, hg, hf⟩
-    exact ⟨funComp_mem_universe hg hf, a, b, c, rfl, hg, hf⟩
+    exact ⟨funComp_mem_universe hg hf, a, fst_mem_sUnion_sUnion a b g hg,
+           b, snd_mem_sUnion_sUnion a b g hg, c, snd_mem_sUnion_sUnion b c f hf,
+           rfl, hg, hf⟩
 
 /-- Membresía en forma de par ordenado:
     ⟪a, c⟫ ∈ f ∘f g ↔ ∃ b, ⟪a, b⟫ ∈ g ∧ ⟪b, c⟫ ∈ f. -/
