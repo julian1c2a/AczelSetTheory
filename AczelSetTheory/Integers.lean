@@ -5,3 +5,4 @@ import AczelSetTheory.Integers.Arithmetic
 import AczelSetTheory.Integers.Bijection
 import AczelSetTheory.Integers.PadicVal
 import AczelSetTheory.Integers.MobiusLiouville
+import AczelSetTheory.Integers.Rationals

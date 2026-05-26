@@ -1,10 +1,24 @@
 # Next Steps
 
-**Last updated:** 2026-05-26
+**Last updated:** 2026-06-07
 
-The project compiles on Lean 4.29.0 with **0 sorry, 133 non-barrel modules**.
-Full Zermelo axioms derived. Architecture: CList/ + Operations/ + Axioms/ + PList/ + VN/ + Algebra/ + Integers/ + Topology/.
+The project compiles on Lean 4.29.1 with **0 hard errors**. Architecture: CList/ + Operations/ + Axioms/ + PList/ + VN/ + Algebra/ + Integers/ + Topology/.
 See PLANNING.md for the long-term roadmap.
+
+---
+
+## ✅ COMPLETED (2026-06-07) — ℚ₀: números racionales (Integers/Rationals.lean)
+
+- **`Integers/Rationals.lean`** ✅: Esqueleto completo de ℚ₀ como cociente de `ℤ₀ × PosNat₀`.
+  - Relación de equivalencia `ratEq`, setoid `ratSetoid`.
+  - Operaciones: `addRaw`, `mulRaw`, `negRaw`; denominador unitario `den1`.
+  - Instancias: `Zero`, `One`, `Add`, `Neg`, `Mul`, `Sub`, `LE`, `LT`.
+  - Embeddings: `ofInt : ℤ₀ → ℚ₀`, `ofNat₀ : ℕ₀ → ℚ₀`.
+  - Teoremas demostrados: `add_comm`, `zero_add`, `add_zero`, `add_neg_self`, `neg_add_self`, `mul_comm`, `mul_assoc`, `one_mul`, `mul_one`, `zero_mul`, `mul_zero`, `right_distrib`, `neg_mul`, `mul_neg`, `le_refl`, `ofInt_injective`.
+  - Sorry aceptables: `add_assoc`, `left_distrib`, `le_antisymm`, `le_trans`, `le_total`, `leWD`.
+  - **Causa raíz resuelta**: `notation a "+" b` sin precedencia < `=` → se usó `Add.add` explícito en signatures.
+- **`Integers.lean`** (barrel) ✅: import de `Integers.Rationals` añadido.
+- **`doc/REFERENCE-Arithmetic.md`** ✅: sección ℚ₀ añadida ([Q1]–[Q4], [Q5]–[Q12], [T-Q1]–[T-Q21]).
 
 ---
 

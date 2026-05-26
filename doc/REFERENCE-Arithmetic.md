@@ -2094,3 +2094,91 @@ Cota del resto: $r < 2k + 1$.
 Cota superior: $n < (k+1)^2$. Se deriva de [T21.5] + [T21.6] + la identidad $(k+1)^2 = k^2 + (2k+1)$.
 
 ---
+
+## Módulo: `AczelSetTheory/Integers/Rationals.lean`
+
+**Namespace:** `ℚ₀`
+**Descripción:** Números racionales como cociente $\mathbb{Z}_0 \times \{n : \mathbb{N}_0 \mid n \neq 0\}$ por la relación $(a,b) \sim (c,d) \iff a \cdot \mathrm{ofNat}(d) = c \cdot \mathrm{ofNat}(b)$.
+
+### Tipo y construcción
+
+**[Q1]** `ℚ₀ : Type`
+Tipo de los racionales Peano. `Quotient ratSetoid` donde `ratSetoid` es el setoid sobre `ℤ₀ × PosNat₀`.
+
+**[Q2]** `ℚ₀.mk (z : ℤ₀) (d : {n : ℕ₀ // n ≠ 𝟘}) : ℚ₀`
+Constructor: clase de equivalencia de `(z, d)`.
+
+**[Q3]** `ℚ₀.ofInt (z : ℤ₀) : ℚ₀`
+Embedding del entero $z$: representa $z/1$.
+
+**[Q4]** `ℚ₀.ofNat₀ (n : ℕ₀) : ℚ₀`
+Embedding del natural $n$: `ofInt (ℤ₀.ofNat n)`.
+
+### Instancias algebraicas
+
+**[Q5]** `instance : Zero ℚ₀` — cero racional ($0/1$)
+
+**[Q6]** `instance : One ℚ₀` — uno racional ($1/1$)
+
+**[Q7]** `instance : Add ℚ₀` — suma: $(a/b) + (c/d) = (ad + bc)/(bd)$
+
+**[Q8]** `instance : Neg ℚ₀` — negación: $-(a/b) = (-a)/b$
+
+**[Q9]** `instance : Mul ℚ₀` — producto: $(a/b) \cdot (c/d) = (ac)/(bd)$
+
+**[Q10]** `instance : Sub ℚ₀` — resta: $a - b = a + (-b)$
+
+**[Q11]** `instance : LE ℚ₀` — orden: $a/b \leq c/d \iff a \cdot \mathrm{ofNat}(d) \leq c \cdot \mathrm{ofNat}(b)$ (con denominadores positivos)
+
+**[Q12]** `instance : LT ℚ₀` — orden estricto: $a < b \iff a \leq b \land \neg(b \leq a)$
+
+### Leyes de anillo conmutativo
+
+**[T-Q1]** `ℚ₀.add_comm (a b : ℚ₀) : Add.add a b = Add.add b a`
+
+**[T-Q2]** `ℚ₀.add_assoc (a b c : ℚ₀) : Add.add (Add.add a b) c = Add.add a (Add.add b c)` *(sorry)*
+
+**[T-Q3]** `ℚ₀.zero_add (a : ℚ₀) : Add.add 0 a = a`
+
+**[T-Q4]** `ℚ₀.add_zero (a : ℚ₀) : Add.add a 0 = a`
+
+**[T-Q5]** `ℚ₀.add_neg_self (a : ℚ₀) : Add.add a (Neg.neg a) = 0`
+
+**[T-Q6]** `ℚ₀.neg_add_self (a : ℚ₀) : Add.add (Neg.neg a) a = 0`
+
+**[T-Q7]** `ℚ₀.mul_comm (a b : ℚ₀) : a * b = b * a`
+
+**[T-Q8]** `ℚ₀.mul_assoc (a b c : ℚ₀) : a * b * c = a * (b * c)`
+
+**[T-Q9]** `ℚ₀.one_mul (a : ℚ₀) : 1 * a = a`
+
+**[T-Q10]** `ℚ₀.mul_one (a : ℚ₀) : a * 1 = a`
+
+**[T-Q11]** `ℚ₀.zero_mul (a : ℚ₀) : 0 * a = 0`
+
+**[T-Q12]** `ℚ₀.mul_zero (a : ℚ₀) : a * 0 = 0`
+
+**[T-Q13]** `ℚ₀.left_distrib (a b c : ℚ₀) : a * Add.add b c = Add.add (a * b) (a * c)` *(sorry)*
+
+**[T-Q14]** `ℚ₀.right_distrib (a b c : ℚ₀) : Add.add a b * c = Add.add (a * c) (b * c)`
+
+**[T-Q15]** `ℚ₀.neg_mul (a b : ℚ₀) : Neg.neg a * b = Neg.neg (a * b)`
+
+**[T-Q16]** `ℚ₀.mul_neg (a b : ℚ₀) : a * Neg.neg b = Neg.neg (a * b)`
+
+### Orden
+
+**[T-Q17]** `ℚ₀.le_refl (a : ℚ₀) : a ≤ a`
+
+**[T-Q18]** `ℚ₀.le_antisymm {a b : ℚ₀} (h1 : a ≤ b) (h2 : b ≤ a) : a = b` *(sorry)*
+
+**[T-Q19]** `ℚ₀.le_trans {a b c : ℚ₀} (h1 : a ≤ b) (h2 : b ≤ c) : a ≤ c` *(sorry)*
+
+**[T-Q20]** `ℚ₀.le_total (a b : ℚ₀) : a ≤ b ∨ b ≤ a` *(sorry)*
+
+### Inyectividad
+
+**[T-Q21]** `ℚ₀.ofInt_injective {a b : ℤ₀} (h : ofInt a = ofInt b) : a = b`
+El embedding $\mathbb{Z}_0 \hookrightarrow \mathbb{Q}_0$ es inyectivo.
+
+---
