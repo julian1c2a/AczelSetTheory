@@ -15,6 +15,7 @@ License: MIT
 
 import AczelSetTheory.Operations.Cardinal
 import AczelSetTheory.Axioms.Adjunction
+import AczelSetTheory.Axioms.Induction
 
 open Peano
 
@@ -128,5 +129,47 @@ theorem rank_insert (x A : HFSet) (h : x ∉ A) :
     | false => rfl
     | true  => exact absurd h_mem h
   exact rankCList_insert xc a h_nm
+
+-- ==================================================================
+-- Lema auxiliar: insert b A = A cuando b ∈ A
+-- ==================================================================
+
+private theorem insert_mem_eq' {b A : HFSet} (h : b ∈ A) : insert b A = A :=
+  extensionality _ _ fun x =>
+    ⟨fun hx => by
+       rcases (mem_insert x b A).mp hx with rfl | hxA
+       · exact h
+       · exact hxA,
+     fun hx => (mem_insert x b A).mpr (Or.inr hx)⟩
+
+-- ==================================================================
+-- mem_rank_lt: si a ∈ b entonces rank a < rank b
+-- ==================================================================
+
+theorem mem_rank_lt : ∀ (a b : HFSet), a ∈ b → rank a < rank b := by
+  have key : ∀ b a, a ∈ b → rank a < rank b :=
+    eps_induction (fun b => ∀ a, a ∈ b → rank a < rank b)
+      (fun a ha => absurd ha (not_mem_empty a))
+      (fun A x ih a ha => by
+        rcases (mem_insert a x A).mp ha with hax | haA
+        · rw [hax]
+          by_cases hxA : x ∈ A
+          · rw [insert_mem_eq' hxA]; exact ih x hxA
+          · rw [rank_insert x A hxA]
+            exact lt_of_lt_of_le (lt_self_σ_self (rank x)) (le_max_left _ _)
+        · have h_rankA := ih a haA
+          by_cases hxA : x ∈ A
+          · rw [insert_mem_eq' hxA]; exact h_rankA
+          · rw [rank_insert x A hxA]
+            exact lt_of_lt_of_le h_rankA (le_max_right _ _))
+  intro a b h
+  exact key b a h
+
+-- ==================================================================
+-- WellFounded de ∈ en HFSet, vía Subrelation.wf
+-- ==================================================================
+
+instance mem_wf : WellFounded (· ∈ · : HFSet → HFSet → Prop) :=
+  Subrelation.wf (fun {a b} h => mem_rank_lt a b h) (InvImage.wf rank well_founded_lt)
 
 end HFSet
