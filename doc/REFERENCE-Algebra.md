@@ -1238,7 +1238,7 @@ def HFSubspace.inter (sub₁ sub₂ : HFSubspace fld vs) : HFSubspace fld vs
 
 ### Algebra/Lattice.lean
 
-`HFAlgebra.HFLattice`, `HFAlgebra.HFLattice.le`, `HFAlgebra.HFLattice.meet_idem`, `HFAlgebra.HFLattice.join_idem`, `HFAlgebra.HFLattice.le_refl`, `HFAlgebra.HFLattice.le_antisymm`, `HFAlgebra.HFLattice.le_trans`, `HFAlgebra.HFLattice.meet_le_left`, `HFAlgebra.HFLattice.meet_le_right`, `HFAlgebra.HFLattice.le_join_left`, `HFAlgebra.HFLattice.le_join_right`, `HFAlgebra.HFBoundedLattice`, `HFAlgebra.HFBoundedLattice.toLattice`, `HFAlgebra.HFBoundedLattice.meet_bot`, `HFAlgebra.HFBoundedLattice.join_top`, `HFAlgebra.HFDistributiveLattice`, `HFAlgebra.HFDistributiveLattice.toLattice`, `HFAlgebra.HFDistributiveLattice.join_distrib` (⚠️ sorry), `HFAlgebra.HFLatHom`, `HFAlgebra.HFLatHom.id`, `HFAlgebra.HFLatHom.comp`, `HFAlgebra.HFSublattice`, `HFAlgebra.HFSublattice.toHFLattice`, `HFAlgebra.HFSublattice.inter`
+`HFAlgebra.HFLattice`, `HFAlgebra.HFLattice.le`, `HFAlgebra.HFLattice.meet_idem`, `HFAlgebra.HFLattice.join_idem`, `HFAlgebra.HFLattice.le_refl`, `HFAlgebra.HFLattice.le_antisymm`, `HFAlgebra.HFLattice.le_trans`, `HFAlgebra.HFLattice.meet_le_left`, `HFAlgebra.HFLattice.meet_le_right`, `HFAlgebra.HFLattice.le_join_left`, `HFAlgebra.HFLattice.le_join_right`, `HFAlgebra.HFBoundedLattice`, `HFAlgebra.HFBoundedLattice.toLattice`, `HFAlgebra.HFBoundedLattice.meet_bot`, `HFAlgebra.HFBoundedLattice.join_top`, `HFAlgebra.HFDistributiveLattice`, `HFAlgebra.HFDistributiveLattice.toLattice`, `HFAlgebra.HFDistributiveLattice.join_distrib`, `HFAlgebra.HFLatHom`, `HFAlgebra.HFLatHom.id`, `HFAlgebra.HFLatHom.comp`, `HFAlgebra.HFSublattice`, `HFAlgebra.HFSublattice.toHFLattice`, `HFAlgebra.HFSublattice.inter`
 
 ---
 
@@ -1329,7 +1329,7 @@ def HFDistributiveLattice.toLattice (dl : HFDistributiveLattice) : HFLattice
 
 | Nombre | Enunciado |
 |--------|-----------|
-| `join_distrib` | `dl.join a (dl.meet b c) = dl.meet (dl.join a b) (dl.join a c)` ⚠️ sorry |
+| `join_distrib` | `dl.join a (dl.meet b c) = dl.meet (dl.join a b) (dl.join a c)` |
 
 ### `HFAlgebra.HFLatHom`
 

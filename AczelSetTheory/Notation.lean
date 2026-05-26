@@ -106,6 +106,20 @@ def seven : HFSet := insert six six
 def eight : HFSet := insert seven seven
 def nine  : HFSet := insert eight eight
 
+-- Notación blackboard-bold para los numerales de von Neumann.
+-- Scoped para no colisionar con 𝟘 de Peano (ℕ₀).
+-- Uso: open HFSet in ... ó open HFSet (𝟘 𝟙 ...) in ...
+scoped notation "𝟘" => zero
+scoped notation "𝟙" => one
+scoped notation "𝟚" => two
+scoped notation "𝟛" => three
+scoped notation "𝟜" => four
+scoped notation "𝟝" => five
+scoped notation "𝟞" => six
+scoped notation "𝟟" => seven
+scoped notation "𝟠" => eight
+scoped notation "𝟡" => nine
+
 instance : OfNat HFSet 0 where ofNat := zero
 instance : OfNat HFSet 1 where ofNat := one
 instance : OfNat HFSet 2 where ofNat := two
