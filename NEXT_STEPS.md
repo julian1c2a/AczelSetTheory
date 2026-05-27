@@ -1,9 +1,111 @@
 # Next Steps
 
-**Last updated:** 2026-06-07
+**Last updated:** 2026-05-28
 
-The project compiles on Lean 4.29.1 with **0 hard errors**. Architecture: CList/ + Operations/ + Axioms/ + PList/ + VN/ + Algebra/ + Integers/ + Topology/.
-See PLANNING.md for the long-term roadmap.
+El proyecto compila pero **el invariante "0 sorry" está roto**:
+`Integers/Rationals.lean` contiene **9 `sorry`** introducidos en commit `ee607e3`.
+Resto de la arquitectura: CList/ + Operations/ + Axioms/ + PList/ + VN/ + Algebra/ + Integers/ + Topology/.
+Ver PLANNING.md para el roadmap a largo plazo.
+
+---
+
+## 🔴 PLAN ACTIVO (2026-05-28) — Cerrar los 9 `sorry` de `Integers/Rationals.lean`
+
+**Objetivo:** restaurar el invariante "0 sorry, 0 axiomas privados" cerrando todos los huecos sin debilitar firmas ni añadir axiomas.
+
+### Inventario de huecos
+
+| # | Línea | Símbolo | Tipo | Dificultad |
+|---|-------|---------|------|------------|
+| S1 | 64  | `mul_left_cancel_int` | `private lemma` | media |
+| S2 | 122 | `mulWD`               | `private` (well-def ·) | media |
+| S3 | 130 | `addWD`               | `private` (well-def +) | media |
+| S4 | 200 | `add_assoc`           | `theorem`       | baja |
+| S5 | 274 | `left_distrib`        | `theorem`       | media |
+| S6 | 298 | `leWD`                | `private` (well-def ≤) | media-alta |
+| S7 | 318 | `le_antisymm`         | `theorem`       | baja (depende de S6) |
+| S8 | 321 | `le_trans`            | `theorem`       | media (depende de S6) |
+| S9 | 324 | `le_total`            | `theorem`       | baja (depende de S6) |
+
+### Grafo de dependencias
+
+```
+S1 (mul_left_cancel_int)
+  └── ya consumido por ratEq_trans (no requiere demostrar otros)
+
+S2 (mulWD) ───┐
+S3 (addWD) ───┴─ algebra pura en ℤ₀ (mul_assoc, mul_comm, distrib, ofNat_mul)
+
+S4 (add_assoc), S5 (left_distrib)
+  └── algebra pura en ℤ₀ (idem)
+
+S6 (leWD) — núcleo del orden
+  ├── S7 (le_antisymm) — usa ℤ₀.le_antisymm sobre representantes
+  ├── S8 (le_trans)    — multiplica por ofNat positivo y usa ℤ₀.le_trans
+  └── S9 (le_total)    — usa ℤ₀.le_total sobre representantes
+```
+
+### Lemas prerequisitos en ℤ₀ que se necesitarán
+
+Antes de tocar Rationals, comprobar (y, si faltan, añadir en `Integers/Order.lean` o `Integers/Arithmetic.lean`):
+
+- [P1] `ℤ₀.ofNat_pos_of_ne_zero : n ≠ 𝟘 → 0 < ofNat n`  *(probable: derivable de `zero_le_ofNat` + `ofNat_lt`)*
+- [P2] `ℤ₀.mul_left_cancel_of_pos : 0 < k → k·x = k·y → x = y`  *(necesario para S1)*
+- [P3] `ℤ₀.mul_le_mul_right_of_pos : 0 < c → (a ≤ b ↔ a·c ≤ b·c)`  *(necesario para S6)*
+- [P4] `ℤ₀.mul_le_mul_left_of_pos : 0 < c → (a ≤ b ↔ c·a ≤ c·b)`  *(corolario de P3 + mul_comm)*
+- [P5] verificar `ℤ₀.left_distrib`, `right_distrib`, `mul_assoc`, `mul_comm` ya disponibles.
+
+Si P2/P3 no existen, demostrarlos primero (bridge vía `repr`/`canonical` o vía división con `0 < k`).
+
+### Pasos en orden
+
+1. **Auditar prerequisitos ℤ₀** (lectura de `Integers/Order.lean` y `Integers/Arithmetic.lean`). Listar qué P1–P5 ya existen.
+2. **Añadir los que falten** en sus módulos correspondientes (commit intermedio opcional).
+3. **S1 — `mul_left_cancel_int`** *(línea 64)*:
+   - Usar `P2` con `ha : 0 < ofNat k` deducido de `hk : k ≠ 𝟘` por `P1`.
+   - Forma: `exact ℤ₀.mul_left_cancel_of_pos (P1 hk) h`.
+4. **S2 — `mulWD`** *(línea 122)*:
+   - Tras `simp only [ratEq, mulRaw, mulDen, ℤ₀.ofNat_mul]`, la meta es:
+     `(p.1·q.1)·(ofNat p'.2 · ofNat q'.2) = (p'.1·q'.1)·(ofNat p.2 · ofNat q.2)`.
+   - Estrategia: reordenar con `mul_assoc`/`mul_comm` para agrupar `(p.1·ofNat p'.2)·(q.1·ofNat q'.2)`, sustituir con `h1`, `h2` (reescritos vía `ratEq`), y reagrupar.
+   - Cierre con `ring`-like via cadena de `rw`.
+5. **S3 — `addWD`** *(línea 130)*:
+   - Meta tras simp: `(p.1·ofNat q.2 + q.1·ofNat p.2)·(ofNat p'.2 · ofNat q'.2) = (p'.1·ofNat q'.2 + q'.1·ofNat p'.2)·(ofNat p.2 · ofNat q.2)`.
+   - Distribuir con `left_distrib`/`right_distrib`, sustituir vía `h1`, `h2` término a término, reagrupar.
+6. **S4 — `add_assoc`** *(línea 200)*:
+   - Tras `simp only [ratEq, addRaw, mulDen, Peano.Mul.mul_assoc, ℤ₀.ofNat_mul]`, ambos lados son productos de sumas de `p.1·ofNat q.2·ofNat r.2`, etc. Cierre con cadena `rw` usando `add_assoc`, `mul_assoc`, `mul_comm` en ℤ₀.
+7. **S5 — `left_distrib`** *(línea 274)*:
+   - Similar a S4: tras simp, manipular distribución y reordenar. Usar mismas tácticas.
+8. **S6 — `leWD`** *(línea 298)*: pieza más delicada.
+   - Meta: `(p₁.1·ofNat q₁.2 ≤ q₁.1·ofNat p₁.2) ↔ (p₂.1·ofNat q₂.2 ≤ q₂.1·ofNat p₂.2)`.
+   - Plan: probar `→` (la `←` se sigue por simetría usando `hp.symm`, `hq.symm`).
+   - Para `→`: multiplicar ambos lados de `h : p₁.1·ofNat q₁.2 ≤ q₁.1·ofNat p₁.2` por `(ofNat p₂.2 · ofNat q₂.2)` (positivo) usando `P3`/`P4`; sustituir vía `hp`, `hq` (que dan `pᵢ.1·ofNat pⱼ.2 = pⱼ.1·ofNat pᵢ.2`); cancelar `(ofNat p₁.2 · ofNat q₁.2)` (positivo) por `P3`/`P4`.
+9. **S7 — `le_antisymm`** *(línea 318)*:
+   - `Quotient.inductionOn₂` sobre `a`, `b`; reducir vía `leWD` a aserción en ℤ₀; aplicar `Quotient.sound` con `ℤ₀.le_antisymm` (que da igualdad de productos cruzados = exactamente `ratEq`).
+10. **S8 — `le_trans`** *(línea 321)*:
+    - Reducción análoga; multiplicar `h1` por `ofNat c.2.2` (positivo) y `h2` por `ofNat a.2.2`, encadenar con `ℤ₀.le_trans`, cancelar factor común con `P3`.
+11. **S9 — `le_total`** *(línea 324)*:
+    - Reducir a `ℤ₀.le_total (p.1·ofNat q.2) (q.1·ofNat p.2)`.
+12. **Build limpio** `lake build`; confirmar `grep -r "sorry" AczelSetTheory/` retorna sólo comentarios.
+13. **Actualizar invariantes**:
+    - `REFERENCE-Paridad-Peano-Aczel.md`: refrescar fecha + nota de invariante.
+    - `NEXT_STEPS.md`: mover Rationals de "✅ COMPLETED con sorries aceptables" a "✅ COMPLETED 0-sorry".
+    - `project_aczel.md` en memoria: actualizar fecha y restablecer "0 sorries" verificado.
+14. **Commit final** con mensaje:
+    `fix(Rationals): close 9 sorries — ℚ₀ ahora sin sorry`.
+
+### Riesgos / posibles bloqueos
+
+- **R1 — Cancelación multiplicativa en ℤ₀ por nonzero (no por positivo)**: si sólo tenemos cancelación por positivo, S1 requiere bifurcar por signo (`k > 0` ya lo tenemos por `k ≠ 𝟘` y `ofNat`). OK.
+- **R2 — Falta `mul_le_mul_right_of_pos`**: si no existe, hay que demostrarlo vía `repr`/conversión a `ℕ₀`. Aumentaría el alcance.
+- **R3 — Cadenas `rw` muy largas en S4/S5**: puede que necesite lemas auxiliares `ring`-style. Si la cadena pasa de 10 pasos, extraer a un `have` intermedio.
+- **R4 — `leWD` no se simplifica directamente**: alternativa es definir `leRaw` como predicado y demostrar transferencia con `Quotient.lift`.
+
+### Criterio de éxito
+
+- `lake build` retorna éxito sin warning de sorry.
+- `grep -rn "^[^-/].*sorry" AczelSetTheory/` no encuentra ocurrencias en código (sólo comentarios documentales si los hay).
+- Memoria y docs actualizados.
 
 ---
 
