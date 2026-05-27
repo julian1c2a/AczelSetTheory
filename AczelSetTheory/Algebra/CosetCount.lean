@@ -294,3 +294,6 @@ end HFAlgebra
 --   HFSubgroup.coset_card_eq                : ∀ C ∈ cosets, card C = card H
 --   HFSubgroup.card_G_eq_card_H_mul_index   : card G = card(cosets) · card H  (9)
 --   HFSubgroup.card_subgroup_dvd_card_group : card H ∣ card G  (Lagrange, 10)
+
+-- ¿DEBERÍAMOS HACER UN EXPORT LEAN 4 PARA ESTO COMO LO HEMOS HECHO HABITUALEMNTE
+-- EN OTROS PROYECTOS Y MÓDULOS? SERÍA DEL ESTILO `export HFAlgebra.HFSubgroup (...)` Y SOLO INCLUYENDO LOS RESULTADOS PÚBLICOS ANTERIORES.
