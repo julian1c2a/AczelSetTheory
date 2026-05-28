@@ -65,11 +65,17 @@ Esta tesis se refleja en `doc/REFERENCE-Paridad-Peano-Aczel.md` como tabla viva.
 
 ### 🅰️ FASE A — Cierre de Paridad Peano (próximas ~14–18 sesiones)
 
-Detalle táctico en `NEXT_STEPS.md` (M1–M7). Ordenado:
+Detalle táctico en `NEXT_STEPS.md`. Orden de ejecución aprobado (2026-05-28):
 
-1. **A1. Combinatoria pendiente** (M1–M3): Counting, Perm, Sign, Action, Orbit.
-2. **A2. GroupTheory concreto VN** (M4–M5): QuotientGroup, los 3 isomorfismos, Correspondence.
-3. **A3. Sylow + Zassenhaus** (M6–M7): cierra el bloque más denso.
+1. **M1** — H1 Counting.
+2. **M4 (1ª parte)** — H6 NormalSubgroup (puente VN) *[adelantado para desbloquear M5]*.
+3. **M2** — H2 Perm + H3 Sign *(paralelizable con M3)*.
+4. **M3** — H5 Action + H4 Orbit.
+5. **M4 (2ª parte)** — H7 QuotientGroup.
+6. **M5** — H8/H9/H10 bundle `IsomorphismsVN.lean` + H11 Correspondence separado.
+7. **M6** — H13/H14/H15 Sylow.
+8. **M7** — H12 Zassenhaus.
+9. **MFUTURE** — Schreier, Jordan-Hölder (fuera del alcance de paridad; aplazados).
 
 **Criterio de cierre:** tabla §1–§7 del REFERENCE de paridad con 0 ❌.
 
@@ -100,11 +106,15 @@ Lo que ya está documentado en este mismo archivo en §"Largo Plazo": ASet₁, J
 
 ## Preguntas abiertas para discutir
 
-1. **¿Aceptas la prioridad "Paridad antes que Extensión"?** Si tu visión es otra (p.ej. priorizar ℚ₀ extendido o topología), reordenamos.
-2. **¿Sylow es realmente prioritario?** Es ~40% del coste estimado de la Fase A. Si lo bajamos a "opcional", la Fase A baja a ~8–10 sesiones.
-3. **¿Punto de inflexión C: cuándo y cómo decidirlo?** Propuesta: tras cerrar Fase A, escribir un mini-RFC (1 página) comparando C1/C2/C3 con criterio concreto.
-4. **¿Mantenemos los ⚠️ "embebidos" como aceptables** (WellFounded, EquivRel) o nos comprometemos a darles módulo propio para cerrar la tabla a "100% ✅/🆕, 0 ⚠️"?
-5. **¿Cadencia de check-in con `PLANNING.md`?** Propuesta: actualizar tras cada milestone (M1, M2, …) con un párrafo de "lecciones aprendidas + recálculo de estimación".
+> **Resueltas el 2026-05-28** — registro de decisiones:
+>
+> 1. **Prioridad "Paridad antes que Extensión":** **aceptada.** Procedemos con Fase A íntegra antes de Fase B.
+> 2. **Sylow:** **se mantiene dentro del bloque mínimo** (M6). Es parte de la paridad Peano completa.
+> 3. **Punto de inflexión C:** **se mantiene** para discutir al cierre de Fase A. Escribiremos mini-RFC C1/C2/C3 tras M7.
+> 4. **⚠️ embebidos:** **se auditarán** (tarea T1 en `NEXT_STEPS.md`) antes de tocar ℚ₀ extendido en Fase B; decisión caso por caso.
+> 5. **Cadencia de check-in:** **acordada.** Actualizar `PLANNING.md` y `REFERENCE-Paridad-Peano-Aczel.md` tras cada milestone con lecciones aprendidas + recálculo de estimación (tarea T3).
+
+Ver `NEXT_STEPS.md` para el plan de ejecución detallado de Fase A con todas las decisiones tácticas adicionales (paralelización, especialización de iso theorems, `PermVN := SymVN`, bundle).
 
 ---
 

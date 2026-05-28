@@ -8,6 +8,61 @@ Ver PLANNING.md para el roadmap a largo plazo.
 
 ---
 
+## ✅ PLAN APROBADO (2026-05-28) — Paridad Peano: orden de ejecución
+
+**Estado:** Propuesta aprobada por el usuario el 2026-05-28. Procedemos a ejecución.
+
+### Decisiones fijadas
+
+| # | Pregunta | Decisión |
+|---|---|---|
+| Q1 | ¿Paralelizar milestones independientes? | **Sí**, paralelizamos donde el grafo lo permita. |
+| Q2 | ¿Puente o redemostrar iso theorems (H7–H11)? | **Opción A — especializar abstracto a vN.** Redemostramos sólo si la especialización falla. |
+| Q3 | `PermVN` como `Fin n → Fin n` o como `SymVN`? | **Opción A — `PermVN n := SymVN n`** y trabajamos módulo isomorfismo. |
+| Q4 | ¿Bundle de iso theorems? | **Agrupamos** H8/H9/H10 en un único `VN/IsomorphismsVN.lean`; H11 (Correspondence) por separado. |
+| Q5 | ¿Antes o después de Sylow atacar ℚ₀ extendido? | **Después.** Cerramos los 7 hitos M1–M7 íntegros antes de tocar Racionales. |
+
+### Orden de ejecución acordado
+
+| Paso | Huecos | Hito | Notas |
+|------|--------|------|-------|
+| 1 | H1 (Counting) | **M1** | Sin dependencias VN nuevas. Arranca aquí. |
+| 2 | H6 (NormalSubgroup puente) | **M4 (1ª parte)** | Adelantado: desbloquea H7 antes de M2/M3. |
+| 3–4 | H2 (Perm), H3 (Sign) | **M2** | Paralelizable con paso 5–6. |
+| 5–6 | H5 (Action), H4 (Orbit) | **M3** | + ActionVN como prerequisito explícito. |
+| 7 | H7 (QuotientGroup) | **M4 (2ª parte)** | Cierra M4. |
+| 8 | H8, H9, H10 (3 iso theorems) | **M5 (1ª parte)** | Bundle en `IsomorphismsVN.lean`. |
+| 9 | H11 (Correspondence) | **M5 (2ª parte)** | Módulo separado. |
+| 10 | H13, H14, H15 (Sylow ×3) | **M6** | El bloque más denso. |
+| 11 | H12 (Zassenhaus) | **M7** | Cierre de paridad. |
+| 12 | Schreier, Jordan-Hölder | **MFUTURE** | Fuera de paridad Peano; aplazado. |
+
+### Paralelización aplicable
+
+- **M2 ‖ M3:** una vez completado el paso 2 (H6), M2 (Perm+Sign) y M3 (Action+Orbit) son independientes; se pueden alternar o atacar en ramas paralelas.
+- **M5 (paso 8) ‖ M5 (paso 9):** H8/H9/H10 (bundle iso) y H11 (Correspondence) son independientes una vez cerrado H7.
+
+### Tareas de mantenimiento — orden acordado
+
+Antes de tocar ℚ₀ extendido en la Fase B:
+
+1. **T1 — auditar** los ⚠️ residuales (WellFounded §1, EquivRel §6) y decidir caso por caso si se formalizan como módulo VN o se aceptan como "embebidos".
+2. **T2 — migrar** `Algebra/CosetCount.lean` (Lagrange abstracto) a un puente VN explícito tras cerrar M4.
+3. **T3 — actualizar** `PLANNING.md` y `REFERENCE-Paridad-Peano-Aczel.md` tras cada milestone con: lecciones aprendidas + recálculo de estimación.
+
+### Próxima acción inmediata
+
+**Arrancar M1 — `VN/CountingVN.lean`** (paso 1 = H1).
+
+Acciones de arranque:
+1. Leer `Peano/PeanoNat/Combinatorics/Counting.lean` y catalogar teoremas (pigeonhole, inclusión-exclusión, lemas auxiliares).
+2. Crear esqueleto `AczelSetTheory/VN/CountingVN.lean` con imports y namespace.
+3. Transportar cada lema vía `congrArg vN (peano_lemma ...)`.
+4. Build limpio + entrada en REFERENCE de paridad.
+5. Tras M1: registrar lecciones en `PLANNING.md`, recalcular estimación restante.
+
+---
+
 ## 🎯 PROPUESTA (2026-05-28) — Plan de Paridad Peano (corto/medio plazo)
 
 **Objetivo declarado:** que AczelSetTheory **recubra completamente** todos los teoremas de Peano. Hoy quedan ~15 módulos Peano sin equivalente VN (ver `doc/REFERENCE-Paridad-Peano-Aczel.md`).

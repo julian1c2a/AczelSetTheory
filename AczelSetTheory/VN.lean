@@ -36,3 +36,14 @@ import AczelSetTheory.VN.CRTVN
 import AczelSetTheory.VN.LatticeVN
 import AczelSetTheory.VN.SymGroupVN
 import AczelSetTheory.VN.InitialityVN
+import AczelSetTheory.VN.CountingVN
+import AczelSetTheory.VN.NormalSubgroupVN
+import AczelSetTheory.VN.PermVN
+import AczelSetTheory.VN.SignVN
+import AczelSetTheory.VN.OrbitVN
+import AczelSetTheory.VN.ActionVN
+import AczelSetTheory.VN.QuotientGroupVN
+import AczelSetTheory.VN.FirstIsomorphismVN
+import AczelSetTheory.VN.SecondIsomorphismVN
+import AczelSetTheory.VN.ThirdIsomorphismVN
+import AczelSetTheory.VN.CorrespondenceTheoremVN

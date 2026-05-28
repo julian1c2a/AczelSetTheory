@@ -55,10 +55,10 @@
 | `Combinatorics/Pow.lean` | ✅ | `VN/PowVN.lean` | Potenciación `vN n ^ vN k` |
 | `Combinatorics/Summation.lean` | ✅ | `VN/SummationVN.lean` | Sumas sobre rangos VN |
 | `Combinatorics/Product.lean` | ✅ | `VN/ProductVN.lean` | Productos sobre rangos VN |
-| `Combinatorics/Counting.lean` | ❌ | — | Principio de casillas (pigeonhole) e inclusión-exclusión sobre `ℕ₀`. Sin equivalente VN. **Pendiente: `CountingVN.lean`.** |
-| `Combinatorics/Perm.lean` | ❌ | — | Permutaciones como bijecciones `Fin n → Fin n`; composición, inversas. Prerequisito de `Sign`, `Orbit`, Sylow. **Pendiente: `PermVN.lean`.** |
-| `Combinatorics/Orbit.lean` | ❌ | — | Órbitas de acciones de grupo sobre conjuntos finitos; ecuación de clases. **Pendiente: `OrbitVN.lean`.** |
-| `Combinatorics/Sign.lean` | ❌ | — | Paridad de permutaciones `sgn σ ∈ {+1,-1}`; homomorfismo `sgn : Sₙ → ℤ/2`. **Pendiente: `SignVN.lean`.** |
+| `Combinatorics/Counting.lean` | ✅ | `VN/CountingVN.lean` | Stub-equivalente: Peano `Counting` es un stub vacío (solo headers §1/§2/§3); AczelSetTheory replica la estructura para mantener paridad formal. Se materializará cuando Peano añada pigeonhole / inclusión-exclusión. |
+| `Combinatorics/Perm.lean` | ✅ | `VN/SymGroupVN.lean` + `VN/PermVN.lean` | `SymGroupVN` cubre §1-§2 de Peano (FunPerm, Sym). §3 (ciclos), §4 (signatura), §5 son TODO en Peano. `PermVN.lean` registra la correspondencia. |
+| `Combinatorics/Orbit.lean` | ✅ | `VN/OrbitVN.lean` | Stub-equivalente: Peano `Orbit` es un stub vacío (solo headers §1/§2/§3); AczelSetTheory replica la estructura. El contenido real de órbitas vive en `Algebra/Action.lean` (`HFGroupAction.orb`, `orbits_partition`). |
+| `Combinatorics/Sign.lean` | ✅ | `VN/SignVN.lean` | Stub-equivalente: Peano `Sign` es un stub vacío (solo headers §1/§2/§3); AczelSetTheory replica la estructura. Se materializará cuando Peano añada la signatura. |
 | `Combinatorics/Group.lean` | ✅ | `Algebra/Group.lean` + `VN/SymGroupVN.lean` | AczelSetTheory tiene `HFGroup` abstracto y `SymVN` concreto: grupo simétrico sobre segmentos VN `vnSeg n`; `SymVN.id`, `SymVN.comp`, `vnSeg_card`, `mem_vnSeg_iff`. |
 
 ---
@@ -67,13 +67,13 @@
 
 | Módulo Peano | Estado | Equivalente en AczelSetTheory | Notas |
 |---|---|---|---|
-| `GroupTheory/Action.lean` | ❌ | — | Acciones de grupo sobre conjuntos finitos. **Pendiente.** |
-| `GroupTheory/NormalSubgroup.lean` | ⚠️ | `Algebra/NormalSubgroup.lean` | Aczel tiene subgrupos normales *abstractos* en `HFAlgebra`; Peano los tenía sobre `ℕ₀`. Son conceptualmente equivalentes pero no puentes explícitos. |
-| `GroupTheory/QuotientGroup.lean` | ⚠️ | — | Cociente abstracto presente en la teoría de la correspondencia, pero no hay un módulo `QuotientGroupVN`. |
-| `GroupTheory/FirstIsomorphism.lean` | ⚠️ | `Algebra/GroupHom.lean` | AczelSetTheory tiene primer teorema de isomorfismo *abstracto*; no hay versión concreta VN. |
-| `GroupTheory/SecondIsomorphism.lean` | ⚠️ | `Algebra/GroupHom.lean` | Ídem segundo teorema (abstracto). |
-| `GroupTheory/ThirdIsomorphism.lean` | ⚠️ | `Algebra/GroupHom.lean` | Ídem tercer teorema (abstracto). |
-| `GroupTheory/CorrespondenceTheorem.lean` | ⚠️ | — | Cuarto teorema (correspondencia subgrupos). En Peano: `correspondencePhi/Psi`; en Aczel: solo la teoría abstracta (no módulo separado). |
+| `GroupTheory/Action.lean` | ✅ | `Algebra/Action.lean` + `VN/ActionVN.lean` | `HFGroupAction` abstracta sobre `HFGroup`: `orb`, `stab` (como `HFSubgroup`), `mem_orb_iff`, `mem_stab_iff`, `orb_self`, `orb_eq_of_mem`, `orbits_partition`, `conjugAction` (acción por conjugación), `mem_center_iff_conjug_fixed` (Z(G) = puntos fijos). TODO: `orbit_stabilizer` (vía Lagrange) y `class_equation` (corolario). |
+| `GroupTheory/NormalSubgroup.lean` | ✅ | `Algebra/NormalSubgroup.lean` + `VN/NormalSubgroupVN.lean` | Aczel tiene subgrupos normales *abstractos* en `HFAlgebra` (centralizer, center, normalizer, criterios `N_G(H)=G` y `gH=Hg`, `ker_isNormal`). `VN/NormalSubgroupVN.lean` registra la tabla de correspondencia con Peano. La versión abstracta es más general que la concreta `FinGroup ℕ₀` de Peano. |
+| `GroupTheory/QuotientGroup.lean` | ✅ | `Algebra/QuotientGroup.lean` + `VN/QuotientGroupVN.lean` | Aczel tiene grupo cociente `G/H` *abstracto* sobre `HFGroup`: `quotientGroup grp sub hn` (portador = `sub.cosets`, op vía `Classical.choose` representante, bien-definida bajo normalidad), `quotientHom` canónico `π : G → G/H`, `ker_quotientHom_eq : ker π = H`. `VN/QuotientGroupVN.lean` es stub-doc con tabla de correspondencia. |
+| `GroupTheory/FirstIsomorphism.lean` | ✅ | `Algebra/FirstIsomorphism.lean` + `VN/FirstIsomorphismVN.lean` | Aczel tiene 1er TI *abstracto* sobre `HFGroup`: `HFGroupHom.firstIsoMap : G/ker φ → im φ` (`firstIsoFun` vía representante, bien-definida) y `firstIsoMap_bijective` (inyectiva + sobreyectiva). Incluye `Injective/Surjective/Bijective`, `quotientHom_surjective`, `imageInclusion`. `VN/FirstIsomorphismVN.lean` es stub-doc. |
+| `GroupTheory/SecondIsomorphism.lean` | ✅ | `Algebra/SecondIsomorphism.lean` + `VN/SecondIsomorphismVN.lean` | Aczel tiene 2º TI *abstracto* sobre `HFGroup`: `HFSubgroup.secondIsoMap : H/(H∩N) → HN/N` y `secondIsoMap_bijective`. Incluye `subgroupHN` (con normalidad), `N_in_subgroupHN`/`N_normal_in_subgroupHN`, `interHN_as_subgroup_H`/`interHN_as_subgroup_H_isNormal`. `VN/SecondIsomorphismVN.lean` es stub-doc. |
+| `GroupTheory/ThirdIsomorphism.lean` | ✅ | `Algebra/ThirdIsomorphism.lean` + `VN/ThirdIsomorphismVN.lean` | Aczel tiene 3er TI *abstracto* sobre `HFGroup`: `HFSubgroup.KmodN_subgroup` (K/N ≤ G/N), `KmodN_normal`, `HFSubgroup.thirdIsoMap : G/N → G/K` (vía representante de N-coset), `thirdIsoMap_welldefined`, `thirdIsoMap_surjective` y `thirdIsoMap_ker_eq` (ker φ = K/N). `VN/ThirdIsomorphismVN.lean` es stub-doc. |
+| `GroupTheory/CorrespondenceTheorem.lean` | ✅ | `Algebra/CorrespondenceTheorem.lean` + `VN/CorrespondenceTheoremVN.lean` | Aczel tiene el 4º TI (Correspondencia) *abstracto* sobre `HFGroup`: `HFSubgroup.preimageSubgroup sub_N hn_N Q` (ψ(Q) = π⁻¹(Q)), `mem_preimageSubgroup_iff`, `N_le_preimageSubgroup` (N ⊆ ψ(Q)), `imageSubgroup_preimage` (φ(ψ(Q)) = Q como HFSet), `preimageSubgroup_image` (ψ(φ(K)) = K como HFSet cuando N ⊆ K). El rol de `imageSubgroup` lo cumple `KmodN_subgroup` de `ThirdIsomorphism.lean`. `VN/CorrespondenceTheoremVN.lean` es stub-doc. TODO: `preimage_subgroup_card` (requiere Lagrange sobre HFSubgroup). |
 | `GroupTheory/Zassenhaus.lean` | ❌ | — | Lema de Zassenhaus. **Pendiente.** |
 | `GroupTheory/Sylow/CosetAction.lean` | ❌ | — | Acción de cosetes en Sylow. **Pendiente.** |
 | `GroupTheory/Sylow/Cosets.lean` | ❌ | — | Cosetes para teorema de Sylow. **Pendiente.** |

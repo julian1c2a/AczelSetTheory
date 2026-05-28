@@ -2,6 +2,7 @@ import AczelSetTheory.Algebra.Group
 import AczelSetTheory.Algebra.Subgroup
 import AczelSetTheory.Algebra.GroupHom
 import AczelSetTheory.Algebra.NormalSubgroup
+import AczelSetTheory.Algebra.Action
 import AczelSetTheory.Algebra.Ring
 import AczelSetTheory.Algebra.CosetCount
 import AczelSetTheory.Algebra.Monoid
@@ -10,3 +11,8 @@ import AczelSetTheory.Algebra.Field
 import AczelSetTheory.Algebra.Module
 import AczelSetTheory.Algebra.LinearSpace
 import AczelSetTheory.Algebra.Lattice
+import AczelSetTheory.Algebra.QuotientGroup
+import AczelSetTheory.Algebra.FirstIsomorphism
+import AczelSetTheory.Algebra.SecondIsomorphism
+import AczelSetTheory.Algebra.ThirdIsomorphism
+import AczelSetTheory.Algebra.CorrespondenceTheorem
