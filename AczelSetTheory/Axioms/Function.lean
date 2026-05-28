@@ -76,7 +76,7 @@ theorem mem_range_of_mem
 -- Especificación de apply
 -- ==================================================================
 
-private theorem sInter_singleton_eq' (A : HFSet) : sInter (singleton A) = A :=
+theorem sInter_singleton_eq' (A : HFSet) : sInter (singleton A) = A :=
   extensionality _ _ fun x => by
     rw [mem_sInter]
     constructor
@@ -87,7 +87,7 @@ private theorem sInter_singleton_eq' (A : HFSet) : sInter (singleton A) = A :=
         have heq : B = A := (mem_singleton B A).mp hB
         subst heq; exact hx⟩
 
-private theorem sInter_orderedPair_fst' (a b : HFSet) : sInter ⟪a, b⟫ = singleton a :=
+theorem sInter_orderedPair_fst' (a b : HFSet) : sInter ⟪a, b⟫ = singleton a :=
   extensionality _ _ fun x => by
     rw [mem_sInter]
     constructor
@@ -99,11 +99,11 @@ private theorem sInter_orderedPair_fst' (a b : HFSet) : sInter ⟪a, b⟫ = sing
         · rw [h1]; exact hx
         · rw [h2]; exact (mem_pair x a b).mpr (Or.inl ((mem_singleton x a).mp hx))⟩
 
-private theorem fst_orderedPair_eq' (a b : HFSet) : fst ⟪a, b⟫ = a := by
+theorem fst_orderedPair_eq' (a b : HFSet) : fst ⟪a, b⟫ = a := by
   show sInter (sInter ⟪a, b⟫) = a
   rw [sInter_orderedPair_fst', sInter_singleton_eq']
 
-private theorem snd_orderedPair_eq' (a b : HFSet) : snd ⟪a, b⟫ = b := by
+theorem snd_orderedPair_eq' (a b : HFSet) : snd ⟪a, b⟫ = b := by
   show (if ∀ x, x ∈ HFSet.sUnion ⟪a, b⟫ → x ∈ HFSet.sInter ⟪a, b⟫
         then HFSet.sInter (HFSet.sInter ⟪a, b⟫)
         else HFSet.sInter (HFSet.setminus (HFSet.sUnion ⟪a, b⟫) (HFSet.sInter ⟪a, b⟫))) = b

@@ -38,6 +38,11 @@ License: MIT
 
 import AczelSetTheory.Algebra.Subgroup
 import AczelSetTheory.Axioms.OrdinalNat
+import AczelSetTheory.Axioms.Function
+import AczelSetTheory.Axioms.CartProd
+import AczelSetTheory.Axioms.Separation
+import AczelSetTheory.Axioms.CardImage
+import AczelSetTheory.Operations.NPow
 import Peano.PeanoNat.Combinatorics.Pow
 import Peano.PeanoNat.Arith
 import Peano.Prelim.Classical
@@ -499,5 +504,400 @@ noncomputable def cyclicSubgroup (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G) 
   e_mem      := cyclicCarrier_e_mem grp hg
   op_closed  := cyclicCarrier_op_closed grp hg
   inv_closed := cyclicCarrier_inv_closed grp hg
+
+-- ─────────────────────────────────────────────────────────────────
+-- §9. McKay carrier: p-tuplas con producto = e
+-- ─────────────────────────────────────────────────────────────────
+
+/-- Producto secuencial de las componentes de una `p`-tupla `t ∈ nPow grp.G p`,
+    definido por recursión sobre la longitud y proyecciones `fst`/`snd`.
+    Para `p = σ n`: `tupleProd (σ n) ⟪s, a⟫ = (tupleProd n s) · a`. -/
+def tupleProd (grp : HFGroup) : ℕ₀ → HFSet → HFSet
+  | .zero,   _ => grp.e
+  | .succ n, t => grp.op (tupleProd grp n (HFSet.fst t)) (HFSet.snd t)
+
+@[simp] theorem tupleProd_zero (grp : HFGroup) (t : HFSet) :
+    tupleProd grp 𝟘 t = grp.e := rfl
+
+@[simp] theorem tupleProd_succ (grp : HFGroup) (n : ℕ₀) (t : HFSet) :
+    tupleProd grp (σ n) t
+      = grp.op (tupleProd grp n (HFSet.fst t)) (HFSet.snd t) := rfl
+
+/-- Sobre un par `⟪s, a⟫` el producto se reduce limpiamente. -/
+theorem tupleProd_pair (grp : HFGroup) (n : ℕ₀) (s a : HFSet) :
+    tupleProd grp (σ n) ⟪s, a⟫ = grp.op (tupleProd grp n s) a := by
+  show grp.op (tupleProd grp n (HFSet.fst ⟪s, a⟫)) (HFSet.snd ⟪s, a⟫)
+        = grp.op (tupleProd grp n s) a
+  rw [HFSet.fst_orderedPair_eq', HFSet.snd_orderedPair_eq']
+
+/-- Primera proyección de un elemento de `nPow A (σ n)` cae en `nPow A n`. -/
+theorem fst_mem_nPow (A : HFSet) (n : ℕ₀) {t : HFSet}
+    (ht : t ∈ HFSet.nPow A (σ n)) : HFSet.fst t ∈ HFSet.nPow A n := by
+  rw [HFSet.nPow_succ] at ht
+  obtain ⟨a, b, ha, _hb, heq⟩ := (HFSet.mem_cartProd t (HFSet.nPow A n) A).mp ht
+  rw [heq, HFSet.fst_orderedPair_eq']
+  exact ha
+
+/-- Segunda proyección de un elemento de `nPow A (σ n)` cae en `A`. -/
+theorem snd_mem_of_mem_nPow (A : HFSet) (n : ℕ₀) {t : HFSet}
+    (ht : t ∈ HFSet.nPow A (σ n)) : HFSet.snd t ∈ A := by
+  rw [HFSet.nPow_succ] at ht
+  obtain ⟨a, b, _ha, hb, heq⟩ := (HFSet.mem_cartProd t (HFSet.nPow A n) A).mp ht
+  rw [heq, HFSet.snd_orderedPair_eq']
+  exact hb
+
+/-- El producto de las componentes de una `p`-tupla de `G` vive en `G`. -/
+theorem tupleProd_mem (grp : HFGroup) :
+    ∀ (n : ℕ₀) {t : HFSet}, t ∈ HFSet.nPow grp.G n →
+      tupleProd grp n t ∈ grp.G
+  | .zero,   _, _  => grp.e_mem
+  | .succ n, _, ht =>
+      grp.op_closed
+        (tupleProd_mem grp n (fst_mem_nPow grp.G n ht))
+        (snd_mem_of_mem_nPow grp.G n ht)
+
+/-- Tupla constante `(e, e, …, e)` de longitud `n`. -/
+def eTuple (grp : HFGroup) : ℕ₀ → HFSet
+  | .zero   => HFSet.empty
+  | .succ n => ⟪eTuple grp n, grp.e⟫
+
+theorem eTuple_mem_nPow (grp : HFGroup) :
+    ∀ n : ℕ₀, eTuple grp n ∈ HFSet.nPow grp.G n
+  | .zero   => by
+      show HFSet.empty ∈ HFSet.singleton HFSet.empty
+      exact (HFSet.mem_singleton _ _).mpr rfl
+  | .succ n => by
+      show ⟪eTuple grp n, grp.e⟫ ∈ HFSet.nPow grp.G n ×ₕ grp.G
+      exact (HFSet.mem_cartProd _ _ _).mpr
+        ⟨eTuple grp n, grp.e, eTuple_mem_nPow grp n, grp.e_mem, rfl⟩
+
+theorem tupleProd_eTuple (grp : HFGroup) :
+    ∀ n : ℕ₀, tupleProd grp n (eTuple grp n) = grp.e
+  | .zero   => rfl
+  | .succ n => by
+      show tupleProd grp (σ n) ⟪eTuple grp n, grp.e⟫ = grp.e
+      rw [tupleProd_pair, tupleProd_eTuple grp n, grp.op_id_left grp.e_mem]
+
+/-- Decidibilidad del predicado McKay (necesaria para `sep`). -/
+instance instDecidableTupleProdEq (grp : HFGroup) (p : ℕ₀) :
+    DecidablePred (fun t : HFSet => tupleProd grp p t = grp.e) :=
+  fun _ => inferInstance
+
+/-- **Carrier de McKay**: `{t ∈ nPow G p | producto t = e}`. -/
+def mckayCarrier (grp : HFGroup) (p : ℕ₀) : HFSet :=
+  HFSet.sep (HFSet.nPow grp.G p) (fun t => tupleProd grp p t = grp.e)
+
+theorem mem_mckayCarrier (grp : HFGroup) (p : ℕ₀) (t : HFSet) :
+    t ∈ mckayCarrier grp p
+      ↔ t ∈ HFSet.nPow grp.G p ∧ tupleProd grp p t = grp.e :=
+  HFSet.mem_sep _ _ _
+
+theorem mckayCarrier_subset_nPow (grp : HFGroup) (p : ℕ₀) :
+    mckayCarrier grp p ⊆ HFSet.nPow grp.G p := fun _ hx =>
+  ((mem_mckayCarrier grp p _).mp hx).1
+
+/-- La tupla constante `(e, …, e)` pertenece al carrier de McKay. -/
+theorem eTuple_mem_mckayCarrier (grp : HFGroup) (p : ℕ₀) :
+    eTuple grp p ∈ mckayCarrier grp p :=
+  (mem_mckayCarrier grp p _).mpr ⟨eTuple_mem_nPow grp p, tupleProd_eTuple grp p⟩
+
+-- ==================================================================
+-- §10. McKay shift (D.2)
+-- ==================================================================
+
+/-- Lema auxiliar: en un grupo, `a·b = e → b·a = e`. -/
+theorem swap_op_eq_e (grp : HFGroup) {a b : HFSet}
+    (ha : a ∈ grp.G) (hb : b ∈ grp.G) (h : grp.op a b = grp.e) :
+    grp.op b a = grp.e := by
+  have : a = grp.inv b := grp.unique_inv hb ha h
+  rw [this, grp.op_inv_right hb]
+
+/-- Cabeza (primera componente) de una `(σ n)`-tupla. -/
+def getHead : ℕ₀ → HFSet → HFSet
+  | .zero,   t => HFSet.snd t
+  | .succ n, t => getHead n (HFSet.fst t)
+
+/-- Cola (componentes 2..σn) de una `(σ n)`-tupla, como una `n`-tupla. -/
+def dropHead : ℕ₀ → HFSet → HFSet
+  | .zero,   _ => HFSet.empty
+  | .succ n, t => ⟪dropHead n (HFSet.fst t), HFSet.snd t⟫
+
+theorem getHead_mem (G : HFSet) :
+    ∀ (n : ℕ₀) {t : HFSet}, t ∈ HFSet.nPow G (σ n) → getHead n t ∈ G
+  | .zero,   t, ht   => snd_mem_of_mem_nPow G 𝟘 ht
+  | .succ n, t, ht   => by
+      show getHead n (HFSet.fst t) ∈ G
+      exact getHead_mem G n (fst_mem_nPow G (σ n) ht)
+
+theorem dropHead_mem (G : HFSet) :
+    ∀ (n : ℕ₀) {t : HFSet}, t ∈ HFSet.nPow G (σ n) → dropHead n t ∈ HFSet.nPow G n
+  | .zero,   _, _    => by
+      show HFSet.empty ∈ HFSet.singleton HFSet.empty
+      exact (HFSet.mem_singleton _ _).mpr rfl
+  | .succ n, t, ht   => by
+      show ⟪dropHead n (HFSet.fst t), HFSet.snd t⟫ ∈ HFSet.nPow G n ×ₕ G
+      exact (HFSet.mem_cartProd _ _ _).mpr
+        ⟨dropHead n (HFSet.fst t), HFSet.snd t,
+         dropHead_mem G n (fst_mem_nPow G (σ n) ht),
+         snd_mem_of_mem_nPow G (σ n) ht,
+         rfl⟩
+
+/-- Descomposición del producto: `tupleProd (σ n) t = (getHead n t) · (tupleProd n (dropHead n t))`. -/
+theorem tupleProd_split (grp : HFGroup) :
+    ∀ (n : ℕ₀) {t : HFSet}, t ∈ HFSet.nPow grp.G (σ n) →
+      tupleProd grp (σ n) t
+        = grp.op (getHead n t) (tupleProd grp n (dropHead n t))
+  | .zero,   t, ht => by
+      show grp.op (tupleProd grp 𝟘 (HFSet.fst t)) (HFSet.snd t)
+            = grp.op (HFSet.snd t) (tupleProd grp 𝟘 HFSet.empty)
+      have hsnd : HFSet.snd t ∈ grp.G := snd_mem_of_mem_nPow grp.G 𝟘 ht
+      rw [show tupleProd grp 𝟘 (HFSet.fst t) = grp.e from rfl,
+          show tupleProd grp 𝟘 HFSet.empty = grp.e from rfl,
+          grp.op_id_left hsnd, grp.op_id_right hsnd]
+  | .succ n, t, ht => by
+      -- t : nPow G (σ (σ n)) = nPow G (σ n) ×ₕ G
+      -- LHS = (tupleProd (σ n) (fst t)) · (snd t)
+      -- IH on fst t : tupleProd (σ n) (fst t) = (getHead n (fst t)) · (tupleProd n (dropHead n (fst t)))
+      -- RHS = getHead (σ n) t · tupleProd (σ n) (dropHead (σ n) t)
+      --     = getHead n (fst t) · ((tupleProd n (dropHead n (fst t))) · (snd t))
+      have hfst : HFSet.fst t ∈ HFSet.nPow grp.G (σ n) := fst_mem_nPow grp.G (σ n) ht
+      have hsnd : HFSet.snd t ∈ grp.G := snd_mem_of_mem_nPow grp.G (σ n) ht
+      have hhead : getHead n (HFSet.fst t) ∈ grp.G := getHead_mem grp.G n hfst
+      have hdrop : dropHead n (HFSet.fst t) ∈ HFSet.nPow grp.G n :=
+        dropHead_mem grp.G n hfst
+      have htail : tupleProd grp n (dropHead n (HFSet.fst t)) ∈ grp.G :=
+        tupleProd_mem grp n hdrop
+      have ih := tupleProd_split grp n hfst
+      show grp.op (tupleProd grp (σ n) (HFSet.fst t)) (HFSet.snd t)
+            = grp.op (getHead n (HFSet.fst t))
+                     (tupleProd grp (σ n) ⟪dropHead n (HFSet.fst t), HFSet.snd t⟫)
+      rw [tupleProd_pair, ih, grp.op_assoc hhead htail hsnd]
+
+/-- **McKay shift**: rota cíclicamente las componentes de una `p`-tupla. -/
+def mckayShift (_grp : HFGroup) : ℕ₀ → HFSet → HFSet
+  | .zero,   t => t
+  | .succ n, t => ⟪dropHead n t, getHead n t⟫
+
+theorem mckayShift_mem_nPow (grp : HFGroup) :
+    ∀ (p : ℕ₀) {t : HFSet}, t ∈ HFSet.nPow grp.G p →
+      mckayShift grp p t ∈ HFSet.nPow grp.G p
+  | .zero,   _, ht => ht
+  | .succ n, t, ht => by
+      show ⟪dropHead n t, getHead n t⟫ ∈ HFSet.nPow grp.G n ×ₕ grp.G
+      exact (HFSet.mem_cartProd _ _ _).mpr
+        ⟨dropHead n t, getHead n t,
+         dropHead_mem grp.G n ht, getHead_mem grp.G n ht, rfl⟩
+
+/-- El shift de McKay preserva el predicado "producto = e". -/
+theorem mckayShift_prod_e (grp : HFGroup) :
+    ∀ (p : ℕ₀) {t : HFSet}, t ∈ HFSet.nPow grp.G p →
+      tupleProd grp p t = grp.e →
+      tupleProd grp p (mckayShift grp p t) = grp.e
+  | .zero,   _, _,  hprod => hprod
+  | .succ n, t, ht, hprod => by
+      -- mckayShift (σ n) t = ⟪dropHead n t, getHead n t⟫
+      -- tupleProd (σ n) ⟪dropHead n t, getHead n t⟫
+      --   = (tupleProd n (dropHead n t)) · (getHead n t)
+      -- Por tupleProd_split: tupleProd (σ n) t = (getHead n t) · (tupleProd n (dropHead n t)) = e
+      -- Por swap: (tupleProd n (dropHead n t)) · (getHead n t) = e.
+      have hhead : getHead n t ∈ grp.G := getHead_mem grp.G n ht
+      have hdrop : dropHead n t ∈ HFSet.nPow grp.G n := dropHead_mem grp.G n ht
+      have htail : tupleProd grp n (dropHead n t) ∈ grp.G := tupleProd_mem grp n hdrop
+      have hsplit : grp.op (getHead n t) (tupleProd grp n (dropHead n t)) = grp.e := by
+        rw [← tupleProd_split grp n ht]; exact hprod
+      have hswap : grp.op (tupleProd grp n (dropHead n t)) (getHead n t) = grp.e :=
+        swap_op_eq_e grp hhead htail hsplit
+      show tupleProd grp (σ n) ⟪dropHead n t, getHead n t⟫ = grp.e
+      rw [tupleProd_pair]
+      exact hswap
+
+/-- El shift de McKay preserva el carrier de McKay. -/
+theorem mckayShift_mem_mckayCarrier (grp : HFGroup) (p : ℕ₀) {t : HFSet}
+    (ht : t ∈ mckayCarrier grp p) :
+    mckayShift grp p t ∈ mckayCarrier grp p := by
+  obtain ⟨htN, hprod⟩ := (mem_mckayCarrier grp p t).mp ht
+  exact (mem_mckayCarrier grp p _).mpr
+    ⟨mckayShift_mem_nPow grp p htN, mckayShift_prod_e grp p htN hprod⟩
+
+-- ==================================================================
+-- §11. Cardinalidad del carrier de McKay (D.3)
+-- ==================================================================
+
+/-- "Levanta" un `n`-tupla a un `(σ n)`-tupla en el carrier de McKay,
+    añadiendo como última componente el inverso del producto. -/
+def mckayLift (grp : HFGroup) (n : ℕ₀) (s : HFSet) : HFSet :=
+  ⟪s, grp.inv (tupleProd grp n s)⟫
+
+theorem mckayLift_mem (grp : HFGroup) (n : ℕ₀) {s : HFSet}
+    (hs : s ∈ HFSet.nPow grp.G n) :
+    mckayLift grp n s ∈ mckayCarrier grp (σ n) := by
+  have hprod : tupleProd grp n s ∈ grp.G := tupleProd_mem grp n hs
+  have hinv : grp.inv (tupleProd grp n s) ∈ grp.G := grp.inv_closed hprod
+  refine (mem_mckayCarrier grp (σ n) _).mpr ⟨?_, ?_⟩
+  · -- Pertenencia a nPow G (σ n)
+    show ⟪s, grp.inv (tupleProd grp n s)⟫ ∈ HFSet.nPow grp.G n ×ₕ grp.G
+    exact (HFSet.mem_cartProd _ _ _).mpr ⟨s, _, hs, hinv, rfl⟩
+  · -- Producto = e
+    show tupleProd grp (σ n) ⟪s, grp.inv (tupleProd grp n s)⟫ = grp.e
+    rw [tupleProd_pair]; exact grp.op_inv_right hprod
+
+theorem mckayLift_injective (grp : HFGroup) (n : ℕ₀) :
+    ∀ s₁ s₂, s₁ ∈ HFSet.nPow grp.G n → s₂ ∈ HFSet.nPow grp.G n →
+      mckayLift grp n s₁ = mckayLift grp n s₂ → s₁ = s₂ := by
+  intro s₁ s₂ _ _ h
+  have h' : (⟪s₁, grp.inv (tupleProd grp n s₁)⟫ : HFSet)
+              = ⟪s₂, grp.inv (tupleProd grp n s₂)⟫ := h
+  have hfst := congrArg HFSet.fst h'
+  rwa [HFSet.fst_orderedPair_eq', HFSet.fst_orderedPair_eq'] at hfst
+
+theorem mckayLift_surjective (grp : HFGroup) (n : ℕ₀) :
+    ∀ t, t ∈ mckayCarrier grp (σ n) →
+      ∃ s ∈ HFSet.nPow grp.G n, t = mckayLift grp n s := by
+  intro t ht
+  obtain ⟨htN, hprod⟩ := (mem_mckayCarrier grp (σ n) t).mp ht
+  rw [HFSet.nPow_succ] at htN
+  obtain ⟨s, last, hs, hlast, heq⟩ := (HFSet.mem_cartProd _ _ _).mp htN
+  refine ⟨s, hs, ?_⟩
+  have hprod' : tupleProd grp (σ n) ⟪s, last⟫ = grp.e := heq ▸ hprod
+  rw [tupleProd_pair] at hprod'
+  have hprodG : tupleProd grp n s ∈ grp.G := tupleProd_mem grp n hs
+  -- (prod s) · last = e, swap to last · (prod s) = e, then unique_inv
+  have hswap : grp.op last (tupleProd grp n s) = grp.e :=
+    swap_op_eq_e grp hprodG hlast hprod'
+  have hlast_eq : last = grp.inv (tupleProd grp n s) :=
+    grp.unique_inv hprodG hlast hswap
+  show t = ⟪s, grp.inv (tupleProd grp n s)⟫
+  rw [heq, hlast_eq]
+
+/-- Cardinalidad del carrier de McKay: `|X_{σ n}| = |G|^n`. -/
+theorem card_mckayCarrier_succ (grp : HFGroup) (n : ℕ₀) :
+    HFSet.card (mckayCarrier grp (σ n)) = (HFSet.card grp.G) ^ n := by
+  have hbij : HFSet.card (HFSet.nPow grp.G n) = HFSet.card (mckayCarrier grp (σ n)) :=
+    HFSet.card_eq_of_classBij
+      (fun s hs => mckayLift_mem grp n hs)
+      (mckayLift_injective grp n)
+      (fun y hy => mckayLift_surjective grp n y hy)
+  rw [← hbij, HFSet.card_nPow]
+
+/-- Si `p ∣ |G|` y `n ≠ 0`, entonces `p ∣ |G|^n`. -/
+theorem dvd_card_pow_of_dvd_card (grp : HFGroup) (p : ℕ₀)
+    (hp : p ∣ HFSet.card grp.G) {n : ℕ₀} (hn : n ≠ 𝟘) :
+    p ∣ (HFSet.card grp.G) ^ n := by
+  cases n with
+  | zero => exact absurd rfl hn
+  | succ m =>
+      show p ∣ Peano.Mul.mul ((HFSet.card grp.G) ^ m) (HFSet.card grp.G)
+      exact Peano.Arith.divides_mul_left hp
+
+/-- **D.3**: Si `p ∣ |G|`, entonces `p ∣ |mckayCarrier (σ n)|` para todo `n ≠ 0`. -/
+theorem dvd_card_mckayCarrier_succ (grp : HFGroup) (p : ℕ₀)
+    (hp : p ∣ HFSet.card grp.G) {n : ℕ₀} (hn : n ≠ 𝟘) :
+    p ∣ HFSet.card (mckayCarrier grp (σ n)) := by
+  rw [card_mckayCarrier_succ]
+  exact dvd_card_pow_of_dvd_card grp p hp hn
+
+-- ==================================================================
+-- §12. Iteración de McKay shift y puntos fijos (D.4.A)
+-- ==================================================================
+
+/-- Iteración `k`-ésima del shift de McKay. -/
+def shiftIter (grp : HFGroup) (p : ℕ₀) : ℕ₀ → HFSet → HFSet
+  | .zero,   t => t
+  | .succ k, t => mckayShift grp p (shiftIter grp p k t)
+
+@[simp] theorem shiftIter_zero (grp : HFGroup) (p : ℕ₀) (t : HFSet) :
+    shiftIter grp p 𝟘 t = t := rfl
+
+@[simp] theorem shiftIter_succ (grp : HFGroup) (p k : ℕ₀) (t : HFSet) :
+    shiftIter grp p (σ k) t = mckayShift grp p (shiftIter grp p k t) := rfl
+
+/-- La iteración preserva la pertenencia a `nPow G p`. -/
+theorem shiftIter_mem_nPow (grp : HFGroup) (p : ℕ₀) :
+    ∀ (k : ℕ₀) {t : HFSet}, t ∈ HFSet.nPow grp.G p →
+      shiftIter grp p k t ∈ HFSet.nPow grp.G p
+  | .zero,   _, ht => ht
+  | .succ k, _, ht =>
+      mckayShift_mem_nPow grp p (shiftIter_mem_nPow grp p k ht)
+
+/-- La iteración preserva el carrier de McKay. -/
+theorem shiftIter_mem_mckayCarrier (grp : HFGroup) (p : ℕ₀) :
+    ∀ (k : ℕ₀) {t : HFSet}, t ∈ mckayCarrier grp p →
+      shiftIter grp p k t ∈ mckayCarrier grp p
+  | .zero,   _, ht => ht
+  | .succ k, _, ht =>
+      mckayShift_mem_mckayCarrier grp p (shiftIter_mem_mckayCarrier grp p k ht)
+
+/-- Conjunto de puntos fijos del shift de McKay en el carrier. -/
+def mckayFixedPoints (grp : HFGroup) (p : ℕ₀) : HFSet :=
+  HFSet.sep (mckayCarrier grp p) (fun t => mckayShift grp p t = t)
+
+theorem mem_mckayFixedPoints (grp : HFGroup) (p : ℕ₀) (t : HFSet) :
+    t ∈ mckayFixedPoints grp p
+      ↔ t ∈ mckayCarrier grp p ∧ mckayShift grp p t = t :=
+  HFSet.mem_sep _ _ _
+
+theorem mckayFixedPoints_subset (grp : HFGroup) (p : ℕ₀) :
+    mckayFixedPoints grp p ⊆ mckayCarrier grp p :=
+  fun _ hx => ((mem_mckayFixedPoints grp p _).mp hx).1
+
+/-- Lema técnico: `getHead n (eTuple (σ n)) = e`. -/
+theorem eTuple_getHead (grp : HFGroup) :
+    ∀ n : ℕ₀, getHead n (eTuple grp (σ n)) = grp.e
+  | .zero   => by
+      show HFSet.snd (eTuple grp (σ 𝟘)) = grp.e
+      show HFSet.snd ⟪eTuple grp 𝟘, grp.e⟫ = grp.e
+      rw [HFSet.snd_orderedPair_eq']
+  | .succ n => by
+      show getHead n (HFSet.fst (eTuple grp (σ (σ n)))) = grp.e
+      show getHead n (HFSet.fst ⟪eTuple grp (σ n), grp.e⟫) = grp.e
+      rw [HFSet.fst_orderedPair_eq']
+      exact eTuple_getHead grp n
+
+/-- Lema técnico: `dropHead n (eTuple (σ n)) = eTuple n`. -/
+theorem eTuple_dropHead (grp : HFGroup) :
+    ∀ n : ℕ₀, dropHead n (eTuple grp (σ n)) = eTuple grp n
+  | .zero   => rfl
+  | .succ n => by
+      show ⟪dropHead n (HFSet.fst (eTuple grp (σ (σ n)))),
+            HFSet.snd (eTuple grp (σ (σ n)))⟫ = eTuple grp (σ n)
+      show ⟪dropHead n (HFSet.fst ⟪eTuple grp (σ n), grp.e⟫),
+            HFSet.snd ⟪eTuple grp (σ n), grp.e⟫⟫ = ⟪eTuple grp n, grp.e⟫
+      rw [HFSet.fst_orderedPair_eq', HFSet.snd_orderedPair_eq',
+          eTuple_dropHead grp n]
+
+/-- La tupla constante `(e, …, e)` es fija bajo el shift. -/
+theorem mckayShift_eTuple (grp : HFGroup) :
+    ∀ p : ℕ₀, mckayShift grp p (eTuple grp p) = eTuple grp p
+  | .zero   => rfl
+  | .succ n => by
+      show ⟪dropHead n (eTuple grp (σ n)), getHead n (eTuple grp (σ n))⟫
+            = eTuple grp (σ n)
+      rw [eTuple_getHead grp n, eTuple_dropHead grp n]
+      rfl
+
+/-- La tupla constante está en el conjunto de puntos fijos. -/
+theorem eTuple_mem_mckayFixedPoints (grp : HFGroup) (p : ℕ₀) :
+    eTuple grp p ∈ mckayFixedPoints grp p :=
+  (mem_mckayFixedPoints grp p _).mpr
+    ⟨eTuple_mem_mckayCarrier grp p, mckayShift_eTuple grp p⟩
+
+-- ==================================================================
+-- §13. shiftIter es homomorfismo de monoides (D.4.B parte 1)
+-- ==================================================================
+
+/-- `shiftIter` respeta la suma: `shiftIter (i+j) t = shiftIter i (shiftIter j t)`. -/
+theorem shiftIter_add (grp : HFGroup) (p : ℕ₀) :
+    ∀ (i j : ℕ₀) (t : HFSet),
+      shiftIter grp p (Peano.Add.add i j) t
+        = shiftIter grp p i (shiftIter grp p j t)
+  | .zero,   j, t => by
+      show shiftIter grp p (Peano.Add.add 𝟘 j) t = shiftIter grp p j t
+      rw [Peano.Add.zero_add]
+  | .succ i, j, t => by
+      show shiftIter grp p (Peano.Add.add (σ i) j) t
+            = mckayShift grp p (shiftIter grp p i (shiftIter grp p j t))
+      rw [Peano.Add.succ_add]
+      show mckayShift grp p (shiftIter grp p (Peano.Add.add i j) t) = _
+      rw [shiftIter_add grp p i j t]
 
 end HFAlgebra
