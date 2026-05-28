@@ -8,6 +8,82 @@ Ver PLANNING.md para el roadmap a largo plazo.
 
 ---
 
+## 🎯 PROPUESTA (2026-05-28) — Plan de Paridad Peano (corto/medio plazo)
+
+**Objetivo declarado:** que AczelSetTheory **recubra completamente** todos los teoremas de Peano. Hoy quedan ~15 módulos Peano sin equivalente VN (ver `doc/REFERENCE-Paridad-Peano-Aczel.md`).
+
+### Inventario de huecos (estado 2026-05-28)
+
+| # | Módulo Peano | Estado | Módulo VN propuesto | Bloqueante de |
+|---|---|---|---|---|
+| H1 | `Combinatorics/Counting.lean` | ❌ | `VN/CountingVN.lean` | Sylow, Orbit, ecuación de clases |
+| H2 | `Combinatorics/Perm.lean` | ❌ | `VN/PermVN.lean` | Sign, Orbit, Sₙ concreto |
+| H3 | `Combinatorics/Sign.lean` | ❌ | `VN/SignVN.lean` | Aₙ, determinante (futuro) |
+| H4 | `Combinatorics/Orbit.lean` | ❌ | `VN/OrbitVN.lean` | Sylow |
+| H5 | `GroupTheory/Action.lean` | ❌ | `VN/ActionVN.lean` | Orbit, Sylow |
+| H6 | `GroupTheory/NormalSubgroup.lean` | ⚠️ | `VN/NormalSubgroupVN.lean` (puente) | QuotientGroup concreto |
+| H7 | `GroupTheory/QuotientGroup.lean` | ⚠️ | `VN/QuotientGroupVN.lean` | Iso theorems concretos |
+| H8 | `GroupTheory/FirstIsomorphism.lean` | ⚠️ | `VN/FirstIsoVN.lean` | — |
+| H9 | `GroupTheory/SecondIsomorphism.lean` | ⚠️ | `VN/SecondIsoVN.lean` | — |
+| H10 | `GroupTheory/ThirdIsomorphism.lean` | ⚠️ | `VN/ThirdIsoVN.lean` | — |
+| H11 | `GroupTheory/CorrespondenceTheorem.lean` | ⚠️ | `VN/CorrespondenceVN.lean` | — |
+| H12 | `GroupTheory/Zassenhaus.lean` | ❌ | `VN/ZassenhausVN.lean` | Schreier (futuro) |
+| H13 | `GroupTheory/Sylow/CosetAction.lean` | ❌ | `VN/SylowCosetActionVN.lean` | Sylow |
+| H14 | `GroupTheory/Sylow/Cosets.lean` | ❌ | `VN/SylowCosetsVN.lean` | Sylow |
+| H15 | `GroupTheory/Sylow/Sylow.lean` | ❌ | `VN/SylowVN.lean` | — |
+
+### Grafo de dependencias
+
+```
+H1 Counting ──┐
+              ├──► H2 Perm ──► H3 Sign
+              │
+              └──► H5 Action ──► H4 Orbit ──┐
+                                            │
+H6 NormalSubgroup ──► H7 QuotientGroup ──► H8/H9/H10 Iso ──► H11 Correspondence
+                                            │
+                                            └──► H13/H14/H15 Sylow ──┐
+                                                                     ├──► H12 Zassenhaus
+                                                                     │
+                                                                     └──► (Schreier, Jordan-Hölder)
+```
+
+### Hitos propuestos (en orden ejecutable)
+
+- **M1 — Counting (H1).** Pigeonhole, inclusión-exclusión sobre `vN`. Sin dependencias VN nuevas. **Coste:** 1–2 sesiones.
+- **M2 — Perm + Sign (H2, H3).** Permutaciones `Fin n → Fin n` transportadas; `sgn` con valores en `{+1, -1} ⊂ ℤ₀`. **Coste:** 2–3 sesiones. *Aprovecha ℤ₀ ya cerrado.*
+- **M3 — Action + Orbit (H5, H4).** Acción de `HFGroup` sobre HFSet; ecuación de clases. **Coste:** 2 sesiones.
+- **M4 — QuotientGroup concreto (H6, H7).** Puente desde `HFNormalSubgroup` abstracto a `vN`. **Coste:** 1–2 sesiones.
+- **M5 — Teoremas de isomorfismo VN (H8, H9, H10, H11).** Concretizar los abstractos ya existentes. **Coste:** 2 sesiones (mayormente especialización).
+- **M6 — Sylow (H13, H14, H15).** El más pesado: tres pasos clásicos (existencia, conjugación, conteo). **Coste:** 4–6 sesiones.
+- **M7 — Zassenhaus (H12).** Lema sandwich. **Coste:** 1 sesión post-Sylow.
+
+**Estimación total:** ~14–18 sesiones para cierre completo de paridad.
+
+### Preguntas abiertas para discutir
+
+1. **¿Orden estricto o paralelizable?** M2 y M3 son independientes; ¿paralelizamos para reducir wall-clock?
+2. **¿Hacer "puente" o "redemostrar"?** Para H7–H11 (iso theorems) ya tenemos versión abstracta en `Algebra/`. **Opción A:** especializar el abstracto a `vN` (rápido, frágil si cambia el abstracto). **Opción B:** redemostrar desde cero sobre VN (verboso pero auto-contenido). *Yo recomendaría A salvo donde falle.*
+3. **¿`PermVN` como `Fin n → Fin n` o como subconjunto de `Sym(vnSeg n)`?** Ya tenemos `VN/SymGroupVN.lean`. **Opción A:** `PermVN n := SymVN n` y trabajamos modulo isomorfismo. **Opción B:** mantener `PermVN` separado como puente concreto. *Necesito tu lectura aquí.*
+4. **¿Bundle de iso theorems en un solo módulo `VN/IsomorphismsVN.lean`?** Los tres juntos son ~300 líneas; separados se duplica boilerplate. *Yo agruparía.*
+5. **¿Antes o después de Sylow, atacar `Integers/Rationals` extendido?** ℚ₀ existe pero falta densidad, completitud parcial, valor absoluto. Esto **no** es paridad Peano (Peano no tenía ℚ), pero el usuario podría querer cerrarlo antes. *Pregunto.*
+
+### Criterio de éxito del bloque
+
+- Tabla §1–§4 del REFERENCE de paridad con **0 ❌** (sólo ✅ y 🆕).
+- `lake build` ✅, 0 sorry, 0 axiomas privados.
+- Cada módulo nuevo con su entrada en `doc/REFERENCE-Paridad-Peano-Aczel.md`.
+
+---
+
+## 📋 Tareas de mantenimiento (paralelas, baja prioridad)
+
+- **T1.** Auditar los ⚠️ residuales en `WellFounded` (§1) y `EquivRel` (§6) — ¿formalizar como módulo VN o aceptar como "embebido"?
+- **T2.** Migrar `Algebra/CosetCount.lean` (Lagrange abstracto) a un puente VN explícito una vez completado M4.
+- **T3.** Actualizar `PLANNING.md` con un check-in tras cada milestone.
+
+---
+
 ## ✅ COMPLETED (2026-05-28) — Cierre de los 9 `sorry` de `Integers/Rationals.lean`
 
 Cerrados todos los huecos S1–S9 sin debilitar firmas ni añadir axiomas:

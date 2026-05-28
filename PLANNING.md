@@ -1,6 +1,6 @@
 # PLANNING — AczelSetTheory
 
-**Last updated:** 2026-05-22
+**Last updated:** 2026-05-28
 **Author:** Julián Calderón Almendros
 
 > Plan de largo plazo para AczelSetTheory. Cada fase es ejecutable de forma
@@ -12,6 +12,32 @@
 > [doc/peano/INTUICIONES.md](doc/peano/INTUICIONES.md) y la documentación de
 > referencia de sus módulos en `doc/REFERENCE-{Arithmetic,Combinatorics,Foundation,
 > GroupTheory,ListsAndSets,NumberTheory,Prelim}.md`.
+
+---
+
+## 🎯 Tesis del proyecto (2026-05-28)
+
+> **AczelSetTheory debe recubrir completamente todos los teoremas de Peano**, y
+> extenderlos hacia teorías que Peano no podía expresar (axiomática Zermelo,
+> álgebra abstracta, topología, jerarquía aritmética). El criterio de éxito es:
+> *para cada teorema `T` demostrado en Peano sobre `ℕ₀`, existe un teorema
+> equivalente `T_vN` (o `T_HF`) demostrado en AczelSetTheory*.
+
+Esta tesis se refleja en `doc/REFERENCE-Paridad-Peano-Aczel.md` como tabla viva.
+
+### Estado de paridad (2026-05-28)
+
+| Bloque | ✅ Portado | ⚠️ Parcial | ❌ Pendiente |
+|---|---|---|---|
+| Aritmética base + orden (§1) | 17/18 | 1 (WellFounded) | 0 |
+| Combinatoria numérica (§2) | 7/12 | 0 | 5 (Counting, Perm, Sign, Orbit, …) |
+| GroupTheory (§3) | 0 abstractos | 5 (Iso, Quot, Corresp) | 5 (Action, Sylow×3, Zassenhaus) |
+| Teoría de números (§4) | 5/5 | 0 | 0 |
+| Fundamentos (§5) | 5/5 | 0 | 0 |
+| Listas/Conjuntos finitos (§6) | 3/3 | 1 (EquivRel) | 0 |
+| Enteros (§7) | 7 módulos | 0 | 0 |
+
+**Total estimado:** ~32 ✅ / ~5 ⚠️ / ~15 ❌ sobre ~53 módulos sustantivos de Peano.
 
 ---
 
@@ -28,13 +54,64 @@
    sea estrictamente inevitable.
 4. **Notaciones:** `vN` para la función de von Neumann, `VN` para su
    namespace. Los constructores de `ℕ₀`: `𝟘` (zero), `σ n` (succ).
+5. **Paridad antes que extensión.** *(Nuevo, 2026-05-28)* Cerrar paridad
+   Peano tiene prioridad sobre añadir teorías nuevas en HFSet (anillos no
+   conmutativos, módulos avanzados, topología algebraica…). Razón: el valor
+   del proyecto descansa en ser *superconjunto verificado* de Peano.
 
 ---
 
-## Estado actual (2026-05-18)
+## Hoja de ruta a largo plazo (PROPUESTA 2026-05-28)
 
-- **~85 módulos Lean, 0 sorry.**
-- Fases 1–5 **completadas**. Ver detalle abajo.
+### 🅰️ FASE A — Cierre de Paridad Peano (próximas ~14–18 sesiones)
+
+Detalle táctico en `NEXT_STEPS.md` (M1–M7). Ordenado:
+
+1. **A1. Combinatoria pendiente** (M1–M3): Counting, Perm, Sign, Action, Orbit.
+2. **A2. GroupTheory concreto VN** (M4–M5): QuotientGroup, los 3 isomorfismos, Correspondence.
+3. **A3. Sylow + Zassenhaus** (M6–M7): cierra el bloque más denso.
+
+**Criterio de cierre:** tabla §1–§7 del REFERENCE de paridad con 0 ❌.
+
+### 🅱️ FASE B — Consolidación post-paridad (~6–8 sesiones)
+
+Una vez cerrada la paridad, atacar las extensiones naturales que Peano no podía expresar pero que cierran el discurso aritmético:
+
+1. **B1. ℚ₀ extendido**: densidad, completitud parcial, valor absoluto, métrica `|p−q|`.
+2. **B2. Bridge `ℤ₀ ↔ HFInt`** (si todavía hay drift entre ambos): unificación.
+3. **B3. Anillos cocientes concretos** sobre HFRing: `ℤ₀/(n)`, anillos de matrices `Mₙ(ℤ₀)` (uso de `FinList`/`NPow`).
+4. **B4. Documentación de cierre**: revisar `THOUGHTS.md`, congelar `REFERENCE-Paridad-Peano-Aczel.md` con sello "Paridad completa".
+
+### 🅲️ FASE C — Decisión: ¿extender HF o saltar a ASet₁? (punto de inflexión)
+
+Aquí se decide la estrategia de los próximos 12+ meses. Tres opciones (no excluyentes):
+
+- **C1. Profundizar en HFSet.** Topología avanzada (compacidad, conexidad sobre HF), categorías pequeñas, álgebra homológica truncada. *Pros:* todo computable. *Contras:* limitado a finitos.
+- **C2. Comenzar ASet₁ (Δ⁰₁).** Subconjuntos decidibles infinitos (incluye ω, ℕ₀ como HFSet infinito). Permite hablar de funciones `ℕ₀ → ℕ₀`, sucesiones, límites. *Ver §Largo Plazo más abajo.*
+- **C3. Atacar ZFC vía W-Types** (Estrategia C de THOUGHTS.md). *Más ambicioso, más arriesgado.*
+
+**Mi recomendación tentativa:** C2 (ASet₁) por ser el incremento natural y el que abre análisis real computable.
+
+### 🅳️ FASE D — Largo plazo (12+ meses)
+
+Lo que ya está documentado en este mismo archivo en §"Largo Plazo": ASet₁, Jerarquía Aritmética, ZFC. Sin cambio respecto a la versión 2026-05-22.
+
+---
+
+## Preguntas abiertas para discutir
+
+1. **¿Aceptas la prioridad "Paridad antes que Extensión"?** Si tu visión es otra (p.ej. priorizar ℚ₀ extendido o topología), reordenamos.
+2. **¿Sylow es realmente prioritario?** Es ~40% del coste estimado de la Fase A. Si lo bajamos a "opcional", la Fase A baja a ~8–10 sesiones.
+3. **¿Punto de inflexión C: cuándo y cómo decidirlo?** Propuesta: tras cerrar Fase A, escribir un mini-RFC (1 página) comparando C1/C2/C3 con criterio concreto.
+4. **¿Mantenemos los ⚠️ "embebidos" como aceptables** (WellFounded, EquivRel) o nos comprometemos a darles módulo propio para cerrar la tabla a "100% ✅/🆕, 0 ⚠️"?
+5. **¿Cadencia de check-in con `PLANNING.md`?** Propuesta: actualizar tras cada milestone (M1, M2, …) con un párrafo de "lecciones aprendidas + recálculo de estimación".
+
+---
+
+## Estado actual (snapshot 2026-05-28)
+
+- **~117 módulos Lean + Integers/Rationals, 0 sorry, 0 axiomas privados.**
+- Fases históricas 1–5 **completadas**. Detalle abajo se conserva como histórico.
 
 ### Completado
 
