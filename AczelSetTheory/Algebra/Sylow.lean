@@ -1295,4 +1295,280 @@ theorem orbitOf_eq_or_disjoint (grp : HFGroup) (n : ℕ₀) (t s : HFSet)
       orbitOf_eq_of_mem grp n s x hs hxs
     rw [← h1, h2]
 
+-- ==================================================================
+-- §19. D.4.C parte 3: período mínimo de una tupla bajo el shift
+-- ==================================================================
+
+/-- Especificación del período mínimo vía WOP: existe único `k > 0` con
+    `shiftIter k t = t` y minimal entre tales. Existencia: `shiftIter_period`. -/
+private theorem periodOf_wop (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) :
+    ExistsUnique (fun k : ℕ₀ =>
+      (lt₀ 𝟘 k ∧ shiftIter grp (σ n) k t = t) ∧
+      ∀ m : ℕ₀, (lt₀ 𝟘 m ∧ shiftIter grp (σ n) m t = t) → le₀ k m) :=
+  Peano.WellFounded.well_ordering_principle
+    (fun k => lt₀ 𝟘 k ∧ shiftIter grp (σ n) k t = t)
+    ⟨σ n, zero_lt_succ n, shiftIter_period grp n t ht⟩
+
+/-- Período mínimo de `t` bajo el shift: mínimo `k > 0` con `shiftIter k t = t`. -/
+noncomputable def periodOf (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) : ℕ₀ :=
+  Peano.choose_unique (periodOf_wop grp n t ht)
+
+private theorem periodOf_spec (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) :
+    (lt₀ 𝟘 (periodOf grp n t ht) ∧
+     shiftIter grp (σ n) (periodOf grp n t ht) t = t) ∧
+    ∀ m : ℕ₀, (lt₀ 𝟘 m ∧ shiftIter grp (σ n) m t = t) →
+      le₀ (periodOf grp n t ht) m :=
+  Peano.choose_spec_unique (periodOf_wop grp n t ht)
+
+theorem periodOf_pos (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) :
+    lt₀ 𝟘 (periodOf grp n t ht) := (periodOf_spec grp n t ht).1.1
+
+theorem periodOf_ne_zero (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) :
+    periodOf grp n t ht ≠ 𝟘 :=
+  (ne_of_lt 𝟘 _ (periodOf_pos grp n t ht)).symm
+
+theorem shiftIter_periodOf (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) :
+    shiftIter grp (σ n) (periodOf grp n t ht) t = t := (periodOf_spec grp n t ht).1.2
+
+theorem periodOf_minimal (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n))
+    {m : ℕ₀} (hm_pos : lt₀ 𝟘 m) (hm_eq : shiftIter grp (σ n) m t = t) :
+    le₀ (periodOf grp n t ht) m :=
+  (periodOf_spec grp n t ht).2 m ⟨hm_pos, hm_eq⟩
+
+theorem periodOf_le_succ_n (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) :
+    le₀ (periodOf grp n t ht) (σ n) :=
+  periodOf_minimal grp n t ht (zero_lt_succ n) (shiftIter_period grp n t ht)
+
+-- ==================================================================
+-- §20. D.4.C parte 3: período divide a σ n (vía divMod)
+-- ==================================================================
+
+/-- Iteración por múltiplos del período: `shiftIter (q · period) t = t`. -/
+private theorem shiftIter_mul_periodOf (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) :
+    ∀ q : ℕ₀, shiftIter grp (σ n) (mul q (periodOf grp n t ht)) t = t
+  | .zero    => by
+      show shiftIter grp (σ n) (mul 𝟘 (periodOf grp n t ht)) t = t
+      rw [zero_mul]; rfl
+  | .succ q' => by
+      show shiftIter grp (σ n) (mul (σ q') (periodOf grp n t ht)) t = t
+      rw [succ_mul]
+      rw [shiftIter_add, shiftIter_periodOf grp n t ht]
+      exact shiftIter_mul_periodOf grp n t ht q'
+
+/-- **`periodOf` divide a `σ n`** (vía división euclídea y minimalidad). -/
+theorem periodOf_dvd_succ_n (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) :
+    Divides (periodOf grp n t ht) (σ n) := by
+  have hp_ne : periodOf grp n t ht ≠ 𝟘 := periodOf_ne_zero grp n t ht
+  let p := periodOf grp n t ht
+  have hspec : σ n = add (mul (div (σ n) p) p) (mod (σ n) p) := by
+    have := divMod_spec (σ n) p hp_ne
+    show σ n = add (mul (divMod (σ n) p).1 p) (divMod (σ n) p).2
+    exact this
+  have hr_lt : lt₀ (mod (σ n) p) p := mod_lt (σ n) p hp_ne
+  have h1 : shiftIter grp (σ n) (σ n) t = t := shiftIter_period grp n t ht
+  -- Reordenamos: σ n = (mod) + (div * p), aplicamos shiftIter_add y shiftIter_mul_periodOf.
+  have hspec' : σ n = add (mod (σ n) p) (mul (div (σ n) p) p) := by
+    have hc : add (mul (div (σ n) p) p) (mod (σ n) p)
+            = add (mod (σ n) p) (mul (div (σ n) p) p) :=
+      add_comm _ _
+    exact hspec.trans hc
+  have hsubst : shiftIter grp (σ n) (σ n) t
+               = shiftIter grp (σ n)
+                  (add (mod (σ n) p) (mul (div (σ n) p) p)) t :=
+    congrArg (fun k => shiftIter grp (σ n) k t) hspec'
+  have hsplit : shiftIter grp (σ n)
+                  (add (mod (σ n) p) (mul (div (σ n) p) p)) t
+               = shiftIter grp (σ n) (mod (σ n) p)
+                  (shiftIter grp (σ n) (mul (div (σ n) p) p) t) :=
+    shiftIter_add grp (σ n) (mod (σ n) p) (mul (div (σ n) p) p) t
+  have hmul : shiftIter grp (σ n) (mul (div (σ n) p) p) t = t :=
+    shiftIter_mul_periodOf grp n t ht (div (σ n) p)
+  rw [hmul] at hsplit
+  have h2 : shiftIter grp (σ n) (mod (σ n) p) t = t :=
+    (hsubst.trans hsplit).symm.trans h1
+  -- Si mod > 0, contradice minimalidad.
+  have hr_zero : mod (σ n) p = 𝟘 := by
+    rcases trichotomy (mod (σ n) p) 𝟘 with hlt | heq | hgt
+    · exact (nlt_n_0 _ hlt).elim
+    · exact heq
+    · have hle : le₀ p (mod (σ n) p) := periodOf_minimal grp n t ht hgt h2
+      exact (le_not_lt hle hr_lt).elim
+  -- Así σ n = mul p (div (σ n) p).
+  refine ⟨div (σ n) p, ?_⟩
+  show σ n = mul p (div (σ n) p)
+  have e1 : add (mul (div (σ n) p) p) (mod (σ n) p)
+          = add (mul (div (σ n) p) p) 𝟘 :=
+    congrArg (add _) hr_zero
+  have e2 : add (mul (div (σ n) p) p) 𝟘 = mul (div (σ n) p) p := add_zero _
+  have e3 : mul (div (σ n) p) p = mul p (div (σ n) p) := mul_comm _ _
+  exact hspec.trans (e1.trans (e2.trans e3))
+
+-- ==================================================================
+-- §21. D.4.C parte 3: cancelación e inyectividad bajo el período
+-- ==================================================================
+
+/-- **Cancelación**: si `shiftIter i t = shiftIter j t` con `i ≤ j ≤ n`,
+    entonces `shiftIter (j - i) t = t`. Vía `shiftIter_invIdx`. -/
+private theorem shiftIter_cancel (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) :
+    ∀ i j : ℕ₀, le₀ i j → le₀ j n →
+      shiftIter grp (σ n) i t = shiftIter grp (σ n) j t →
+      shiftIter grp (σ n) (Peano.Sub.sub j i) t = t
+  | .zero, j, _, _, heq => by
+      rw [Peano.Sub.sub_zero]
+      exact heq.symm
+  | .succ i', j, hij, hjn, heq => by
+      have hi'n : le₀ i' n :=
+        Peano.Order.le_succ_then_le (le_trans _ _ _ hij hjn)
+      have hin : le₀ (σ i') n := le_trans _ _ _ hij hjn
+      -- shiftIter (sub n i') (shiftIter (σ i') t) = t
+      have hkey : shiftIter grp (σ n) (Peano.Sub.sub n i')
+                    (shiftIter grp (σ n) (σ i') t) = t := by
+        have := shiftIter_invIdx grp n t ht (σ i') hin
+        show shiftIter grp (σ n) (invIdx n (σ i'))
+                (shiftIter grp (σ n) (σ i') t) = t
+        exact this
+      -- Aplicar shiftIter (sub n i') al lado derecho de heq.
+      have h := congrArg (shiftIter grp (σ n) (Peano.Sub.sub n i')) heq.symm
+      rw [hkey] at h
+      -- h : shiftIter (sub n i') (shiftIter j t) = t
+      -- LHS = shiftIter (add (sub n i') j) t  (vía shiftIter_add inverso)
+      have hLHS : shiftIter grp (σ n) (Peano.Sub.sub n i')
+                    (shiftIter grp (σ n) j t)
+                = shiftIter grp (σ n) (add (Peano.Sub.sub n i') j) t :=
+        (shiftIter_add grp (σ n) (Peano.Sub.sub n i') j t).symm
+      rw [hLHS] at h
+      -- h : shiftIter (sub n i' + j) t = t
+      -- Reescribir (sub n i' + j) = (σ n) + (sub j (σ i')).
+      have hsig : add (Peano.Sub.sub n i') (σ i') = σ n := by
+        rw [Peano.Add.add_succ]
+        show σ (add (Peano.Sub.sub n i') i') = σ n
+        rw [Peano.Sub.sub_k_add_k n i' hi'n]
+      have hj_eq : j = add (Peano.Sub.sub j (σ i')) (σ i') :=
+        (sub_k_add_k j (σ i') hij).symm
+      have hrec : add (Peano.Sub.sub n i') j
+                = add (σ n) (Peano.Sub.sub j (σ i')) := by
+        calc add (Peano.Sub.sub n i') j
+            = add (Peano.Sub.sub n i') (add (Peano.Sub.sub j (σ i')) (σ i')) := by
+                rw [← hj_eq]
+          _ = add (add (Peano.Sub.sub n i') (Peano.Sub.sub j (σ i'))) (σ i') := by
+                rw [← add_assoc]
+          _ = add (add (Peano.Sub.sub j (σ i')) (Peano.Sub.sub n i')) (σ i') := by
+                rw [add_comm (Peano.Sub.sub n i') (Peano.Sub.sub j (σ i'))]
+          _ = add (Peano.Sub.sub j (σ i')) (add (Peano.Sub.sub n i') (σ i')) := by
+                rw [add_assoc]
+          _ = add (Peano.Sub.sub j (σ i')) (σ n) := by rw [hsig]
+          _ = add (σ n) (Peano.Sub.sub j (σ i')) := add_comm _ _
+      rw [hrec] at h
+      -- h : shiftIter (σ n + (j - σ i')) t = t
+      -- Reescribir vía shiftIter_add: = shiftIter (σ n) (shiftIter (j - σ i') t).
+      rw [shiftIter_add] at h
+      -- h : shiftIter (σ n) (shiftIter (j - σ i') t) = t
+      -- Aplicar shiftIter_period a (shiftIter (j - σ i') t), que sigue en nPow.
+      have hmem : shiftIter grp (σ n) (Peano.Sub.sub j (σ i')) t ∈ HFSet.nPow grp.G (σ n) :=
+        shiftIter_mem_nPow grp (σ n) (Peano.Sub.sub j (σ i')) ht
+      rw [shiftIter_period grp n _ hmem] at h
+      exact h
+
+/-- **`shiftIter k t = t ↔ period ∣ k`**. -/
+theorem shiftIter_eq_id_iff_periodOf_dvd (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) (k : ℕ₀) :
+    shiftIter grp (σ n) k t = t ↔ Divides (periodOf grp n t ht) k := by
+  let p := periodOf grp n t ht
+  have hp_ne : p ≠ 𝟘 := periodOf_ne_zero grp n t ht
+  refine ⟨?_, ?_⟩
+  · intro hk
+    -- divMod: k = (div k p) * p + (mod k p), mod < p
+    have hspec : k = add (mul (div k p) p) (mod k p) := by
+      have := divMod_spec k p hp_ne
+      show k = add (mul (divMod k p).1 p) (divMod k p).2
+      exact this
+    have hr_lt : lt₀ (mod k p) p := mod_lt k p hp_ne
+    have hspec' : k = add (mod k p) (mul (div k p) p) := by
+      have hc : add (mul (div k p) p) (mod k p)
+              = add (mod k p) (mul (div k p) p) := add_comm _ _
+      exact hspec.trans hc
+    have hsubst : shiftIter grp (σ n) k t
+                = shiftIter grp (σ n)
+                    (add (mod k p) (mul (div k p) p)) t :=
+      congrArg (fun m => shiftIter grp (σ n) m t) hspec'
+    have hsplit : shiftIter grp (σ n)
+                    (add (mod k p) (mul (div k p) p)) t
+                = shiftIter grp (σ n) (mod k p)
+                    (shiftIter grp (σ n) (mul (div k p) p) t) :=
+      shiftIter_add grp (σ n) (mod k p) (mul (div k p) p) t
+    have hmul : shiftIter grp (σ n) (mul (div k p) p) t = t :=
+      shiftIter_mul_periodOf grp n t ht (div k p)
+    rw [hmul] at hsplit
+    have h2 : shiftIter grp (σ n) (mod k p) t = t :=
+      (hsubst.trans hsplit).symm.trans hk
+    have hr_zero : mod k p = 𝟘 := by
+      rcases trichotomy (mod k p) 𝟘 with hlt | heq | hgt
+      · exact (nlt_n_0 _ hlt).elim
+      · exact heq
+      · exact (le_not_lt (periodOf_minimal grp n t ht hgt h2) hr_lt).elim
+    refine ⟨div k p, ?_⟩
+    show k = mul p (div k p)
+    have e1 : add (mul (div k p) p) (mod k p)
+            = add (mul (div k p) p) 𝟘 :=
+      congrArg (add _) hr_zero
+    have e2 : add (mul (div k p) p) 𝟘 = mul (div k p) p := add_zero _
+    have e3 : mul (div k p) p = mul p (div k p) := mul_comm _ _
+    exact hspec.trans (e1.trans (e2.trans e3))
+  · rintro ⟨q, hq⟩
+    -- k = mul p q. shiftIter (mul p q) t = shiftIter (mul q p) t = t.
+    have hcomm : mul p q = mul q p := mul_comm _ _
+    have hkeq : k = mul q p := hq.trans hcomm
+    rw [hkeq]
+    exact shiftIter_mul_periodOf grp n t ht q
+
+/-- **Inyectividad bajo el período**: si `i, j < periodOf` y `shiftIter i t = shiftIter j t`,
+    entonces `i = j`. -/
+theorem shiftIter_inj_below_period (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n))
+    (i j : ℕ₀) (hi : lt₀ i (periodOf grp n t ht))
+    (hj : lt₀ j (periodOf grp n t ht))
+    (heq : shiftIter grp (σ n) i t = shiftIter grp (σ n) j t) :
+    i = j := by
+  -- WLOG i ≤ j; aplicamos cancelación.
+  have hp_le : le₀ (periodOf grp n t ht) (σ n) := periodOf_le_succ_n grp n t ht
+  have hi_lt_sn : lt₀ i (σ n) := lt_of_lt_of_le hi hp_le
+  have hj_lt_sn : lt₀ j (σ n) := lt_of_lt_of_le hj hp_le
+  have hin : le₀ i n := (le_iff_lt_succ i n).mpr hi_lt_sn
+  have hjn : le₀ j n := (le_iff_lt_succ j n).mpr hj_lt_sn
+  -- Helper: bajo a ≤ b, deduce a = b.
+  have helper : ∀ a b : ℕ₀, le₀ a b → lt₀ b (periodOf grp n t ht) → le₀ b n →
+      shiftIter grp (σ n) a t = shiftIter grp (σ n) b t → a = b := by
+    intro a b hab hb_lt hbn heq'
+    have hcancel : shiftIter grp (σ n) (Peano.Sub.sub b a) t = t :=
+      shiftIter_cancel grp n t ht a b hab hbn heq'
+    rcases trichotomy (Peano.Sub.sub b a) 𝟘 with hlt | heq0 | hgt
+    · exact (nlt_n_0 _ hlt).elim
+    · -- sub b a = 0 ⇒ a = b vía sub_k_add_k.
+      have hsum : add (Peano.Sub.sub b a) a = b := sub_k_add_k b a hab
+      have hzeroa : add 𝟘 a = b := heq0 ▸ hsum
+      have : a = b := by rw [Peano.Add.zero_add] at hzeroa; exact hzeroa
+      exact this
+    · -- sub b a > 0 + shiftIter (sub b a) t = t ⇒ period ≤ sub b a ≤ b < period.
+      have hge : le₀ (periodOf grp n t ht) (Peano.Sub.sub b a) :=
+        periodOf_minimal grp n t ht hgt hcancel
+      have hsub_le_b : le₀ (Peano.Sub.sub b a) b := Peano.Sub.sub_le_self b a
+      have hp_le_b : le₀ (periodOf grp n t ht) b := le_trans _ _ _ hge hsub_le_b
+      exact (le_not_lt hp_le_b hb_lt).elim
+  rcases trichotomy i j with hij | hij | hij
+  · exact helper i j (lt_imp_le _ _ hij) hj hjn heq
+  · exact hij
+  · exact (helper j i (lt_imp_le _ _ hij) hi hin heq.symm).symm
+
 end HFAlgebra
+
