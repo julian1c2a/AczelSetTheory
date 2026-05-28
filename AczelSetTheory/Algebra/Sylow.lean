@@ -45,11 +45,12 @@ import AczelSetTheory.Axioms.CardImage
 import AczelSetTheory.Operations.NPow
 import Peano.PeanoNat.Combinatorics.Pow
 import Peano.PeanoNat.Arith
+import Peano.PeanoNat.Primes
 import Peano.Prelim.Classical
 
 namespace HFAlgebra
 
-open Peano Peano.Arith
+open Peano Peano.Arith Peano.Primes
 
 /-- `p^k` divide la cardinalidad de `X`. -/
 def pow_dvd_card (p k : ℕ₀) (X : HFSet) : Prop :=
@@ -1569,6 +1570,173 @@ theorem shiftIter_inj_below_period (grp : HFGroup) (n : ℕ₀) (t : HFSet)
   · exact helper i j (lt_imp_le _ _ hij) hj hjn heq
   · exact hij
   · exact (helper j i (lt_imp_le _ _ hij) hi hin heq.symm).symm
+
+-- ==================================================================
+-- §22. D.4.C parte 4: card (orbitOf) = periodOf, vía enumeración
+-- ==================================================================
+
+/-- Enumeración por el período: `periodEnum grp p m t = {shiftIter k t | k < m}`. -/
+def periodEnum (grp : HFGroup) (p : ℕ₀) : ℕ₀ → HFSet → HFSet
+  | .zero,   _ => HFSet.empty
+  | .succ m, t => HFSet.insert (shiftIter grp p m t) (periodEnum grp p m t)
+
+theorem mem_periodEnum (grp : HFGroup) (p : ℕ₀) :
+    ∀ (m : ℕ₀) (t x : HFSet),
+      x ∈ periodEnum grp p m t ↔ ∃ k : ℕ₀, lt₀ k m ∧ x = shiftIter grp p k t
+  | .zero, _, x => by
+      show x ∈ HFSet.empty ↔ _
+      refine ⟨fun h => absurd h (HFSet.not_mem_empty x), ?_⟩
+      rintro ⟨k, hk, _⟩
+      exact (nlt_n_0 k hk).elim
+  | .succ m, t, x => by
+      show x ∈ HFSet.insert (shiftIter grp p m t) (periodEnum grp p m t) ↔ _
+      rw [HFSet.mem_insert]
+      constructor
+      · rintro (hx | hx)
+        · exact ⟨m, lt_succ_self m, hx⟩
+        · obtain ⟨k, hk, hx⟩ := (mem_periodEnum grp p m t x).mp hx
+          exact ⟨k, lt_trans _ _ _ hk (lt_succ_self m), hx⟩
+      · rintro ⟨k, hk, hx⟩
+        have hk_le_m : le₀ k m := (le_iff_lt_succ k m).mpr hk
+        rcases trichotomy k m with h | h | h
+        · exact Or.inr ((mem_periodEnum grp p m t x).mpr ⟨k, h, hx⟩)
+        · exact Or.inl (hx.trans (congrArg (fun i => shiftIter grp p i t) h))
+        · exact (le_not_lt hk_le_m h).elim
+
+/-- Si `m ≤ periodOf`, todas las `shiftIter k t` con `k < m` son distintas,
+    luego el cardinal es exactamente `m`. -/
+theorem card_periodEnum_le_period (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) :
+    ∀ m : ℕ₀, le₀ m (periodOf grp n t ht) →
+      HFSet.card (periodEnum grp (σ n) m t) = m
+  | .zero, _ => by
+      show HFSet.card HFSet.empty = 𝟘
+      exact HFSet.card_empty
+  | .succ m, hm => by
+      have hm_lt : lt₀ m (periodOf grp n t ht) :=
+        lt_of_lt_of_le (lt_succ_self m) hm
+      have hm_le_p : le₀ m (periodOf grp n t ht) := lt_imp_le _ _ hm_lt
+      have hrec : HFSet.card (periodEnum grp (σ n) m t) = m :=
+        card_periodEnum_le_period grp n t ht m hm_le_p
+      have hnotin : shiftIter grp (σ n) m t ∉ periodEnum grp (σ n) m t := by
+        intro hin
+        obtain ⟨k, hk, hk_eq⟩ :=
+          (mem_periodEnum grp (σ n) m t (shiftIter grp (σ n) m t)).mp hin
+        have hk_lt_p : lt₀ k (periodOf grp n t ht) :=
+          lt_trans _ _ _ hk hm_lt
+        have hkm_eq : m = k :=
+          shiftIter_inj_below_period grp n t ht m k hm_lt hk_lt_p hk_eq
+        exact (lt_irrefl k) (hkm_eq ▸ hk)
+      show HFSet.card (HFSet.insert (shiftIter grp (σ n) m t)
+                        (periodEnum grp (σ n) m t)) = σ m
+      rw [HFSet.card_insert _ _ hnotin, hrec]
+
+/-- `card (periodEnum (σ n) (periodOf) t) = periodOf`. -/
+theorem card_periodEnum_period (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) :
+    HFSet.card (periodEnum grp (σ n) (periodOf grp n t ht) t)
+      = periodOf grp n t ht :=
+  card_periodEnum_le_period grp n t ht (periodOf grp n t ht) (le_refl _)
+
+/-- **Reducción módulo período**: `shiftIter k t = shiftIter (k mod p) t`. -/
+theorem shiftIter_eq_mod (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) (k : ℕ₀) :
+    shiftIter grp (σ n) k t
+      = shiftIter grp (σ n) (mod k (periodOf grp n t ht)) t := by
+  have hp_ne : periodOf grp n t ht ≠ 𝟘 := periodOf_ne_zero grp n t ht
+  have hspec : k = add (mul (div k (periodOf grp n t ht))
+                            (periodOf grp n t ht))
+                       (mod k (periodOf grp n t ht)) := by
+    have := divMod_spec k (periodOf grp n t ht) hp_ne
+    show k = add (mul (divMod k (periodOf grp n t ht)).1 (periodOf grp n t ht))
+                 (divMod k (periodOf grp n t ht)).2
+    exact this
+  have hspec' : k = add (mod k (periodOf grp n t ht))
+                        (mul (div k (periodOf grp n t ht))
+                             (periodOf grp n t ht)) := by
+    have hc : add (mul (div k (periodOf grp n t ht)) (periodOf grp n t ht))
+                  (mod k (periodOf grp n t ht))
+            = add (mod k (periodOf grp n t ht))
+                  (mul (div k (periodOf grp n t ht))
+                       (periodOf grp n t ht)) := add_comm _ _
+    exact hspec.trans hc
+  have hsubst : shiftIter grp (σ n) k t
+              = shiftIter grp (σ n)
+                  (add (mod k (periodOf grp n t ht))
+                       (mul (div k (periodOf grp n t ht))
+                            (periodOf grp n t ht))) t :=
+    congrArg (fun m => shiftIter grp (σ n) m t) hspec'
+  have hsplit : shiftIter grp (σ n)
+                  (add (mod k (periodOf grp n t ht))
+                       (mul (div k (periodOf grp n t ht))
+                            (periodOf grp n t ht))) t
+              = shiftIter grp (σ n) (mod k (periodOf grp n t ht))
+                  (shiftIter grp (σ n)
+                    (mul (div k (periodOf grp n t ht))
+                         (periodOf grp n t ht)) t) :=
+    shiftIter_add grp (σ n) (mod k (periodOf grp n t ht))
+      (mul (div k (periodOf grp n t ht)) (periodOf grp n t ht)) t
+  have hmul : shiftIter grp (σ n)
+                (mul (div k (periodOf grp n t ht))
+                     (periodOf grp n t ht)) t = t :=
+    shiftIter_mul_periodOf grp n t ht (div k (periodOf grp n t ht))
+  rw [hmul] at hsplit
+  exact hsubst.trans hsplit
+
+/-- `orbitOf ⊆ periodEnum`. Vía reducción mod período. -/
+theorem orbitOf_subset_periodEnum (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) :
+    ∀ x : HFSet, x ∈ orbitOf grp n t →
+      x ∈ periodEnum grp (σ n) (periodOf grp n t ht) t := by
+  intro x hx
+  obtain ⟨k, _, hx_eq⟩ := (mem_orbitOf grp n t x).mp hx
+  have hp_ne := periodOf_ne_zero grp n t ht
+  have hmod_lt : lt₀ (mod k (periodOf grp n t ht)) (periodOf grp n t ht) :=
+    mod_lt k (periodOf grp n t ht) hp_ne
+  have hxeq : x = shiftIter grp (σ n) (mod k (periodOf grp n t ht)) t := by
+    rw [hx_eq]; exact shiftIter_eq_mod grp n t ht k
+  exact (mem_periodEnum grp (σ n) (periodOf grp n t ht) t x).mpr
+    ⟨mod k (periodOf grp n t ht), hmod_lt, hxeq⟩
+
+/-- `periodEnum ⊆ orbitOf`. Vía `periodOf ≤ σ n`. -/
+theorem periodEnum_subset_orbitOf (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) :
+    ∀ x : HFSet, x ∈ periodEnum grp (σ n) (periodOf grp n t ht) t →
+      x ∈ orbitOf grp n t := by
+  intro x hx
+  obtain ⟨k, hk_lt, hx_eq⟩ :=
+    (mem_periodEnum grp (σ n) (periodOf grp n t ht) t x).mp hx
+  have hp_le : le₀ (periodOf grp n t ht) (σ n) := periodOf_le_succ_n grp n t ht
+  have hk_lt_sn : lt₀ k (σ n) := lt_of_lt_of_le hk_lt hp_le
+  have hk_le_n : le₀ k n := (le_iff_lt_succ k n).mpr hk_lt_sn
+  exact (mem_orbitOf grp n t x).mpr ⟨k, hk_le_n, hx_eq⟩
+
+/-- **Igualdad de conjuntos**: `orbitOf = periodEnum (σ n) periodOf t`. -/
+theorem orbitOf_eq_periodEnum (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) :
+    orbitOf grp n t = periodEnum grp (σ n) (periodOf grp n t ht) t :=
+  HFSet.extensionality _ _ fun x =>
+    ⟨orbitOf_subset_periodEnum grp n t ht x,
+     periodEnum_subset_orbitOf grp n t ht x⟩
+
+/-- **`card (orbitOf grp n t) = periodOf grp n t`**. -/
+theorem card_orbitOf_eq_periodOf (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) :
+    HFSet.card (orbitOf grp n t) = periodOf grp n t ht := by
+  rw [orbitOf_eq_periodEnum grp n t ht]
+  exact card_periodEnum_period grp n t ht
+
+-- ==================================================================
+-- §23. D.4.C parte 5: caso primo — card (orbitOf) ∈ {𝟙, σ n}
+-- ==================================================================
+
+/-- **Caso primo**: si `σ n` es primo, entonces `card (orbitOf grp n t) ∈ {𝟙, σ n}`. -/
+theorem card_orbitOf_one_or_succ (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) (hprime : Peano.Arith.Prime (σ n)) :
+    HFSet.card (orbitOf grp n t) = 𝟙 ∨
+    HFSet.card (orbitOf grp n t) = σ n := by
+  rw [card_orbitOf_eq_periodOf grp n t ht]
+  exact prime_divisors hprime (periodOf_dvd_succ_n grp n t ht)
 
 end HFAlgebra
 
