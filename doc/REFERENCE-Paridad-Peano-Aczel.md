@@ -1,9 +1,9 @@
 # Paridad de Resultados: Peano → AczelSetTheory
 
-**Fecha de referencia:** 2026-05-26  
+**Fecha de referencia:** 2026-05-28  
 **Peano (feature-freeze desde 2026-05-10):** `E:\Dropbox\GitHub\lean4\Peano\`  
 **AczelSetTheory (activo):** `E:\Dropbox\GitHub\lean4\AczelSetTheory\`  
-**Estado build ambos proyectos:** ✅ 0 sorry, 0 axiomas privados
+**Estado build ambos proyectos:** ✅ 0 sorry, 0 axiomas privados (invariante reverificada tras cerrar 9 sorries en `Integers/Rationals.lean`)
 
 ---
 
@@ -243,7 +243,7 @@ Axiomática de conjuntos, álgebra abstracta, topología, enteros extendidos (M�
 
 ## 11. Prioridades de portado sugeridas
 
-**Última actualización:** 2026-05-26 — LatticeVN ✅, SymGroupVN ✅, InitialityVN ✅ completados.
+**Última actualización:** 2026-05-28 — `Integers/Rationals.lean` reverificado 0-sorry (cerradas 9 sorries en orden y leyes de anillo).
 
 1. **Alta prioridad** (prerrequisito para Sylow en Aczel):
    - `CountingVN.lean` — principios de recuento (pigeonhole, inclusión-exclusión); necesario para combinatoria.

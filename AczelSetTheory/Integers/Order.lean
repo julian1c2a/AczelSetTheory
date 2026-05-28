@@ -214,4 +214,77 @@ theorem mul_pos {a b : ℤ₀} (ha : 0 < a) (hb : 0 < b) : 0 < Mul.mul a b := by
   have hne : Peano.Mul.mul a.repr.1 b.repr.1 ≠ 𝟘 := lt_0_then_neq_0 hpos
   exact ofNat_lt (Or.inl hpos) (Ne.symm hne)
 
+-- ─────────────────────────────────────────────────────────────────────────────
+-- P1: ofNat de nonzero ℕ₀ es positivo en ℤ₀
+-- ─────────────────────────────────────────────────────────────────────────────
+
+/-- Si `n ≠ 𝟘`, entonces `ofNat n` es estrictamente positivo en ℤ₀. -/
+theorem ofNat_pos_of_ne_zero {n : ℕ₀} (hn : n ≠ 𝟘) : (0 : ℤ₀) < ofNat n := by
+  have h0 : (ofNat 𝟘 : ℤ₀) = 0 := ofNat_zero
+  rw [← h0]
+  exact ofNat_lt (Peano.Order.zero_le n) (fun h => hn h.symm)
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Cancelación / monotonía de ≤ en ℕ₀ por multiplicación positiva (helper)
+-- ─────────────────────────────────────────────────────────────────────────────
+
+private theorem nat_le_cancel_mul_right {a b k : ℕ₀} (hk : k ≠ 𝟘)
+    (h : Peano.Mul.mul a k ≤ Peano.Mul.mul b k) : a ≤ b := by
+  rcases Peano.Order.le_total a b with hle | hle
+  · exact hle
+  -- Caso b ≤ a. Si a = b, terminamos; si b < a, contradicción con h.
+  by_cases heq : a = b
+  · exact heq ▸ Peano.Order.le_refl a
+  -- a ≠ b ∧ b ≤ a ⟹ d := a - b ≠ 𝟘 ∧ a = b + d
+  have hd_add : Peano.Add.add b (Peano.Sub.sub a b) = a := by
+    have := Peano.Sub.sub_k_add_k a b hle
+    omega₀
+  have hd_ne : Peano.Sub.sub a b ≠ 𝟘 := by
+    intro hd0
+    rw [hd0, Peano.Add.add_zero] at hd_add
+    exact heq hd_add.symm
+  exfalso
+  have h' : Peano.Mul.mul (Peano.Add.add b (Peano.Sub.sub a b)) k ≤
+            Peano.Mul.mul b k := by rw [hd_add]; exact h
+  rw [Peano.Mul.add_mul] at h'
+  have hdk_zero : Peano.Mul.mul (Peano.Sub.sub a b) k = 𝟘 := by omega₀
+  exact Peano.Mul.eq_zero_of_mul_eq_zero hd_ne hk hdk_zero
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- P3: a ≤ b ↔ a·ofNat k ≤ b·ofNat k  (para k ≠ 𝟘)
+-- ─────────────────────────────────────────────────────────────────────────────
+
+/-- Monotonía y cancelación del producto por `ofNat k` positivo (lado derecho). -/
+theorem mul_le_mul_right_ofNat_pos {k : ℕ₀} (hk : k ≠ 𝟘) (a b : ℤ₀) :
+    a ≤ b ↔ Mul.mul a (ofNat k) ≤ Mul.mul b (ofNat k) := by
+  have ha := repr_mul_ofNat_intEq a k
+  have hb := repr_mul_ofNat_intEq b k
+  rw [le_iff, le_iff]
+  show (Peano.Add.add a.repr.1 b.repr.2 : ℕ₀) ≤ Peano.Add.add a.repr.2 b.repr.1 ↔
+       (Peano.Add.add (HMul.hMul a (ofNat k)).repr.1 (HMul.hMul b (ofNat k)).repr.2 : ℕ₀) ≤
+       Peano.Add.add (HMul.hMul a (ofNat k)).repr.2 (HMul.hMul b (ofNat k)).repr.1
+  constructor
+  · intro h
+    have hmul : Peano.Mul.mul (Peano.Add.add a.repr.1 b.repr.2) k ≤
+                Peano.Mul.mul (Peano.Add.add a.repr.2 b.repr.1) k :=
+      Peano.Mul.mul_le_mono_right k h
+    rw [Peano.Mul.add_mul, Peano.Mul.add_mul] at hmul
+    omega₀
+  · intro h
+    have hmul : Peano.Mul.mul (Peano.Add.add a.repr.1 b.repr.2) k ≤
+                Peano.Mul.mul (Peano.Add.add a.repr.2 b.repr.1) k := by
+      rw [Peano.Mul.add_mul, Peano.Mul.add_mul]
+      omega₀
+    exact nat_le_cancel_mul_right hk hmul
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- P4: a ≤ b ↔ ofNat k · a ≤ ofNat k · b  (corolario de P3 + mul_comm)
+-- ─────────────────────────────────────────────────────────────────────────────
+
+/-- Monotonía y cancelación del producto por `ofNat k` positivo (lado izquierdo). -/
+theorem mul_le_mul_left_ofNat_pos {k : ℕ₀} (hk : k ≠ 𝟘) (a b : ℤ₀) :
+    a ≤ b ↔ Mul.mul (ofNat k) a ≤ Mul.mul (ofNat k) b := by
+  rw [mul_comm (ofNat k) a, mul_comm (ofNat k) b]
+  exact mul_le_mul_right_ofNat_pos hk a b
+
 end ℤ₀

@@ -59,9 +59,14 @@ private theorem ratEq_symm {p q : ℤ₀ × PosNat₀} (h : ratEq p q) : ratEq q
 
 -- Cancelación izquierda por ofNat(k) en ℤ₀, usada en ratEq_trans
 private theorem mul_left_cancel_int {k : ℕ₀} (hk : k ≠ 𝟘) {x y : ℤ₀}
-    (h : Mul.mul (ℤ₀.ofNat k) x = Mul.mul (ℤ₀.ofNat k) y) : x = y := by
-  -- k ≠ 𝟘 => ofNat(k) > 0; si x ≠ y => ofNat(k)·(x-y) ≠ 0, contradicción.
-  sorry
+    (h : Mul.mul (ℤ₀.ofNat k) x = Mul.mul (ℤ₀.ofNat k) y) : x = y :=
+  ℤ₀.mul_left_cancel_ofNat hk h
+
+-- Helper: reordenar dos productos en ℤ₀ por commutatividad de los factores internos.
+private theorem mul_swap_inner (a b c d : ℤ₀) :
+    Mul.mul (Mul.mul a b) (Mul.mul c d) = Mul.mul (Mul.mul a c) (Mul.mul b d) := by
+  rw [ℤ₀.mul_assoc a b (Mul.mul c d), ← ℤ₀.mul_assoc b c d,
+      ℤ₀.mul_comm b c, ℤ₀.mul_assoc c b d, ← ℤ₀.mul_assoc a c (Mul.mul b d)]
 
 private theorem ratEq_trans {p q r : ℤ₀ × PosNat₀}
     (h1 : ratEq p q) (h2 : ratEq q r) : ratEq p r := by
@@ -118,16 +123,33 @@ private theorem mulWD (p p' q q' : ℤ₀ × PosNat₀)
     (h1 : ratEq p p') (h2 : ratEq q q') :
     ratEq (mulRaw p q) (mulRaw p' q') := by
   simp only [ratEq, mulRaw, mulDen, ℤ₀.ofNat_mul] at *
-  -- (p.1·q.1)·(p'.2·q'.2) = (p'.1·q'.1)·(p.2·q.2)  usando h1, h2 y conmutatividad.
-  sorry
+  -- (p.1·q.1)·(ofNat p'.2·ofNat q'.2) = (p'.1·q'.1)·(ofNat p.2·ofNat q.2)
+  rw [mul_swap_inner p.1 q.1 (ℤ₀.ofNat p'.2.val) (ℤ₀.ofNat q'.2.val), h1, h2,
+      mul_swap_inner p'.1 (ℤ₀.ofNat p.2.val) q'.1 (ℤ₀.ofNat q.2.val)]
 
 private theorem addWD (p p' q q' : ℤ₀ × PosNat₀)
     (h1 : ratEq p p') (h2 : ratEq q q') :
     ratEq (addRaw p q) (addRaw p' q') := by
   simp only [ratEq, addRaw, mulDen, ℤ₀.ofNat_mul] at *
-  -- h1 : p.1·p'.2 = p'.1·p.2,  h2 : q.1·q'.2 = q'.1·q.2
-  -- Goal: (p.1·q.2 + q.1·p.2)·(p'.2·q'.2) = (p'.1·q'.2 + q'.1·p'.2)·(p.2·q.2)
-  sorry
+  -- h1 : p.1·ofNat p'.2 = p'.1·ofNat p.2,  h2 : q.1·ofNat q'.2 = q'.1·ofNat q.2
+  -- Goal: (p.1·ofNat q.2 + q.1·ofNat p.2)·(ofNat p'.2·ofNat q'.2) =
+  --       (p'.1·ofNat q'.2 + q'.1·ofNat p'.2)·(ofNat p.2·ofNat q.2)
+  rw [show (Mul.mul p.1 (ℤ₀.ofNat q.2.val) + Mul.mul q.1 (ℤ₀.ofNat p.2.val))
+        = Add.add (Mul.mul p.1 (ℤ₀.ofNat q.2.val)) (Mul.mul q.1 (ℤ₀.ofNat p.2.val)) from rfl,
+      show (Mul.mul p'.1 (ℤ₀.ofNat q'.2.val) + Mul.mul q'.1 (ℤ₀.ofNat p'.2.val))
+        = Add.add (Mul.mul p'.1 (ℤ₀.ofNat q'.2.val)) (Mul.mul q'.1 (ℤ₀.ofNat p'.2.val)) from rfl,
+      ℤ₀.right_distrib, ℤ₀.right_distrib]
+  congr 1
+  · -- (p.1·ofNat q.2)·(ofNat p'.2·ofNat q'.2) = (p'.1·ofNat q'.2)·(ofNat p.2·ofNat q.2)
+    rw [mul_swap_inner p.1 (ℤ₀.ofNat q.2.val) (ℤ₀.ofNat p'.2.val) (ℤ₀.ofNat q'.2.val), h1,
+        ℤ₀.mul_comm (ℤ₀.ofNat q.2.val) (ℤ₀.ofNat q'.2.val),
+        mul_swap_inner p'.1 (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat q'.2.val) (ℤ₀.ofNat q.2.val)]
+  · -- (q.1·ofNat p.2)·(ofNat p'.2·ofNat q'.2) = (q'.1·ofNat p'.2)·(ofNat p.2·ofNat q.2)
+    rw [ℤ₀.mul_comm (ℤ₀.ofNat p'.2.val) (ℤ₀.ofNat q'.2.val),
+        mul_swap_inner q.1 (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat q'.2.val) (ℤ₀.ofNat p'.2.val), h2,
+        mul_swap_inner q'.1 (ℤ₀.ofNat q.2.val) (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat p'.2.val),
+        ℤ₀.mul_comm (ℤ₀.ofNat q.2.val) (ℤ₀.ofNat p'.2.val),
+        mul_swap_inner q'.1 (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat p'.2.val) (ℤ₀.ofNat q.2.val)]
 
 end PrivateDefs
 
@@ -196,8 +218,24 @@ theorem add_assoc (a b c : ℚ₀) : Add.add (Add.add a b) c = Add.add a (Add.ad
   apply Quotient.sound
   show ratEq (addRaw (addRaw p q) r) (addRaw p (addRaw q r))
   simp only [ratEq, addRaw, mulDen, Peano.Mul.mul_assoc, ℤ₀.ofNat_mul]
-  -- Ambos lados iguales por leyes de anillo de ℤ₀.
-  sorry
+  congr 1
+  -- Igualdad de numeradores; convertir HAdd.hAdd a Add.add para usar right_distrib.
+  show Add.add (Mul.mul (Add.add (Mul.mul p.1 (ℤ₀.ofNat q.2.val))
+                                  (Mul.mul q.1 (ℤ₀.ofNat p.2.val)))
+                        (ℤ₀.ofNat r.2.val))
+                (Mul.mul r.1 (Mul.mul (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat q.2.val)))
+     = Add.add (Mul.mul p.1 (Mul.mul (ℤ₀.ofNat q.2.val) (ℤ₀.ofNat r.2.val)))
+                (Mul.mul (Add.add (Mul.mul q.1 (ℤ₀.ofNat r.2.val))
+                                  (Mul.mul r.1 (ℤ₀.ofNat q.2.val)))
+                         (ℤ₀.ofNat p.2.val))
+  rw [ℤ₀.right_distrib, ℤ₀.right_distrib,
+      ℤ₀.mul_assoc p.1 (ℤ₀.ofNat q.2.val) (ℤ₀.ofNat r.2.val),
+      ℤ₀.mul_assoc q.1 (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat r.2.val),
+      ℤ₀.mul_comm (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat r.2.val),
+      ← ℤ₀.mul_assoc q.1 (ℤ₀.ofNat r.2.val) (ℤ₀.ofNat p.2.val),
+      ℤ₀.mul_comm (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat q.2.val),
+      ← ℤ₀.mul_assoc r.1 (ℤ₀.ofNat q.2.val) (ℤ₀.ofNat p.2.val),
+      ℤ₀.add_assoc]
 
 theorem zero_add (a : ℚ₀) : Add.add 0 a = a := by
   refine Quotient.inductionOn a (fun p => ?_)
@@ -269,9 +307,39 @@ theorem left_distrib (a b c : ℚ₀) : a * Add.add b c = Add.add (a * b) (a * c
   apply Quotient.sound
   show ratEq (mulRaw p (addRaw q r)) (addRaw (mulRaw p q) (mulRaw p r))
   simp only [ratEq, mulRaw, addRaw, mulDen, ℤ₀.ofNat_mul]
-  -- Ambos lados son iguales tras distribuir y reordenar factores.
-  -- LHS: (p.1·(q.1·ofNat(r.2) + r.1·ofNat(q.2))) · (ofNat(p.2·q.2)·ofNat(p.2·r.2)) (aprox)
-  sorry
+  -- Convertir HAdd→Add y aplicar distribución
+  show Mul.mul (Mul.mul p.1 (Add.add (Mul.mul q.1 (ℤ₀.ofNat r.2.val))
+                                      (Mul.mul r.1 (ℤ₀.ofNat q.2.val))))
+                (Mul.mul (Mul.mul (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat q.2.val))
+                         (Mul.mul (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat r.2.val)))
+       = Mul.mul (Add.add (Mul.mul (Mul.mul p.1 q.1)
+                                    (Mul.mul (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat r.2.val)))
+                          (Mul.mul (Mul.mul p.1 r.1)
+                                    (Mul.mul (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat q.2.val))))
+                  (Mul.mul (ℤ₀.ofNat p.2.val)
+                           (Mul.mul (ℤ₀.ofNat q.2.val) (ℤ₀.ofNat r.2.val)))
+  rw [ℤ₀.left_distrib, ℤ₀.right_distrib, ℤ₀.right_distrib]
+  congr 1
+  · -- LT1 = (p.1·(q.1·R))·((P·Q)·(P·R)) = ((p.1·q.1)·(P·R))·(P·(Q·R)) = RT1
+    rw [← ℤ₀.mul_assoc p.1 q.1 (ℤ₀.ofNat r.2.val),
+        mul_swap_inner (Mul.mul p.1 q.1) (ℤ₀.ofNat r.2.val)
+                       (Mul.mul (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat q.2.val))
+                       (Mul.mul (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat r.2.val)),
+        ← ℤ₀.mul_assoc (ℤ₀.ofNat r.2.val) (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat r.2.val),
+        ℤ₀.mul_comm (ℤ₀.ofNat r.2.val) (ℤ₀.ofNat p.2.val),
+        mul_swap_inner (Mul.mul p.1 q.1)
+                       (Mul.mul (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat q.2.val))
+                       (Mul.mul (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat r.2.val))
+                       (ℤ₀.ofNat r.2.val),
+        ℤ₀.mul_assoc (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat q.2.val) (ℤ₀.ofNat r.2.val)]
+  · -- LT2 = (p.1·(r.1·Q))·((P·Q)·(P·R)) = ((p.1·r.1)·(P·Q))·(P·(Q·R)) = RT2
+    rw [← ℤ₀.mul_assoc p.1 r.1 (ℤ₀.ofNat q.2.val),
+        mul_swap_inner (Mul.mul p.1 r.1) (ℤ₀.ofNat q.2.val)
+                       (Mul.mul (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat q.2.val))
+                       (Mul.mul (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat r.2.val)),
+        ← ℤ₀.mul_assoc (ℤ₀.ofNat q.2.val) (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat r.2.val),
+        ℤ₀.mul_comm (ℤ₀.ofNat q.2.val) (ℤ₀.ofNat p.2.val),
+        ℤ₀.mul_assoc (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat q.2.val) (ℤ₀.ofNat r.2.val)]
 
 theorem right_distrib (a b c : ℚ₀) : Add.add a b * c = Add.add (a * c) (b * c) := by
   rw [mul_comm, left_distrib, mul_comm c a, mul_comm c b]
@@ -295,7 +363,48 @@ private theorem leWD (p₁ p₂ q₁ q₂ : ℤ₀ × PosNat₀)
     (hp : ratEq p₁ p₂) (hq : ratEq q₁ q₂) :
     (Mul.mul p₁.1 (ℤ₀.ofNat q₁.2.val) ≤ Mul.mul q₁.1 (ℤ₀.ofNat p₁.2.val)) ↔
     (Mul.mul p₂.1 (ℤ₀.ofNat q₂.2.val) ≤ Mul.mul q₂.1 (ℤ₀.ofNat p₂.2.val)) := by
-  sorry
+  -- hp : p₁.1·ofNat p₂.2 = p₂.1·ofNat p₁.2
+  -- hq : q₁.1·ofNat q₂.2 = q₂.1·ofNat q₁.2
+  -- Estrategia: multiplicar ambos lados de la desigualdad LHS por ofNat(p₂.2·q₂.2)
+  -- (positivo) y de RHS por ofNat(p₁.2·q₁.2), reordenar y aplicar hp, hq.
+  have key1 :
+      (Mul.mul p₁.1 (ℤ₀.ofNat q₁.2.val) ≤ Mul.mul q₁.1 (ℤ₀.ofNat p₁.2.val)) ↔
+      (Mul.mul (Mul.mul p₂.1 (ℤ₀.ofNat p₁.2.val))
+               (Mul.mul (ℤ₀.ofNat q₁.2.val) (ℤ₀.ofNat q₂.2.val))
+       ≤ Mul.mul (Mul.mul q₂.1 (ℤ₀.ofNat q₁.2.val))
+                 (Mul.mul (ℤ₀.ofNat p₁.2.val) (ℤ₀.ofNat p₂.2.val))) := by
+    rw [ℤ₀.mul_le_mul_right_ofNat_pos
+          (mul_ne_zero₀ p₂.2.property q₂.2.property)
+          (Mul.mul p₁.1 (ℤ₀.ofNat q₁.2.val))
+          (Mul.mul q₁.1 (ℤ₀.ofNat p₁.2.val)),
+        ℤ₀.ofNat_mul,
+        mul_swap_inner p₁.1 (ℤ₀.ofNat q₁.2.val)
+                       (ℤ₀.ofNat p₂.2.val) (ℤ₀.ofNat q₂.2.val),
+        hp,
+        ℤ₀.mul_comm (ℤ₀.ofNat p₂.2.val) (ℤ₀.ofNat q₂.2.val),
+        mul_swap_inner q₁.1 (ℤ₀.ofNat p₁.2.val)
+                       (ℤ₀.ofNat q₂.2.val) (ℤ₀.ofNat p₂.2.val),
+        hq]
+  have key2 :
+      (Mul.mul p₂.1 (ℤ₀.ofNat q₂.2.val) ≤ Mul.mul q₂.1 (ℤ₀.ofNat p₂.2.val)) ↔
+      (Mul.mul (Mul.mul p₂.1 (ℤ₀.ofNat p₁.2.val))
+               (Mul.mul (ℤ₀.ofNat q₁.2.val) (ℤ₀.ofNat q₂.2.val))
+       ≤ Mul.mul (Mul.mul q₂.1 (ℤ₀.ofNat q₁.2.val))
+                 (Mul.mul (ℤ₀.ofNat p₁.2.val) (ℤ₀.ofNat p₂.2.val))) := by
+    rw [ℤ₀.mul_le_mul_right_ofNat_pos
+          (mul_ne_zero₀ p₁.2.property q₁.2.property)
+          (Mul.mul p₂.1 (ℤ₀.ofNat q₂.2.val))
+          (Mul.mul q₂.1 (ℤ₀.ofNat p₂.2.val)),
+        ℤ₀.ofNat_mul,
+        mul_swap_inner p₂.1 (ℤ₀.ofNat q₂.2.val)
+                       (ℤ₀.ofNat p₁.2.val) (ℤ₀.ofNat q₁.2.val),
+        ℤ₀.mul_comm (ℤ₀.ofNat q₂.2.val) (ℤ₀.ofNat q₁.2.val),
+        mul_swap_inner q₂.1 (ℤ₀.ofNat p₂.2.val)
+                       (ℤ₀.ofNat p₁.2.val) (ℤ₀.ofNat q₁.2.val),
+        ℤ₀.mul_comm (ℤ₀.ofNat p₂.2.val) (ℤ₀.ofNat q₁.2.val),
+        mul_swap_inner q₂.1 (ℤ₀.ofNat p₁.2.val)
+                       (ℤ₀.ofNat q₁.2.val) (ℤ₀.ofNat p₂.2.val)]
+  exact key1.trans key2.symm
 
 instance instLE : LE ℚ₀ where
   le a b := Quotient.liftOn₂ a b
@@ -315,13 +424,64 @@ theorem le_refl (a : ℚ₀) : a ≤ a := by
   exact ℤ₀.le_refl _
 
 theorem le_antisymm {a b : ℚ₀} (h1 : a ≤ b) (h2 : b ≤ a) : a = b := by
-  sorry
+  induction a using Quotient.inductionOn with
+  | _ p =>
+    induction b using Quotient.inductionOn with
+    | _ q =>
+      apply Quotient.sound
+      show ratEq p q
+      exact ℤ₀.le_antisymm h1 h2
 
 theorem le_trans {a b c : ℚ₀} (h1 : a ≤ b) (h2 : b ≤ c) : a ≤ c := by
-  sorry
+  induction a using Quotient.inductionOn with
+  | _ p =>
+    induction b using Quotient.inductionOn with
+    | _ q =>
+      induction c using Quotient.inductionOn with
+      | _ r =>
+        -- h1 : p.1·ofNat q.2 ≤ q.1·ofNat p.2
+        -- h2 : q.1·ofNat r.2 ≤ r.1·ofNat q.2
+        -- Goal: p.1·ofNat r.2 ≤ r.1·ofNat p.2
+        show Mul.mul p.1 (ℤ₀.ofNat r.2.val) ≤ Mul.mul r.1 (ℤ₀.ofNat p.2.val)
+        change Mul.mul p.1 (ℤ₀.ofNat q.2.val) ≤ Mul.mul q.1 (ℤ₀.ofNat p.2.val) at h1
+        change Mul.mul q.1 (ℤ₀.ofNat r.2.val) ≤ Mul.mul r.1 (ℤ₀.ofNat q.2.val) at h2
+        -- Multiplica h1 por ofNat r.2.val (positivo) por la derecha
+        have h1' : Mul.mul (Mul.mul p.1 (ℤ₀.ofNat q.2.val)) (ℤ₀.ofNat r.2.val)
+                 ≤ Mul.mul (Mul.mul q.1 (ℤ₀.ofNat p.2.val)) (ℤ₀.ofNat r.2.val) :=
+          (ℤ₀.mul_le_mul_right_ofNat_pos r.2.property _ _).mp h1
+        -- Multiplica h2 por ofNat p.2.val (positivo) por la derecha
+        have h2' : Mul.mul (Mul.mul q.1 (ℤ₀.ofNat r.2.val)) (ℤ₀.ofNat p.2.val)
+                 ≤ Mul.mul (Mul.mul r.1 (ℤ₀.ofNat q.2.val)) (ℤ₀.ofNat p.2.val) :=
+          (ℤ₀.mul_le_mul_right_ofNat_pos p.2.property _ _).mp h2
+        -- Reordena h1' : (p.1·ofNat r.2)·ofNat q.2 ≤ (q.1·ofNat r.2)·ofNat p.2
+        have h1'' : Mul.mul (Mul.mul p.1 (ℤ₀.ofNat r.2.val)) (ℤ₀.ofNat q.2.val)
+                  ≤ Mul.mul (Mul.mul q.1 (ℤ₀.ofNat r.2.val)) (ℤ₀.ofNat p.2.val) := by
+          rw [ℤ₀.mul_assoc p.1 (ℤ₀.ofNat r.2.val) (ℤ₀.ofNat q.2.val),
+              ℤ₀.mul_comm (ℤ₀.ofNat r.2.val) (ℤ₀.ofNat q.2.val),
+              ← ℤ₀.mul_assoc p.1 (ℤ₀.ofNat q.2.val) (ℤ₀.ofNat r.2.val),
+              ℤ₀.mul_assoc q.1 (ℤ₀.ofNat r.2.val) (ℤ₀.ofNat p.2.val),
+              ℤ₀.mul_comm (ℤ₀.ofNat r.2.val) (ℤ₀.ofNat p.2.val),
+              ← ℤ₀.mul_assoc q.1 (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat r.2.val)]
+          exact h1'
+        -- Reordena h2' : (q.1·ofNat r.2)·ofNat p.2 ≤ (r.1·ofNat p.2)·ofNat q.2
+        have h2'' : Mul.mul (Mul.mul q.1 (ℤ₀.ofNat r.2.val)) (ℤ₀.ofNat p.2.val)
+                  ≤ Mul.mul (Mul.mul r.1 (ℤ₀.ofNat p.2.val)) (ℤ₀.ofNat q.2.val) := by
+          rw [ℤ₀.mul_assoc r.1 (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat q.2.val),
+              ℤ₀.mul_comm (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat q.2.val),
+              ← ℤ₀.mul_assoc r.1 (ℤ₀.ofNat q.2.val) (ℤ₀.ofNat p.2.val)]
+          exact h2'
+        -- Encadena y cancela por ofNat q.2.val
+        have hchain : Mul.mul (Mul.mul p.1 (ℤ₀.ofNat r.2.val)) (ℤ₀.ofNat q.2.val)
+                    ≤ Mul.mul (Mul.mul r.1 (ℤ₀.ofNat p.2.val)) (ℤ₀.ofNat q.2.val) :=
+          ℤ₀.le_trans h1'' h2''
+        exact (ℤ₀.mul_le_mul_right_ofNat_pos q.2.property _ _).mpr hchain
 
 theorem le_total (a b : ℚ₀) : a ≤ b ∨ b ≤ a := by
-  sorry
+  induction a using Quotient.inductionOn with
+  | _ p =>
+    induction b using Quotient.inductionOn with
+    | _ q =>
+      exact ℤ₀.le_total (Mul.mul p.1 (ℤ₀.ofNat q.2.val)) (Mul.mul q.1 (ℤ₀.ofNat p.2.val))
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Inyectividad del embedding

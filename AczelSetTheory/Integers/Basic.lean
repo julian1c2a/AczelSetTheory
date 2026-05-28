@@ -461,4 +461,44 @@ theorem ofNat_injective {m n : ℕ₀} (h : ofNat m = ofNat n) : m = n := by
   unfold intEq at heq
   omega₀
 
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Cancelación multiplicativa por ofNat k positivo
+-- ─────────────────────────────────────────────────────────────────────────────
+
+/-- Si `k ≠ 𝟘` entonces multiplicar por `ofNat k` por la izquierda es cancelativo. -/
+theorem mul_left_cancel_ofNat {k : ℕ₀} (hk : k ≠ 𝟘) {x y : ℤ₀}
+    (h : Mul.mul (ofNat k) x = Mul.mul (ofNat k) y) : x = y := by
+  rcases Quotient.exists_rep x with ⟨p, rfl⟩
+  rcases Quotient.exists_rep y with ⟨q, rfl⟩
+  have h' : HMul.hMul (mk (k, 𝟘)) (mk p) = HMul.hMul (mk (k, 𝟘)) (mk q) := h
+  rw [mul_mk, mul_mk, mk_eq_iff] at h'
+  rw [mk_eq_iff]
+  unfold intEq mulRaw at h'
+  simp only [Peano.Mul.zero_mul, Peano.Add.add_zero] at h'
+  unfold intEq
+  have h2 : Peano.Mul.mul k (Peano.Add.add p.1 q.2) = Peano.Mul.mul k (Peano.Add.add p.2 q.1) := by
+    rw [Peano.Mul.mul_add, Peano.Mul.mul_add]; exact h'
+  exact Peano.Mul.mul_cancelation_left k _ _ hk h2
+
+/-- Bridge: `(a * ofNat k).repr` satisface la relación intEq con `(a.r.1·k, a.r.2·k)`. -/
+theorem repr_mul_ofNat_intEq (a : ℤ₀) (k : ℕ₀) :
+    Peano.Add.add (HMul.hMul a (ofNat k)).repr.1 (Peano.Mul.mul a.repr.2 k) =
+    Peano.Add.add (HMul.hMul a (ofNat k)).repr.2 (Peano.Mul.mul a.repr.1 k) := by
+  rcases Quotient.exists_rep a with ⟨p, rfl⟩
+  show Peano.Add.add (HMul.hMul (mk p) (mk (k, 𝟘))).repr.1
+        (Peano.Mul.mul (normalize p).2 k) =
+       Peano.Add.add (HMul.hMul (mk p) (mk (k, 𝟘))).repr.2
+        (Peano.Mul.mul (normalize p).1 k)
+  rw [mul_mk, repr_mk]
+  have hRaw : mulRaw p (k, 𝟘) = (Peano.Mul.mul p.1 k, Peano.Mul.mul p.2 k) := by
+    simp [mulRaw, Peano.Mul.mul_zero, Peano.Add.add_zero, Peano.Add.zero_add]
+  rw [hRaw]
+  have h1 := normalize_intEq (Peano.Mul.mul p.1 k, Peano.Mul.mul p.2 k)
+  have h2 := normalize_intEq p
+  have h2k : Peano.Mul.mul (Peano.Add.add (normalize p).1 p.2) k =
+             Peano.Mul.mul (Peano.Add.add (normalize p).2 p.1) k :=
+    congrArg (fun x => Peano.Mul.mul x k) h2
+  simp only [Peano.Mul.add_mul] at h2k
+  omega₀
+
 end ℤ₀
