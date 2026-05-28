@@ -900,4 +900,399 @@ theorem shiftIter_add (grp : HFGroup) (p : ℕ₀) :
       show mckayShift grp p (shiftIter grp p (Peano.Add.add i j) t) = _
       rw [shiftIter_add grp p i j t]
 
+-- ==================================================================
+-- §14. Extensionalidad de tuplas y reglas de componentes (D.4.B parte 2)
+-- ==================================================================
+
+/-- Extensionalidad: las `(σ n)`-tuplas se determinan por sus σ n primeras
+    componentes `getHead j` (`j ≤ n`). -/
+theorem nPow_ext (G : HFSet) :
+    ∀ (n : ℕ₀) (t₁ t₂ : HFSet),
+      t₁ ∈ HFSet.nPow G (σ n) → t₂ ∈ HFSet.nPow G (σ n) →
+      (∀ j : ℕ₀, le₀ j n → getHead j t₁ = getHead j t₂) → t₁ = t₂
+  | .zero, t₁, t₂, h₁, h₂, h => by
+      rw [HFSet.nPow_succ, HFSet.nPow_zero] at h₁ h₂
+      obtain ⟨a₁, b₁, ha₁, _, heq₁⟩ := (HFSet.mem_cartProd _ _ _).mp h₁
+      obtain ⟨a₂, b₂, ha₂, _, heq₂⟩ := (HFSet.mem_cartProd _ _ _).mp h₂
+      have ea₁ : a₁ = HFSet.empty := (HFSet.mem_singleton _ _).mp ha₁
+      have ea₂ : a₂ = HFSet.empty := (HFSet.mem_singleton _ _).mp ha₂
+      have hb : b₁ = b₂ := by
+        have e1 : getHead 𝟘 t₁ = b₁ := by
+          show HFSet.snd t₁ = b₁
+          rw [heq₁]; exact HFSet.snd_orderedPair_eq' _ _
+        have e2 : getHead 𝟘 t₂ = b₂ := by
+          show HFSet.snd t₂ = b₂
+          rw [heq₂]; exact HFSet.snd_orderedPair_eq' _ _
+        rw [← e1, ← e2]; exact h 𝟘 (le_refl 𝟘)
+      rw [heq₁, heq₂, ea₁, ea₂, hb]
+  | .succ m, t₁, t₂, h₁, h₂, h => by
+      rw [HFSet.nPow_succ] at h₁ h₂
+      obtain ⟨a₁, b₁, ha₁, _, heq₁⟩ := (HFSet.mem_cartProd _ _ _).mp h₁
+      obtain ⟨a₂, b₂, ha₂, _, heq₂⟩ := (HFSet.mem_cartProd _ _ _).mp h₂
+      have hb : b₁ = b₂ := by
+        have e1 : getHead 𝟘 t₁ = b₁ := by
+          show HFSet.snd t₁ = b₁
+          rw [heq₁]; exact HFSet.snd_orderedPair_eq' _ _
+        have e2 : getHead 𝟘 t₂ = b₂ := by
+          show HFSet.snd t₂ = b₂
+          rw [heq₂]; exact HFSet.snd_orderedPair_eq' _ _
+        rw [← e1, ← e2]; exact h 𝟘 (Peano.Order.zero_le _)
+      have ha : a₁ = a₂ := by
+        apply nPow_ext G m a₁ a₂ ha₁ ha₂
+        intro j hjm
+        have e1 : getHead (σ j) t₁ = getHead j a₁ := by
+          show getHead j (HFSet.fst t₁) = getHead j a₁
+          rw [heq₁, HFSet.fst_orderedPair_eq']
+        have e2 : getHead (σ j) t₂ = getHead j a₂ := by
+          show getHead j (HFSet.fst t₂) = getHead j a₂
+          rw [heq₂, HFSet.fst_orderedPair_eq']
+        rw [← e1, ← e2]
+        exact h (σ j) ((Peano.Order.succ_le_succ_iff _ _).mpr hjm)
+      rw [heq₁, heq₂, ha, hb]
+
+/-- Lema auxiliar: `getHead j (dropHead (σ n) t) = getHead j t` cuando `j ≤ n`. -/
+theorem getHead_dropHead :
+    ∀ (n j : ℕ₀) (t : HFSet), le₀ j n →
+      getHead j (dropHead (σ n) t) = getHead j t
+  | .zero,   .zero,   t, _ => by
+      show HFSet.snd (dropHead (σ 𝟘) t) = HFSet.snd t
+      show HFSet.snd ⟪dropHead 𝟘 (HFSet.fst t), HFSet.snd t⟫ = HFSet.snd t
+      rw [HFSet.snd_orderedPair_eq']
+  | .zero,   .succ _, _, h => by
+      exact (Peano.Order.not_succ_le_zero _ h).elim
+  | .succ m, .zero,   t, _ => by
+      show HFSet.snd (dropHead (σ (σ m)) t) = HFSet.snd t
+      show HFSet.snd ⟪dropHead (σ m) (HFSet.fst t), HFSet.snd t⟫ = HFSet.snd t
+      rw [HFSet.snd_orderedPair_eq']
+  | .succ m, .succ j', t, h => by
+      have hjm : le₀ j' m := Peano.Order.succ_le_succ_then h
+      show getHead j' (HFSet.fst (dropHead (σ (σ m)) t)) = getHead j' (HFSet.fst t)
+      show getHead j' (HFSet.fst ⟪dropHead (σ m) (HFSet.fst t), HFSet.snd t⟫)
+            = getHead j' (HFSet.fst t)
+      rw [HFSet.fst_orderedPair_eq']
+      exact getHead_dropHead m j' (HFSet.fst t) hjm
+
+/-- Regla de componente 0 del shift: `getHead 0 (shift t) = getHead n t`. -/
+theorem mckayShift_getHead_zero (grp : HFGroup) (n : ℕ₀) (t : HFSet) :
+    getHead 𝟘 (mckayShift grp (σ n) t) = getHead n t := by
+  show HFSet.snd (mckayShift grp (σ n) t) = getHead n t
+  show HFSet.snd ⟪dropHead n t, getHead n t⟫ = getHead n t
+  rw [HFSet.snd_orderedPair_eq']
+
+/-- Regla de componente `σ j` del shift: para `σ j ≤ n`,
+    `getHead (σ j) (shift t) = getHead j t`. -/
+theorem mckayShift_getHead_succ (grp : HFGroup) :
+    ∀ (n j : ℕ₀) (t : HFSet), le₀ (σ j) n →
+      getHead (σ j) (mckayShift grp (σ n) t) = getHead j t
+  | .zero,   j, _, h => by
+      exact (Peano.Order.not_succ_le_zero _ h).elim
+  | .succ m, j, t, h => by
+      have hjm : le₀ j m := Peano.Order.succ_le_succ_then h
+      show getHead j (HFSet.fst (mckayShift grp (σ (σ m)) t)) = getHead j t
+      show getHead j (HFSet.fst ⟪dropHead (σ m) t, getHead (σ m) t⟫) = getHead j t
+      rw [HFSet.fst_orderedPair_eq']
+      exact getHead_dropHead m j t hjm
+
+-- §15. Función predIndex/predIter y periodicidad (D.4.B parte 2, paso 3)
+
+/-- Índice cíclico decreciente sobre `{0,...,n}`: `0 ↦ n`, `σ j ↦ j`. -/
+def predIndex (n : ℕ₀) : ℕ₀ → ℕ₀
+  | .zero   => n
+  | .succ j => j
+
+/-- Iteración `k` veces de `predIndex n`. -/
+def predIter (n : ℕ₀) : ℕ₀ → ℕ₀ → ℕ₀
+  | .zero,   j => j
+  | .succ k, j => predIter n k (predIndex n j)
+
+theorem predIter_zero (n j : ℕ₀) : predIter n 𝟘 j = j := rfl
+
+theorem predIter_succ (n k j : ℕ₀) :
+    predIter n (σ k) j = predIter n k (predIndex n j) := rfl
+
+/-- Variante "trasera": `predIter (σ k) = predIndex ∘ predIter k`. -/
+theorem predIter_succ_right (n : ℕ₀) :
+    ∀ k j, predIter n (σ k) j = predIndex n (predIter n k j)
+  | .zero,    j => rfl
+  | .succ k', j => by
+      show predIter n (σ (σ k')) j = predIndex n (predIter n (σ k') j)
+      rw [predIter_succ n (σ k') j, predIter_succ_right n k' (predIndex n j)]
+      rfl
+
+theorem predIter_add (n a : ℕ₀) :
+    ∀ b j, predIter n (Peano.Add.add a b) j = predIter n b (predIter n a j)
+  | .zero,   _ => rfl
+  | .succ b', j => by
+      show predIter n (Peano.Add.add a (σ b')) j
+            = predIter n (σ b') (predIter n a j)
+      have hadd : Peano.Add.add a (σ b') = σ (Peano.Add.add a b') := rfl
+      rw [hadd, predIter_succ_right n (Peano.Add.add a b') j,
+          predIter_add n a b' j, predIter_succ_right n b' (predIter n a j)]
+
+theorem predIter_self_zero (n : ℕ₀) :
+    ∀ j, predIter n j j = 𝟘
+  | .zero    => rfl
+  | .succ j' => by
+      show predIter n (σ j') (σ j') = 𝟘
+      rw [predIter_succ n j' (σ j')]
+      show predIter n j' j' = 𝟘
+      exact predIter_self_zero n j'
+
+theorem predIter_succ_self (n j : ℕ₀) :
+    predIter n (σ j) j = n := by
+  rw [predIter_succ_right n j j, predIter_self_zero n j]
+  rfl
+
+theorem predIter_le_eq_sub (n : ℕ₀) :
+    ∀ k j, le₀ k j → predIter n k j = Peano.Sub.sub j k
+  | .zero,    j, _ => by
+      show j = Peano.Sub.sub j 𝟘
+      rw [Peano.Sub.sub_zero]
+  | .succ _,  .zero, h =>
+      (Peano.Order.not_succ_le_zero _ h).elim
+  | .succ k', .succ j', h => by
+      have hk : le₀ k' j' := Peano.Order.succ_le_succ_then h
+      show predIter n k' (predIndex n (σ j')) = Peano.Sub.sub (σ j') (σ k')
+      show predIter n k' j' = Peano.Sub.sub (σ j') (σ k')
+      rw [predIter_le_eq_sub n k' j' hk, Peano.Sub.sub_succ_succ_eq]
+
+/-- `sub n (sub n j) = j` para `j ≤ n`, vía `sub_k_add_k` + `add_k_sub_k`. -/
+theorem sub_sub_self (n j : ℕ₀) (h : le₀ j n) :
+    Peano.Sub.sub n (Peano.Sub.sub n j) = j := by
+  have h1 : Peano.Add.add (Peano.Sub.sub n j) j = n := Peano.Sub.sub_k_add_k n j h
+  have h2 : Peano.Sub.sub (Peano.Add.add (Peano.Sub.sub n j) j) (Peano.Sub.sub n j) = j :=
+    Peano.Sub.add_k_sub_k j (Peano.Sub.sub n j)
+  rw [h1] at h2
+  exact h2
+
+/-- Periodicidad: `predIter n (σ n) j = j` para `j ≤ n`. -/
+theorem predIter_period (n : ℕ₀) :
+    ∀ j, le₀ j n → predIter n (σ n) j = j := by
+  intro j hjn
+  have hsum : Peano.Add.add j (Peano.Sub.sub n j) = n := by
+    have := Peano.Sub.sub_k_add_k n j hjn
+    -- this : add (sub n j) j = n
+    have hcomm : Peano.Add.add j (Peano.Sub.sub n j)
+               = Peano.Add.add (Peano.Sub.sub n j) j := Peano.Add.add_comm _ _
+    rw [hcomm]; exact this
+  have heq : σ n = Peano.Add.add (σ j) (Peano.Sub.sub n j) := by
+    rw [Peano.Add.succ_add]
+    show σ n = σ (Peano.Add.add j (Peano.Sub.sub n j))
+    rw [hsum]
+  have hle : le₀ (Peano.Sub.sub n j) n := Peano.Sub.sub_le_self n j
+  rw [heq, predIter_add n (σ j) (Peano.Sub.sub n j) j,
+      predIter_succ_self n j,
+      predIter_le_eq_sub n (Peano.Sub.sub n j) n hle,
+      sub_sub_self n j hjn]
+
+-- §16. Ensamblaje: shiftIter_getHead + shiftIter_period (D.4.B parte 2, paso 4)
+
+/-- Componente `j`-ésima de iterar el shift: equivale a aplicar `predIter` al índice. -/
+theorem shiftIter_getHead (grp : HFGroup) (n : ℕ₀) :
+    ∀ (k : ℕ₀) (j : ℕ₀), le₀ j n → ∀ (t : HFSet),
+      getHead j (shiftIter grp (σ n) k t) = getHead (predIter n k j) t
+  | .zero,    _,       _,  _ => rfl
+  | .succ k', .zero,   _,  t => by
+      show getHead 𝟘 (mckayShift grp (σ n) (shiftIter grp (σ n) k' t))
+            = getHead (predIter n (σ k') 𝟘) t
+      rw [mckayShift_getHead_zero grp n]
+      have ih := shiftIter_getHead grp n k' n (Peano.Order.le_refl n) t
+      rw [ih]
+      rfl
+  | .succ k', .succ j', h, t => by
+      have hj : le₀ j' n := Peano.Order.le_succ_then_le h
+      show getHead (σ j') (mckayShift grp (σ n) (shiftIter grp (σ n) k' t))
+            = getHead (predIter n (σ k') (σ j')) t
+      rw [mckayShift_getHead_succ grp n j' _ h]
+      have ih := shiftIter_getHead grp n k' j' hj t
+      rw [ih]
+      rfl
+
+/-- **Periodicidad del shift** (D.4.B parte 2 completo):
+    para `t ∈ nPow grp.G (σ n)`, iterar el shift `σ n` veces devuelve `t`. -/
+theorem shiftIter_period (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) :
+    shiftIter grp (σ n) (σ n) t = t := by
+  apply nPow_ext grp.G n (shiftIter grp (σ n) (σ n) t) t
+    (shiftIter_mem_nPow grp (σ n) (σ n) ht) ht
+  intro j hjn
+  rw [shiftIter_getHead grp n (σ n) j hjn t, predIter_period n j hjn]
+
+-- §17. D.4.C parte 1: órbitas (enumeración y cota de cardinal)
+
+/-- Enumeración auxiliar: `orbitEnum grp p m t = {shiftIter k t | k ≤ m}`. -/
+def orbitEnum (grp : HFGroup) (p : ℕ₀) : ℕ₀ → HFSet → HFSet
+  | .zero,   t => HFSet.singleton (shiftIter grp p 𝟘 t)
+  | .succ m, t => HFSet.insert (shiftIter grp p (σ m) t) (orbitEnum grp p m t)
+
+theorem mem_orbitEnum (grp : HFGroup) (p : ℕ₀) :
+    ∀ (m : ℕ₀) (t x : HFSet),
+      x ∈ orbitEnum grp p m t ↔ ∃ k : ℕ₀, le₀ k m ∧ x = shiftIter grp p k t
+  | .zero, t, x => by
+      show x ∈ HFSet.singleton (shiftIter grp p 𝟘 t) ↔ _
+      rw [HFSet.mem_singleton]
+      refine ⟨fun hx => ⟨𝟘, le_refl 𝟘, hx⟩, ?_⟩
+      rintro ⟨k, hk, hx⟩
+      have hk0 : k = 𝟘 := le_zero_eq_wp hk
+      rw [hx, hk0]
+  | .succ m, t, x => by
+      show x ∈ HFSet.insert (shiftIter grp p (σ m) t) (orbitEnum grp p m t) ↔ _
+      rw [HFSet.mem_insert]
+      constructor
+      · rintro (hx | hx)
+        · exact ⟨σ m, le_refl (σ m), hx⟩
+        · obtain ⟨k, hk, hx⟩ := (mem_orbitEnum grp p m t x).mp hx
+          exact ⟨k, le_n_m_then_le_n_sm_wp hk, hx⟩
+      · rintro ⟨k, hk, hx⟩
+        rcases (le_succ_iff_le_or_eq k m).mp hk with hk' | hk'
+        · exact Or.inr ((mem_orbitEnum grp p m t x).mpr ⟨k, hk', hx⟩)
+        · exact Or.inl (hx.trans (congrArg (fun i => shiftIter grp p i t) hk'))
+
+theorem orbitEnum_card_le_succ (grp : HFGroup) (p : ℕ₀) :
+    ∀ (m : ℕ₀) (t : HFSet), le₀ (HFSet.card (orbitEnum grp p m t)) (σ m)
+  | .zero, t => by
+      show le₀ (HFSet.card (HFSet.singleton (shiftIter grp p 𝟘 t))) (σ 𝟘)
+      have heq : HFSet.singleton (shiftIter grp p 𝟘 t)
+                  = HFSet.insert (shiftIter grp p 𝟘 t) HFSet.empty :=
+        HFSet.extensionality _ _ fun z => by
+          rw [HFSet.mem_singleton, HFSet.mem_insert]
+          exact ⟨Or.inl, fun h => h.elim id (absurd · (HFSet.not_mem_empty z))⟩
+      rw [heq, HFSet.card_insert _ _ (HFSet.not_mem_empty _), HFSet.card_empty]
+      exact le_refl (σ 𝟘)
+  | .succ m, t => by
+      show le₀ (HFSet.card
+        (HFSet.insert (shiftIter grp p (σ m) t) (orbitEnum grp p m t))) (σ (σ m))
+      by_cases hin : shiftIter grp p (σ m) t ∈ orbitEnum grp p m t
+      · have heq : HFSet.insert (shiftIter grp p (σ m) t) (orbitEnum grp p m t)
+                    = orbitEnum grp p m t := by
+          apply HFSet.extensionality; intro z
+          rw [HFSet.mem_insert]
+          exact ⟨fun h => h.elim (· ▸ hin) id, Or.inr⟩
+        rw [heq]
+        exact le_trans _ _ _ (orbitEnum_card_le_succ grp p m t)
+                              (lt_imp_le _ _ (lt_succ_self (σ m)))
+      · rw [HFSet.card_insert _ _ hin]
+        exact succ_le_succ_if (orbitEnum_card_le_succ grp p m t)
+
+/-- Órbita de `t` bajo la acción del shift de período `σ n`. -/
+def orbitOf (grp : HFGroup) (n : ℕ₀) (t : HFSet) : HFSet :=
+  orbitEnum grp (σ n) n t
+
+theorem mem_orbitOf (grp : HFGroup) (n : ℕ₀) (t x : HFSet) :
+    x ∈ orbitOf grp n t ↔ ∃ k : ℕ₀, le₀ k n ∧ x = shiftIter grp (σ n) k t :=
+  mem_orbitEnum grp (σ n) n t x
+
+/-- `card (orbitOf grp n t) ≤ σ n`. -/
+theorem card_orbitOf_le (grp : HFGroup) (n : ℕ₀) (t : HFSet) :
+    le₀ (HFSet.card (orbitOf grp n t)) (σ n) :=
+  orbitEnum_card_le_succ grp (σ n) n t
+
+/-- La órbita es cerrada bajo el shift: si `t' ∈ orbitOf grp n t`, entonces
+    `mckayShift grp (σ n) t' ∈ orbitOf grp n t`. -/
+theorem mckayShift_mem_orbitOf (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) :
+    ∀ {t' : HFSet}, t' ∈ orbitOf grp n t →
+      mckayShift grp (σ n) t' ∈ orbitOf grp n t := by
+  intro t' h
+  obtain ⟨k, hk, hk_eq⟩ := (mem_orbitOf grp n t t').mp h
+  have hshift : mckayShift grp (σ n) t' = shiftIter grp (σ n) (σ k) t := by
+    rw [hk_eq]; rfl
+  rcases hk with hk_lt | hk_eq2
+  · have hsk : le₀ (σ k) n :=
+      (le_iff_lt_succ (σ k) n).mpr ((lt_iff_lt_σ_σ k n).mp hk_lt)
+    exact (mem_orbitOf grp n t _).mpr ⟨σ k, hsk, hshift⟩
+  · refine (mem_orbitOf grp n t _).mpr ⟨𝟘, Peano.Order.zero_le n, ?_⟩
+    show mckayShift grp (σ n) t' = t
+    rw [hshift, hk_eq2]
+    exact shiftIter_period grp n t ht
+
+-- §18. D.4.C parte 2: simetría e igualdad de órbitas que se intersectan
+
+/-- Cualquier iteración del shift cae en la órbita. -/
+theorem shiftIter_mem_orbitOf (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) :
+    ∀ k : ℕ₀, shiftIter grp (σ n) k t ∈ orbitOf grp n t
+  | .zero =>
+      (mem_orbitOf grp n t _).mpr ⟨𝟘, Peano.Order.zero_le n, rfl⟩
+  | .succ k' => by
+      show mckayShift grp (σ n) (shiftIter grp (σ n) k' t) ∈ orbitOf grp n t
+      exact mckayShift_mem_orbitOf grp n t ht
+        (shiftIter_mem_orbitOf grp n t ht k')
+
+/-- Índice inverso para el shift: si `s = shiftIter k t` con `k ≤ n`, entonces
+    `t = shiftIter (invIdx n k) s`. -/
+def invIdx (n : ℕ₀) : ℕ₀ → ℕ₀
+  | .zero    => 𝟘
+  | .succ k' => Peano.Sub.sub n k'
+
+theorem invIdx_le (n : ℕ₀) :
+    ∀ k, le₀ k n → le₀ (invIdx n k) n
+  | .zero,    _ => Peano.Order.zero_le n
+  | .succ _,  _ => Peano.Sub.sub_le_self n _
+
+theorem shiftIter_invIdx (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) :
+    ∀ k, le₀ k n →
+      shiftIter grp (σ n) (invIdx n k) (shiftIter grp (σ n) k t) = t
+  | .zero,    _ => rfl
+  | .succ k', h => by
+      have hk' : le₀ k' n := Peano.Order.le_succ_then_le h
+      show shiftIter grp (σ n) (Peano.Sub.sub n k') (shiftIter grp (σ n) (σ k') t) = t
+      rw [← shiftIter_add]
+      have hadd : Peano.Add.add (Peano.Sub.sub n k') (σ k') = σ n := by
+        show Peano.Add.add (Peano.Sub.sub n k') (σ k') = σ n
+        rw [Peano.Add.add_succ]
+        show σ (Peano.Add.add (Peano.Sub.sub n k') k') = σ n
+        rw [Peano.Sub.sub_k_add_k n k' hk']
+      rw [hadd]
+      exact shiftIter_period grp n t ht
+
+/-- Si `s ∈ orbitOf grp n t`, entonces `orbitOf grp n s ⊆ orbitOf grp n t`. -/
+theorem orbitOf_subset (grp : HFGroup) (n : ℕ₀) (t s : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) (hs : s ∈ orbitOf grp n t) :
+    orbitOf grp n s ⊆ orbitOf grp n t := by
+  intro x hx
+  obtain ⟨k, _, hsk⟩ := (mem_orbitOf grp n t s).mp hs
+  obtain ⟨j, _, hxj⟩ := (mem_orbitOf grp n s x).mp hx
+  have hxeq : x = shiftIter grp (σ n) (Peano.Add.add j k) t := by
+    rw [hxj, hsk, ← shiftIter_add]
+  rw [hxeq]
+  exact shiftIter_mem_orbitOf grp n t ht (Peano.Add.add j k)
+
+/-- Si `s ∈ orbitOf grp n t`, entonces las órbitas coinciden. -/
+theorem orbitOf_eq_of_mem (grp : HFGroup) (n : ℕ₀) (t s : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) (hs : s ∈ orbitOf grp n t) :
+    orbitOf grp n s = orbitOf grp n t := by
+  have hsN : s ∈ HFSet.nPow grp.G (σ n) := by
+    obtain ⟨k, _, hsk⟩ := (mem_orbitOf grp n t s).mp hs
+    rw [hsk]
+    exact shiftIter_mem_nPow grp (σ n) k ht
+  have ht_s : t ∈ orbitOf grp n s := by
+    obtain ⟨k, hk, hsk⟩ := (mem_orbitOf grp n t s).mp hs
+    refine (mem_orbitOf grp n s t).mpr ⟨invIdx n k, invIdx_le n k hk, ?_⟩
+    rw [hsk]
+    exact (shiftIter_invIdx grp n t ht k hk).symm
+  apply HFSet.subset_antisymm
+  · exact orbitOf_subset grp n t s ht hs
+  · exact orbitOf_subset grp n s t hsN ht_s
+
+/-- Dos órbitas o son iguales o son disjuntas. -/
+theorem orbitOf_eq_or_disjoint (grp : HFGroup) (n : ℕ₀) (t s : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) (hs : s ∈ HFSet.nPow grp.G (σ n)) :
+    orbitOf grp n t = orbitOf grp n s ∨
+    (∀ x, ¬ (x ∈ orbitOf grp n t ∧ x ∈ orbitOf grp n s)) := by
+  by_cases hdisj : ∀ x, ¬ (x ∈ orbitOf grp n t ∧ x ∈ orbitOf grp n s)
+  · exact Or.inr hdisj
+  · refine Or.inl ?_
+    -- Extracción clásica del testigo.
+    have hex : ∃ x, x ∈ orbitOf grp n t ∧ x ∈ orbitOf grp n s :=
+      Classical.byContradiction (fun hne =>
+        hdisj (fun x hx => hne ⟨x, hx⟩))
+    obtain ⟨x, hxt, hxs⟩ := hex
+    have h1 : orbitOf grp n x = orbitOf grp n t :=
+      orbitOf_eq_of_mem grp n t x ht hxt
+    have h2 : orbitOf grp n x = orbitOf grp n s :=
+      orbitOf_eq_of_mem grp n s x hs hxs
+    rw [← h1, h2]
+
 end HFAlgebra
