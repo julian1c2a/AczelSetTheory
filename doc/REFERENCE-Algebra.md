@@ -1360,3 +1360,106 @@ structure HFSublattice (lat : HFLattice) where
 def HFSublattice.toHFLattice (sub : HFSublattice lat) : HFLattice
 def HFSublattice.inter (sub₁ sub₂ : HFSublattice lat) : HFSublattice lat
 ```
+
+---
+
+## `Algebra/Sylow.lean`
+
+Infraestructura para los teoremas de Sylow sobre `HFGroup` finito, vía la prueba combinatorial de McKay (acción cíclica sobre `p`-tuplas con producto = e). **En desarrollo.**
+
+### §1–§14. Subgrupos triviales, orden cíclico, carrier de McKay
+
+Incluye: `gpow grp g m` (potencia iterada), `gpowImg grp g m` (imagen `{g^0,...,g^m}`), `cyclicSubgroup grp g` (⟨g⟩ vía orden por WOP), `mckayCarrier grp p` (= `{t ∈ nPow grp.G p | tupleProd t = e}`), `mckayShift grp (σ n) t = ⟪dropHead n t, getHead n t⟫`, `card_mckayCarrier_eq_pow` (D.3: `card (mckayCarrier grp p) = (card grp.G)^(p-1)`).
+
+### §15. `predIndex` / `predIter` (índice cíclico decreciente)
+
+```lean
+def predIndex (n : ℕ₀) : ℕ₀ → ℕ₀
+  | .zero   => n
+  | .succ j => j
+
+def predIter (n : ℕ₀) : ℕ₀ → ℕ₀ → ℕ₀
+  | .zero,   j => j
+  | .succ k, j => predIter n k (predIndex n j)
+
+theorem predIter_zero (n j : ℕ₀) : predIter n 𝟘 j = j
+theorem predIter_succ (n k j : ℕ₀) :
+    predIter n (σ k) j = predIter n k (predIndex n j)
+theorem predIter_succ_right (n k j : ℕ₀) :
+    predIter n (σ k) j = predIndex n (predIter n k j)
+theorem predIter_add (n a b j : ℕ₀) :
+    predIter n (Peano.Add.add a b) j = predIter n b (predIter n a j)
+theorem predIter_self_zero (n j : ℕ₀) : predIter n j j = 𝟘
+theorem predIter_succ_self (n j : ℕ₀) : predIter n (σ j) j = n
+theorem predIter_le_eq_sub (n k j : ℕ₀) (h : le₀ k j) :
+    predIter n k j = Peano.Sub.sub j k
+theorem sub_sub_self (n j : ℕ₀) (h : le₀ j n) :
+    Peano.Sub.sub n (Peano.Sub.sub n j) = j
+theorem predIter_period (n j : ℕ₀) (hjn : le₀ j n) :
+    predIter n (σ n) j = j
+```
+
+### §16. `shiftIter_period` (D.4.B parte 2)
+
+```lean
+theorem shiftIter_getHead (grp : HFGroup) (n k j : ℕ₀) (h : le₀ j n) (t : HFSet) :
+    getHead j (shiftIter grp (σ n) k t) = getHead (predIter n k j) t
+
+theorem shiftIter_period (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) :
+    shiftIter grp (σ n) (σ n) t = t
+```
+
+### §17. Órbitas: definición y cota de cardinal (D.4.C parte 1)
+
+```lean
+def orbitEnum (grp : HFGroup) (p : ℕ₀) : ℕ₀ → HFSet → HFSet
+  | .zero,   t => HFSet.singleton (shiftIter grp p 𝟘 t)
+  | .succ m, t => HFSet.insert (shiftIter grp p (σ m) t) (orbitEnum grp p m t)
+
+def orbitOf (grp : HFGroup) (n : ℕ₀) (t : HFSet) : HFSet :=
+  orbitEnum grp (σ n) n t
+
+theorem mem_orbitEnum (grp : HFGroup) (p m : ℕ₀) (t x : HFSet) :
+    x ∈ orbitEnum grp p m t ↔ ∃ k : ℕ₀, le₀ k m ∧ x = shiftIter grp p k t
+theorem mem_orbitOf (grp : HFGroup) (n : ℕ₀) (t x : HFSet) :
+    x ∈ orbitOf grp n t ↔ ∃ k : ℕ₀, le₀ k n ∧ x = shiftIter grp (σ n) k t
+theorem orbitEnum_card_le_succ (grp : HFGroup) (p m : ℕ₀) (t : HFSet) :
+    le₀ (HFSet.card (orbitEnum grp p m t)) (σ m)
+theorem card_orbitOf_le (grp : HFGroup) (n : ℕ₀) (t : HFSet) :
+    le₀ (HFSet.card (orbitOf grp n t)) (σ n)
+theorem mckayShift_mem_orbitOf (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) {t' : HFSet}
+    (h : t' ∈ orbitOf grp n t) :
+    mckayShift grp (σ n) t' ∈ orbitOf grp n t
+```
+
+### §18. Simetría y partición de órbitas (D.4.C parte 2)
+
+```lean
+theorem shiftIter_mem_orbitOf (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) (k : ℕ₀) :
+    shiftIter grp (σ n) k t ∈ orbitOf grp n t
+
+def invIdx (n : ℕ₀) : ℕ₀ → ℕ₀
+  | .zero    => 𝟘
+  | .succ k' => Peano.Sub.sub n k'
+
+theorem invIdx_le (n k : ℕ₀) (h : le₀ k n) : le₀ (invIdx n k) n
+theorem shiftIter_invIdx (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) (k : ℕ₀) (h : le₀ k n) :
+    shiftIter grp (σ n) (invIdx n k) (shiftIter grp (σ n) k t) = t
+
+theorem orbitOf_subset (grp : HFGroup) (n : ℕ₀) (t s : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) (hs : s ∈ orbitOf grp n t) :
+    orbitOf grp n s ⊆ orbitOf grp n t
+theorem orbitOf_eq_of_mem (grp : HFGroup) (n : ℕ₀) (t s : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) (hs : s ∈ orbitOf grp n t) :
+    orbitOf grp n s = orbitOf grp n t
+theorem orbitOf_eq_or_disjoint (grp : HFGroup) (n : ℕ₀) (t s : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) (hs : s ∈ HFSet.nPow grp.G (σ n)) :
+    orbitOf grp n t = orbitOf grp n s ∨
+    (∀ x, ¬ (x ∈ orbitOf grp n t ∧ x ∈ orbitOf grp n s))
+```
+
+**Pendiente (D.4.C cierre + D.4.D):** `card_orbitOf ∈ {1, p}` para `p` primo (Bezout sobre ℕ₀); particionado de `mckayCarrier` ⇒ `p ∣ #fixedPoints`.

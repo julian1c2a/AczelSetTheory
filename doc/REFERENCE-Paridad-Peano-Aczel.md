@@ -75,9 +75,9 @@
 | `GroupTheory/ThirdIsomorphism.lean` | ✅ | `Algebra/ThirdIsomorphism.lean` + `VN/ThirdIsomorphismVN.lean` | Aczel tiene 3er TI *abstracto* sobre `HFGroup`: `HFSubgroup.KmodN_subgroup` (K/N ≤ G/N), `KmodN_normal`, `HFSubgroup.thirdIsoMap : G/N → G/K` (vía representante de N-coset), `thirdIsoMap_welldefined`, `thirdIsoMap_surjective` y `thirdIsoMap_ker_eq` (ker φ = K/N). `VN/ThirdIsomorphismVN.lean` es stub-doc. |
 | `GroupTheory/CorrespondenceTheorem.lean` | ✅ | `Algebra/CorrespondenceTheorem.lean` + `VN/CorrespondenceTheoremVN.lean` | Aczel tiene el 4º TI (Correspondencia) *abstracto* sobre `HFGroup`: `HFSubgroup.preimageSubgroup sub_N hn_N Q` (ψ(Q) = π⁻¹(Q)), `mem_preimageSubgroup_iff`, `N_le_preimageSubgroup` (N ⊆ ψ(Q)), `imageSubgroup_preimage` (φ(ψ(Q)) = Q como HFSet), `preimageSubgroup_image` (ψ(φ(K)) = K como HFSet cuando N ⊆ K). El rol de `imageSubgroup` lo cumple `KmodN_subgroup` de `ThirdIsomorphism.lean`. `VN/CorrespondenceTheoremVN.lean` es stub-doc. TODO: `preimage_subgroup_card` (requiere Lagrange sobre HFSubgroup). |
 | `GroupTheory/Zassenhaus.lean` | ❌ | — | Lema de Zassenhaus. **Pendiente.** |
-| `GroupTheory/Sylow/CosetAction.lean` | ❌ | — | Acción de cosetes en Sylow. **Pendiente.** |
-| `GroupTheory/Sylow/Cosets.lean` | ❌ | — | Cosetes para teorema de Sylow. **Pendiente.** |
-| `GroupTheory/Sylow/Sylow.lean` | ❌ | — | Teoremas de Sylow. **Pendiente.** |
+| `GroupTheory/Sylow/CosetAction.lean` | 🟡 | `Algebra/Sylow.lean` (§9–§11) | McKay carrier `mckayCarrier grp p` (p-tuplas con producto = e) y shift cíclico `mckayShift`. Ruta directa combinatorial, no acción explícita de cosetes. |
+| `GroupTheory/Sylow/Cosets.lean` | 🟡 | `Algebra/Sylow.lean` (§12–§18) | D.4.A `shiftIter` + `mckayFixedPoints`; D.4.B `shiftIter_add` y **`shiftIter_period`** (período `σ n`); D.4.C parte 1+2: `orbitOf`, `card_orbitOf_le`, `orbitOf_eq_or_disjoint` (partición). **Pendiente:** `card_orbitOf ∈ {1,p}` para p primo. |
+| `GroupTheory/Sylow/Sylow.lean` | ❌ | — | Teoremas de Sylow (Sylow I-III). **Pendiente** — requiere cierre D.4.C + D.4.D (`p ∣ #fixedPoints`). |
 
 ---
 
