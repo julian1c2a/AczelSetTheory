@@ -2454,14 +2454,14 @@ private theorem prime_dvd_of_dvd_prime_pow {p : ℕ₀} (hp : Peano.Arith.Prime 
     (k : ℕ₀) {d : ℕ₀} (hd_pow : d ∣ p ^ k) (hd1 : d ≠ 𝟙) : p ∣ d := by
   induction k with
   | zero =>
-    rw [pow_zero] at hd_pow
+    -- p ^ 𝟘 = 𝟙 por rfl a través del puente HPow/Peano.Pow
     exact absurd (antisymm_divides hd_pow (one_divides d)) hd1
   | succ k' ih =>
-    rw [pow_succ, mul_comm] at hd_pow
+    have hps : p ^ σ k' = mul (p ^ k') p := by rw [pow_def]; exact Peano.Pow.pow_succ p k'
+    rw [hps, mul_comm] at hd_pow
     rcases prime_coprime_or_dvd hp (n := d) with hdvd | hcop
     · exact hdvd
-    · have hcop' : Coprime d p := coprime_symm hcop
-      exact ih (coprime_dvd_of_dvd_mul hcop' hd_pow)
+    · exact ih (coprime_dvd_of_dvd_mul (coprime_symm hcop) hd_pow)
 
 -- ==================================================================
 -- §36. Órbitas no centrales bajo la acción de conjugación
@@ -2701,7 +2701,8 @@ private theorem p_dvd_card_orbit_closed_set {grp : HFGroup} {p : ℕ₀} (hp : P
     have hcard_lt : lt₀ (HFSet.card (HFSet.setminus T O)) n := by
       rw [← hcard, hcard_split]
       have hO_ne : O ≠ HFSet.empty := fun h => absurd (h ▸ hx₀_O) (HFSet.not_mem_empty x₀)
-      have hO_pos : lt₀ 𝟘 (HFSet.card O) := by rwa [← HFSet.card_pos_iff_ne_empty]
+      have hO_pos : lt₀ 𝟘 (HFSet.card O) :=
+        pos_of_ne_zero _ (fun h => hO_ne (HFSet.card_eq_zero_iff.mp h))
       exact lt_of_le_add_left _ _ hO_pos
     -- Sublemmas for IH
     have hTO_sub : HFSet.setminus T O ⊆ grp.G :=
@@ -2765,28 +2766,33 @@ private theorem p_dvd_center_of_no_proper {grp : HFGroup} {p k : ℕ₀}
         HFSet.card sub.H ≠ HFSet.card grp.G →
         ¬ (p ^ k ∣ HFSet.card sub.H)) :
     p ∣ HFSet.card (center grp).H := by
-  have hp_G := divides_trans (by exact ⟨p ^ (k.pred), by rw [← pow_succ_eq]; congr 1;
-    exact (succ_pred hk).symm⟩) hdvd
   have hp_sm := p_dvd_setminus_center_of_no_proper hp hk hdvd h_no_proper
   have hclass := class_equation grp
-  -- card G = card Z(G) + card(G \ Z(G))
-  -- p | card G, p | card(G \ Z(G)) → p | card Z(G)
-  obtain ⟨a, ha⟩ := hdvd
-  obtain ⟨b, hb⟩ := hp_sm
-  have hcard_eq : HFSet.card grp.G =
-      add (HFSet.card (center grp).H) (HFSet.card (HFSet.setminus grp.G (center grp).H)) :=
-    hclass
-  -- card Z(G) = card G - card(G \ Z(G))
-  have hle : HFSet.card (HFSet.setminus grp.G (center grp).H) ≤ HFSet.card grp.G := by
-    apply HFSet.card_le_of_subset
-    exact fun y hy => (HFSet.mem_setminus grp.G (center grp).H y).mp hy |>.1
-  have hcenter_eq : HFSet.card (center grp).H =
-      sub (HFSet.card grp.G) (HFSet.card (HFSet.setminus grp.G (center grp).H)) := by
-    have := hcard_eq
-    rw [add_comm] at this
-    exact (add_sub_cancel this hle).symm
-  rw [hcenter_eq]
-  exact divides_sub hle hdvd hp_sm
+  -- Derivar p ∣ card G (ya que k ≠ 0)
+  have hp_G : p ∣ HFSet.card grp.G := by
+    cases k with
+    | zero => exact absurd rfl hk
+    | succ k' =>
+      have hps : p ^ σ k' = mul (p ^ k') p := by rw [pow_def]; exact Peano.Pow.pow_succ p k'
+      exact divides_trans ⟨p ^ k', by rw [hps, mul_comm]⟩ hdvd
+  -- card Z(G) > 0 (pues e ∈ Z(G))
+  have hcenter_pos : HFSet.card (center grp).H ≠ 𝟘 := fun h =>
+    absurd ((HFSet.card_eq_zero_iff.mp h) ▸ (center grp).e_mem) (HFSet.not_mem_empty _)
+  -- card(G \ Z(G)) < card G (pues card Z > 0)
+  have hlt : lt₀ (HFSet.card (HFSet.setminus grp.G (center grp).H)) (HFSet.card grp.G) := by
+    rw [hclass, add_comm]
+    exact Peano.Add.lt_self_add_l _ _ hcenter_pos
+  have hle := lt_imp_le _ _ hlt
+  -- sub(card G, card(G\Z)) = card Z(G)
+  have hcenter_eq : Peano.Sub.sub (HFSet.card grp.G)
+        (HFSet.card (HFSet.setminus grp.G (center grp).H)) =
+      HFSet.card (center grp).H := by
+    apply Peano.Add.add_cancel (HFSet.card (HFSet.setminus grp.G (center grp).H))
+    conv_lhs => rw [add_comm]
+    rw [Peano.Sub.sub_k_add_k _ _ hle, hclass]
+    exact add_comm _ _
+  rw [← hcenter_eq]
+  exact divides_sub hlt hp_G hp_sm
 
 -- ==================================================================
 -- §38. Subgrupo cíclico generado por elemento central es normal
@@ -2796,41 +2802,33 @@ private theorem p_dvd_center_of_no_proper {grp : HFGroup} {p k : ℕ₀}
 private theorem cyclicSubgroup_of_central_isNormal {grp : HFGroup} {z : HFSet}
     (hz : z ∈ grp.G) (hz_center : z ∈ (center grp).H) :
     (cyclicSubgroup grp hz).isNormal := by
-  intro g hg n hn
-  -- n ∈ ⟨z⟩ = { z^k | k : ℕ₀ } — need to show g·n·g⁻¹ ∈ ⟨z⟩
-  -- Key: z ∈ Z(G) → z commutes with everything → z^k commutes with everything
-  -- → g·n·g⁻¹ = n ∈ ⟨z⟩
+  -- isNormal : ∀ (g n : HFSet), g ∈ G → n ∈ H → op (op g n) (inv g) ∈ H
+  intro g n hg hn
+  rw [HFAlgebra.mem_center_iff] at hz_center
+  -- hz_center.1 : z ∈ grp.G,  hz_center.2 : ∀ h ∈ G, op h z = op z h
   have hn_comm : ∀ h ∈ grp.G, grp.op h n = grp.op n h := by
-    rw [HFAlgebra.mem_center_iff] at hz_center
     intro h hh
-    -- n ∈ cyclicSubgroup grp hz, so n = z^k for some k
-    -- z^k commutes with h iff z commutes with h
-    have hn_G : n ∈ grp.G := (cyclicSubgroup grp hz).H_sub hn
-    -- Show by induction that all gpow z m commute with all h ∈ G
-    have hcomm_gpow : ∀ m : ℕ₀, grp.op h (gpow grp hz m) = grp.op (gpow grp hz m) h := by
+    have hcomm_gpow : ∀ m : ℕ₀, grp.op h (gpow grp z m) = grp.op (gpow grp z m) h := by
       intro m; induction m with
       | zero =>
         rw [gpow_zero, grp.op_id_right hh, grp.op_id_left hh]
       | succ m' ihm' =>
-        rw [gpow_succ, ← grp.op_assoc (gpow_mem grp hz m') hz_center.1 hh |>.symm]
-        rw [grp.op_assoc hh (gpow_mem grp hz m') hz_center.1]
-        rw [ihm', ← grp.op_assoc (gpow_mem grp hz m') hh hz_center.1]
-        rw [hz_center.2 h hh, grp.op_assoc (gpow_mem grp hz m') hz_center.1 hh]
-    -- n ∈ cyclicCarrier → n = gpow z k
-    obtain ⟨k, hk⟩ := ((cyclicMem_iff grp hz n).mp hn)
-    rw [← hk]
-    exact hcomm_gpow k
-  -- g·n·g⁻¹ = n ∈ ⟨z⟩
+        rw [gpow_succ]
+        have pm := gpow_mem grp hz m'
+        calc grp.op h (grp.op (gpow grp z m') z)
+            = grp.op (grp.op h (gpow grp z m')) z := by rw [grp.op_assoc hh pm hz_center.1]
+          _ = grp.op (grp.op (gpow grp z m') h) z := by rw [ihm']
+          _ = grp.op (gpow grp z m') (grp.op h z) := by rw [← grp.op_assoc pm hh hz_center.1]
+          _ = grp.op (gpow grp z m') (grp.op z h) := by rw [hz_center.2 h hh]
+          _ = grp.op (grp.op (gpow grp z m') z) h := by rw [grp.op_assoc pm hz_center.1 hh]
+    obtain ⟨k, _, hk⟩ := (mem_cyclicCarrier grp hz n).mp hn
+    rw [hk]; exact hcomm_gpow k
   have hconj_eq : grp.op (grp.op g n) (grp.inv g) = n := by
     have hn_G : n ∈ grp.G := (cyclicSubgroup grp hz).H_sub hn
-    rw [← hn_comm g hg]
+    rw [hn_comm g hg]
     rw [grp.op_assoc hn_G hg (grp.inv_closed hg)]
     rw [grp.op_inv_right hg, grp.op_id_right hn_G]
-  rw [HFAlgebra.isNormal] at *
-  rw [show grp.op g (grp.op n (grp.inv g)) = grp.op (grp.op g n) (grp.inv g) from
-    (grp.op_assoc hg ((cyclicSubgroup grp hz).H_sub hn) (grp.inv_closed hg)).symm]
-  rw [hconj_eq]
-  exact hn
+  rw [hconj_eq]; exact hn
 
 -- ==================================================================
 -- §39. Aritmética de la cardinalidad en el cociente
