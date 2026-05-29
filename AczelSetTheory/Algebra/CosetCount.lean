@@ -103,6 +103,59 @@ theorem card_sUnion_uniform_partition (F : HFSet) (k : ℕ₀)
           hunif C hCinF, hcard_F', card_insert C F' hCF', succ_mul]
       exact add_comm k _
 
+/-- Si `F` es una familia pairwise disjunta de conjuntos, cada uno con
+    cardinalidad divisible por `p`, entonces `p ∣ card(⋃ F)`. -/
+theorem dvd_card_sUnion_of_all_dvd (p : ℕ₀) (F : HFSet)
+    (hdisj : ∀ C D, C ∈ F → D ∈ F → C ≠ D → inter C D = empty)
+    (hdvd : ∀ C, C ∈ F → p ∣ card C) :
+    p ∣ card (sUnion F) := by
+  revert hdisj hdvd
+  apply eps_induction
+      (fun F =>
+        (∀ C D, C ∈ F → D ∈ F → C ≠ D → inter C D = empty) →
+        (∀ C, C ∈ F → p ∣ card C) →
+        p ∣ card (sUnion F))
+  · -- Base: F = ∅
+    intro _ _
+    rw [sUnion_empty_eq, card_empty]
+    exact divides_zero p
+  · -- Paso: F = insert C F'
+    intro F' C IH hdisj hdvd
+    have hCinF : C ∈ insert C F' := mem_insert_self C F'
+    by_cases hCF' : C ∈ F'
+    · -- C ∈ F': insert C F' = F' por insert_mem_eq
+      have heq : insert C F' = F' :=
+        extensionality _ _ fun x => ⟨
+          fun hx => (mem_insert x C F').mp hx |>.elim (· ▸ hCF') id,
+          fun hx => (mem_insert x C F').mpr (Or.inr hx)⟩
+      rw [heq]
+      exact IH
+        (fun D E hD hE hDE => hdisj D E
+          ((mem_insert D C F').mpr (Or.inr hD))
+          ((mem_insert E C F').mpr (Or.inr hE)) hDE)
+        (fun D hD => hdvd D ((mem_insert D C F').mpr (Or.inr hD)))
+    · -- C ∉ F': card(sUnion(insert C F')) = card C + card(sUnion F')
+      have hdisj_C : inter C (sUnion F') = empty := by
+        apply extensionality; intro x
+        constructor
+        · intro hx
+          simp only [mem_inter, mem_sUnion] at hx
+          obtain ⟨hxC, Y, hYF', hxY⟩ := hx
+          have hCY : C ≠ Y := fun h => hCF' (h ▸ hYF')
+          have hCYd : inter C Y = empty :=
+            hdisj C Y hCinF ((mem_insert Y C F').mpr (Or.inr hYF')) hCY
+          exact absurd ((mem_inter C Y x).mpr ⟨hxC, hxY⟩)
+            (hCYd ▸ not_mem_empty x)
+        · intro hx; exact absurd hx (not_mem_empty x)
+      have hdvd_F' : p ∣ card (sUnion F') :=
+        IH
+          (fun D E hD hE hDE => hdisj D E
+            ((mem_insert D C F').mpr (Or.inr hD))
+            ((mem_insert E C F').mpr (Or.inr hE)) hDE)
+          (fun D hD => hdvd D ((mem_insert D C F').mpr (Or.inr hD)))
+      rw [sUnion_insert, card_union_disjoint _ _ hdisj_C]
+      exact divides_add (hdvd C hCinF) hdvd_F'
+
 end HFSet
 
 -- ======================================================================
@@ -283,6 +336,7 @@ end HFAlgebra
 -- Público (HFSet):
 --   HFSet.sUnion_insert               : sUnion (insert C F) = union C (sUnion F)
 --   HFSet.card_sUnion_uniform_partition : partición uniforme → card(⋃F) = card(F) · k
+--   HFSet.dvd_card_sUnion_of_all_dvd  : pairwise disjoint + p∣card C → p∣card(⋃F)
 --
 -- Público (HFAlgebra.HFSubgroup):
 --   HFSubgroup.card_rightCoset_eq_card_H    : card(Ha) = card(H)  (a ∈ G general)
