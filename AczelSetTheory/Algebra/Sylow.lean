@@ -5,29 +5,34 @@ License: MIT
 -/
 
 -- AczelSetTheory/Algebra/Sylow.lean
--- Definiciones para los Teoremas de Sylow:
---   p-subgrupo, exponente de Sylow, p-subgrupo de Sylow.
+-- p-subgrupos, exponente de Sylow, infraestructura de McKay (D.4) y
+-- lema combinatorio de McKay: σ n ∣ card (mckayFixedPoints grp (σ n)).
 --
--- Paridad con Peano/Combinatorics/GroupTheory/Sylow/Sylow.lean (§1).
+-- Paridad con Peano/Combinatorics/GroupTheory/Sylow/Sylow.lean.
 --
--- Público:
---   HFAlgebra.pow_dvd_card           : ∃ m, p^k · m = card X
---   HFAlgebra.isPSubgroup            : ∃ k, card sub.H = p^k
---   HFAlgebra.isSylowExponent        : p^n ∣ card G  ∧  p^(n+1) ∤ card G
---   HFAlgebra.isSylowSubgroup        : ∃ n, isSylowExponent grp p n ∧ card sub.H = p^n
---   HFSubgroup.trivial               : subgrupo trivial {e}
---   HFSubgroup.trivial_card          : card trivial.H = 1
---   HFAlgebra.pow_dvd_card_of_le     : a ≤ b → p^b ∣ |G| → p^a ∣ |G|
---   HFAlgebra.sylow_card_eq          : todos los Sylow-p tienen el mismo cardinal
---   HFAlgebra.sylow_first_zero       : sylow_first caso n = 0 (subgrupo trivial)
---   HFAlgebra.gpow                   : g^n iterado
---   HFAlgebra.gpow_zero/succ/one/mem/add : reglas básicas de gpow
+-- Público (definiciones e infraestructura):
+--   isPSubgroup / isSylowExponent / isSylowSubgroup
+--   trivial / trivial_card
+--   pow_dvd_card_of_le / sylow_card_eq / sylow_first_zero
+--   gpow / gpow_zero / gpow_succ / gpow_one / gpow_mem / gpow_add
+--   order / order_pos / order_ne_zero / gpow_order_eq_id / order_minimal
+--   order_le_card / gpow_mul_order_eq_id / gpow_mod_order
+--   cyclicCarrier / cyclicSubgroup
+--   mckayCarrier / mckayShift / mckayFixedPoints / shiftIter / orbitOf / periodOf
 --
--- TODO (M6.4.B-F):
---   • gpow sobre HFGroup, order, cyclicSubgroup
---   • McKay: argumento combinatorio para Cauchy
---   • cauchy_minimal: ∃ subgrupo de orden p
---   • sylow_lift_from_cauchy: lift inductivo p^n → p^(n+1)
+-- Público (D.3 – D.4.D, argumento de McKay):
+--   dvd_card_mckayCarrier_succ          : σ n primo, p ∣ |G| → p ∣ |carrier|   (D.3)
+--   card_orbitOf_eq_periodOf            : card(orbitOf t) = periodOf t           (§22)
+--   card_orbitOf_one_or_succ            : card ∈ {1, σ n} en caso primo          (§23)
+--   periodOf_eq_one_iff_fixed           : period = 1 ↔ t fijo por shift          (§24)
+--   card_orbitOf_eq_one_iff_fixed       : card = 1 ↔ t fijo por shift            (§24)
+--   card_orbitOf_eq_succ_of_not_fixed   : ¬fijo → card(orbit) = σ n             (§25)
+--   succ_n_dvd_card_of_shift_closed_no_fixed : σ n ∣ card S, S ⊆ carrier        (§26)
+--   succ_n_dvd_card_mckayFixedPoints    : σ n ∣ card(fixedPoints)  (D.4.D/McKay) (§27)
+--
+-- TODO (M6.4.E-F):
+--   • cauchy_minimal : ∃ subgrupo de orden p  (de McKay + Lagrange)
+--   • sylow_lift_from_cauchy : lift inductivo p^n → p^(n+1)
 --   • sylow_first (caso inductivo)
 --
 -- Correspondencia con Peano:
@@ -2086,4 +2091,48 @@ theorem succ_n_dvd_card_mckayFixedPoints
     exact ⟨𝟘, by rw [mul_zero]⟩
 
 end HFAlgebra
+
+-- ======================================================================
+-- Exports
+-- ======================================================================
+--
+-- Público (HFAlgebra — definiciones básicas):
+--   pow_dvd_card              : ∃ m, p^k · m = card X
+--   isPSubgroup               : ∃ k, card sub.H = p^k
+--   isSylowExponent           : p^n ∣ |G| ∧ p^(n+1) ∤ |G|
+--   isSylowSubgroup           : ∃ n, isSylowExponent ∧ card sub.H = p^n
+--   trivial / trivial_card    : subgrupo trivial y su cardinalidad = 1
+--   pow_dvd_card_of_le        : a ≤ b → p^b ∣ |G| → p^a ∣ |G|
+--   sylow_card_eq             : todos los Sylow-p tienen el mismo cardinal
+--   sylow_first_zero          : caso n = 0 del primer teorema de Sylow
+--
+-- Público (HFAlgebra — gpow y order):
+--   gpow / gpow_zero / gpow_succ / gpow_one / gpow_mem / gpow_add
+--   order / order_pos / order_ne_zero
+--   gpow_order_eq_id / order_minimal / order_le_card
+--   gpow_mul_order_eq_id / gpow_mod_order
+--   cyclicCarrier / cyclicSubgroup
+--
+-- Público (HFAlgebra — infraestructura de McKay D.4.A–D.4.C):
+--   mckayCarrier / mem_mckayCarrier / mckayCarrier_subset_nPow
+--   mckayShift / mckayShift_mem_nPow / mckayShift_mem_mckayCarrier
+--   mckayFixedPoints / mem_mckayFixedPoints / mckayFixedPoints_subset
+--   shiftIter / shiftIter_mem_nPow / shiftIter_mem_mckayCarrier
+--   shiftIter_period / shiftIter_eq_id_iff_periodOf_dvd / shiftIter_inj_below_period
+--   orbitOf / mem_orbitOf / card_orbitOf_le / orbitOf_eq_of_mem
+--   orbitOf_eq_or_disjoint
+--   periodOf / periodOf_pos / periodOf_ne_zero
+--   shiftIter_periodOf / periodOf_minimal / periodOf_le_succ_n / periodOf_dvd_succ_n
+--   dvd_card_mckayCarrier_succ        : p ∣ |G|, n ≠ 𝟘 → p ∣ |carrier(σ n)|  (D.3)
+--   card_orbitOf_eq_periodOf          : card(orbitOf t) = periodOf t            (§22)
+--   card_orbitOf_one_or_succ          : primo → card ∈ {1, σ n}                 (§23)
+--
+-- Público (HFAlgebra — D.4.D argumento de McKay, §24–§27):
+--   periodOf_eq_one_iff_fixed         : period = 1 ↔ mckayShift t = t          (§24)
+--   card_orbitOf_eq_one_iff_fixed     : card = 1 ↔ mckayShift t = t            (§24)
+--   card_orbitOf_eq_succ_of_not_fixed : ¬fijo → card(orbit) = σ n              (§25)
+--   succ_n_dvd_card_of_shift_closed_no_fixed :
+--       S ⊆ carrier, S shift-cerrado, sin fijos → σ n ∣ card S                  (§26)
+--   succ_n_dvd_card_mckayFixedPoints  :
+--       primo(σ n) ∧ σ n ∣ |G| → σ n ∣ card(mckayFixedPoints)   (D.4.D/McKay)  (§27)
 
