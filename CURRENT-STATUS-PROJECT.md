@@ -1,6 +1,6 @@
 # Current Project Status — AczelSetTheory
 
-**Last updated:** 2026-05-26
+**Last updated:** 2026-05-29
 **Author**: Julián Calderón Almendros
 
 ---
@@ -163,19 +163,30 @@
 | VN/FermatVN.lean | `vN_fermat_little`, `vN_wilson` | ✅ |
 | VN/CRTVN.lean | `vN_chinese_remainder` | ✅ |
 
-### Algebra/ (9 modules)
+### Algebra/ (20 modules)
 
 | Module | Key exports | Status |
 |--------|-------------|--------|
 | Algebra/Group.lean | `HFAlgebra.HFGroup`, 10 lemas derivados | ✅ |
 | Algebra/Subgroup.lean | `HFSubgroup`, `toHFGroup`, `inter`, `rightCoset`, `cosetEq`, 16 teoremas | ✅ |
 | Algebra/GroupHom.lean | `HFGroupHom`, `hom_e`, `hom_inv`, `ker`, `image` | ✅ |
+| Algebra/NormalSubgroup.lean | `HFNormalSubgroup`, `centralizer`, `center`, `normalizer`, `ker_isNormal` | ✅ |
 | Algebra/Ring.lean | `HFRing`, `toAdditiveHFGroup`, 7 lemas derivados | ✅ |
 | Algebra/CosetCount.lean | `cosets`, `index`, `card_sUnion_uniform_partition`, Lagrange (9 teoremas) | ✅ |
 | Algebra/Monoid.lean | `HFMonoid`, lemas de monoid | ✅ |
 | Algebra/RingHom.lean | `HFRingHom`, `hom_zero`, `hom_one`, `ker`, `image` | ✅ |
 | Algebra/Field.lean | `HFField`, cociente de campos | ✅ |
 | Algebra/Module.lean | `HFModule`, módulo sobre anillo | ✅ |
+| Algebra/LinearSpace.lean | `HFLinearSpace`, axiomas de espacio vectorial | ✅ |
+| Algebra/Lattice.lean | `HFLattice`, retículo | ✅ |
+| Algebra/Action.lean | `HFGroupAction`, `orb`, `stab`, `orbits_partition`, `conjugAction` | ✅ |
+| Algebra/CosetAction.lean | acción de G sobre cosetes; lemas de acción transitiva | ✅ |
+| Algebra/QuotientGroup.lean | `quotientGroup`, `quotientHom`, `ker_quotientHom_eq` | ✅ |
+| Algebra/FirstIsomorphism.lean | `firstIsoMap`, `firstIsoMap_bijective` | ✅ |
+| Algebra/SecondIsomorphism.lean | `secondIsoMap`, `secondIsoMap_bijective` | ✅ |
+| Algebra/ThirdIsomorphism.lean | `thirdIsoMap`, `thirdIsoMap_ker_eq` | ✅ |
+| Algebra/CorrespondenceTheorem.lean | `preimageSubgroup`, `imageSubgroup_preimage`, `preimageSubgroup_image` | ✅ |
+| Algebra/Sylow.lean | `mckayCarrier`, `mckayShift`, `orbitOf`, `periodOf`, `succ_n_dvd_card_mckayFixedPoints` (D.4.D McKay), 50+ teoremas | ✅ |
 
 ### Integers/ (7 modules)
 
@@ -206,6 +217,15 @@
 None — **0 sorry** across the entire project.
 
 ---
+
+## Recent Achievements (2026-05-29) — D.4.D McKay completo [`Sylow.lean` §24–§27]
+
+- ✅ **§24**: `periodOf_eq_one_iff_fixed` + `card_orbitOf_eq_one_iff_fixed` (equivalencia período 1 ↔ punto fijo del shift).
+- ✅ **§25**: `card_orbitOf_eq_succ_of_not_fixed` (caso primo + no fijo ⇒ `card(orbit) = σ n`).
+- ✅ **§26**: `succ_n_dvd_card_of_shift_closed_no_fixed` — WOP fuerte vía `Peano.WellFounded.strongInductionOn` sobre `card S`. En cada paso: orbit de tamaño `σ n`; `S' = S \ orbit` shift-cerrado; recursión.
+- ✅ **§27**: `succ_n_dvd_card_mckayFixedPoints` — **Lema de McKay D.4.D**: `σ n primo ∧ σ n ∣ |G| → σ n ∣ card(fixedPoints)`. Partición `|C| = |F| + |S|`; D.3 da `p ∣ |C|`; §26 da `p ∣ |S|`; `divides_sub` + `cancelation_add` cierran.
+- ✅ **Documentación** actualizada: header + bloque exports en `Sylow.lean`; `NEXT_STEPS.md`; `CURRENT-STATUS-PROJECT.md`; `doc/REFERENCE-Paridad-Peano-Aczel.md`.
+- **Build:** `lake build` → 75 jobs ✅, 0 sorry, 0 warnings.
 
 ## Recent Achievements (2026-05-26) — Rank.lean + Decidable.lean
 

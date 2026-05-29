@@ -1,6 +1,6 @@
 # PLANNING — AczelSetTheory
 
-**Last updated:** 2026-05-28
+**Last updated:** 2026-05-29
 **Author:** Julián Calderón Almendros
 
 > Plan de largo plazo para AczelSetTheory. Cada fase es ejecutable de forma
@@ -15,7 +15,7 @@
 
 ---
 
-## 🎯 Tesis del proyecto (2026-05-28)
+## 🎯 Tesis del proyecto (2026-05-29)
 
 > **AczelSetTheory debe recubrir completamente todos los teoremas de Peano**, y
 > extenderlos hacia teorías que Peano no podía expresar (axiomática Zermelo,
@@ -25,19 +25,22 @@
 
 Esta tesis se refleja en `doc/REFERENCE-Paridad-Peano-Aczel.md` como tabla viva.
 
-### Estado de paridad (2026-05-28)
+### Estado de paridad (2026-05-29)
 
 | Bloque | ✅ Portado | ⚠️ Parcial | ❌ Pendiente |
 |---|---|---|---|
 | Aritmética base + orden (§1) | 17/18 | 1 (WellFounded) | 0 |
 | Combinatoria numérica (§2) | 7/12 | 0 | 5 (Counting, Perm, Sign, Orbit, …) |
-| GroupTheory (§3) | 0 abstractos | 5 (Iso, Quot, Corresp) | 5 (Action, Sylow×3, Zassenhaus) |
+| GroupTheory (§3) | 14 abstractos ✅ | 0 | 3 (Sylow I–III, Zassenhaus) |
 | Teoría de números (§4) | 5/5 | 0 | 0 |
 | Fundamentos (§5) | 5/5 | 0 | 0 |
 | Listas/Conjuntos finitos (§6) | 3/3 | 1 (EquivRel) | 0 |
 | Enteros (§7) | 7 módulos | 0 | 0 |
 
-**Total estimado:** ~32 ✅ / ~5 ⚠️ / ~15 ❌ sobre ~53 módulos sustantivos de Peano.
+**Total estimado:** ~46 ✅ / ~2 ⚠️ / ~8 ❌ sobre ~56 módulos sustantivos de Peano.
+
+> Avance respecto a 2026-05-28: GroupTheory §3 pasó de `0 abstractos / 5 ⚠️ / 5 ❌` a
+> `14 abstractos ✅ / 0 ⚠️ / 3 ❌` tras completar D.4.D McKay (§24–§27) en `Algebra/Sylow.lean`.
 
 ---
 
@@ -73,7 +76,7 @@ Detalle táctico en `NEXT_STEPS.md`. Orden de ejecución aprobado (2026-05-28):
 4. **M3** — H5 Action + H4 Orbit.
 5. **M4 (2ª parte)** — H7 QuotientGroup.
 6. **M5** — H8/H9/H10 bundle `IsomorphismsVN.lean` + H11 Correspondence separado.
-7. **M6** — H13/H14/H15 Sylow.
+7. **M6** — H13/H14/H15 Sylow. *(Parcialmente completo 2026-05-29: McKay D.4.D §24–§27 ✅; pendiente `cauchy_minimal` + Sylow I–III.)*
 8. **M7** — H12 Zassenhaus.
 9. **MFUTURE** — Schreier, Jordan-Hölder (fuera del alcance de paridad; aplazados).
 
@@ -118,9 +121,10 @@ Ver `NEXT_STEPS.md` para el plan de ejecución detallado de Fase A con todas las
 
 ---
 
-## Estado actual (snapshot 2026-05-28)
+## Estado actual (snapshot 2026-05-29)
 
-- **~117 módulos Lean + Integers/Rationals, 0 sorry, 0 axiomas privados.**
+- **133 módulos Lean (no-barrel) + 9 barrels = 142 total, 0 sorry, 0 axiomas privados.**
+- **Algebra/**: 20 módulos incluyendo `Sylow.lean` con D.4.D McKay completo (§1–§27).
 - Fases históricas 1–5 **completadas**. Detalle abajo se conserva como histórico.
 
 ### Completado

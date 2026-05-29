@@ -1,6 +1,6 @@
 # Technical Reference — Algebra, Lattice & Structural Axioms
 
-**Last updated:** 2026-05-21
+**Last updated:** 2026-05-29
 **Parent:** [../REFERENCE.md](../REFERENCE.md)
 **Related:** [REFERENCE-HFSets.md](REFERENCE-HFSets.md) | [REFERENCE-Relations.md](REFERENCE-Relations.md) | [REFERENCE-VN.md](REFERENCE-VN.md)
 
@@ -49,6 +49,7 @@ foundation, decidability).
 | 94 | `AczelSetTheory/Algebra/Field.lean` | ✅ Complete |
 | 95 | `AczelSetTheory/Algebra/Module.lean` | ✅ Complete |
 | 96 | `AczelSetTheory/Algebra/LinearSpace.lean` | ✅ Complete |
+| 97 | `AczelSetTheory/Algebra/Sylow.lean` | ✅ Complete (§1–§27, D.4.D McKay) |
 
 ---
 
@@ -486,7 +487,7 @@ def HFSet.rank (A : HFSet) : ℕ₀
 
 ## Group Theory — `Algebra/` subdirectory
 
-**Last projected:** 2026-05-21
+**Last projected:** 2026-05-29
 
 **Primary namespaces:** `HFAlgebra`, `HFAlgebra.HFGroup`, `HFAlgebra.HFSubgroup`, `HFAlgebra.HFGroupHom`, `HFAlgebra.HFRing`, `HFAlgebra.HFMonoid`, `HFAlgebra.HFMonoidHom`, `HFAlgebra.HFSubmonoid`, `HFAlgebra.HFRingHom`, `HFAlgebra.HFSubring`, `HFAlgebra.HFField`, `HFAlgebra.HFFieldHom`, `HFAlgebra.HFSubfield`, `HFAlgebra.HFModule`, `HFAlgebra.HFModuleHom`, `HFAlgebra.HFSubmodule`, `HFAlgebra.HFLinearSpace`, `HFAlgebra.HFLinearMap`, `HFAlgebra.HFSubspace`
 
@@ -1365,11 +1366,20 @@ def HFSublattice.inter (sub₁ sub₂ : HFSublattice lat) : HFSublattice lat
 
 ## `Algebra/Sylow.lean`
 
-Infraestructura para los teoremas de Sylow sobre `HFGroup` finito, vía la prueba combinatorial de McKay (acción cíclica sobre `p`-tuplas con producto = e). **En desarrollo.**
+**Namespace:** `HFAlgebra`
+**Last projected:** 2026-05-29
+**Imports:** `AczelSetTheory.Algebra.Subgroup`, `AczelSetTheory.Axioms.OrdinalNat`, `AczelSetTheory.Axioms.Function`, `AczelSetTheory.Axioms.CartProd`, `AczelSetTheory.Axioms.Separation`, `AczelSetTheory.Axioms.CardImage`, `AczelSetTheory.Axioms.Choice`, `AczelSetTheory.Operations.NPow`, `Peano.PeanoNat.Combinatorics.Pow`, `Peano.PeanoNat.Arith`, `Peano.PeanoNat.Primes`, `Peano.Prelim.Classical`
+**Opens:** `Peano`, `Peano.Arith`, `Peano.Primes`
+
+Infraestructura para los teoremas de Sylow sobre `HFGroup` finito, vía la prueba combinatorial de McKay (acción cíclica sobre `p`-tuplas con producto = e).
+
+---
 
 ### §1–§14. Subgrupos triviales, orden cíclico, carrier de McKay
 
 Incluye: `gpow grp g m` (potencia iterada), `gpowImg grp g m` (imagen `{g^0,...,g^m}`), `cyclicSubgroup grp g` (⟨g⟩ vía orden por WOP), `mckayCarrier grp p` (= `{t ∈ nPow grp.G p | tupleProd t = e}`), `mckayShift grp (σ n) t = ⟪dropHead n t, getHead n t⟫`, `card_mckayCarrier_eq_pow` (D.3: `card (mckayCarrier grp p) = (card grp.G)^(p-1)`).
+
+---
 
 ### §15. `predIndex` / `predIter` (índice cíclico decreciente)
 
@@ -1399,6 +1409,8 @@ theorem predIter_period (n j : ℕ₀) (hjn : le₀ j n) :
     predIter n (σ n) j = j
 ```
 
+---
+
 ### §16. `shiftIter_period` (D.4.B parte 2)
 
 ```lean
@@ -1409,6 +1421,8 @@ theorem shiftIter_period (grp : HFGroup) (n : ℕ₀) (t : HFSet)
     (ht : t ∈ HFSet.nPow grp.G (σ n)) :
     shiftIter grp (σ n) (σ n) t = t
 ```
+
+---
 
 ### §17. Órbitas: definición y cota de cardinal (D.4.C parte 1)
 
@@ -1433,6 +1447,8 @@ theorem mckayShift_mem_orbitOf (grp : HFGroup) (n : ℕ₀) (t : HFSet)
     (h : t' ∈ orbitOf grp n t) :
     mckayShift grp (σ n) t' ∈ orbitOf grp n t
 ```
+
+---
 
 ### §18. Simetría y partición de órbitas (D.4.C parte 2)
 
@@ -1462,4 +1478,132 @@ theorem orbitOf_eq_or_disjoint (grp : HFGroup) (n : ℕ₀) (t s : HFSet)
     (∀ x, ¬ (x ∈ orbitOf grp n t ∧ x ∈ orbitOf grp n s))
 ```
 
-**Pendiente (D.4.C cierre + D.4.D):** `card_orbitOf ∈ {1, p}` para `p` primo (Bezout sobre ℕ₀); particionado de `mckayCarrier` ⇒ `p ∣ #fixedPoints`.
+---
+
+### §19–§21. `periodOf` y sus propiedades
+
+```lean
+/-- Período mínimo de `t` bajo el shift: mínimo `k > 0` con `shiftIter k t = t`. -/
+noncomputable def periodOf (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) : ℕ₀
+```
+
+- **Math**: Per(t) = min { k > 0 | shift^k(t) = t }.
+- `noncomputable` (usa `Peano.choose_unique` clásico).
+
+| Teorema | Lean signature |
+|---------|---------------|
+| `periodOf_pos` | `(ht : ...) : lt₀ 𝟘 (periodOf grp n t ht)` |
+| `periodOf_ne_zero` | `(ht : ...) : periodOf grp n t ht ≠ 𝟘` |
+| `shiftIter_periodOf` | `(ht : ...) : shiftIter grp (σ n) (periodOf grp n t ht) t = t` |
+| `periodOf_minimal` | `(ht : ...) (hm_pos : lt₀ 𝟘 m) (hm_eq : shiftIter grp (σ n) m t = t) : le₀ (periodOf grp n t ht) m` |
+| `periodOf_le_succ_n` | `(ht : ...) : le₀ (periodOf grp n t ht) (σ n)` |
+| `periodOf_dvd_succ_n` | `(ht : ...) : Divides (periodOf grp n t ht) (σ n)` |
+| `shiftIter_mul_periodOf` | `(ht : ...) (q : ℕ₀) : shiftIter grp (σ n) (mul q (periodOf grp n t ht)) t = t` |
+| `shiftIter_inj_below_period` | `(ht : ...) (i j : ℕ₀) (hi : lt₀ i (periodOf ...)) (hj : lt₀ j (periodOf ...)) : shiftIter ... i t = shiftIter ... j t → i = j` |
+| `shiftIter_eq_id_iff_periodOf_dvd` | `(ht : ...) (k : ℕ₀) : shiftIter grp (σ n) k t = t ↔ Divides (periodOf grp n t ht) k` |
+
+---
+
+### §22. D.4.C parte 4: `card (orbitOf) = periodOf`
+
+```lean
+theorem card_orbitOf_eq_periodOf (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) :
+    HFSet.card (orbitOf grp n t) = periodOf grp n t ht
+```
+
+- **Math**: |orb(t)| = Per(t). Vía `orbitOf = periodEnum (σ n) (periodOf) t` y `card_periodEnum_le_period`.
+
+---
+
+### §23. D.4.C parte 5: caso primo — `card (orbitOf) ∈ {𝟙, σ n}`
+
+```lean
+theorem card_orbitOf_one_or_succ (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) (hprime : Peano.Arith.Prime (σ n)) :
+    HFSet.card (orbitOf grp n t) = 𝟙 ∨
+    HFSet.card (orbitOf grp n t) = σ n
+```
+
+- **Math**: Si `σ n` es primo, Per(t) divide a `σ n`, luego Per(t) ∈ {1, σ n}.
+
+---
+
+### §24. D.4.D parte 1: `card = 1 ↔ t fijo`
+
+```lean
+theorem periodOf_eq_one_iff_fixed (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) :
+    periodOf grp n t ht = 𝟙 ↔ mckayShift grp (σ n) t = t
+
+theorem card_orbitOf_eq_one_iff_fixed (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) :
+    HFSet.card (orbitOf grp n t) = 𝟙 ↔ mckayShift grp (σ n) t = t
+```
+
+- **Math**: Per(t) = 1 ↔ shift(t) = t ↔ |orb(t)| = 1.
+
+---
+
+### §25. D.4.D parte 2: no fijo ⇒ `card = σ n`
+
+```lean
+theorem card_orbitOf_eq_succ_of_not_fixed (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) (hprime : Peano.Arith.Prime (σ n))
+    (hnf : mckayShift grp (σ n) t ≠ t) :
+    HFSet.card (orbitOf grp n t) = σ n
+```
+
+- **Math**: Si `σ n` primo y `t` no fijo, |orb(t)| = σ n (caso {1, σ n} con 1 descartado).
+
+---
+
+### §26. D.4.D parte 3: `σ n ∣ card S` para S shift-cerrado sin fijos
+
+```lean
+theorem succ_n_dvd_card_of_shift_closed_no_fixed
+    (grp : HFGroup) (n : ℕ₀) (hprime : Peano.Arith.Prime (σ n)) :
+    ∀ (S : HFSet),
+      S ⊆ mckayCarrier grp (σ n) →
+      (∀ x, x ∈ S → mckayShift grp (σ n) x ≠ x) →
+      (∀ x, x ∈ S → mckayShift grp (σ n) x ∈ S) →
+      (σ n) ∣ HFSet.card S
+```
+
+- **Math**: Si S ⊆ carrier, S cerrado por shift, y S ∩ F = ∅ (sin puntos fijos), entonces `σ n ∣ |S|`.
+- **Prueba**: Inducción fuerte (`Peano.WellFounded.strongInductionOn`) sobre `card S`. En cada paso: extraer `t ∈ S` (vía `nonempty_of_ne_empty`), orbita de tamaño `σ n` (§25), `S' = S \ orb(t)` shift-cerrado (§26 helpers), recursión sobre `|S'| < |S|`; combinar vía `divides_add`.
+
+---
+
+### §27. D.4.D conclusión: `σ n ∣ card (mckayFixedPoints)` — **Lema de McKay**
+
+```lean
+def mckayFixedPoints (grp : HFGroup) (p : ℕ₀) : HFSet :=
+  HFSet.sep (mckayCarrier grp p) (fun t => mckayShift grp p t = t)
+
+theorem mem_mckayFixedPoints (grp : HFGroup) (p : ℕ₀) (t : HFSet) :
+    t ∈ mckayFixedPoints grp p
+      ↔ t ∈ mckayCarrier grp p ∧ mckayShift grp p t = t
+
+theorem succ_n_dvd_card_mckayFixedPoints
+    (grp : HFGroup) (n : ℕ₀) (hprime : Peano.Arith.Prime (σ n))
+    (hdvd : (σ n) ∣ HFSet.card grp.G) (hn : n ≠ 𝟘) :
+    (σ n) ∣ HFSet.card (mckayFixedPoints grp (σ n))
+```
+
+- **Math**: Si `σ n` primo y `σ n ∣ |G|`, entonces `σ n ∣ |F|` donde F = puntos fijos del shift.
+- **Prueba**: `|C| = |F| + |S|` (partición carrier = fijos + no-fijos). D.3 da `σ n ∣ |C|`. §26 da `σ n ∣ |S|`. Luego `divides_sub` da `σ n ∣ |F|`.
+- **Aplicación**: Cauchy's theorem — existencia de subgrupo de orden p cuando p primo divide |G|.
+
+---
+
+### 7c. Exports — `Algebra/Sylow.lean`
+
+**Definiciones públicas:**
+
+`HFAlgebra.pow_dvd_card`, `HFAlgebra.isPSubgroup`, `HFAlgebra.isSylowExponent`, `HFAlgebra.isSylowSubgroup`, `HFAlgebra.HFSubgroup.trivial`, `HFAlgebra.HFSubgroup.trivial_card`, `HFAlgebra.isPSubgroup_of_isSylowSubgroup`, `HFAlgebra.gpow`, `HFAlgebra.gpow_zero`, `HFAlgebra.gpow_succ`, `HFAlgebra.gpow_one`, `HFAlgebra.gpow_mem`, `HFAlgebra.gpow_add`, `HFAlgebra.order`, `HFAlgebra.order_pos`, `HFAlgebra.order_ne_zero`, `HFAlgebra.gpow_order_eq_id`, `HFAlgebra.order_minimal`, `HFAlgebra.order_le_card`, `HFAlgebra.gpow_mul_order_eq_id`, `HFAlgebra.gpow_mod_order`, `HFAlgebra.cyclicCarrier`, `HFAlgebra.cyclicSubgroup`, `HFAlgebra.mckayCarrier`, `HFAlgebra.mckayShift`, `HFAlgebra.mckayFixedPoints`, `HFAlgebra.mem_mckayFixedPoints`, `HFAlgebra.shiftIter`, `HFAlgebra.orbitOf`, `HFAlgebra.periodOf`
+
+**Teoremas D.3 – D.4.D:**
+
+`HFAlgebra.dvd_card_mckayCarrier_succ`, `HFAlgebra.card_orbitOf_eq_periodOf`, `HFAlgebra.card_orbitOf_one_or_succ`, `HFAlgebra.periodOf_eq_one_iff_fixed`, `HFAlgebra.card_orbitOf_eq_one_iff_fixed`, `HFAlgebra.card_orbitOf_eq_succ_of_not_fixed`, `HFAlgebra.succ_n_dvd_card_of_shift_closed_no_fixed`, `HFAlgebra.succ_n_dvd_card_mckayFixedPoints`

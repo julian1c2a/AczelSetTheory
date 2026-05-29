@@ -5,7 +5,7 @@
 **Author**: Julián Calderón Almendros
 **License**: MIT
 **Lean version**: v4.29.0
-**Build status**: ✅ 0 `sorry` — 0 errors, 0 warnings — 85 modules (90 incl. barrels)
+**Build status**: ✅ 0 `sorry` — 0 errors, 0 warnings — 133 modules (142 incl. barrels)
 
 ---
 
@@ -56,23 +56,50 @@ AczelSetTheory/
   HFSets.lean        — HFSet quotient type, membership, extensionality, empty, pairs
   HFList.lean        — Ordered sequences of HFSets (PList HFSet)
   Notation.lean      — ∅, {[a,b]}, {[a]}, {[x ∈ A <|> P]}, ⟪a,b⟫, numerals 0–9
-  Operations/        — CList-level constructors lifted to HFSet (20 sub-modules)
+  Operations/        — CList-level constructors lifted to HFSet (21 sub-modules)
     Union, Intersection, Setminus, Separation, Pair, Powerset, SymDiff,
     OrderedPair, Relation, Function, Inverse, Restriction, Composition,
-    Replacement, Cardinal, FunctionComp, Identity, Product, CartProd, NPow
-  Axioms/            — HFSet-level axioms and theorems (38 sub-modules)
+    Replacement, Cardinal, FunctionComp, Identity, Product, CartProd, NPow, Order
+  Axioms/            — HFSet-level axioms and theorems (41 sub-modules)
     Union, Intersection, Setminus, Separation, Pair, Powerset, Singleton,
     SymDiff, OrderedPair, Foundation, Decidable, Subset, Lattice,
     BooleanAlgebra, BooleanRing, Succ, VonNeumann, Choice, Cardinal,
     Relation, Function, Bijection, Inverse, Composition, Restriction,
     Replacement, FunctionComp, Identity, Product, Image, Adjunction,
-    Induction, CartProd, Ordinal, OrdinalNat, Fintype, NPow, Rank
-  VN/                — Von Neumann embedding vN : ℕ₀ → HFSet (13 sub-modules)
+    Induction, CartProd, Ordinal, OrdinalNat, Fintype, NPow, Rank,
+    Order, WellOrder, LinearOrder
+  VN/                — Von Neumann embedding vN : ℕ₀ → HFSet (35 sub-modules)
     Basic, Injective, IsNat, Arithmetic, FSet, PeanoAxioms, PeanoArith,
-    PowVN, SubVN, DivVN, FactorialVN, CardVN, RankVN
+    PowVN, SubVN, DivVN, FactorialVN, CardVN, RankVN, GcdVN, FibVN, BinomVN,
+    SummationVN, SqrtVN, LogVN, DigitsVN, ModEqVN, TotientVN, PrimesVN,
+    CantorPairingVN, PairingVN, NewtonBinomVN, ProductVN, GodelBetaVN,
+    HFGroupVN, ProdBridgeVN, MapBridgeVN, ListBridgeVN,
+    PrimeVN, FermatVN, CRTVN
+  Algebra/           — Native algebraic structures in HFSet (20 sub-modules)
+    Group, Subgroup, GroupHom, NormalSubgroup, Ring, CosetCount, Monoid, RingHom,
+    Field, Module, LinearSpace, Lattice, Action, CosetAction, QuotientGroup,
+    FirstIsomorphism, SecondIsomorphism, ThirdIsomorphism, CorrespondenceTheorem,
+    Sylow
+  Integers/          — Integer type ℤ₀ as quotient of ℕ₀×ℕ₀ (7 sub-modules)
+    Basic, Order, Functions, Arithmetic, Bijection, PadicVal, MobiusLiouville
+  Topology/          — Topological spaces over HFSet (5 sub-modules)
+    Basic, Interior, Subspace, Neighborhoods, Separation
 ```
 
-### Key types
+### What it covers
+
+Beyond the Zermelo axioms, the library includes:
+
+| Area | Highlights |
+|------|-----------|
+| **Von Neumann arithmetic** | `vN : ℕ₀ → HFSet`; GCD, Fibonacci, binomial, totient, Cantor pairing, Gödel beta, primes (TFA, Gauss lemma), Fermat–Wilson, CRT |
+| **Abstract algebra** | `HFGroup`, `HFSubgroup`, `HFGroupHom`, `HFNormalSubgroup`, `HFRing`, `HFField`, `HFModule`, quotient groups, three isomorphism theorems, correspondence theorem |
+| **Group actions & Sylow** | `HFGroupAction`, orbits, stabilizers, orbit-stabilizer (via Lagrange); McKay's combinatorial proof of Cauchy's theorem (D.4.D complete, §1–§27 in `Algebra/Sylow.lean`) |
+| **Order theory** | Preorder, partial/total/well order; `wf_induction`, `no_infinite_descent` |
+| **Integers** | `ℤ₀ = Quotient (ℕ₀×ℕ₀)`, commutative ring laws, order, GCD, p-adic valuation, Möbius μ, Liouville λ |
+| **Topology** | `HFTopSpace`, interior/closure/boundary, subspace topology, continuous maps, neighborhood spaces, separation axioms T₀–T₄ |
+
+
 
 | Type | Definition | Module |
 |------|-----------|--------|

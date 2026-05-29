@@ -1,10 +1,32 @@
 # Next Steps
 
-**Last updated:** 2026-05-28
+**Last updated:** 2026-05-29
 
 El proyecto compila con **invariante "0 sorry, 0 axiomas privados" restaurado** (2026-05-28).
 Resto de la arquitectura: CList/ + Operations/ + Axioms/ + PList/ + VN/ + Algebra/ + Integers/ + Topology/.
 Ver PLANNING.md para el roadmap a largo plazo.
+
+---
+
+## ✅ COMPLETED (2026-05-29) — D.4.D McKay: `σ n ∣ card(mckayFixedPoints)` [`Sylow.lean` §24–§27]
+
+Cerrado el argumento combinatorio de McKay completo (D.4.D). Todos los §§ sin sorry:
+
+| § | Teorema | Descripción |
+|---|---------|-------------|
+| §24 | `periodOf_eq_one_iff_fixed` | `period = 1 ↔ mckayShift t = t` |
+| §24 | `card_orbitOf_eq_one_iff_fixed` | `card(orbit) = 1 ↔ t fijo` |
+| §25 | `card_orbitOf_eq_succ_of_not_fixed` | primo + ¬fijo → `card(orbit) = σ n` |
+| §26 | `succ_n_dvd_card_of_shift_closed_no_fixed` | WOP sobre `card S` → `σ n ∣ card S` |
+| §27 | `succ_n_dvd_card_mckayFixedPoints` | **D.4.D / Lema de McKay**: `σ n ∣ card(fixedPoints)` |
+
+Técnicas clave:
+- WOP en §26 vía `Peano.WellFounded.strongInductionOn` — no `omega`/`push_neg`/`set`.
+- `card_orbitOf_eq_one_iff_fixed` para probar que S = C\F es shift-cerrado (si shift(x) fijo entonces x fijo).
+- Partición `card C = card F + card S` + `divides_sub` + `Peano.Add.cancelation_add`.
+- `zero_ne_succ` (no `succ_ne_zero`); `HFSet.nonempty_of_ne_empty`; subset explícito `∀ x, x ∈ A → ...`.
+
+**Build:** `lake build` → 75/75 jobs ✅, 0 sorry, 0 warnings.
 
 ---
 
@@ -83,9 +105,9 @@ Acciones de arranque:
 | H10 | `GroupTheory/ThirdIsomorphism.lean` | ⚠️ | `VN/ThirdIsoVN.lean` | — |
 | H11 | `GroupTheory/CorrespondenceTheorem.lean` | ⚠️ | `VN/CorrespondenceVN.lean` | — |
 | H12 | `GroupTheory/Zassenhaus.lean` | ❌ | `VN/ZassenhausVN.lean` | Schreier (futuro) |
-| H13 | `GroupTheory/Sylow/CosetAction.lean` | ❌ | `VN/SylowCosetActionVN.lean` | Sylow |
-| H14 | `GroupTheory/Sylow/Cosets.lean` | ❌ | `VN/SylowCosetsVN.lean` | Sylow |
-| H15 | `GroupTheory/Sylow/Sylow.lean` | ❌ | `VN/SylowVN.lean` | — |
+| H13 | `GroupTheory/Sylow/CosetAction.lean` | ✅ | `Algebra/Sylow.lean` (§9–§27) | McKay carrier + shift + orbitOf + D.4.D completo. |
+| H14 | `GroupTheory/Sylow/Cosets.lean` | ✅ | `Algebra/Sylow.lean` (§12–§27) | shiftIter, periodOf, orbitOf, card_orbitOf_eq_periodOf, card ∈ {1,p}, D.4.D. |
+| H15 | `GroupTheory/Sylow/Sylow.lean` | 🟡 | `Algebra/Sylow.lean` (parcial) | McKay lema ✅. **Pendiente:** cauchy_minimal + sylow_lift + Sylow I-III. |
 
 ### Grafo de dependencias
 
