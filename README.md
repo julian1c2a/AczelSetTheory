@@ -94,7 +94,7 @@ Beyond the Zermelo axioms, the library includes:
 |------|-----------|
 | **Von Neumann arithmetic** | `vN : ℕ₀ → HFSet`; GCD, Fibonacci, binomial, totient, Cantor pairing, Gödel beta, primes (TFA, Gauss lemma), Fermat–Wilson, CRT |
 | **Abstract algebra** | `HFGroup`, `HFSubgroup`, `HFGroupHom`, `HFNormalSubgroup`, `HFRing`, `HFField`, `HFModule`, quotient groups, three isomorphism theorems, correspondence theorem |
-| **Group actions & Sylow** | `HFGroupAction`, orbits, stabilizers, orbit-stabilizer (via Lagrange); McKay's combinatorial proof of Cauchy's theorem (D.4.D complete, §1–§27 in `Algebra/Sylow.lean`) |
+| **Group actions & Sylow** | `HFGroupAction`, orbits, stabilizers, orbit-stabilizer (via Lagrange); McKay's combinatorial proof of Cauchy's theorem (complete, §1–§32 in `Algebra/Sylow.lean`): D.4.D McKay lemma + Cauchy's theorem (`cauchy_minimal`) |
 | **Order theory** | Preorder, partial/total/well order; `wf_induction`, `no_infinite_descent` |
 | **Integers** | `ℤ₀ = Quotient (ℕ₀×ℕ₀)`, commutative ring laws, order, GCD, p-adic valuation, Möbius μ, Liouville λ |
 | **Topology** | `HFTopSpace`, interior/closure/boundary, subspace topology, continuous maps, neighborhood spaces, separation axioms T₀–T₄ |

@@ -8,6 +8,31 @@ Ver PLANNING.md para el roadmap a largo plazo.
 
 ---
 
+## ✅ COMPLETED (2026-05-29) — Cauchy vía McKay: §28–§32 [`Sylow.lean`]
+
+Completado el **Teorema de Cauchy** mediante el argumento combinatorio de McKay. 0 sorry, 0 warnings.
+
+| § | Teorema | Descripción |
+|---|---------|-------------|
+| §28 | `eTuple_mem_mckayFixedPoints` | `eTuple grp p ∈ mckayFixedPoints grp p` |
+| §29 | `mckayShift_succ_pair` (priv.) | Reducción del shift en pares anidados |
+| §29 | `shift_fixed_snd_e_implies_eTuple` (priv.) | `snd t = e ∧ shift-fijo → t = eTuple` |
+| §29 | `shift_fixed_tupleProd_eq_gpow` (priv.) | `tupleProd t = gpow (snd t) p` si t fijo |
+| §30 | `order_dvd_of_gpow_eq_id` | `g^m = e → order g ∣ m` |
+| §30 | `order_eq_prime_of_pow` | primo `p`, `g^p = e`, `g ≠ e` → `order g = p` |
+| §31 | `cyclicCarrier_card_eq_order` | `card(⟨g⟩) = order g` |
+| §32 | **`cauchy_minimal`** | primo `p`, `p ∣ \|G\|` → `∃ sub, card sub = p` |
+
+Técnicas clave:
+- `Classical.byContradiction` (no `by_contra` — no disponible sin Mathlib).
+- `intro h; subst h` para derivar `n ≠ 𝟘` desde `hp : Peano.Arith.Prime (σ n)`.
+- Sin `let`/`set` (causan type mismatch en have-types sin Mathlib).
+- `mckayFixedPoints_subset grp p t ht` — el elemento `t` es argumento explícito.
+
+**Build:** `lake build` → 228 jobs ✅, 0 sorry, 0 warnings.
+
+---
+
 ## ✅ COMPLETED (2026-05-29) — D.4.D McKay: `σ n ∣ card(mckayFixedPoints)` [`Sylow.lean` §24–§27]
 
 Cerrado el argumento combinatorio de McKay completo (D.4.D). Todos los §§ sin sorry:
@@ -19,14 +44,6 @@ Cerrado el argumento combinatorio de McKay completo (D.4.D). Todos los §§ sin 
 | §25 | `card_orbitOf_eq_succ_of_not_fixed` | primo + ¬fijo → `card(orbit) = σ n` |
 | §26 | `succ_n_dvd_card_of_shift_closed_no_fixed` | WOP sobre `card S` → `σ n ∣ card S` |
 | §27 | `succ_n_dvd_card_mckayFixedPoints` | **D.4.D / Lema de McKay**: `σ n ∣ card(fixedPoints)` |
-
-Técnicas clave:
-- WOP en §26 vía `Peano.WellFounded.strongInductionOn` — no `omega`/`push_neg`/`set`.
-- `card_orbitOf_eq_one_iff_fixed` para probar que S = C\F es shift-cerrado (si shift(x) fijo entonces x fijo).
-- Partición `card C = card F + card S` + `divides_sub` + `Peano.Add.cancelation_add`.
-- `zero_ne_succ` (no `succ_ne_zero`); `HFSet.nonempty_of_ne_empty`; subset explícito `∀ x, x ∈ A → ...`.
-
-**Build:** `lake build` → 75/75 jobs ✅, 0 sorry, 0 warnings.
 
 ---
 

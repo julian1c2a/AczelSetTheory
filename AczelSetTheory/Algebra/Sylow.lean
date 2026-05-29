@@ -6,7 +6,7 @@ License: MIT
 
 -- AczelSetTheory/Algebra/Sylow.lean
 -- p-subgrupos, exponente de Sylow, infraestructura de McKay (D.4) y
--- lema combinatorio de McKay: σ n ∣ card (mckayFixedPoints grp (σ n)).
+-- prueba de Cauchy vía McKay: si p primo, p ∣ |G|, existe subgrupo de orden p.
 --
 -- Paridad con Peano/Combinatorics/GroupTheory/Sylow/Sylow.lean.
 --
@@ -30,10 +30,12 @@ License: MIT
 --   succ_n_dvd_card_of_shift_closed_no_fixed : σ n ∣ card S, S ⊆ carrier        (§26)
 --   succ_n_dvd_card_mckayFixedPoints    : σ n ∣ card(fixedPoints)  (D.4.D/McKay) (§27)
 --
--- TODO (M6.4.E-F):
---   • cauchy_minimal : ∃ subgrupo de orden p  (de McKay + Lagrange)
---   • sylow_lift_from_cauchy : lift inductivo p^n → p^(n+1)
---   • sylow_first (caso inductivo)
+-- Público (§28–§32: punto fijo canónico, teorema de Cauchy):
+--   eTuple_mem_mckayFixedPoints         : eTuple grp p ∈ mckayFixedPoints grp p  (§28)
+--   order_dvd_of_gpow_eq_id             : g^m = e → order g ∣ m                 (§30)
+--   order_eq_prime_of_pow               : g^p = e, primo p, g ≠ e → order g = p  (§30)
+--   cyclicCarrier_card_eq_order         : card(⟨g⟩) = order g                   (§31)
+--   cauchy_minimal                      : primo p, p ∣ |G| → ∃ sub, card sub = p (§32)
 --
 -- Correspondencia con Peano:
 --   Peano isPSubgroup G H p     ↔ HFAlgebra.isPSubgroup sub p
@@ -2090,6 +2092,280 @@ theorem succ_n_dvd_card_mckayFixedPoints
     rw [hF_zero]
     exact ⟨𝟘, by rw [mul_zero]⟩
 
+-- ==================================================================
+-- §29. Infraestructura: puntos fijos del shift y producto de tupla
+-- ==================================================================
+
+-- Expande mckayShift grp (σ (σ m)) ⟪a, b⟫ como par ordenado.
+private theorem mckayShift_succ_pair (grp : HFGroup) (m : ℕ₀) (a b : HFSet) :
+    mckayShift grp (σ (σ m)) ⟪a, b⟫ = ⟪⟪dropHead m a, b⟫, getHead m a⟫ := by
+  show ⟪dropHead (σ m) ⟪a, b⟫, getHead (σ m) ⟪a, b⟫⟫
+      = ⟪⟪dropHead m a, b⟫, getHead m a⟫
+  have h1 : dropHead (σ m) ⟪a, b⟫ = ⟪dropHead m a, b⟫ := by
+    show ⟪dropHead m (HFSet.fst ⟪a, b⟫), HFSet.snd ⟪a, b⟫⟫ = ⟪dropHead m a, b⟫
+    rw [HFSet.fst_orderedPair_eq', HFSet.snd_orderedPair_eq']
+  have h2 : getHead (σ m) ⟪a, b⟫ = getHead m a := by
+    show getHead m (HFSet.fst ⟪a, b⟫) = getHead m a
+    rw [HFSet.fst_orderedPair_eq']
+  rw [h1, h2]
+
+-- Si mckayShift fija t y snd(t)=e, entonces t = eTuple.
+private theorem shift_fixed_snd_e_implies_eTuple (grp : HFGroup) :
+    ∀ (n : ℕ₀) {t : HFSet},
+      t ∈ HFSet.nPow grp.G (σ n) →
+      mckayShift grp (σ n) t = t →
+      HFSet.snd t = grp.e →
+      t = eTuple grp (σ n)
+  | .zero, t, ht, _, hsnd => by
+      rw [HFSet.nPow_succ, HFSet.nPow_zero] at ht
+      obtain ⟨a, b, ha, _hb, heq⟩ := (HFSet.mem_cartProd _ _ _).mp ht
+      have ha_e : a = HFSet.empty := (HFSet.mem_singleton _ _).mp ha
+      rw [heq, HFSet.snd_orderedPair_eq'] at hsnd
+      rw [heq, ha_e, hsnd]; rfl
+  | .succ m, t, ht, hfix, hsnd => by
+      rw [HFSet.nPow_succ] at ht
+      obtain ⟨a, b, ha, _hb, heq⟩ := (HFSet.mem_cartProd _ _ _).mp ht
+      have hb_e : b = grp.e := by
+        rw [heq, HFSet.snd_orderedPair_eq'] at hsnd; exact hsnd
+      have hfix_t : (⟪⟪dropHead m a, b⟫, getHead m a⟫ : HFSet) = ⟪a, b⟫ := by
+        rw [heq] at hfix; rw [← mckayShift_succ_pair]; exact hfix
+      have hpair := (HFSet.orderedPair_eq_iff _ _ _ _).mp hfix_t
+      have ha_eq : ⟪dropHead m a, b⟫ = a := hpair.1
+      have hsnd_a : HFSet.snd a = grp.e := by
+        have : HFSet.snd ⟪dropHead m a, b⟫ = HFSet.snd a := congrArg HFSet.snd ha_eq
+        rw [HFSet.snd_orderedPair_eq'] at this
+        exact hb_e ▸ this.symm
+      have hfix_a : mckayShift grp (σ m) a = a := by
+        show (⟪dropHead m a, getHead m a⟫ : HFSet) = a
+        rw [hpair.2]; exact ha_eq
+      have ha_et : a = eTuple grp (σ m) :=
+        shift_fixed_snd_e_implies_eTuple grp m ha hfix_a hsnd_a
+      rw [heq, ha_et, hb_e]; rfl
+
+-- Si mckayShift fija t, entonces tupleProd(t) = gpow(snd t, σ n).
+private theorem shift_fixed_tupleProd_eq_gpow (grp : HFGroup) :
+    ∀ (n : ℕ₀) {t : HFSet},
+      t ∈ HFSet.nPow grp.G (σ n) →
+      mckayShift grp (σ n) t = t →
+      tupleProd grp (σ n) t = gpow grp (HFSet.snd t) (σ n)
+  | .zero, t, ht, _ => by
+      rw [HFSet.nPow_succ, HFSet.nPow_zero] at ht
+      obtain ⟨_a, b, _ha, hb, heq⟩ := (HFSet.mem_cartProd _ _ _).mp ht
+      rw [heq, tupleProd_pair, tupleProd_zero, grp.op_id_left hb,
+          HFSet.snd_orderedPair_eq', gpow_succ, gpow_zero, grp.op_id_left hb]
+  | .succ m, t, ht, hfix => by
+      rw [HFSet.nPow_succ] at ht
+      obtain ⟨a, b, ha, _hb, heq⟩ := (HFSet.mem_cartProd _ _ _).mp ht
+      have hfix_t : (⟪⟪dropHead m a, b⟫, getHead m a⟫ : HFSet) = ⟪a, b⟫ := by
+        rw [heq] at hfix; rw [← mckayShift_succ_pair]; exact hfix
+      have hpair := (HFSet.orderedPair_eq_iff _ _ _ _).mp hfix_t
+      have ha_eq : ⟪dropHead m a, b⟫ = a := hpair.1
+      have hsnd_a : HFSet.snd a = b := by
+        have : HFSet.snd ⟪dropHead m a, b⟫ = HFSet.snd a := congrArg HFSet.snd ha_eq
+        rw [HFSet.snd_orderedPair_eq'] at this; exact this.symm
+      have hfix_a : mckayShift grp (σ m) a = a := by
+        show (⟪dropHead m a, getHead m a⟫ : HFSet) = a
+        rw [hpair.2]; exact ha_eq
+      have ih := shift_fixed_tupleProd_eq_gpow grp m ha hfix_a
+      rw [hsnd_a] at ih
+      rw [heq, tupleProd_pair, ih, HFSet.snd_orderedPair_eq', ← gpow_succ]
+
+-- ==================================================================
+-- §30. El orden divide cualquier potencia que dé e;
+--      si la potencia es prima, el orden es exactamente esa prima.
+-- ==================================================================
+
+/-- Si `g^m = e`, entonces `order g ∣ m`. -/
+theorem order_dvd_of_gpow_eq_id (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G)
+    (m : ℕ₀) (hm : gpow grp g m = grp.e) : order grp hg ∣ m := by
+  have hord_ne := order_ne_zero grp hg
+  have hmod_eq : gpow grp g (mod m (order grp hg)) = grp.e :=
+    (gpow_mod_order grp hg m).symm.trans hm
+  have hmod_zero : mod m (order grp hg) = 𝟘 := by
+    rcases trichotomy (mod m (order grp hg)) 𝟘 with h | h | h
+    · exact (nlt_n_0 _ h).elim
+    · exact h
+    · exact absurd (mod_lt m _ hord_ne)
+        (le_not_lt (order_minimal grp hg h hmod_eq))
+  have hdec : m = add (mul (div m (order grp hg)) (order grp hg)) (mod m (order grp hg)) :=
+    divMod_spec m (order grp hg) hord_ne
+  rw [hmod_zero, add_zero] at hdec
+  exact ⟨div m (order grp hg), by rw [mul_comm]; exact hdec⟩
+
+/-- Si `g^(σ n) = e`, `σ n` es primo y `g ≠ e`, entonces `order g = σ n`. -/
+theorem order_eq_prime_of_pow (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G)
+    {n : ℕ₀} (hp : Peano.Arith.Prime (σ n)) (hg_ne : g ≠ grp.e)
+    (hpow : gpow grp g (σ n) = grp.e) : order grp hg = σ n := by
+  have hdvd : order grp hg ∣ σ n := order_dvd_of_gpow_eq_id grp hg (σ n) hpow
+  rcases prime_divisors hp hdvd with hord1 | hord_eq
+  · have : gpow grp g 𝟙 = grp.e := hord1 ▸ gpow_order_eq_id grp hg
+    exact absurd (gpow_one grp hg ▸ this) hg_ne
+  · exact hord_eq
+
+-- ==================================================================
+-- §31. Injectividad de gpow bajo el orden; cardinalidad del
+--      subgrupo cíclico = order.
+-- ==================================================================
+
+private theorem gpow_inj_below_order (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G)
+    {i j : ℕ₀} (hi : lt₀ i (order grp hg)) (hj : lt₀ j (order grp hg))
+    (heq : gpow grp g i = gpow grp g j) : i = j := by
+  rcases trichotomy i j with hij | hij | hij
+  · exfalso
+    -- i < j: sub j i > 0 y gpow(sub j i)=e, contradiciendo la minimalidad
+    have hpos : lt₀ 𝟘 (Peano.Sub.sub j i) := by
+      rcases trichotomy (Peano.Sub.sub j i) 𝟘 with h | h | h
+      · exact (nlt_n_0 _ h).elim
+      · have := sub_k_add_k j i (lt_imp_le _ _ hij)
+        rw [h, zero_add] at this
+        exact absurd this (ne_of_lt _ _ hij)
+      · exact h
+    have hle : le₀ (Peano.Sub.sub j i) (order grp hg) :=
+      le_trans _ j _ (sub_le_self j i) (lt_imp_le _ _ hj)
+    have hne : Peano.Sub.sub j i ≠ order grp hg := fun h =>
+      absurd hj (nlt_of_le (h ▸ sub_le_self j i))
+    have hlt : lt₀ (Peano.Sub.sub j i) (order grp hg) :=
+      lt_of_le_neq_wp hle hne
+    exact absurd hlt
+      (le_not_lt (order_minimal grp hg hpos (gpow_sub_eq_id grp hg hij heq.symm)))
+  · exact hij
+  · exfalso
+    -- j < i: sub i j > 0 y gpow(sub i j)=e, contradiciendo la minimalidad
+    have hpos : lt₀ 𝟘 (Peano.Sub.sub i j) := by
+      rcases trichotomy (Peano.Sub.sub i j) 𝟘 with h | h | h
+      · exact (nlt_n_0 _ h).elim
+      · have := sub_k_add_k i j (lt_imp_le _ _ hij)
+        rw [h, zero_add] at this
+        exact absurd this (ne_of_lt _ _ hij)
+      · exact h
+    have hle : le₀ (Peano.Sub.sub i j) (order grp hg) :=
+      le_trans _ i _ (sub_le_self i j) (lt_imp_le _ _ hi)
+    have hne : Peano.Sub.sub i j ≠ order grp hg := fun h =>
+      absurd hi (nlt_of_le (h ▸ sub_le_self i j))
+    have hlt : lt₀ (Peano.Sub.sub i j) (order grp hg) :=
+      lt_of_le_neq_wp hle hne
+    exact absurd hlt
+      (le_not_lt (order_minimal grp hg hpos (gpow_sub_eq_id grp hg hij heq)))
+
+-- card(gpowImg grp g m) = σ m cuando m < order.
+private theorem gpowImg_card_eq (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G) :
+    ∀ {m : ℕ₀}, lt₀ m (order grp hg) → HFSet.card (gpowImg grp g m) = σ m
+  | .zero, _ => by
+      show HFSet.card (HFSet.singleton (gpow grp g (𝟘 : ℕ₀))) = σ 𝟘
+      have heq : HFSet.singleton (gpow grp g (𝟘 : ℕ₀)) =
+                  HFSet.insert (gpow grp g (𝟘 : ℕ₀)) HFSet.empty :=
+        HFSet.extensionality _ _ fun z => by
+          rw [HFSet.mem_singleton, HFSet.mem_insert]
+          exact ⟨Or.inl, fun h => h.elim id (absurd · (HFSet.not_mem_empty z))⟩
+      rw [heq, HFSet.card_insert _ _ (HFSet.not_mem_empty _), HFSet.card_empty]
+  | .succ m', hm => by
+      have hm'_lt : lt₀ m' (order grp hg) :=
+        lt_trans _ (σ m') _ (lt_succ_self m') hm
+      have ih := gpowImg_card_eq grp hg hm'_lt
+      have hnotin : gpow grp g (σ m') ∉ gpowImg grp g m' := by
+        intro hmem
+        obtain ⟨i, hi_le, hi_eq⟩ := (mem_gpowImg grp g m' _).mp hmem
+        have hile_sm : le₀ i (σ m') :=
+          le_trans _ m' _ hi_le (lt_imp_le _ _ (lt_succ_self m'))
+        have hi_lt : lt₀ i (order grp hg) := by
+          rcases trichotomy i (σ m') with h | h | h
+          · exact lt_trans _ (σ m') _ h hm
+          · rw [h]; exact hm
+          · exact absurd h (nlt_of_le hile_sm)
+        have heq_idx : σ m' = i :=
+          gpow_inj_below_order grp hg hm hi_lt hi_eq
+        exact absurd (heq_idx.symm ▸ hi_le) (nle_σn_n m')
+      rw [show HFSet.card (gpowImg grp g (σ m')) =
+                σ (HFSet.card (gpowImg grp g m')) from
+              HFSet.card_insert _ _ hnotin,
+          ih]
+
+/-- La cardinalidad del subgrupo cíclico ⟨g⟩ es `order g`. -/
+theorem cyclicCarrier_card_eq_order (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G) :
+    HFSet.card (cyclicCarrier grp hg) = order grp hg := by
+  show HFSet.card (gpowImg grp g (order grp hg)) = order grp hg
+  cases h_ord : order grp hg with
+  | zero => exact (order_ne_zero grp hg h_ord).elim
+  | succ m =>
+    have hm_lt : lt₀ m (order grp hg) := by rw [h_ord]; exact lt_succ_self m
+    have hcard_m : HFSet.card (gpowImg grp g m) = σ m := gpowImg_card_eq grp hg hm_lt
+    have he_mem : gpow grp g (σ m) ∈ gpowImg grp g m := by
+      have hpow_e : gpow grp g (σ m) = grp.e := h_ord ▸ gpow_order_eq_id grp hg
+      rw [hpow_e, ← gpow_zero grp g]
+      exact (mem_gpowImg grp g m _).mpr ⟨𝟘, zero_le m, rfl⟩
+    have hins_eq : gpowImg grp g (σ m) = gpowImg grp g m :=
+      HFSet.extensionality _ _ fun x => by
+        rw [show gpowImg grp g (σ m) =
+              HFSet.insert (gpow grp g (σ m)) (gpowImg grp g m) from rfl,
+            HFSet.mem_insert]
+        exact ⟨fun h => h.elim (· ▸ he_mem) id, Or.inr⟩
+    rw [hins_eq, hcard_m]
+
+-- ==================================================================
+-- §32. Teorema de Cauchy (vía McKay)
+-- ==================================================================
+
+/-- **Teorema de Cauchy** (vía el argumento de McKay):
+    si `p` es primo y `p ∣ |G|`, existe un subgrupo de orden `p`. -/
+theorem cauchy_minimal (grp : HFGroup) {n : ℕ₀} (hp : Peano.Arith.Prime (σ n))
+    (hdvd : σ n ∣ HFSet.card grp.G) :
+    ∃ sub : HFSubgroup grp, HFSet.card sub.H = σ n := by
+  -- n ≠ 0, pues σ 0 = 1 no es primo
+  have hn : n ≠ 𝟘 := by
+    intro h; subst h
+    exact absurd (prime_ge_two hp) (nle_σn_n 𝟙)
+  -- Lema McKay: σ n ∣ |F|
+  have hF_dvd : σ n ∣ HFSet.card (mckayFixedPoints grp (σ n)) :=
+    succ_n_dvd_card_mckayFixedPoints grp n hp hdvd hn
+  have hF_eTuple : eTuple grp (σ n) ∈ mckayFixedPoints grp (σ n) :=
+    eTuple_mem_mckayFixedPoints grp (σ n)
+  have hF_ne : mckayFixedPoints grp (σ n) ≠ HFSet.empty := fun h =>
+    absurd (h ▸ hF_eTuple) (HFSet.not_mem_empty _)
+  have hcard_F_ne : HFSet.card (mckayFixedPoints grp (σ n)) ≠ 𝟘 := fun h =>
+    hF_ne (HFSet.card_eq_zero_iff.mp h)
+  obtain ⟨k, hcard_F_eq⟩ := hF_dvd
+  have hk_ne : k ≠ 𝟘 := fun hk0 =>
+    hcard_F_ne (by rw [hcard_F_eq, hk0, mul_zero])
+  have hcard_ge : le₀ (σ n) (HFSet.card (mckayFixedPoints grp (σ n))) := by
+    rw [hcard_F_eq]; exact mul_le_right (σ n) k hk_ne
+  have hcard_ge2 : le₀ 𝟚 (HFSet.card (mckayFixedPoints grp (σ n))) :=
+    le_trans _ (σ n) _ (prime_ge_two hp) hcard_ge
+  -- Existe t ∈ F con t ≠ eTuple (si no, |F| ≤ 1 < 2, contradicción)
+  have hexists_ne : ∃ t ∈ mckayFixedPoints grp (σ n), t ≠ eTuple grp (σ n) :=
+    Classical.byContradiction fun h_none => by
+      have hall : ∀ t, t ∈ mckayFixedPoints grp (σ n) → t = eTuple grp (σ n) :=
+        fun t ht => Classical.byContradiction fun ht_ne => h_none ⟨t, ht, ht_ne⟩
+      have hF_sub : mckayFixedPoints grp (σ n) ⊆ HFSet.singleton (eTuple grp (σ n)) :=
+        fun x hx => (HFSet.mem_singleton _ _).mpr (hall x hx)
+      have hcard_sing : HFSet.card (HFSet.singleton (eTuple grp (σ n))) = 𝟙 := by
+        have heq : HFSet.singleton (eTuple grp (σ n)) =
+                    HFSet.insert (eTuple grp (σ n)) HFSet.empty :=
+          HFSet.extensionality _ _ fun z => by
+            rw [HFSet.mem_singleton, HFSet.mem_insert]
+            exact ⟨Or.inl, fun h => h.elim id (absurd · (HFSet.not_mem_empty z))⟩
+        rw [heq, HFSet.card_insert _ _ (HFSet.not_mem_empty _), HFSet.card_empty]; rfl
+      have hcard_le : le₀ (HFSet.card (mckayFixedPoints grp (σ n))) 𝟙 :=
+        hcard_sing ▸ HFSet.card_le_of_subset hF_sub
+      exact absurd (le_trans _ _ _ hcard_ge2 hcard_le) (nle_σn_n 𝟙)
+  obtain ⟨t, ht_F, ht_ne⟩ := hexists_ne
+  have ht_car : t ∈ mckayCarrier grp (σ n) := mckayFixedPoints_subset grp (σ n) t ht_F
+  have ht_nPow : t ∈ HFSet.nPow grp.G (σ n) :=
+    mckayCarrier_subset_nPow grp (σ n) t ht_car
+  have hshift_t : mckayShift grp (σ n) t = t :=
+    ((mem_mckayFixedPoints grp (σ n) t).mp ht_F).2
+  have htprod : tupleProd grp (σ n) t = grp.e :=
+    ((mem_mckayCarrier grp (σ n) t).mp ht_car).2
+  have hg : HFSet.snd t ∈ grp.G := snd_mem_of_mem_nPow grp.G n ht_nPow
+  have hg_ne : HFSet.snd t ≠ grp.e := fun hge =>
+    ht_ne (shift_fixed_snd_e_implies_eTuple grp n ht_nPow hshift_t hge)
+  have hpow_eq : tupleProd grp (σ n) t = gpow grp (HFSet.snd t) (σ n) :=
+    shift_fixed_tupleProd_eq_gpow grp n ht_nPow hshift_t
+  have hpow : gpow grp (HFSet.snd t) (σ n) = grp.e := hpow_eq.symm.trans htprod
+  have hord : order grp hg = σ n :=
+    order_eq_prime_of_pow grp hg hp hg_ne hpow
+  exact ⟨cyclicSubgroup grp hg,
+         hord ▸ cyclicCarrier_card_eq_order grp hg⟩
+
 end HFAlgebra
 
 -- ======================================================================
@@ -2135,4 +2411,11 @@ end HFAlgebra
 --       S ⊆ carrier, S shift-cerrado, sin fijos → σ n ∣ card S                  (§26)
 --   succ_n_dvd_card_mckayFixedPoints  :
 --       primo(σ n) ∧ σ n ∣ |G| → σ n ∣ card(mckayFixedPoints)   (D.4.D/McKay)  (§27)
+--
+-- Público (HFAlgebra — §28–§32: punto fijo canónico, Cauchy):
+--   eTuple_mem_mckayFixedPoints       : eTuple grp p ∈ mckayFixedPoints grp p   (§28)
+--   order_dvd_of_gpow_eq_id           : g^m = e → order g ∣ m                  (§30)
+--   order_eq_prime_of_pow             : g^p = e, primo p, g ≠ e → order g = p   (§30)
+--   cyclicCarrier_card_eq_order       : card(⟨g⟩) = order g                    (§31)
+--   cauchy_minimal                    : primo p, p ∣ |G| → ∃ sub, card sub = p  (§32)
 

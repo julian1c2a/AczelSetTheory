@@ -1,6 +1,6 @@
 # Technical Reference — Algebra, Lattice & Structural Axioms
 
-**Last updated:** 2026-05-29
+**Last updated:** 2026-05-29 (§28–§32 added: eTuple_mem_mckayFixedPoints, order theorems, cyclicCarrier_card_eq_order, cauchy_minimal)
 **Parent:** [../REFERENCE.md](../REFERENCE.md)
 **Related:** [REFERENCE-HFSets.md](REFERENCE-HFSets.md) | [REFERENCE-Relations.md](REFERENCE-Relations.md) | [REFERENCE-VN.md](REFERENCE-VN.md)
 
@@ -49,7 +49,7 @@ foundation, decidability).
 | 94 | `AczelSetTheory/Algebra/Field.lean` | ✅ Complete |
 | 95 | `AczelSetTheory/Algebra/Module.lean` | ✅ Complete |
 | 96 | `AczelSetTheory/Algebra/LinearSpace.lean` | ✅ Complete |
-| 97 | `AczelSetTheory/Algebra/Sylow.lean` | ✅ Complete (§1–§27, D.4.D McKay) |
+| 97 | `AczelSetTheory/Algebra/Sylow.lean` | ✅ Complete (§1–§32, D.4.D McKay + Cauchy) |
 
 ---
 
@@ -1598,12 +1598,77 @@ theorem succ_n_dvd_card_mckayFixedPoints
 
 ---
 
+### §28. Punto fijo canónico: `eTuple ∈ mckayFixedPoints`
+
+```lean
+theorem eTuple_mem_mckayFixedPoints (grp : HFGroup) (p : ℕ₀) :
+    eTuple grp p ∈ mckayFixedPoints grp p
+```
+
+- **Math**: La `p`-tupla `(e, e, ..., e)` con todas las componentes iguales al neutro siempre es un punto fijo del shift cíclico.
+- **Prueba**: Por inducción en `p`. En el caso base `eTuple grp 0 = ∅` ∈ carrier trivialmente. En el caso sucesor, se verifica que `mckayShift grp (σ n) (eTuple grp (σ n)) = eTuple grp (σ n)` y que `tupleProd grp (σ n) (eTuple grp (σ n)) = e`.
+
+---
+
+### §29–§31. Auxiliares del teorema de Cauchy: orden y subgrupo cíclico
+
+```lean
+-- Auxiliares privados (no exportados):
+private theorem mckayShift_succ_pair (grp : HFGroup) (m : ℕ₀) (a b : HFSet) :
+    mckayShift grp (σ (σ m)) ⟪a, b⟫ = ⟪⟪dropHead m a, b⟫, getHead m a⟫
+
+private theorem shift_fixed_snd_e_implies_eTuple (grp : HFGroup) :
+    ∀ (n : ℕ₀) {t : HFSet},
+      t ∈ HFSet.nPow grp.G (σ n) → mckayShift grp (σ n) t = t →
+      HFSet.snd t = grp.e → t = eTuple grp (σ n)
+
+private theorem shift_fixed_tupleProd_eq_gpow (grp : HFGroup) :
+    ∀ (n : ℕ₀) {t : HFSet},
+      t ∈ HFSet.nPow grp.G (σ n) → mckayShift grp (σ n) t = t →
+      tupleProd grp (σ n) t = gpow grp (HFSet.snd t) (σ n)
+
+-- Exportados:
+theorem order_dvd_of_gpow_eq_id (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G)
+    (m : ℕ₀) (hm : gpow grp g m = grp.e) : order grp hg ∣ m
+
+theorem order_eq_prime_of_pow (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G)
+    {n : ℕ₀} (hp : Peano.Arith.Prime (σ n)) (hg_ne : g ≠ grp.e)
+    (hpow : gpow grp g (σ n) = grp.e) : order grp hg = σ n
+
+theorem cyclicCarrier_card_eq_order (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G) :
+    HFSet.card (cyclicCarrier grp hg) = order grp hg
+```
+
+- **`order_dvd_of_gpow_eq_id`**: Si `g^m = e`, entonces `order g ∣ m`. Prueba por división euclídea: `m = q · ord + r` con `r < ord`; si `g^r = e`, minimalidad del orden da `r = 0`.
+- **`order_eq_prime_of_pow`**: Si `g^p = e`, `p` primo, `g ≠ e`, entonces `order g = p`. Prueba: `ord ∣ p` (por `order_dvd_of_gpow_eq_id`); como `p` primo, `ord = 1` o `ord = p`; `ord = 1 ↔ g = e`, contradicción.
+- **`cyclicCarrier_card_eq_order`**: El subgrupo cíclico `⟨g⟩ = {e, g, g², ..., g^(ord-1)}` tiene exactamente `order g` elementos. Prueba: `gpow g i` es inyectiva para `i < ord` (por `gpow_inj_below_order`); la inserción del último elemento cierra en el primero.
+
+---
+
+### §32. Teorema de Cauchy (vía McKay)
+
+```lean
+theorem cauchy_minimal (grp : HFGroup) {n : ℕ₀} (hp : Peano.Arith.Prime (σ n))
+    (hdvd : σ n ∣ HFSet.card grp.G) :
+    ∃ sub : HFSubgroup grp, HFSet.card sub.H = σ n
+```
+
+- **Math**: Si `p = σ n` es primo y `p ∣ |G|`, existe un subgrupo de `G` de orden exactamente `p`.
+- **Prueba** (argumento de McKay):
+  1. El Lema de McKay (§27) da `p ∣ |F|` donde `F = mckayFixedPoints grp p`.
+  2. El punto fijo canónico `eTuple grp p ∈ F` (§28) asegura `|F| ≥ 1`.
+  3. Como `p ∣ |F|` y `|F| ≥ 1`, se tiene `|F| ≥ p ≥ 2`, así que existe `t ∈ F` con `t ≠ eTuple grp p`.
+  4. Para tal `t`: `g = HFSet.snd t ∈ G`, `g ≠ e` (por §29 — si `g = e` entonces `t = eTuple`), y `g^p = e` (por §29 — si `t` es punto fijo, `tupleProd = gpow (snd t) p = e`).
+  5. Por §30: `order g = p`. Por §31: `card (cyclicSubgroup g) = p`. ∎
+
+---
+
 ### 7c. Exports — `Algebra/Sylow.lean`
 
 **Definiciones públicas:**
 
 `HFAlgebra.pow_dvd_card`, `HFAlgebra.isPSubgroup`, `HFAlgebra.isSylowExponent`, `HFAlgebra.isSylowSubgroup`, `HFAlgebra.HFSubgroup.trivial`, `HFAlgebra.HFSubgroup.trivial_card`, `HFAlgebra.isPSubgroup_of_isSylowSubgroup`, `HFAlgebra.gpow`, `HFAlgebra.gpow_zero`, `HFAlgebra.gpow_succ`, `HFAlgebra.gpow_one`, `HFAlgebra.gpow_mem`, `HFAlgebra.gpow_add`, `HFAlgebra.order`, `HFAlgebra.order_pos`, `HFAlgebra.order_ne_zero`, `HFAlgebra.gpow_order_eq_id`, `HFAlgebra.order_minimal`, `HFAlgebra.order_le_card`, `HFAlgebra.gpow_mul_order_eq_id`, `HFAlgebra.gpow_mod_order`, `HFAlgebra.cyclicCarrier`, `HFAlgebra.cyclicSubgroup`, `HFAlgebra.mckayCarrier`, `HFAlgebra.mckayShift`, `HFAlgebra.mckayFixedPoints`, `HFAlgebra.mem_mckayFixedPoints`, `HFAlgebra.shiftIter`, `HFAlgebra.orbitOf`, `HFAlgebra.periodOf`
 
-**Teoremas D.3 – D.4.D:**
+**Teoremas D.3 – D.4.D + §28–§32:**
 
-`HFAlgebra.dvd_card_mckayCarrier_succ`, `HFAlgebra.card_orbitOf_eq_periodOf`, `HFAlgebra.card_orbitOf_one_or_succ`, `HFAlgebra.periodOf_eq_one_iff_fixed`, `HFAlgebra.card_orbitOf_eq_one_iff_fixed`, `HFAlgebra.card_orbitOf_eq_succ_of_not_fixed`, `HFAlgebra.succ_n_dvd_card_of_shift_closed_no_fixed`, `HFAlgebra.succ_n_dvd_card_mckayFixedPoints`
+`HFAlgebra.dvd_card_mckayCarrier_succ`, `HFAlgebra.card_orbitOf_eq_periodOf`, `HFAlgebra.card_orbitOf_one_or_succ`, `HFAlgebra.periodOf_eq_one_iff_fixed`, `HFAlgebra.card_orbitOf_eq_one_iff_fixed`, `HFAlgebra.card_orbitOf_eq_succ_of_not_fixed`, `HFAlgebra.succ_n_dvd_card_of_shift_closed_no_fixed`, `HFAlgebra.succ_n_dvd_card_mckayFixedPoints`, `HFAlgebra.eTuple_mem_mckayFixedPoints`, `HFAlgebra.order_dvd_of_gpow_eq_id`, `HFAlgebra.order_eq_prime_of_pow`, `HFAlgebra.cyclicCarrier_card_eq_order`, `HFAlgebra.cauchy_minimal`
