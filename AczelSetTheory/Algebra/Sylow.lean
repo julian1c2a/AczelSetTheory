@@ -42,6 +42,7 @@ import AczelSetTheory.Axioms.Function
 import AczelSetTheory.Axioms.CartProd
 import AczelSetTheory.Axioms.Separation
 import AczelSetTheory.Axioms.CardImage
+import AczelSetTheory.Axioms.Choice
 import AczelSetTheory.Operations.NPow
 import Peano.PeanoNat.Combinatorics.Pow
 import Peano.PeanoNat.Arith
@@ -1737,6 +1738,352 @@ theorem card_orbitOf_one_or_succ (grp : HFGroup) (n : ℕ₀) (t : HFSet)
     HFSet.card (orbitOf grp n t) = σ n := by
   rw [card_orbitOf_eq_periodOf grp n t ht]
   exact prime_divisors hprime (periodOf_dvd_succ_n grp n t ht)
+
+-- ==================================================================
+-- §24. D.4.D parte 1: card (orbitOf) = 𝟙 ↔ punto fijo
+-- ==================================================================
+
+/-- `periodOf grp n t = 𝟙` syss `t` es un punto fijo del shift. -/
+theorem periodOf_eq_one_iff_fixed (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) :
+    periodOf grp n t ht = 𝟙 ↔ mckayShift grp (σ n) t = t := by
+  constructor
+  · intro hp
+    have hspec := shiftIter_periodOf grp n t ht
+    rw [hp] at hspec
+    -- shiftIter 𝟙 t = mckayShift (shiftIter 𝟘 t) = mckayShift t
+    exact hspec
+  · intro hfix
+    have h1 : shiftIter grp (σ n) 𝟙 t = t := hfix
+    have hmin : le₀ (periodOf grp n t ht) 𝟙 :=
+      periodOf_minimal grp n t ht (zero_lt_succ 𝟘) h1
+    rcases (le_iff_lt_or_eq _ _).mp hmin with hlt | heq
+    · exfalso
+      have h0 : periodOf grp n t ht = 𝟘 := lt_b_1_then_b_eq_0 hlt
+      exact periodOf_ne_zero grp n t ht h0
+    · exact heq
+
+/-- `card (orbitOf grp n t) = 𝟙` syss `t` es un punto fijo del shift. -/
+theorem card_orbitOf_eq_one_iff_fixed (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) :
+    HFSet.card (orbitOf grp n t) = 𝟙 ↔ mckayShift grp (σ n) t = t := by
+  rw [card_orbitOf_eq_periodOf grp n t ht]
+  exact periodOf_eq_one_iff_fixed grp n t ht
+
+-- ==================================================================
+-- §25. D.4.D parte 2: no fijo ⇒ card (orbitOf) = σ n  (caso primo)
+-- ==================================================================
+
+/-- **Caso primo, no fijo**: si `σ n` es primo y `t` no es fijo,
+    entonces `card (orbitOf grp n t) = σ n`. -/
+theorem card_orbitOf_eq_succ_of_not_fixed (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+    (ht : t ∈ HFSet.nPow grp.G (σ n)) (hprime : Peano.Arith.Prime (σ n))
+    (hnf : mckayShift grp (σ n) t ≠ t) :
+    HFSet.card (orbitOf grp n t) = σ n := by
+  rcases card_orbitOf_one_or_succ grp n t ht hprime with h1 | hp
+  · exact absurd ((card_orbitOf_eq_one_iff_fixed grp n t ht).mp h1) hnf
+  · exact hp
+
+-- ==================================================================
+-- §26. D.4.D parte 3: σ n ∣ card S para S ⊆ carrier shift-cerrado sin fijos
+-- ==================================================================
+
+/-- Helper: si `S ⊆ carrier` es cerrado por shift y `t ∈ S`, entonces
+    `orbitOf grp n t ⊆ S`. -/
+private theorem orbitOf_subset_of_shift_closed (grp : HFGroup) (n : ℕ₀)
+    {S : HFSet} {t : HFSet} (htS : t ∈ S)
+    (hcl : ∀ x, x ∈ S → mckayShift grp (σ n) x ∈ S) :
+    orbitOf grp n t ⊆ S := by
+  intro x hx
+  obtain ⟨k, hkn, hxk⟩ := (mem_orbitOf grp n t x).mp hx
+  rw [hxk]
+  clear hx hxk hkn
+  induction k with
+  | zero => exact htS
+  | succ k' ih =>
+      show mckayShift grp (σ n) (shiftIter grp (σ n) k' t) ∈ S
+      exact hcl _ ih
+
+/-- Helper: `inter S O = O` cuando `O ⊆ S`. -/
+private theorem inter_eq_of_subset {S O : HFSet} (hOS : O ⊆ S) :
+    HFSet.inter S O = O :=
+  HFSet.extensionality _ _ fun x => by
+    rw [HFSet.mem_inter]
+    exact ⟨fun h => h.2, fun h => ⟨hOS _ h, h⟩⟩
+
+/-- Helper: si `mckayShift x ∈ orbitOf t`, entonces `x ∈ orbitOf t`. -/
+private theorem mem_orbitOf_of_shift_mem (grp : HFGroup) (n : ℕ₀)
+    {t x : HFSet} (ht : t ∈ HFSet.nPow grp.G (σ n))
+    (hx : x ∈ HFSet.nPow grp.G (σ n))
+    (h : mckayShift grp (σ n) x ∈ orbitOf grp n t) :
+    x ∈ orbitOf grp n t := by
+  have h_shift_in_orbit_x : mckayShift grp (σ n) x ∈ orbitOf grp n x := by
+    have h1 : shiftIter grp (σ n) (σ 𝟘) x = mckayShift grp (σ n) x := rfl
+    rw [← h1]
+    exact shiftIter_mem_orbitOf grp n x hx (σ 𝟘)
+  have h_orbits_eq : orbitOf grp n x = orbitOf grp n (mckayShift grp (σ n) x) :=
+    (orbitOf_eq_of_mem grp n x (mckayShift grp (σ n) x) hx h_shift_in_orbit_x).symm
+  have h_orbits_eq2 : orbitOf grp n (mckayShift grp (σ n) x) = orbitOf grp n t :=
+    orbitOf_eq_of_mem grp n t (mckayShift grp (σ n) x) ht h
+  have hxx : x ∈ orbitOf grp n x :=
+    (mem_orbitOf grp n x x).mpr ⟨𝟘, Peano.Order.zero_le n, rfl⟩
+  rw [h_orbits_eq, h_orbits_eq2] at hxx
+  exact hxx
+
+/-- **§26**: Si `σ n` es primo y `S ⊆ mckayCarrier grp (σ n)` es cerrado por
+    shift y disjunto de los puntos fijos, entonces `σ n ∣ card S`. -/
+theorem succ_n_dvd_card_of_shift_closed_no_fixed
+    (grp : HFGroup) (n : ℕ₀) (hprime : Peano.Arith.Prime (σ n)) :
+    ∀ (S : HFSet),
+      S ⊆ mckayCarrier grp (σ n) →
+      (∀ x, x ∈ S → mckayShift grp (σ n) x ≠ x) →
+      (∀ x, x ∈ S → mckayShift grp (σ n) x ∈ S) →
+      (σ n) ∣ HFSet.card S := by
+  suffices key : ∀ m : ℕ₀, ∀ S : HFSet,
+      S ⊆ mckayCarrier grp (σ n) →
+      (∀ x, x ∈ S → mckayShift grp (σ n) x ≠ x) →
+      (∀ x, x ∈ S → mckayShift grp (σ n) x ∈ S) →
+      HFSet.card S = m →
+      (σ n) ∣ m by
+    intro S hsub hnf hcl
+    exact key (HFSet.card S) S hsub hnf hcl rfl
+  intro m
+  refine Peano.WellFounded.strongInductionOn (P := fun m =>
+      ∀ S : HFSet,
+        S ⊆ mckayCarrier grp (σ n) →
+        (∀ x, x ∈ S → mckayShift grp (σ n) x ≠ x) →
+        (∀ x, x ∈ S → mckayShift grp (σ n) x ∈ S) →
+        HFSet.card S = m →
+        (σ n) ∣ m) m ?_
+  intro m IH S hsub hnf hcl hcard
+  cases hm : m with
+  | zero =>
+      exact ⟨𝟘, by rw [mul_zero]⟩
+  | succ m' =>
+      -- card S = σ m', so S is nonempty
+      have hcard_sm' : HFSet.card S = σ m' := by rw [hcard, hm]
+      have hSne : S ≠ HFSet.empty := fun heq => by
+        rw [heq, HFSet.card_empty] at hcard_sm'
+        exact (zero_ne_succ m') hcard_sm'
+      -- Extract t ∈ S
+      obtain ⟨t, htS⟩ : ∃ t, t ∈ S := HFSet.nonempty_of_ne_empty S hSne
+      have ht_carrier : t ∈ mckayCarrier grp (σ n) := hsub _ htS
+      have ht_nPow : t ∈ HFSet.nPow grp.G (σ n) :=
+        mckayCarrier_subset_nPow grp (σ n) _ ht_carrier
+      have ht_notfix : mckayShift grp (σ n) t ≠ t := hnf t htS
+      -- card (orbitOf t) = σ n
+      have hcardO : HFSet.card (orbitOf grp n t) = σ n :=
+        card_orbitOf_eq_succ_of_not_fixed grp n t ht_nPow hprime ht_notfix
+      -- orbitOf t ⊆ S
+      have hO_sub_S : orbitOf grp n t ⊆ S :=
+        orbitOf_subset_of_shift_closed grp n htS hcl
+      -- card S = card (orbitOf t) + card (S \ orbitOf t)
+      have hpart : HFSet.card S
+                 = Peano.Add.add (HFSet.card (orbitOf grp n t))
+                                 (HFSet.card (HFSet.setminus S (orbitOf grp n t))) := by
+        have := HFSet.card_partition S (orbitOf grp n t)
+        rw [inter_eq_of_subset hO_sub_S] at this
+        exact this
+      -- S' ⊆ carrier (where S' = S \ orbitOf t)
+      have hsub' : HFSet.setminus S (orbitOf grp n t) ⊆ mckayCarrier grp (σ n) :=
+        fun x hx => by
+          rw [HFSet.mem_setminus] at hx
+          exact hsub _ hx.1
+      -- No fixed points in S'
+      have hnf' : ∀ x, x ∈ HFSet.setminus S (orbitOf grp n t) →
+                       mckayShift grp (σ n) x ≠ x := fun x hx => by
+        rw [HFSet.mem_setminus] at hx
+        exact hnf x hx.1
+      -- S' shift-closed
+      have hcl' : ∀ x, x ∈ HFSet.setminus S (orbitOf grp n t) →
+                       mckayShift grp (σ n) x ∈ HFSet.setminus S (orbitOf grp n t) := by
+        intro x hx
+        rw [HFSet.mem_setminus] at hx
+        obtain ⟨hxS, hxnO⟩ := hx
+        refine (HFSet.mem_setminus _ _ _).mpr ⟨hcl x hxS, ?_⟩
+        intro hshift_O
+        have hx_nPow : x ∈ HFSet.nPow grp.G (σ n) :=
+          mckayCarrier_subset_nPow grp (σ n) _ (hsub _ hxS)
+        exact hxnO (mem_orbitOf_of_shift_mem grp n ht_nPow hx_nPow hshift_O)
+      -- card S' < m
+      have hcard_S'_lt :
+          lt₀ (HFSet.card (HFSet.setminus S (orbitOf grp n t))) m := by
+        rw [← hcard, hpart, hcardO]
+        exact Peano.Add.lt_self_add_l
+          (HFSet.card (HFSet.setminus S (orbitOf grp n t))) (σ n) (zero_ne_succ n).symm
+      -- IH gives σ n ∣ card S'
+      have hp_dvd_S' : (σ n) ∣ HFSet.card (HFSet.setminus S (orbitOf grp n t)) :=
+        IH _ hcard_S'_lt _ hsub' hnf' hcl' rfl
+      -- Combine
+      have hp_dvd_sn : (σ n) ∣ σ n := divides_refl (σ n)
+      have hp_dvd_sum :
+          (σ n) ∣ Peano.Add.add (σ n)
+                    (HFSet.card (HFSet.setminus S (orbitOf grp n t))) :=
+        divides_add hp_dvd_sn hp_dvd_S'
+      have hcard_eq : HFSet.card S
+                    = Peano.Add.add (σ n)
+                        (HFSet.card (HFSet.setminus S (orbitOf grp n t))) := by
+        rw [hpart, hcardO]
+      -- Goal: σ n ∣ σ m'.  σ m' = m = card S = σ n + ...
+      have hgoal_eq : σ m' = Peano.Add.add (σ n)
+                              (HFSet.card (HFSet.setminus S (orbitOf grp n t))) := by
+        rw [← hm, ← hcard, hcard_eq]
+      rw [hgoal_eq]
+      exact hp_dvd_sum
+
+-- ==================================================================
+-- §27. D.4.D conclusión: σ n ∣ card (mckayFixedPoints)
+-- ==================================================================
+
+/-- **D.4.D / Lema de McKay**: si `σ n` es primo y `σ n ∣ card grp.G`, con `n ≠ 𝟘`,
+    entonces `σ n ∣ card (mckayFixedPoints grp (σ n))`. -/
+theorem succ_n_dvd_card_mckayFixedPoints
+    (grp : HFGroup) (n : ℕ₀) (hprime : Peano.Arith.Prime (σ n))
+    (hdvd : (σ n) ∣ HFSet.card grp.G) (hn : n ≠ 𝟘) :
+    (σ n) ∣ HFSet.card (mckayFixedPoints grp (σ n)) := by
+  -- p ∣ card C  (D.3)
+  have hp_dvd_C : (σ n) ∣ HFSet.card (mckayCarrier grp (σ n)) :=
+    dvd_card_mckayCarrier_succ grp (σ n) hdvd hn
+  -- S = C \ F.  S ⊆ C, S shift-closed, S no fixed
+  have hS_sub_C :
+      HFSet.setminus (mckayCarrier grp (σ n)) (mckayFixedPoints grp (σ n)) ⊆
+        mckayCarrier grp (σ n) := fun x hx => by
+    rw [HFSet.mem_setminus] at hx; exact hx.1
+  have hS_no_fix : ∀ x,
+      x ∈ HFSet.setminus (mckayCarrier grp (σ n)) (mckayFixedPoints grp (σ n)) →
+        mckayShift grp (σ n) x ≠ x := by
+    intro x hx
+    rw [HFSet.mem_setminus] at hx
+    obtain ⟨hxC, hxnF⟩ := hx
+    intro heq
+    exact hxnF ((mem_mckayFixedPoints grp (σ n) x).mpr ⟨hxC, heq⟩)
+  have hS_cl : ∀ x,
+      x ∈ HFSet.setminus (mckayCarrier grp (σ n)) (mckayFixedPoints grp (σ n)) →
+        mckayShift grp (σ n) x ∈
+          HFSet.setminus (mckayCarrier grp (σ n)) (mckayFixedPoints grp (σ n)) := by
+    intro x hx
+    rw [HFSet.mem_setminus] at hx
+    obtain ⟨hxC, hxnF⟩ := hx
+    refine (HFSet.mem_setminus _ _ _).mpr
+      ⟨mckayShift_mem_mckayCarrier grp (σ n) hxC, ?_⟩
+    intro hshift_F
+    -- mckayShift x ∈ F ⇒ x fixed (via equality of orbits)
+    have hx_nPow : x ∈ HFSet.nPow grp.G (σ n) :=
+      mckayCarrier_subset_nPow grp (σ n) _ hxC
+    have hshift_in_orbit_x : mckayShift grp (σ n) x ∈ orbitOf grp n x := by
+      have h1 : shiftIter grp (σ n) (σ 𝟘) x = mckayShift grp (σ n) x := rfl
+      rw [← h1]
+      exact shiftIter_mem_orbitOf grp n x hx_nPow (σ 𝟘)
+    have horb_eq :
+        orbitOf grp n x = orbitOf grp n (mckayShift grp (σ n) x) :=
+      (orbitOf_eq_of_mem grp n x (mckayShift grp (σ n) x) hx_nPow hshift_in_orbit_x).symm
+    have hshift_nPow : mckayShift grp (σ n) x ∈ HFSet.nPow grp.G (σ n) :=
+      mckayCarrier_subset_nPow grp (σ n) _
+        (mckayShift_mem_mckayCarrier grp (σ n) hxC)
+    have hshift_fixed : mckayShift grp (σ n) (mckayShift grp (σ n) x) =
+        mckayShift grp (σ n) x :=
+      ((mem_mckayFixedPoints grp (σ n) _).mp hshift_F).2
+    have h_card_orbit_shift_one :
+        HFSet.card (orbitOf grp n (mckayShift grp (σ n) x)) = 𝟙 :=
+      (card_orbitOf_eq_one_iff_fixed grp n
+        (mckayShift grp (σ n) x) hshift_nPow).mpr hshift_fixed
+    have h_card_orbit_x_one : HFSet.card (orbitOf grp n x) = 𝟙 := by
+      rw [horb_eq]; exact h_card_orbit_shift_one
+    have hx_fixed : mckayShift grp (σ n) x = x :=
+      (card_orbitOf_eq_one_iff_fixed grp n x hx_nPow).mp h_card_orbit_x_one
+    exact hxnF ((mem_mckayFixedPoints grp (σ n) x).mpr ⟨hxC, hx_fixed⟩)
+  -- p ∣ card S  (§26)
+  have hp_dvd_S : (σ n) ∣
+      HFSet.card (HFSet.setminus (mckayCarrier grp (σ n)) (mckayFixedPoints grp (σ n))) :=
+    succ_n_dvd_card_of_shift_closed_no_fixed grp n hprime _ hS_sub_C hS_no_fix hS_cl
+  -- F ⊆ C, so inter C F = F, hence card C = card F + card S
+  have hF_sub_C : mckayFixedPoints grp (σ n) ⊆ mckayCarrier grp (σ n) :=
+    mckayFixedPoints_subset grp (σ n)
+  have hinter :
+      HFSet.inter (mckayCarrier grp (σ n)) (mckayFixedPoints grp (σ n)) =
+        mckayFixedPoints grp (σ n) := inter_eq_of_subset hF_sub_C
+  have hpart : HFSet.card (mckayCarrier grp (σ n))
+             = Peano.Add.add (HFSet.card (mckayFixedPoints grp (σ n)))
+                 (HFSet.card
+                   (HFSet.setminus (mckayCarrier grp (σ n))
+                     (mckayFixedPoints grp (σ n)))) := by
+    have := HFSet.card_partition (mckayCarrier grp (σ n)) (mckayFixedPoints grp (σ n))
+    rw [hinter] at this
+    exact this
+  -- Case split: card S < card C  or  card S = card C
+  rcases (Peano.Order.le_iff_lt_or_eq _ _).mp
+      (HFSet.card_setminus_le (mckayCarrier grp (σ n)) (mckayFixedPoints grp (σ n)))
+      with hlt | heq
+  · -- Strict
+    have hp_dvd_diff : (σ n) ∣
+        Peano.Sub.sub (HFSet.card (mckayCarrier grp (σ n)))
+          (HFSet.card
+            (HFSet.setminus (mckayCarrier grp (σ n))
+              (mckayFixedPoints grp (σ n)))) :=
+      divides_sub hlt hp_dvd_C hp_dvd_S
+    have hsub_eq :
+        Peano.Sub.sub (HFSet.card (mckayCarrier grp (σ n)))
+          (HFSet.card
+            (HFSet.setminus (mckayCarrier grp (σ n))
+              (mckayFixedPoints grp (σ n))))
+        = HFSet.card (mckayFixedPoints grp (σ n)) := by
+      rw [hpart]
+      have hle :
+          le₀ (HFSet.card
+                (HFSet.setminus (mckayCarrier grp (σ n))
+                  (mckayFixedPoints grp (σ n))))
+              (HFSet.card
+                (HFSet.setminus (mckayCarrier grp (σ n))
+                  (mckayFixedPoints grp (σ n)))) := Or.inr rfl
+      have h1 :
+          Peano.Add.add
+            (Peano.Sub.sub
+              (HFSet.card
+                (HFSet.setminus (mckayCarrier grp (σ n))
+                  (mckayFixedPoints grp (σ n))))
+              (HFSet.card
+                (HFSet.setminus (mckayCarrier grp (σ n))
+                  (mckayFixedPoints grp (σ n)))))
+            (HFSet.card (mckayFixedPoints grp (σ n)))
+          = Peano.Sub.sub
+              (Peano.Add.add
+                (HFSet.card
+                  (HFSet.setminus (mckayCarrier grp (σ n))
+                    (mckayFixedPoints grp (σ n))))
+                (HFSet.card (mckayFixedPoints grp (σ n))))
+              (HFSet.card
+                (HFSet.setminus (mckayCarrier grp (σ n))
+                  (mckayFixedPoints grp (σ n)))) :=
+        Peano.Sub.add_sub_assoc _ _ _ hle
+      rw [Peano.Sub.sub_self, Peano.Add.zero_add] at h1
+      rw [Peano.Add.add_comm (HFSet.card (mckayFixedPoints grp (σ n))) _]
+      exact h1.symm
+    rw [← hsub_eq]
+    exact hp_dvd_diff
+  · -- card S = card C  ⇒ card F = 𝟘
+    have hF_zero : HFSet.card (mckayFixedPoints grp (σ n)) = 𝟘 := by
+      have heq2 :
+          Peano.Add.add (HFSet.card (mckayFixedPoints grp (σ n)))
+            (HFSet.card
+              (HFSet.setminus (mckayCarrier grp (σ n))
+                (mckayFixedPoints grp (σ n))))
+          = HFSet.card
+              (HFSet.setminus (mckayCarrier grp (σ n))
+                (mckayFixedPoints grp (σ n))) := by
+        rw [← hpart]; exact heq.symm
+      have hcancel :
+          Peano.Add.add (HFSet.card (mckayFixedPoints grp (σ n)))
+            (HFSet.card
+              (HFSet.setminus (mckayCarrier grp (σ n))
+                (mckayFixedPoints grp (σ n))))
+          = Peano.Add.add 𝟘
+              (HFSet.card
+                (HFSet.setminus (mckayCarrier grp (σ n))
+                  (mckayFixedPoints grp (σ n)))) := by
+        rw [Peano.Add.zero_add]; exact heq2
+      exact Peano.Add.cancelation_add _ _ _ hcancel
+    rw [hF_zero]
+    exact ⟨𝟘, by rw [mul_zero]⟩
 
 end HFAlgebra
 
