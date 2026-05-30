@@ -20,6 +20,7 @@ import AczelSetTheory.Axioms.CardImage
 import AczelSetTheory.Axioms.OrdinalNat
 import AczelSetTheory.Axioms.Separation
 import AczelSetTheory.Axioms.Subset
+import AczelSetTheory.Axioms.Lattice
 
 namespace HFSet
 
@@ -127,5 +128,54 @@ theorem not_surjective_of_card_ne {A B : HFSet} {f : HFSet → HFSet}
     intro hny
     exact h ⟨y, hy, hny⟩
   exact hne (card_eq_of_classBij hf_into hf_inj hsurj)
+
+-- ─────────────────────────────────────────────────────────────────
+-- §4. Principio de inclusión-exclusión (dos conjuntos)
+-- ─────────────────────────────────────────────────────────────────
+
+/-- **Inclusión-exclusión** (forma aditiva, sin resta truncada):
+    `card (A ∪ B) + card (A ∩ B) = card A + card B`. -/
+theorem card_union_add_card_inter (A B : HFSet) :
+    add (card (union A B)) (card (inter A B)) = add (card A) (card B) := by
+  -- A ∪ B = A ∪ (B \ A), con A y (B \ A) disjuntos
+  have hUeq : union A B = union A (setminus B A) := by
+    apply extensionality; intro x
+    simp only [mem_union, mem_setminus]
+    constructor
+    · rintro (hxA | hxB)
+      · exact Or.inl hxA
+      · by_cases hxA : x ∈ A
+        · exact Or.inl hxA
+        · exact Or.inr ⟨hxB, hxA⟩
+    · rintro (hxA | ⟨hxB, _⟩)
+      · exact Or.inl hxA
+      · exact Or.inr hxB
+  have hdisj : inter A (setminus B A) = empty := by
+    apply extensionality; intro x
+    constructor
+    · intro hx
+      rcases (mem_inter A (setminus B A) x).mp hx with ⟨hxA, hxBA⟩
+      exact absurd hxA ((mem_setminus B A x).mp hxBA).2
+    · intro hx; exact absurd hx (not_mem_empty x)
+  have hUnion : card (union A B) = add (card A) (card (setminus B A)) := by
+    rw [hUeq]; exact card_union_disjoint A (setminus B A) hdisj
+  -- card B = card (A ∩ B) + card (B \ A)   (partición de B por A, con inter conmutado)
+  have hB : card B = add (card (inter A B)) (card (setminus B A)) := by
+    rw [inter_comm A B]; exact card_partition B A
+  -- combinar: (|A| + |B\A|) + |A∩B| = |A| + (|A∩B| + |B\A|)
+  rw [hUnion, hB]
+  omega₀
+
+/-- **Inclusión-exclusión** (forma con resta truncada):
+    `card (A ∪ B) = card A + card B − card (A ∩ B)`. -/
+theorem card_union (A B : HFSet) :
+    card (union A B) = Peano.Sub.sub (add (card A) (card B)) (card (inter A B)) := by
+  have h := card_union_add_card_inter A B
+  -- de  u + d = z  se sigue  u = z − d  (vía add_k_sub_k : sub (add n k) k = n)
+  calc card (union A B)
+      = Peano.Sub.sub (add (card (inter A B)) (card (union A B))) (card (inter A B)) :=
+          (Peano.Sub.add_k_sub_k _ _).symm
+    _ = Peano.Sub.sub (add (card A) (card B)) (card (inter A B)) := by
+          rw [add_comm (card (inter A B)) (card (union A B)), h]
 
 end HFSet
