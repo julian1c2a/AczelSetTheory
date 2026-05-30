@@ -15,6 +15,20 @@
 
 ---
 
+## ⚠️ Directiva maestra (2026-05-30): Peano congelado — teoría nueva en Aczel
+
+**Peano (`peanolib`) no desarrollará más teoría "hacia arriba".** Solo se admite trabajo
+fundacional/metamatemático: la aritmética de Robinson `Q` y su extensión
+**ROBINSON_PlusPlus**. **Toda la teoría matemática nueva** (conteo, signatura de
+permutaciones, álgebra adicional, topología, …) se construye **directamente sobre `HFSet`
+en AczelSetTheory**, en la capa nativa — *no* vía el transporte `congrArg vN` de los
+módulos `VN/`. La combinatoria nueva vive en `AczelSetTheory/Combinatorics/` (paralela a
+`Algebra/`, `Topology/`). Los stubs `VN/CountingVN.lean`, `VN/SignVN.lean` (espejos de
+stubs de Peano que ya no se materializarán) son huérfanos → re-etiquetar o retirar.
+Ver `DECISIONS.md` → ADR-000.
+
+---
+
 ## 🎯 Tesis del proyecto (2026-05-29)
 
 > **AczelSetTheory debe recubrir completamente todos los teoremas de Peano**, y

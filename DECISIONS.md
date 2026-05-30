@@ -11,6 +11,34 @@ Each entry records *what* was decided and *why*, for future reference.
 
 ---
 
+## ADR-000: Peano congelado — toda la teoría nueva en AczelSetTheory
+
+**Date**: 2026-05-30
+**Status**: Accepted (directiva del usuario, reiterada)
+
+**Decision**: El proyecto predecesor **Peano (`peanolib`) no desarrollará más teoría
+"hacia arriba"**. Solo se admite trabajo **fundacional/metamatemático**: la aritmética
+de Robinson `Q` y su extensión **ROBINSON_PlusPlus**. **Toda la teoría matemática nueva**
+(conteo, signatura de permutaciones, álgebra adicional, topología, …) se construye
+**directamente sobre `HFSet` en AczelSetTheory**, en la capa nativa — *no* vía el
+transporte `congrArg vN` de los módulos `VN/`.
+
+**Why**: La fase de "paridad Peano↔Aczel" (replicar Peano en Aczel vía el embedding de
+Von Neumann) fue *bootstrapping* ya completado. Aczel tiene mayor potencia expresiva;
+una vez pagado el coste de construir su infraestructura nativa (cardinalidad, grupos,
+cocientes…), la teoría nueva se hace directamente ahí, sin la doble escritura
+Peano→VN.
+
+**Consequences**:
+- No crear módulos de teoría nueva en `peanolib` ni en `AczelSetTheory/VN/` (transporte).
+  La teoría nueva vive en capas nativas (`AczelSetTheory/Combinatorics/`, paralela a
+  `Algebra/` y `Topology/`).
+- Los stubs `VN/CountingVN.lean` y `VN/SignVN.lean` (espejos de stubs de Peano que nunca
+  se materializarán) quedan huérfanos → re-etiquetar o retirar.
+- Los módulos `VN/` existentes se conservan como puente histórico de la fase de bootstrapping.
+
+---
+
 ## ADR-001: No Mathlib dependency
 
 **Date**: 2026-04-04

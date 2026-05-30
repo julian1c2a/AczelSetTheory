@@ -3,6 +3,18 @@
 **Última actualización**: 2026-05-30
 **Archivo principal recién completado**: `AczelSetTheory/Algebra/Sylow.lean`
 
+> ⚠️ **Nota**: este archivo (`NEXT-STEPS.md`, con guion) duplica al canónico
+> `NEXT_STEPS.md` (con guion bajo). Pendiente consolidar en uno solo.
+
+---
+
+## ⚠️ Directiva maestra (2026-05-30): Peano congelado — teoría nueva en Aczel
+
+**Peano (`peanolib`) no desarrollará más teoría "hacia arriba"** — solo fundamentos
+(aritmética de Robinson `Q` / **ROBINSON_PlusPlus**). **Toda la teoría nueva** se construye
+**directamente sobre `HFSet` en AczelSetTheory**, capa nativa (p.ej. `Combinatorics/`),
+*no* vía transporte `VN/`. Ver `DECISIONS.md` → ADR-000.
+
 ---
 
 ## ✅ COMPLETADO: Primer Teorema de Sylow (§33–§40)

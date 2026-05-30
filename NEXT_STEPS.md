@@ -8,6 +8,16 @@ Ver PLANNING.md para el roadmap a largo plazo.
 
 ---
 
+## ⚠️ Directiva maestra (2026-05-30): Peano congelado — teoría nueva en Aczel
+
+**Peano (`peanolib`) no desarrollará más teoría "hacia arriba"** — solo fundamentos
+(aritmética de Robinson `Q` / **ROBINSON_PlusPlus**). **Toda la teoría nueva** se construye
+**directamente sobre `HFSet` en AczelSetTheory**, capa nativa (p.ej. `Combinatorics/`),
+*no* vía transporte `VN/`. Stubs `VN/CountingVN.lean`, `VN/SignVN.lean` huérfanos. Ver
+`DECISIONS.md` → ADR-000.
+
+---
+
 ## ✅ COMPLETED (2026-05-29) — Cauchy vía McKay: §28–§32 [`Sylow.lean`]
 
 Completado el **Teorema de Cauchy** mediante el argumento combinatorio de McKay. 0 sorry, 0 warnings.
