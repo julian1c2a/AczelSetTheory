@@ -2575,7 +2575,7 @@ open Peano Peano.Arith Peano.Primes in
 /-- Si para todo subgrupo propio M, `p^k ∤ |M|`, entonces `p ∣ |orb_conj(x)|`
     para todo `x ∉ Z(G)`. -/
 private theorem p_dvd_orbit_of_no_proper {grp : HFGroup} {p k : ℕ₀}
-    (hp : Peano.Arith.Prime p) (hk : k ≠ 𝟘)
+    (hp : Peano.Arith.Prime p) (_hk : k ≠ 𝟘)
     (hdvd : p ^ k ∣ HFSet.card grp.G)
     (h_no_proper : ∀ sub : HFSubgroup grp,
         HFSet.card sub.H ≠ HFSet.card grp.G →
@@ -2627,14 +2627,18 @@ private theorem p_dvd_orbit_of_no_proper {grp : HFGroup} {p k : ℕ₀}
       h_only _ ((HFGroupAction.mem_orb_iff (HFGroupAction.conjugAction grp) x _).mpr
         ⟨(HFGroupAction.conjugAction grp).act_closed hg hx, g, hg, rfl⟩)
     -- act g x = g·x·g⁻¹ = x → g·x = x·g
-    show grp.op g x = grp.op x g
+    -- goal: op x g = op g x; the calc below proves op g x = op x g, use .symm
     have hginv : grp.inv g ∈ grp.G := grp.inv_closed hg
     have hgx_G : grp.op g x ∈ grp.G := grp.op_closed hg hx
-    calc grp.op g x
+    exact (calc grp.op g x
         = grp.op (grp.op g x) grp.e := (grp.op_id_right hgx_G).symm
       _ = grp.op (grp.op g x) (grp.op (grp.inv g) g) := by rw [grp.op_inv_left hg]
-      _ = grp.op (grp.op (grp.op g x) (grp.inv g)) g := grp.op_assoc hgx_G hginv hg
-      _ = grp.op x g := by rw [hact_eq]
+      _ = grp.op (grp.op (grp.op g x) (grp.inv g)) g := (grp.op_assoc hgx_G hginv hg).symm
+      _ = grp.op x g := by
+              -- make act g x syntactic, then apply hact_eq
+              have hact_def : grp.op (grp.op g x) (grp.inv g) =
+                              (HFGroupAction.conjugAction grp).act g x := rfl
+              rw [hact_def, hact_eq]).symm
   -- Por h_no_proper: p^k ∤ |stab x|
   have h_stab_ndvd := h_no_proper ((HFGroupAction.conjugAction grp).stab hx) hstab_ne
   -- Por contradicción: si p ∤ |orb x| entonces Coprime(p^k, |orb x|) → p^k | |stab x|
@@ -2660,7 +2664,7 @@ private theorem p_dvd_orbit_of_no_proper {grp : HFGroup} {p k : ℕ₀}
 open Peano Peano.Arith in
 /-- Por inducción fuerte sobre |S|: si S ⊆ G, S ⊆ G\Z(G), órbitas de conjugación
     cerradas en S y cada órbita divisible por p, entonces p | |S|. -/
-private theorem p_dvd_card_orbit_closed_set {grp : HFGroup} {p : ℕ₀} (hp : Peano.Arith.Prime p)
+private theorem p_dvd_card_orbit_closed_set {grp : HFGroup} {p : ℕ₀} (_hp : Peano.Arith.Prime p)
     (S : HFSet)
     (hS_sub : S ⊆ grp.G)
     (hS_nc : ∀ x ∈ S, x ∉ (center grp).H)
@@ -2668,58 +2672,52 @@ private theorem p_dvd_card_orbit_closed_set {grp : HFGroup} {p : ℕ₀} (hp : P
     (hS_dvd : ∀ x ∈ S, p ∣ HFSet.card ((HFGroupAction.conjugAction grp).orb x)) :
     p ∣ HFSet.card S := by
   -- Inducción fuerte sobre card S, parametrizada sobre T para que IH sea útil
-  apply (Peano.WellFounded.strongInductionOn (HFSet.card S) (P := fun n =>
+  refine (Peano.WellFounded.strongInductionOn (HFSet.card S) (P := fun n =>
       ∀ T : HFSet,
       HFSet.card T = n →
       T ⊆ grp.G →
       (∀ x ∈ T, x ∉ (center grp).H) →
       (∀ x ∈ T, (HFGroupAction.conjugAction grp).orb x ⊆ T) →
       (∀ x ∈ T, p ∣ HFSet.card ((HFGroupAction.conjugAction grp).orb x)) →
-      p ∣ HFSet.card T))
-    S rfl hS_sub hS_nc hS_closed hS_dvd
+      p ∣ HFSet.card T) ?_ S rfl hS_sub hS_nc hS_closed hS_dvd)
   intro n ih T hcard hT_sub hT_nc hT_closed hT_dvd
   by_cases hT_empty : T = HFSet.empty
   · rw [hT_empty, HFSet.card_empty]; exact divides_zero p
   · -- T ≠ ∅: existe x₀ ∈ T
     obtain ⟨x₀, hx₀⟩ := HFSet.nonempty_of_ne_empty T hT_empty
-    have hx₀_G : x₀ ∈ grp.G := hT_sub hx₀
+    have hx₀_G : x₀ ∈ grp.G := hT_sub x₀ hx₀   -- explicit element
     let O := (HFGroupAction.conjugAction grp).orb x₀
-    -- x₀ ∈ O
     have hx₀_O : x₀ ∈ O :=
       HFGroupAction.orb_self (HFGroupAction.conjugAction grp) hx₀_G
-    -- O ⊆ T
+    -- O ⊆ T (hT_closed takes explicit element, then membership, then subset proof)
     have hO_sub_T : O ⊆ T := hT_closed x₀ hx₀
     -- T = O ∪ (T \ O)
     have hT_split : T = HFSet.union O (HFSet.setminus T O) := by
       apply HFSet.extensionality; intro y
       rw [HFSet.mem_union, HFSet.mem_setminus]
       exact ⟨fun hy => if hyo : y ∈ O then Or.inl hyo else Or.inr ⟨hy, hyo⟩,
-             fun h => h.elim (hO_sub_T ·) (·.1)⟩
+             fun h => h.elim (fun hy_O => hO_sub_T y hy_O) (·.1)⟩
     -- inter O (T \ O) = ∅
     have hdisj : HFSet.inter O (HFSet.setminus T O) = HFSet.empty := by
       apply HFSet.extensionality; intro y
       constructor
       · intro hy
-        have ⟨hyO, _, hynO⟩ := (HFSet.mem_inter O (HFSet.setminus T O) y).mp hy |>.1
-          |>.intro (HFSet.mem_setminus T O y |>.mp)
-        exact absurd hyO hynO
+        have ⟨hyO, hyTO⟩ := (HFSet.mem_inter O (HFSet.setminus T O) y).mp hy
+        exact absurd hyO ((HFSet.mem_setminus T O y).mp hyTO).2
       · intro hy; exact absurd hy (HFSet.not_mem_empty y)
     -- card T = card O + card(T \ O)
-    have hcard_split : HFSet.card T = add (HFSet.card O) (HFSet.card (HFSet.setminus T O)) := by
-      calc HFSet.card T
-          = HFSet.card (HFSet.union O (HFSet.setminus T O)) := congrArg HFSet.card hT_split
-        _ = add (HFSet.card O) (HFSet.card (HFSet.setminus T O)) :=
-              HFSet.card_union_disjoint O (HFSet.setminus T O) hdisj
+    have hcard_split : HFSet.card T = add (HFSet.card O) (HFSet.card (HFSet.setminus T O)) :=
+      congrArg HFSet.card hT_split |>.trans
+        (HFSet.card_union_disjoint O (HFSet.setminus T O) hdisj)
     -- card(T \ O) < card T = n
     have hcard_lt : lt₀ (HFSet.card (HFSet.setminus T O)) n := by
       rw [← hcard, hcard_split]
       have hO_ne : O ≠ HFSet.empty := fun h => absurd (h ▸ hx₀_O) (HFSet.not_mem_empty x₀)
-      have hO_pos : lt₀ 𝟘 (HFSet.card O) :=
-        pos_of_ne_zero _ (fun h => hO_ne (HFSet.card_eq_zero_iff.mp h))
-      exact lt_of_le_add_left _ _ hO_pos
-    -- Sublemmas for IH
+      -- lt_self_add_l : lt₀ b (add a b) when a ≠ 0
+      exact Peano.Add.lt_self_add_l _ _ (fun h => hO_ne (HFSet.card_eq_zero_iff.mp h))
+    -- Sublemmas for IH (all calls need explicit element before membership proof)
     have hTO_sub : HFSet.setminus T O ⊆ grp.G :=
-      fun y hy => hT_sub ((HFSet.mem_setminus T O y).mp hy).1
+      fun y hy => hT_sub y ((HFSet.mem_setminus T O y).mp hy).1
     have hTO_nc : ∀ y ∈ HFSet.setminus T O, y ∉ (center grp).H :=
       fun y hy => hT_nc y ((HFSet.mem_setminus T O y).mp hy).1
     have hTO_closed : ∀ y ∈ HFSet.setminus T O,
@@ -2727,12 +2725,16 @@ private theorem p_dvd_card_orbit_closed_set {grp : HFGroup} {p : ℕ₀} (hp : P
       intro y hy
       have ⟨hyT, hyO⟩ := (HFSet.mem_setminus T O y).mp hy
       intro z hz
-      have hzT : z ∈ T := hT_closed y hyT hz
+      have hzT : z ∈ T := hT_closed y hyT z hz   -- explicit z and hz
       have hzO : z ∉ O := by
         intro hzO
-        have hy_G : y ∈ grp.G := hT_sub hyT
+        have hy_G : y ∈ grp.G := hT_sub y hyT   -- explicit y
         rcases (HFGroupAction.conjugAction grp).orbits_partition hy_G hx₀_G with heq | hdisj_yo
-        · exact absurd (heq ▸ HFGroupAction.orb_self (HFGroupAction.conjugAction grp) hy_G) hyO
+        · -- heq : orb y = orb x₀; use rw to get y ∈ O
+          have : y ∈ (HFGroupAction.conjugAction grp).orb y :=
+            HFGroupAction.orb_self _ hy_G
+          rw [heq] at this
+          exact absurd this hyO
         · exact absurd ((HFSet.mem_inter _ O z).mpr ⟨hz, hzO⟩)
             (hdisj_yo ▸ HFSet.not_mem_empty z)
       exact (HFSet.mem_setminus T O z).mpr ⟨hzT, hzO⟩
@@ -2764,7 +2766,7 @@ private theorem p_dvd_setminus_center_of_no_proper {grp : HFGroup} {p k : ℕ₀
   · -- orb(x) ⊆ S for x ∈ S
     intro x hxS
     have hx := (HFSet.mem_setminus grp.G (center grp).H x).mp hxS
-    exact fun y hy => conj_orb_closed_in_setminus hx.1 hx.2 hy
+    exact conj_orb_closed_in_setminus hx.1 hx.2
   · -- p | |orb(x)| for x ∈ S
     intro x hxS
     have hx := (HFSet.mem_setminus grp.G (center grp).H x).mp hxS
@@ -2852,18 +2854,6 @@ private theorem cyclicSubgroup_of_central_isNormal {grp : HFGroup} {z : HFSet}
 -- ==================================================================
 
 open Peano Peano.Arith in
-/-- Si `p ∣ n` con testigo `q` (n = p * q), y `q * card(sub.H) = card G`,
-    entonces `p^k ∣ q` iff `p^(k+1) ∣ n`. -/
-private theorem mul_div_dvd_iff {p q n k : ℕ₀} (hp : Peano.Arith.Prime p) (hpq : mul p q = n)
-    (h : p ^ k ∣ q) : p ^ (σ k) ∣ n := by
-  obtain ⟨c, hc⟩ := h
-  refine ⟨c, ?_⟩
-  rw [← hpq, hc]
-  have hps : p ^ σ k = mul p (p ^ k) := by
-    rw [pow_def]; exact (Peano.Pow.pow_succ p k).trans (mul_comm _ _)
-  rw [hps, mul_assoc]
-
-open Peano Peano.Arith in
 /-- Card du quotient: |G/⟨z⟩| = |G| / p quand |⟨z⟩| = p. -/
 private theorem card_quotient_cyclic {grp : HFGroup} {z : HFSet}
     (hz : z ∈ grp.G) (hz_center : z ∈ (center grp).H)
@@ -2897,11 +2887,10 @@ open Peano Peano.Arith in
 theorem sylow_first (grp : HFGroup) (p k : ℕ₀)
     (hp : Peano.Arith.Prime p) (hdvd : p ^ k ∣ HFSet.card grp.G) :
     ∃ sub : HFSubgroup grp, HFSet.card sub.H = p ^ k := by
-  apply (Peano.WellFounded.strongInductionOn (HFSet.card grp.G) (P := fun n =>
+  refine (Peano.WellFounded.strongInductionOn (HFSet.card grp.G) (P := fun n =>
     ∀ (grp : HFGroup), HFSet.card grp.G = n →
     ∀ (p k : ℕ₀), Peano.Arith.Prime p → p ^ k ∣ HFSet.card grp.G →
-    ∃ sub : HFSubgroup grp, HFSet.card sub.H = p ^ k))
-      grp rfl p k hp hdvd
+    ∃ sub : HFSubgroup grp, HFSet.card sub.H = p ^ k) ?_ grp rfl p k hp hdvd)
   intro n ih grp' hcard' p' k' hp' hdvd'
   cases k' with
   | zero => exact sylow_first_zero grp' p'
@@ -2974,17 +2963,26 @@ theorem sylow_first (grp : HFGroup) (p k : ℕ₀)
             ⟨mul ((σ p'_pred) ^ m) c, hc'⟩
           refine ⟨c, ?_⟩
           -- div(card G', p') = p'^m · c
-          apply mul_cancelation_left (σ p'_pred) _ _ hp'_ne
-          conv_lhs => rw [mul_comm]
-          rw [div_mul_cancel hp'_ne hdvd_G]
-          exact hc'
+          -- Use right-cancellation: (div G p') · p' = G = p' · (p'^m · c) = (p'^m · c) · p'
+          apply mul_cancelation_right _ _ (σ p'_pred) hp'_ne
+          -- mul (div G p') p' = G = mul (p'^m · c) p'
+          exact (div_mul_cancel hp'_ne hdvd_G).trans (hc'.trans (mul_comm _ _))
         -- |Q| < n
-        have hcosets_ne : HFSet.card N.cosets ≠ 𝟘 :=
-          fun h => absurd (HFSet.card_eq_zero_iff.mp h ▸ cosetOf_mem_cosets N grp'.e_mem)
-            (HFSet.not_mem_empty _)
+        have hcosets_ne : HFSet.card N.cosets ≠ 𝟘 := by
+          intro h
+          have hmem : N.cosetOf grp'.e ∈ N.cosets := N.cosetOf_mem_cosets grp'.e_mem
+          rw [HFSet.card_eq_zero_iff.mp h] at hmem
+          exact HFSet.not_mem_empty _ hmem
         have hQ_lt : lt₀ (HFSet.card Q.G) n := by
-          rw [← hcard', hQ_card, ← (hQ_card : HFSet.card N.cosets = _), ← hlag_N]
-          exact Peano.Mul.mul_lt_left _ _ hcosets_ne (prime_ge_two hp')
+          rw [← hcard']
+          -- Q.G = N.cosets definitionally; hlag_N : card G = mul (card cosets) p'
+          show lt₀ (HFSet.card N.cosets) (HFSet.card grp'.G)
+          rw [hlag_N]
+          -- prime_ge_two : le₀ 𝟚 p' ≠ lt₀ 𝟙 p' in general; bridge via succ_lt_succ_iff
+          have hp_gt1 : lt₀ 𝟙 (σ p'_pred) :=
+            (succ_lt_succ_iff 𝟘 p'_pred).mpr
+              (pos_of_ne_zero _ (fun h => hp'.2.1 (show σ p'_pred = 𝟙 by rw [h]; rfl)))
+          exact Peano.Mul.mul_lt_left _ _ hcosets_ne hp_gt1
         -- HI sobre Q
         obtain ⟨sub_Q, hsub_Q⟩ :=
           ih (HFSet.card Q.G) hQ_lt Q rfl (σ p'_pred) m hp' hQ_dvd
@@ -3050,4 +3048,14 @@ end HFAlgebra
 --   order_eq_prime_of_pow             : g^p = e, primo p, g ≠ e → order g = p   (§30)
 --   cyclicCarrier_card_eq_order       : card(⟨g⟩) = order g                    (§31)
 --   cauchy_minimal                    : primo p, p ∣ |G| → ∃ sub, card sub = p  (§32)
+--
+-- Público (HFAlgebra — §33–§40: Primer Teorema de Sylow):
+--   subgroupOfSubgroup                : subgrupo de subgrupo es subgrupo de G   (§33)
+--   card_preimage_mul                 : card(π⁻¹(Q)) = card(Q) · card(N)       (§34)
+--   cyclicSubgroup_of_central_isNormal: ⟨z⟩ normal cuando z ∈ Z(G)             (§38)
+--   card_quotient_cyclic              : card(G/⟨z⟩) = card(G)/p, |⟨z⟩| = p      (§39)
+--   sylow_first                       : **Primer Teorema de Sylow** —          (§40)
+--       primo p, p^k ∣ |G| → ∃ subgrupo de orden p^k
+--       (inducción fuerte sobre |G|; ramas: subgrupo propio p-divisible,
+--        |G| = p^k, o Cauchy en Z(G) + cociente G/N + preimagen)
 
