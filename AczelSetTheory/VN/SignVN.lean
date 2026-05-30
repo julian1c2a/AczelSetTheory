@@ -8,15 +8,17 @@ License: MIT
 --
 -- Signatura de permutaciones sobre el embedding de Von Neumann.
 --
--- Estado: ⚠️ Stub-equivalente.
---   Este módulo es el análogo en AczelSetTheory del stub
---   `Peano/PeanoNat/Combinatorics/Sign.lean` (también vacío).
---   La paridad estructural con Peano se mantiene: cuando Peano materialice
---   la signatura (sgn σ ∈ {+1,-1}, homomorfismo Sₙ → ℤ/2), este módulo
---   recibirá el transporte VN correspondiente.
+-- Estado: ⚠️ STUB HUÉRFANO — no se materializará por transporte.
+--   Por ADR-000 (DECISIONS.md, 2026-05-30): Peano queda congelado para teoría
+--   "hacia arriba" y la teoría nueva NO se transporta vía VN. La signatura de
+--   permutaciones (sgn σ ∈ {+1,−1}, homomorfismo Sₙ → ℤ/2) se construirá, cuando
+--   se aborde, de forma NATIVA en `AczelSetTheory/Combinatorics/` (sobre SymGroup
+--   nativo), no aquí.
+--   Este archivo se conserva solo como marcador histórico de la fase de paridad
+--   Peano↔Aczel (bootstrapping). Candidato a retirar.
 --
 -- Contenido:
---   (vacío — placeholder de paridad)
+--   (vacío — placeholder histórico, ver Combinatorics/ para la teoría nativa)
 
 import AczelSetTheory.VN.SymGroupVN
 import Peano.PeanoNat.Combinatorics.Sign

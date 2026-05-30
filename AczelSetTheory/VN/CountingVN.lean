@@ -8,14 +8,16 @@ License: MIT
 --
 -- Principios de conteo sobre el embedding de Von Neumann.
 --
--- Estado: ⚠️ Stub-equivalente.
---   Este módulo es el análogo en AczelSetTheory del stub
---   `Peano/PeanoNat/Combinatorics/Counting.lean` (también vacío).
---   La paridad estructural con Peano se mantiene: cuando Peano materialice
---   pigeonhole / inclusión-exclusión, este módulo recibirá el transporte VN.
+-- Estado: ⚠️ STUB HUÉRFANO — no se materializará por transporte.
+--   Por ADR-000 (DECISIONS.md, 2026-05-30): Peano queda congelado para teoría
+--   "hacia arriba" y la teoría nueva NO se transporta vía VN. El conteo nativo
+--   vive en `AczelSetTheory/Combinatorics/Counting.lean` (pigeonhole ya demostrado:
+--   `HFSet.pigeonhole`, `HFSet.exists_collision_of_card_lt`).
+--   Este archivo se conserva solo como marcador histórico de la fase de paridad
+--   Peano↔Aczel (bootstrapping). Candidato a retirar.
 --
 -- Contenido:
---   (vacío — placeholder de paridad)
+--   (vacío — placeholder histórico, ver Combinatorics/ para el conteo nativo)
 
 import AczelSetTheory.VN.Basic
 import AczelSetTheory.VN.FSet

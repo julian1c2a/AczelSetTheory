@@ -18,6 +18,75 @@ Ver PLANNING.md para el roadmap a largo plazo.
 
 ---
 
+## ✅ COMPLETED (2026-05-30) — Sylow I §33–§40 + Lean v4.30.0 + Combinatorics nativo
+
+### Primer Teorema de Sylow (`Sylow.lean` §33–§40)
+
+`sylow_first` demostrado sin `sorry`. `#print axioms sylow_first` → `[propext,
+Classical.choice, Quot.sound]` (sin sorryAx). `lake build AczelSetTheory` → 0 sorries.
+
+```lean
+theorem sylow_first (grp : HFGroup) (p k : ℕ₀)
+    (hp : Peano.Arith.Prime p) (hdvd : p ^ k ∣ HFSet.card grp.G) :
+    ∃ sub : HFSubgroup grp, HFSet.card sub.H = p ^ k
+```
+
+Inducción fuerte sobre `|G|`; caso `k = σ m` con 3 ramas: (1) ∃ M propio p-divisible
+→ HI + `subgroupOfSubgroup`; (2) `|G| = p^k` → `improperSubgroup`; (3) `p ∣ |Z(G)|`
+(ecuación de clases) → Cauchy en Z(G) → cociente `G/N` + preimagen `π⁻¹`.
+
+Fixes de compilación aplicados (detalle técnico en memoria `feedback_lean.md`):
+§35 `^`=HPow≠Peano.Pow (puente `pow_def`); §36 dirección `mem_center_iff` y `⊆` con
+elemento explícito; §37 reescrito sin `k.pred`/`pow_succ_eq`; §38 intro order de
+`isNormal`; §39 `mul_cancelation`; §40 `Prime` explícito, `strongInductionOn` con
+`refine`, construcción `N` directa. Eliminado código muerto `mul_div_dvd_iff`.
+
+### Lean v4.30.0 (bump desde v4.29.1)
+
+`lean-toolchain` → v4.30.0 (última estable). peanolib (repo Peano) también bumpeado:
+`ConstructiveCheck.lean` migrado de `CollectAxioms.collect` (privado en 4.30) a la API
+pública `Lean.collectAxioms`. Script `update-toolchain.bash` mejorado (consulta GitHub
+API + verifica lib completa). Rutina `/schedule` semanal vigila nuevas versiones.
+
+### Combinatorics nativo (ADR-000)
+
+Nueva capa `AczelSetTheory/Combinatorics/` (teoría nativa, no transporte VN):
+- `HFSet.pigeonhole`: f función-clase A→B inyectiva → `card A ≤ card B`.
+- `HFSet.exists_collision_of_card_lt`: `card B < card A` → ∃ colisión `x≠y`.
+
+### Lecciones técnicas clave (resumen; completo en `feedback_lean.md`)
+
+1. `^` en Sylow resuelve a `HPow.hPow`, no `Peano.Pow.pow` → puente `pow_def`.
+2. `Prime` ambiguo con `open Peano.Arith Peano.Primes` → `Peano.Arith.Prime` explícito.
+3. `⊆` en HFSet = `∀ x, x∈A → x∈B`: subset toma elemento explícito (`h x hx`).
+4. `isNormal` = `∀ (g n), g∈G → n∈H → …`: intro `g n hg hn`.
+5. `prime_ge_two` da `le₀ 𝟚 p`, no `lt₀ 𝟙 p` → puente vía `succ_lt_succ_iff`.
+6. `strongInductionOn`: `refine (… ?_ args)`, no `apply … args`.
+7. `by_contra` NO existe sin Mathlib → `Classical.byContradiction`.
+8. Migración toolchain: APIs internas (`CollectAxioms.collect`) cambian; usar las
+   públicas (`Lean.collectAxioms`). Lake compila deps git con el toolchain del raíz.
+
+### Referencias rápidas (lemas peanolib/HFSet verificados)
+
+| Símbolo | Ubicación | Firma |
+|---------|-----------|-------|
+| `pow_def` | Combinatorics/Pow.lean:402 | `a ^ b = Peano.Pow.pow a b` |
+| `pos_of_ne_zero` | StrictOrder.lean:174 | `n ≠ 𝟘 → lt₀ 𝟘 n` |
+| `nlt_of_le` | Order.lean:1430 | `le₀ a b → ¬ lt₀ b a` |
+| `succ_lt_succ_iff` | StrictOrder.lean:336 | `lt₀ (σ n) (σ m) ↔ lt₀ n m` |
+| `le_iff_lt_or_eq` | Order.lean:1418 | `le₀ a b ↔ lt₀ a b ∨ a = b` |
+| `div_mul_cancel` | Arith.lean:800 | `b ≠ 𝟘 → b ∣ a → mul (a/b) b = a` |
+| `mul_cancelation_left/right` | Mul.lean:163/200 | cancelación por factor ≠ 𝟘 |
+| `card_le_of_subset` | OrdinalNat.lean:47 | `A ⊆ B → card A ≤ card B` |
+| `card_classImage_inj` | CardImage.lean:39 | inyectiva → `card(img) = card A` |
+| `card_eq_of_classBij` | CardImage.lean:110 | biyección-clase → `card A = card B` |
+| `card_eq_zero_iff` | Cardinal.lean:148 | `card A = 𝟘 ↔ A = empty` |
+| `cauchy_minimal` | Sylow.lean:§32 | `Prime (σ n) → σ n ∣ card G → ∃ sub, card = σ n` |
+| `subgroupOfSubgroup` | Sylow.lean:§33 | `sub₂ : Subgrp sub₁.G → Subgrp G` |
+| `card_preimage_mul` | Sylow.lean:§34 | `card(π⁻¹ Q) = mul (card Q.H) (card N.H)` |
+
+---
+
 ## ✅ COMPLETED (2026-05-29) — Cauchy vía McKay: §28–§32 [`Sylow.lean`]
 
 Completado el **Teorema de Cauchy** mediante el argumento combinatorio de McKay. 0 sorry, 0 warnings.

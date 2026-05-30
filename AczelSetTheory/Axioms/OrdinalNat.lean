@@ -288,7 +288,7 @@ theorem card_cartProd (A B : HFSet) :
           card_singleton_cartProd a B, card_insert a A' haA', succ_mul]
 
 /-- Si A ⊆ B y b ∈ B \ A, entonces card A < card B. -/
-private theorem card_lt_of_ssubset {A B : HFSet} (hAB : A ⊆ B)
+theorem card_lt_of_ssubset {A B : HFSet} (hAB : A ⊆ B)
     (b : HFSet) (hbB : b ∈ B) (hbA : b ∉ A) : card A < card B := by
   have h_ins : insert b A ⊆ B := fun x hx => by
     rcases (mem_insert x b A).mp hx with rfl | hxA
