@@ -69,4 +69,63 @@ theorem exists_collision_of_card_lt {A B : HFSet} {f : HFSet → HFSet}
   -- pero entonces card A ≤ card B, contradiciendo card B < card A
   exact absurd hlt (nlt_of_le (pigeonhole hf_into hf_inj))
 
+-- ─────────────────────────────────────────────────────────────────
+-- §3. Conteo de inyecciones: tallas iguales y no-biyección
+-- ─────────────────────────────────────────────────────────────────
+
+/-- Un subconjunto con la misma cardinalidad que el total es el total
+    (conjuntos finitos). -/
+theorem eq_of_subset_of_card_eq {A B : HFSet} (hsub : A ⊆ B)
+    (hcard : card A = card B) : A = B := by
+  apply Classical.byContradiction
+  intro hne
+  -- A ⊆ B con A ≠ B ⟹ existe testigo b ∈ B \ A
+  have hex : ∃ b, b ∈ B ∧ b ∉ A := by
+    apply Classical.byContradiction
+    intro hnex
+    apply hne
+    apply extensionality
+    intro x
+    exact ⟨fun hxA => hsub x hxA,
+           fun hxB => Classical.byContradiction (fun hxA => hnex ⟨x, hxB, hxA⟩)⟩
+  obtain ⟨b, hbB, hbA⟩ := hex
+  have hlt := card_lt_of_ssubset hsub b hbB hbA
+  rw [hcard] at hlt
+  exact absurd hlt (lt_irrefl _)
+
+/-- Si `f : A → B` es inyectiva y `card A = card B`, entonces `f` es sobreyectiva
+    sobre `B`: todo `b ∈ B` tiene preimagen en `A`. Es la forma "inyectiva ⟹
+    biyectiva" para conjuntos finitos de la misma talla. -/
+theorem surjective_of_injective_of_card_eq {A B : HFSet} {f : HFSet → HFSet}
+    (hf_into : ∀ x, x ∈ A → f x ∈ B)
+    (hf_inj  : ∀ x y, x ∈ A → y ∈ A → f x = f y → x = y)
+    (hcard   : card A = card B) :
+    ∀ y, y ∈ B → ∃ x ∈ A, y = f x := by
+  have hcard_img : card (sep B (fun y => ∃ x ∈ A, y = f x)) = card A :=
+    card_classImage_inj f B A hf_into hf_inj
+  have hsub : sep B (fun y => ∃ x ∈ A, y = f x) ⊆ B :=
+    fun x hx => ((mem_sep B _ x).mp hx).1
+  have himg_eq : sep B (fun y => ∃ x ∈ A, y = f x) = B :=
+    eq_of_subset_of_card_eq hsub (hcard_img.trans hcard)
+  intro y hy
+  rw [← himg_eq] at hy
+  exact ((mem_sep B _ y).mp hy).2
+
+/-- No-biyección entre tallas distintas: si `f : A → B` es inyectiva y
+    `card A ≠ card B`, entonces `f` no es sobreyectiva — existe `y ∈ B` sin
+    preimagen en `A`. -/
+theorem not_surjective_of_card_ne {A B : HFSet} {f : HFSet → HFSet}
+    (hf_into : ∀ x, x ∈ A → f x ∈ B)
+    (hf_inj  : ∀ x y, x ∈ A → y ∈ A → f x = f y → x = y)
+    (hne     : card A ≠ card B) :
+    ∃ y, y ∈ B ∧ ¬ ∃ x ∈ A, y = f x := by
+  apply Classical.byContradiction
+  intro h
+  have hsurj : ∀ y, y ∈ B → ∃ x ∈ A, y = f x := by
+    intro y hy
+    apply Classical.byContradiction
+    intro hny
+    exact h ⟨y, hy, hny⟩
+  exact hne (card_eq_of_classBij hf_into hf_inj hsurj)
+
 end HFSet
