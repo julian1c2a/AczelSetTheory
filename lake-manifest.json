@@ -1,15 +1,16 @@
-{"version": "1.1.0",
+{"version": "1.2.0",
  "packagesDir": ".lake/packages",
  "packages":
  [{"url": "https://github.com/julian1c2a/Peano",
    "type": "git",
    "subDir": null,
    "scope": "",
-   "rev": "56ae3d256e7c0705e176d8ae0b1003a9c71df10c",
+   "rev": "5a6c1987992814184ad5d7e3aeaad98b7b12dd20",
    "name": "peanolib",
    "manifestFile": "lake-manifest.json",
    "inputRev": "master",
    "inherited": false,
    "configFile": "lakefile.lean"}],
  "name": "aczelsettheory",
- "lakeDir": ".lake"}
+ "lakeDir": ".lake",
+ "fixedToolchain": false}

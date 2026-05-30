@@ -164,7 +164,7 @@ def comp {ts₁ ts₂ ts₃ : HFTopSpace}
 
 /-- La preimagen de `V₁ ∩ V₂` es `f⁻¹(V₁) ∩ f⁻¹(V₂)`. -/
 theorem preimage_inter (ts₁ ts₂ : HFTopSpace) (f : HFContinuous ts₁ ts₂)
-    {V₁ V₂ : HFSet} (h₁ : V₁ ∈ ts₂.τ) (h₂ : V₂ ∈ ts₂.τ) :
+    {V₁ V₂ : HFSet} (_h₁ : V₁ ∈ ts₂.τ) (_h₂ : V₂ ∈ ts₂.τ) :
     ts₁.preimage f.f (HFSet.inter V₁ V₂) =
     HFSet.inter (ts₁.preimage f.f V₁) (ts₁.preimage f.f V₂) := by
   apply HFSet.extensionality; intro x

@@ -186,7 +186,7 @@ theorem HFTopSpace.isolated_not_accumulation (ts : HFTopSpace) {x A : HFSet}
 
 /-- `x` es punto de adherencia de `A` si y solo si `x ∈ cl(A)`. -/
 theorem HFTopSpace.isAdherencePt_iff_mem_closure (ts : HFTopSpace) {x A : HFSet}
-    (hA : A ⊆ ts.X) :
+    (_hA : A ⊆ ts.X) :
     ts.isAdherencePt x A ↔ x ∈ ts.closure A := by
   unfold isAdherencePt closure
   rw [HFSet.mem_setminus]
@@ -214,7 +214,7 @@ theorem HFTopSpace.isAdherencePt_iff_mem_closure (ts : HFTopSpace) {x A : HFSet}
 
 /-- Todo punto de `X` es interior, exterior, o frontera de `A`. -/
 theorem HFTopSpace.interior_exterior_boundary_partition (ts : HFTopSpace) {A : HFSet}
-    (hA : A ⊆ ts.X) :
+    (_hA : A ⊆ ts.X) :
     ∀ x, x ∈ ts.X →
       ts.isInteriorPt x A ∨ ts.isExteriorPt x A ∨ ts.isBoundaryPt x A := by
   intro x hxX
