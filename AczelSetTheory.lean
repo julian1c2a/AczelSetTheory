@@ -20,3 +20,4 @@ import AczelSetTheory.VN
 import AczelSetTheory.Algebra
 import AczelSetTheory.Integers
 import AczelSetTheory.Topology
+import AczelSetTheory.Combinatorics
