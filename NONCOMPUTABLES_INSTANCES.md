@@ -1,12 +1,17 @@
 # NONCOMPUTABLE INSTANCES — AczelSetTheory
 
-**Fecha de inventario**: 22 de mayo de 2026  
-**Herramienta**: `grep -r "noncomputable" AczelSetTheory/`  
-**Total encontrado**: 27 ocurrencias en 9 archivos
+**Fecha de inventario**: 22 de mayo de 2026 (inventario histórico)
+**Última verificación**: 3 de junio de 2026
+**Herramienta**: `grep -r "noncomputable" AczelSetTheory/`
+**Total encontrado (2026-06-03)**: **0 ocurrencias reales** (única mención: comentario en `VN/QuotientGroupVN.lean:31`)
+
+> **Estado actual:** Las 25 entradas del inventario histórico (mayo 2026) han sido eliminadas
+> en el Sprint B (mayo-junio 2026). El proyecto mantiene el invariante `noncomputable def: 0`.
+> La tabla histórica se conserva a continuación como referencia de las decisiones de diseño.
 
 ---
 
-## Tabla resumen
+## Tabla resumen (inventario histórico — mayo 2026, ya resuelto)
 
 | # | Archivo | Definición | Razón raíz | Fijable |
 |---|---------|-----------|------------|---------|

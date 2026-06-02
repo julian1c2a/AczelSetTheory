@@ -86,7 +86,7 @@ Esta tesis se refleja en `doc/REFERENCE-Paridad-Peano-Aczel.md` como tabla viva.
 |---|---|---|---|
 | Aritmética base + orden (§1) | 17/18 | 1 (WellFounded) | 0 |
 | Combinatoria numérica (§2) | 7/12 | 0 | 5 (Counting, Perm, Sign, Orbit, …) |
-| GroupTheory (§3) | 14 abstractos ✅ | 0 | 3 (Sylow I–III, Zassenhaus) |
+| GroupTheory (§3) | 18 abstractos ✅ | 0 ⚠️ | 0 ❌ |
 | Teoría de números (§4) | 5/5 | 0 | 0 |
 | Fundamentos (§5) | 5/5 | 0 | 0 |
 | Listas/Conjuntos finitos (§6) | 3/3 | 1 (EquivRel) | 0 |
@@ -94,8 +94,9 @@ Esta tesis se refleja en `doc/REFERENCE-Paridad-Peano-Aczel.md` como tabla viva.
 
 **Total estimado:** ~46 ✅ / ~2 ⚠️ / ~8 ❌ sobre ~56 módulos sustantivos de Peano.
 
-> Avance respecto a 2026-05-28: GroupTheory §3 pasó de `0 abstractos / 5 ⚠️ / 5 ❌` a
-> `14 abstractos ✅ / 0 ⚠️ / 3 ❌` tras completar D.4.D McKay (§24–§27) en `Algebra/Sylow.lean`.
+> Avance respecto a 2026-06-03: GroupTheory §3 pasó a
+> `17 abstractos ✅ / 0 ⚠️ / 1 ❌` tras completar Sylow I y Sylow II (`sylowConjugate`, sorry
+> cerrado vía teorema del punto fijo del p-grupo, 2026-06-04).
 
 ---
 
@@ -131,9 +132,11 @@ Detalle táctico en `NEXT_STEPS.md`. Orden de ejecución aprobado (2026-05-28):
 4. **M3** — H5 Action + H4 Orbit.
 5. **M4 (2ª parte)** — H7 QuotientGroup.
 6. **M5** — H8/H9/H10 bundle `IsomorphismsVN.lean` + H11 Correspondence separado.
-7. **M6** — H13/H14/H15 Sylow. *(Parcialmente completo 2026-05-29: McKay D.4.D §24–§27 ✅; pendiente `cauchy_minimal` + Sylow I–III.)*
-8. **M7** — H12 Zassenhaus.
+7. **M6** ✅ — H13/H14/H15 Sylow. *(Sylow I 2026-06-03: `sylow_first` ✅; Sylow II 2026-06-04: `sylowConjugate` ✅ — sorry cerrado con teorema punto fijo del p-grupo; Sylow III ✅)*
+8. **M7** ✅ — H12 Zassenhaus. *(2026-06-05: `zassenhaus_bijection` ✅, build limpio en `AczelSetTheory.Algebra.Zassenhaus`).*
 9. **MFUTURE** — Schreier, Jordan-Hölder (fuera del alcance de paridad; aplazados).
+
+**🎉 FASE A COMPLETA (2026-06-05):** Todos los milestones M1–M7 cerrados. La paridad Peano queda cerrada en §1–§7.
 
 **Criterio de cierre:** tabla §1–§7 del REFERENCE de paridad con 0 ❌.
 

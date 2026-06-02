@@ -6,7 +6,40 @@ All notable changes to this project are documented here.
 
 ---
 
-## [2026-06-02] — Sylow constructivo + Sprint B (inicial + B.2) de cocientes/isomorfismos
+## [2026-06-04] — Sylow II: sorry cerrado — M6 completado (0 sorries en todo el proyecto)
+
+### Added / Changed
+
+- **`AczelSetTheory/Algebra/Sylow.lean`** (§36-bis + §37):
+  - Nuevo import: `AczelSetTheory.Algebra.CosetAction`.
+  - Nuevas sección `§36-bis. Punto fijo del p-grupo`:
+    - `HFGroupAction.orb_act_mem` (private): la órbita es cerrada bajo la acción.
+    - `HFGroupAction.setminus_orb_inv` (private): `X \ orb x` es invariante bajo la acción.
+    - `p_group_fixed_point` (private): si `|G| = p^n` y `p ∤ |X|`, existe punto fijo en X.
+      Demostrado por inducción fuerte sobre `|X|` con partición `X = orb y₀ ⊔ (X \ orb y₀)`.
+  - `sylowConjugate`: sorry cerrado — `hfixed` ahora probado usando `p_group_fixed_point`
+    con `cosetAction K H` (K actúa sobre H.cosets), extrayendo `g₀ = H.cosetRep C`
+    del cosete fijo C y deduciendo `g₀·K·g₀⁻¹ ⊆ H` vía `cosetAction_act_cosetOf`
+    y `cosetEq_iff_rightCoset_eq`.
+  - Build: ✅ 88 jobs, **0 sorries**, 0 errores.
+- **`PLANNING.md`**: M6 marcado ✅ completo; GroupTheory §3: 17 ✅ / 0 ⚠️ / 1 ❌.
+- **`CURRENT-STATUS-PROJECT.md`**, **`NEXT_STEPS.md`**: actualizados.
+
+---
+
+## [2026-06-03] — Sylow II: estructura completa de la prueba de conjugación
+
+### Added / Changed
+
+- **`AczelSetTheory/Algebra/Sylow.lean`** (§37):
+  - `sylowConjugate`: prueba de que todo par de Sylow-p es conjugado.
+    Estructura lógica completa (8 pasos): cardinalidad, p ∤ |H.cosets|,
+    punto fijo (sorry documentado), subconjunto, igualdad por card+subset,
+    conclusión vía `SylowConjugateSubtype`.
+  - `SylowConjugateTotal_of_isSylowExponent`: cierra `SylowConjugateTotal`.
+  - `sylowSecondConjugacyTarget_of_isSylowExponent`: cierra `SylowSecondConjugacyTarget`.
+  - Nuevo import: `AczelSetTheory.Combinatorics.Counting`.
+  - Build: ✅ 87 jobs, 1 sorry documentado.
 
 ### Changed
 

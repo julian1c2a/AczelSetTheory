@@ -159,7 +159,6 @@ abbrev firstIsoMap :
     have hop : φ.ker.quotientOp C₁ C₂ =
         φ.ker.rightCoset (G.op (φ.ker.cosetRep C₁) (φ.ker.cosetRep C₂)) := rfl
     rw [hop, φ.firstIsoFun_eq (G.op_closed hr₁ hr₂), φ.f_hom hr₁ hr₂]
-    rfl
 
 theorem firstIsoMap_welldefined {g : HFSet} (hg : g ∈ G.G) :
     φ.firstIsoMap.f (φ.ker.rightCoset g) = φ.f g :=

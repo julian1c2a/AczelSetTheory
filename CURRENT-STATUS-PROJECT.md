@@ -1,6 +1,6 @@
 # Current Project Status — AczelSetTheory
 
-**Last updated:** 2026-06-02
+**Last updated:** 2026-06-04
 **Author**: Julián Calderón Almendros
 
 ---
@@ -11,10 +11,10 @@
 |--------|-------|
 | Total modules (non-barrel) | 133 |
 | Total modules (incl. barrels) | 142 |
-| Modules with 0 sorry | 133 / 133 |
+| Modules with 0 sorry | 134 / 134 |
 | Total sorry | 0 |
 | Build status | ✅ Passing — 0 errors, 0 warnings |
-| Lean version | v4.29.0 |
+| Lean version | v4.30.0 |
 | Naming convention | Mathlib-style (see NAMING-CONVENTIONS.md) |
 
 ---
@@ -186,7 +186,7 @@
 | Algebra/SecondIsomorphism.lean | `secondIsoMap`, `secondIsoMap_bijective` | ✅ |
 | Algebra/ThirdIsomorphism.lean | `thirdIsoMap`, `thirdIsoMap_ker_eq` | ✅ |
 | Algebra/CorrespondenceTheorem.lean | `preimageSubgroup`, `imageSubgroup_preimage`, `preimageSubgroup_image` | ✅ |
-| Algebra/Sylow.lean | `mckayCarrier`, `mckayShift`, `orbitOf`, `periodOf`, `succ_n_dvd_card_mckayFixedPoints` (D.4.D McKay), 50+ teoremas | ✅ |
+| Algebra/Sylow.lean | `mckayCarrier`, `mckayShift`, `orbitOf`, `periodOf`, `succ_n_dvd_card_mckayFixedPoints` (D.4.D McKay), `p_group_fixed_point`, `sylowConjugate`, `SylowConjugateTotal_of_isSylowExponent`, 50+ teoremas | ✅ |
 
 ### Integers/ (7 modules)
 
@@ -215,6 +215,29 @@
 ## Known Sorry Locations
 
 None — **0 sorry** across the entire project.
+
+---
+
+## Recent Achievements (2026-06-04) — M6 completo: Sylow II sorry cerrado
+
+- ✅ **Segundo Teorema de Sylow** completamente demostrado — 0 sorries.
+  - `p_group_fixed_point` (private): si `|G| = p^n` y `p ∤ |X|`, existe punto fijo en X.
+    Demostrado por inducción fuerte sobre `|X|` con partición de órbitas.
+  - `sylowConjugate`: hfixed probado vía `p_group_fixed_point` + `cosetAction K H`.
+  - M6 (H13/H14/H15 Sylow) marcado ✅ en PLANNING.md.
+- ✅ Build: 88 jobs, **0 errores, 0 sorries**.
+
+## Previous Achievements (2026-06-03) — Sylow I completo + Sylow II estructura
+
+- ✅ **Primer Teorema de Sylow** (`sylow_first`) completamente demostrado sin sorry.
+  - Infraestructura: `improperSubgroup`, `subgroupOfSubgroup`, `card_preimage_mul`.
+  - Auxiliares internos: rama de subgrupo propio (`§37` interno), Cauchy en Z(G), cociente + preimagen.
+  - Corolarios: `exists_isSylowSubgroup_of_isSylowExponent`, `exists_isPSubgroup_of_isSylowExponent`.
+  - Sylow III (parcial): `not_dvd_index_of_isSylowSubgroup`, `not_dvd_card_cosets_of_isSylowSubgroup`.
+- ✅ **Segundo Teorema de Sylow** — estructura lógica completa (`sylowConjugate`, `SylowConjugateTotal_of_isSylowExponent`, `sylowSecondConjugacyTarget_of_isSylowExponent`).
+  - Sorry cerrado en 2026-06-04 (ver arriba).
+- ✅ Build (2026-06-03): 87 jobs, 0 errores, 1 sorry (ya cerrado).
+- ✅ Documentación: `doc/REFERENCE-Algebra.md` actualizada con §33–§40 + §37-II; `REFERENCE.md` actualizado.
 
 ---
 

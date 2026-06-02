@@ -24,6 +24,7 @@ import AczelSetTheory.Axioms.Separation
 import AczelSetTheory.Axioms.Decidable
 import AczelSetTheory.Axioms.OrdinalNat
 import AczelSetTheory.Axioms.Intersection
+import AczelSetTheory.Axioms.CardImage
 
 namespace HFAlgebra
 
@@ -77,6 +78,223 @@ def inter (sub₁ sub₂ : HFSubgroup grp) : HFSubgroup grp where
   inv_closed := fun ha => by
     rw [HFSet.mem_inter] at ha ⊢
     exact ⟨sub₁.inv_closed ha.1, sub₂.inv_closed ha.2⟩
+
+-- ─────────────────────────────────────────────────────────────────
+-- Conjugación de subgrupos
+-- ─────────────────────────────────────────────────────────────────
+
+/-- Subgrupo conjugado `gHg⁻¹ = { x ∈ G | ∃ h ∈ H, x = g·h·g⁻¹ }`. -/
+def conjugate (sub : HFSubgroup grp) (g : HFSet) (hg : g ∈ grp.G) : HFSubgroup grp where
+  H := HFSet.sep grp.G (fun x => ∃ h ∈ sub.H, x = grp.op (grp.op g h) (grp.inv g))
+  H_sub := fun hx => by
+    rw [HFSet.mem_sep] at hx
+    exact hx.1
+  e_mem := by
+    rw [HFSet.mem_sep]
+    refine ⟨grp.e_mem, grp.e, sub.e_mem, ?_⟩
+    calc grp.e
+        = grp.op g (grp.inv g) := (grp.op_inv_right hg).symm
+      _ = grp.op (grp.op g grp.e) (grp.inv g) := by rw [grp.op_id_right hg]
+  op_closed := by
+    intro a b ha hb
+    rw [HFSet.mem_sep] at ha hb ⊢
+    obtain ⟨haG, h₁, hh₁, rfl⟩ := ha
+    obtain ⟨hbG, h₂, hh₂, rfl⟩ := hb
+    refine ⟨grp.op_closed haG hbG, grp.op h₁ h₂, sub.op_closed hh₁ hh₂, ?_⟩
+    have hh₁G : h₁ ∈ grp.G := sub.H_sub hh₁
+    have hh₂G : h₂ ∈ grp.G := sub.H_sub hh₂
+    have hgi : grp.inv g ∈ grp.G := grp.inv_closed hg
+    have hcancel :
+        grp.op (grp.inv g) (grp.op (grp.op g h₂) (grp.inv g)) = grp.op h₂ (grp.inv g) := by
+      calc
+        grp.op (grp.inv g) (grp.op (grp.op g h₂) (grp.inv g))
+            = grp.op (grp.op (grp.inv g) (grp.op g h₂)) (grp.inv g) :=
+                (grp.op_assoc hgi (grp.op_closed hg hh₂G) hgi).symm
+        _ = grp.op h₂ (grp.inv g) := by rw [grp.op_inv_left_apply hg hh₂G]
+    calc grp.op (grp.op (grp.op g h₁) (grp.inv g)) (grp.op (grp.op g h₂) (grp.inv g))
+        = grp.op (grp.op g h₁)
+                 (grp.op (grp.inv g) (grp.op (grp.op g h₂) (grp.inv g))) :=
+            grp.op_assoc (grp.op_closed hg hh₁G) hgi (grp.op_closed (grp.op_closed hg hh₂G) hgi)
+      _ = grp.op (grp.op g h₁) (grp.op h₂ (grp.inv g)) := by rw [hcancel]
+      _ = grp.op g (grp.op h₁ (grp.op h₂ (grp.inv g))) :=
+            grp.op_assoc hg hh₁G (grp.op_closed hh₂G hgi)
+      _ = grp.op g (grp.op (grp.op h₁ h₂) (grp.inv g)) := by
+            rw [grp.op_assoc hh₁G hh₂G hgi]
+      _ = grp.op (grp.op g (grp.op h₁ h₂)) (grp.inv g) :=
+            (grp.op_assoc hg (grp.op_closed hh₁G hh₂G) hgi).symm
+  inv_closed := by
+    intro a ha
+    rw [HFSet.mem_sep] at ha ⊢
+    obtain ⟨haG, h, hh, rfl⟩ := ha
+    have hhG : h ∈ grp.G := sub.H_sub hh
+    refine ⟨grp.inv_closed haG, grp.inv h, sub.inv_closed hh, ?_⟩
+    calc grp.inv (grp.op (grp.op g h) (grp.inv g))
+        = grp.op (grp.inv (grp.inv g)) (grp.inv (grp.op g h)) :=
+            grp.inv_op (grp.op_closed hg hhG) (grp.inv_closed hg)
+      _ = grp.op g (grp.op (grp.inv h) (grp.inv g)) := by
+            rw [grp.inv_inv hg, grp.inv_op hg hhG]
+      _ = grp.op (grp.op g (grp.inv h)) (grp.inv g) :=
+            (grp.op_assoc hg (grp.inv_closed hhG) (grp.inv_closed hg)).symm
+
+/-- Caracterización de membresía en el subgrupo conjugado. -/
+theorem mem_conjugate_iff (sub : HFSubgroup grp) {g x : HFSet} (hg : g ∈ grp.G) :
+    x ∈ (sub.conjugate g hg).H ↔
+      ∃ h ∈ sub.H, x = grp.op (grp.op g h) (grp.inv g) := by
+  show x ∈ HFSet.sep grp.G (fun y => ∃ h ∈ sub.H, y = grp.op (grp.op g h) (grp.inv g)) ↔ _
+  rw [HFSet.mem_sep]
+  constructor
+  · intro hx
+    exact hx.2
+  · intro hx
+    obtain ⟨h, hh, rfl⟩ := hx
+    refine ⟨?_, ⟨h, hh, rfl⟩⟩
+    exact grp.op_closed (grp.op_closed hg (sub.H_sub hh)) (grp.inv_closed hg)
+
+/-- La conjugación preserva cardinalidad: `card(gHg⁻¹) = card(H)`. -/
+theorem conjugate_card_eq (sub : HFSubgroup grp) {g : HFSet} (hg : g ∈ grp.G) :
+    HFSet.card (sub.conjugate g hg).H = HFSet.card sub.H := by
+  let f : HFSet → HFSet := fun h => grp.op (grp.op g h) (grp.inv g)
+  have hf_into : ∀ x, x ∈ sub.H → f x ∈ (sub.conjugate g hg).H := by
+    intro x hx
+    rw [sub.mem_conjugate_iff hg]
+    exact ⟨x, hx, rfl⟩
+  have hf_inj : ∀ x y, x ∈ sub.H → y ∈ sub.H → f x = f y → x = y := by
+    intro x y hx hy hxy
+    have hxG : x ∈ grp.G := sub.H_sub hx
+    have hyG : y ∈ grp.G := sub.H_sub hy
+    have hgi : grp.inv g ∈ grp.G := grp.inv_closed hg
+    have hleft : grp.op g x = grp.op g y :=
+      grp.right_cancel hgi (grp.op_closed hg hxG) (grp.op_closed hg hyG) hxy
+    exact grp.left_cancel hg hxG hyG hleft
+  have hf_surj : ∀ y, y ∈ (sub.conjugate g hg).H → ∃ x ∈ sub.H, y = f x := by
+    intro y hy
+    rw [sub.mem_conjugate_iff hg] at hy
+    obtain ⟨x, hx, hxy⟩ := hy
+    exact ⟨x, hx, hxy⟩
+  have hcard : HFSet.card sub.H = HFSet.card (sub.conjugate g hg).H :=
+    HFSet.card_eq_of_classBij hf_into hf_inj hf_surj
+  exact hcard.symm
+
+/-- Si dos subgrupos tienen el mismo portador, sus conjugados (por un `g` fijo)
+    también tienen el mismo portador. -/
+theorem conjugate_carrier_congr (sub₁ sub₂ : HFSubgroup grp)
+    (hH : sub₁.H = sub₂.H) {g : HFSet} (hg : g ∈ grp.G) :
+    (sub₁.conjugate g hg).H = (sub₂.conjugate g hg).H := by
+  apply HFSet.extensionality
+  intro x
+  rw [sub₁.mem_conjugate_iff hg, sub₂.mem_conjugate_iff hg, hH]
+
+/-- Conjugar por el neutro no cambia el portador del subgrupo. -/
+theorem conjugate_e_carrier_eq (sub : HFSubgroup grp) :
+    (sub.conjugate grp.e grp.e_mem).H = sub.H := by
+  apply HFSet.extensionality
+  intro x
+  constructor
+  · intro hx
+    rw [sub.mem_conjugate_iff grp.e_mem] at hx
+    obtain ⟨h, hh, hxeq⟩ := hx
+    have hhG : h ∈ grp.G := sub.H_sub hh
+    have : x = h := by
+      calc
+        x = grp.op (grp.op grp.e h) (grp.inv grp.e) := hxeq
+        _ = grp.op h (grp.inv grp.e) := by rw [grp.op_id_left hhG]
+        _ = grp.op h grp.e := by rw [grp.inv_e]
+        _ = h := grp.op_id_right hhG
+    rw [this]
+    exact hh
+  · intro hx
+    rw [sub.mem_conjugate_iff grp.e_mem]
+    refine ⟨x, hx, ?_⟩
+    have hxG : x ∈ grp.G := sub.H_sub hx
+    calc
+      x = grp.op x grp.e := (grp.op_id_right hxG).symm
+      _ = grp.op x (grp.inv grp.e) := by rw [grp.inv_e]
+      _ = grp.op (grp.op grp.e x) (grp.inv grp.e) := by rw [grp.op_id_left hxG]
+
+
+/-- Ley de composición de conjugación en el portador:
+    `h(gHg⁻¹)h⁻¹ = (hg)H(hg)⁻¹`. -/
+theorem conjugate_conjugate_carrier_eq (sub : HFSubgroup grp)
+    {g h : HFSet} (hg : g ∈ grp.G) (hh : h ∈ grp.G) :
+    ((sub.conjugate g hg).conjugate h hh).H =
+      (sub.conjugate (grp.op h g) (grp.op_closed hh hg)).H := by
+  apply HFSet.extensionality
+  intro x
+  constructor
+  · intro hx
+    rw [HFSubgroup.mem_conjugate_iff (sub := sub.conjugate g hg) hh] at hx
+    obtain ⟨y, hy, rfl⟩ := hx
+    rw [sub.mem_conjugate_iff hg] at hy
+    obtain ⟨a, ha, rfl⟩ := hy
+    have haG : a ∈ grp.G := sub.H_sub ha
+    have hgi : grp.inv g ∈ grp.G := grp.inv_closed hg
+    have hhi : grp.inv h ∈ grp.G := grp.inv_closed hh
+    rw [HFSubgroup.mem_conjugate_iff (sub := sub) (hg := grp.op_closed hh hg)]
+    refine ⟨a, ha, ?_⟩
+    calc
+      grp.op (grp.op h (grp.op (grp.op g a) (grp.inv g))) (grp.inv h)
+          = grp.op (grp.op (grp.op h (grp.op g a)) (grp.inv g)) (grp.inv h) := by
+              rw [← grp.op_assoc hh (grp.op_closed hg haG) hgi]
+      _ = grp.op (grp.op (grp.op (grp.op h g) a) (grp.inv g)) (grp.inv h) := by
+            rw [← grp.op_assoc hh hg haG]
+      _ = grp.op (grp.op (grp.op h g) a) (grp.op (grp.inv g) (grp.inv h)) := by
+            rw [grp.op_assoc (grp.op_closed (grp.op_closed hh hg) haG) hgi hhi]
+      _ = grp.op (grp.op (grp.op h g) a) (grp.inv (grp.op h g)) := by
+            rw [← grp.inv_op hh hg]
+  · intro hx
+    rw [HFSubgroup.mem_conjugate_iff (sub := sub) (hg := grp.op_closed hh hg)] at hx
+    obtain ⟨a, ha, rfl⟩ := hx
+    have haG : a ∈ grp.G := sub.H_sub ha
+    have hgi : grp.inv g ∈ grp.G := grp.inv_closed hg
+    have hhi : grp.inv h ∈ grp.G := grp.inv_closed hh
+    rw [HFSubgroup.mem_conjugate_iff (sub := sub.conjugate g hg) (hg := hh)]
+    refine ⟨grp.op (grp.op g a) (grp.inv g), ?_, ?_⟩
+    · rw [sub.mem_conjugate_iff hg]
+      exact ⟨a, ha, rfl⟩
+    · calc
+        grp.op (grp.op (grp.op h g) a) (grp.inv (grp.op h g))
+            = grp.op (grp.op (grp.op h g) a) (grp.op (grp.inv g) (grp.inv h)) := by
+                rw [grp.inv_op hh hg]
+        _ = grp.op (grp.op (grp.op (grp.op h g) a) (grp.inv g)) (grp.inv h) := by
+              rw [(grp.op_assoc (grp.op_closed (grp.op_closed hh hg) haG) hgi hhi).symm]
+        _ = grp.op (grp.op (grp.op h (grp.op g a)) (grp.inv g)) (grp.inv h) := by
+              rw [grp.op_assoc hh hg haG]
+        _ = grp.op (grp.op h (grp.op (grp.op g a) (grp.inv g))) (grp.inv h) := by
+              rw [grp.op_assoc hh (grp.op_closed hg haG) hgi]
+
+/-- Conjugar por `g` y luego por `g⁻¹` devuelve el portador original. -/
+theorem conjugate_then_inv_carrier_eq (sub : HFSubgroup grp)
+    {g : HFSet} (hg : g ∈ grp.G) :
+    ((sub.conjugate g hg).conjugate (grp.inv g) (grp.inv_closed hg)).H = sub.H := by
+  have hOp : grp.op (grp.inv g) g = grp.e := grp.op_inv_left hg
+  have hOpG : grp.op (grp.inv g) g ∈ grp.G := grp.op_closed (grp.inv_closed hg) hg
+  have hConj :
+      ((sub.conjugate g hg).conjugate (grp.inv g) (grp.inv_closed hg)).H =
+        (sub.conjugate (grp.op (grp.inv g) g) hOpG).H :=
+    sub.conjugate_conjugate_carrier_eq hg (grp.inv_closed hg)
+  have hMid :
+      (sub.conjugate (grp.op (grp.inv g) g) hOpG).H = (sub.conjugate grp.e grp.e_mem).H := by
+    apply HFSet.extensionality
+    intro x
+    constructor
+    · intro hx
+      rw [sub.mem_conjugate_iff (hg := hOpG)] at hx
+      obtain ⟨a, ha, hxa⟩ := hx
+      rw [sub.mem_conjugate_iff (hg := grp.e_mem)]
+      refine ⟨a, ha, ?_⟩
+      calc
+        x = grp.op (grp.op (grp.op (grp.inv g) g) a) (grp.inv (grp.op (grp.inv g) g)) := hxa
+        _ = grp.op (grp.op grp.e a) (grp.inv grp.e) := by rw [hOp]
+    · intro hx
+      rw [sub.mem_conjugate_iff (hg := grp.e_mem)] at hx
+      obtain ⟨a, ha, hxa⟩ := hx
+      rw [sub.mem_conjugate_iff (hg := hOpG)]
+      refine ⟨a, ha, ?_⟩
+      calc
+        x = grp.op (grp.op grp.e a) (grp.inv grp.e) := hxa
+        _ = grp.op (grp.op (grp.op (grp.inv g) g) a) (grp.inv (grp.op (grp.inv g) g)) := by
+              rw [hOp]
+  exact hConj.trans (hMid.trans sub.conjugate_e_carrier_eq)
 
 -- ─────────────────────────────────────────────────────────────────
 -- Cosete derecho Ha = { h·a | h ∈ H }

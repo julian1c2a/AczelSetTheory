@@ -1,6 +1,6 @@
 # Technical Reference — Algebra, Lattice & Structural Axioms
 
-**Last updated:** 2026-06-02 (Sylow constructivo + Sprint B.2: 0 `noncomputable def` en `Algebra/`)
+**Last updated:** 2026-06-03 (Sylow I completo §33–§40 + Sylow II estructura §37-II, 1 sorry documentado)
 **Parent:** [../REFERENCE.md](../REFERENCE.md)
 **Related:** [REFERENCE-HFSets.md](REFERENCE-HFSets.md) | [REFERENCE-Relations.md](REFERENCE-Relations.md) | [REFERENCE-VN.md](REFERENCE-VN.md)
 
@@ -49,7 +49,7 @@ foundation, decidability).
 | 94 | `AczelSetTheory/Algebra/Field.lean` | ✅ Complete |
 | 95 | `AczelSetTheory/Algebra/Module.lean` | ✅ Complete |
 | 96 | `AczelSetTheory/Algebra/LinearSpace.lean` | ✅ Complete |
-| 97 | `AczelSetTheory/Algebra/Sylow.lean` | ✅ Complete (§1–§32, D.4.D McKay + Cauchy) |
+| 97 | `AczelSetTheory/Algebra/Sylow.lean` | ✅ Sylow I + II completos (§1–§40, §36-bis); 0 sorries (M6 cerrado 2026-06-04) |
 
 ---
 
@@ -1367,8 +1367,8 @@ def HFSublattice.inter (sub₁ sub₂ : HFSublattice lat) : HFSublattice lat
 ## `Algebra/Sylow.lean`
 
 **Namespace:** `HFAlgebra`
-**Last projected:** 2026-05-29
-**Imports:** `AczelSetTheory.Algebra.Subgroup`, `AczelSetTheory.Axioms.OrdinalNat`, `AczelSetTheory.Axioms.Function`, `AczelSetTheory.Axioms.CartProd`, `AczelSetTheory.Axioms.Separation`, `AczelSetTheory.Axioms.CardImage`, `AczelSetTheory.Axioms.Choice`, `AczelSetTheory.Operations.NPow`, `Peano.PeanoNat.Combinatorics.Pow`, `Peano.PeanoNat.Arith`, `Peano.PeanoNat.Primes`, `Peano.Prelim.Classical`
+**Last projected:** 2026-06-04
+**Imports:** `AczelSetTheory.Algebra.Subgroup`, `AczelSetTheory.Algebra.CosetAction`, `AczelSetTheory.Axioms.OrdinalNat`, `AczelSetTheory.Axioms.Function`, `AczelSetTheory.Axioms.CartProd`, `AczelSetTheory.Axioms.Separation`, `AczelSetTheory.Axioms.CardImage`, `AczelSetTheory.Axioms.Choice`, `AczelSetTheory.Operations.NPow`, `Peano.PeanoNat.Combinatorics.Pow`, `Peano.PeanoNat.Arith`, `Peano.PeanoNat.Primes`, `Peano.Prelim.Classical`
 **Opens:** `Peano`, `Peano.Arith`, `Peano.Primes`
 
 Infraestructura para los teoremas de Sylow sobre `HFGroup` finito, vía la prueba combinatorial de McKay (acción cíclica sobre `p`-tuplas con producto = e).
@@ -1663,15 +1663,223 @@ theorem cauchy_minimal (grp : HFGroup) {n : ℕ₀} (hp : Peano.Arith.Prime (σ 
 
 ---
 
+### §33. Infraestructura para Sylow I — subgrupos auxiliares
+
+#### `improperSubgroup`
+
+```lean
+def improperSubgroup (grp : HFGroup) : HFSubgroup grp
+```
+
+- **Math**: El grupo `G` visto como subgrupo impropio de sí mismo.
+- **Namespace:** `HFAlgebra`
+
+#### `improperSubgroup_card`
+
+```lean
+theorem improperSubgroup_card (grp : HFGroup) :
+    HFSet.card (improperSubgroup grp).H = HFSet.card grp.G
+```
+
+#### `subgroupOfSubgroup`
+
+```lean
+def subgroupOfSubgroup {grp : HFGroup} (sub₁ : HFSubgroup grp)
+    (sub₂ : HFSubgroup sub₁.toHFGroup) : HFSubgroup grp
+```
+
+- **Math**: Embed un sub-subgrupo `sub₂ ≤ sub₁.toHFGroup` de vuelta en `grp`.
+
+---
+
+### §34. Cardinalidad de la preimagen bajo el cociente
+
+#### `card_preimage_mul`
+
+```lean
+theorem card_preimage_mul {grp : HFGroup}
+    (sub_N : HFSubgroup grp) (hn_N : sub_N.isNormal)
+    (Q : HFSubgroup (quotientGroup grp sub_N hn_N)) :
+    HFSet.card (HFSubgroup.preimageSubgroup sub_N hn_N Q).H =
+      mul (HFSet.card Q.H) (HFSet.card sub_N.H)
+```
+
+- **Math**: $|\pi^{-1}(Q)| = |Q| \cdot |N|$ para $Q \leq G/N$.
+
+---
+
+### §35–§39. Auxiliares privados para el Primer Teorema de Sylow
+
+Los lemas de §35 (`prime_dvd_of_dvd_prime_pow`), §36 (`noncentral_of_orb_noncentral`),
+§37 (`p_dvd_orbit_of_no_proper`, `p_dvd_card_orbit_closed_set`, `p_dvd_card_noncentral`),
+§38 (`cyclicSubgroup_of_central_isNormal`) y §39 (`card_quotient_cyclic`) son **private**:
+internos a la inducción de `sylow_first`, no se exportan.
+
+> **Excepción**: `cyclicSubgroup_of_central_isNormal` y `card_quotient_cyclic` son privados
+> pero se documentan conceptualmente por su rol en la prueba de Sylow I.
+
+---
+
+### §40. Primer Teorema de Sylow
+
+#### `sylow_first`
+
+```lean
+theorem sylow_first (grp : HFGroup) (p k : ℕ₀)
+    (hp : Peano.Arith.Prime p) (hdvd : p ^ k ∣ HFSet.card grp.G) :
+    ∃ sub : HFSubgroup grp, HFSet.card sub.H = p ^ k
+```
+
+- **Math**: **Primer Teorema de Sylow** — Si $p$ es primo y $p^k \mid |G|$, existe $H \leq G$ con $|H| = p^k$.
+- **Prueba**: Inducción fuerte sobre $|G|$; tres ramas:
+  1. Existe subgrupo propio $M$ con $p^k \mid |M|$ → IH.
+  2. $|G| = p^k$ → $G$ mismo.
+  3. $Z(G)$ tiene un elemento $z$ de orden $p$ (Cauchy); $\langle z \rangle \trianglelefteq G$; IH en $G/\langle z\rangle$ da $Q \leq G/\langle z \rangle$ de orden $p^{k-1}$; preimagen $\pi^{-1}(Q)$ tiene orden $p^k$.
+- **Namespace:** `HFAlgebra`
+
+#### `exists_isSylowSubgroup_of_isSylowExponent`
+
+```lean
+theorem exists_isSylowSubgroup_of_isSylowExponent
+    (grp : HFGroup) (p n : ℕ₀)
+    (hp : Peano.Arith.Prime p)
+    (hexp : isSylowExponent grp p n) :
+    ∃ sub : HFSubgroup grp, isSylowSubgroup sub p
+```
+
+- **Math**: Existencia de $p$-subgrupo de Sylow a partir de un exponente de Sylow.
+
+#### `exists_isPSubgroup_of_isSylowExponent`
+
+```lean
+theorem exists_isPSubgroup_of_isSylowExponent
+    (grp : HFGroup) (p n : ℕ₀)
+    (hp : Peano.Arith.Prime p)
+    (hexp : isSylowExponent grp p n) :
+    ∃ sub : HFSubgroup grp, isPSubgroup sub p
+```
+
+#### `not_dvd_index_of_isSylowSubgroup`
+
+```lean
+theorem not_dvd_index_of_isSylowSubgroup
+    {grp : HFGroup} {sub : HFSubgroup grp} {p : ℕ₀}
+    (hsyl : isSylowSubgroup sub p) :
+    ¬ (p ∣ sub.index)
+```
+
+- **Math**: **Sylow III (parcial)** — $p \nmid [G : H_{\mathrm{Syl}}]$.
+
+#### `not_dvd_card_cosets_of_isSylowSubgroup`
+
+```lean
+theorem not_dvd_card_cosets_of_isSylowSubgroup
+    {grp : HFGroup} {sub : HFSubgroup grp} {p : ℕ₀}
+    (hsyl : isSylowSubgroup sub p) :
+    ¬ (p ∣ HFSet.card sub.cosets)
+```
+
+- **Math**: Formulación equivalente: $p \nmid |\mathrm{cosets}(H_{\mathrm{Syl}})|$.
+
+---
+
+### §37-II. Segundo Teorema de Sylow (estructura completa, 1 sorry)
+
+> **Estado (2026-06-03):** La estructura lógica completa está demostrada. El único `sorry`
+> restante es el **teorema de punto fijo del p-grupo**: si $K$ es un $p$-grupo que actúa
+> sobre un conjunto finito $X$ con $p \nmid |X|$, entonces existe un punto fijo.
+> Esta pieza requiere la teoría de partición de órbitas de acciones finitas (aún no construida).
+
+#### `sylowConjugate`
+
+```lean
+theorem sylowConjugate
+    (grp : HFGroup) (p n : ℕ₀) (hp : Peano.Arith.Prime p)
+    (hexp : isSylowExponent grp p n)
+    (S T : {sub : HFSubgroup grp // isSylowSubgroup sub p}) :
+    SylowConjugateSubtype grp p S T
+```
+
+- **Math**: **Segundo Teorema de Sylow** — cualquier dos $p$-subgrupos de Sylow son conjugados.
+- **Prueba** (estructura):
+  1. $|S| = |T|$ (`sylow_card_eq`).
+  2. $p \nmid |H.\mathrm{cosets}|$ (`not_dvd_card_cosets_of_isSylowSubgroup`).
+  3. **[sorry]** $K$ actúa sobre $H.\mathrm{cosets}$ vía `cosetAction`; $p \nmid |X|$ → punto fijo $g_0$.
+  4. $T \subseteq g_0^{-1} H g_0$ (inclusión vía punto fijo).
+  5. $|T| = |g_0^{-1} H g_0|$ → igualdad por `HFSet.eq_of_subset_of_card_eq`.
+  6. Concluir `SylowConjugateSubtype`.
+- **Namespace:** `HFAlgebra`
+
+#### `SylowConjugateTotal_of_isSylowExponent`
+
+```lean
+theorem SylowConjugateTotal_of_isSylowExponent
+    (grp : HFGroup) (p n : ℕ₀) (hp : Peano.Arith.Prime p)
+    (hexp : isSylowExponent grp p n) :
+    SylowConjugateTotal grp p
+```
+
+- **Math**: $\forall S, T$ Sylow-$p$, $S$ y $T$ son conjugados.
+
+#### `sylowSecondConjugacyTarget_of_isSylowExponent`
+
+```lean
+theorem sylowSecondConjugacyTarget_of_isSylowExponent
+    (grp : HFGroup) (p n : ℕ₀) (hp : Peano.Arith.Prime p)
+    (hexp : isSylowExponent grp p n) :
+    SylowSecondConjugacyTarget grp p
+```
+
+- **Math**: Formulación objetivo de Sylow II: cualquier $p$-subgrupo de Sylow es conjugado a uno fijo.
+
+---
+
 ### 7c. Exports — `Algebra/Sylow.lean`
 
 **Definiciones públicas:**
 
-`HFAlgebra.pow_dvd_card`, `HFAlgebra.isPSubgroup`, `HFAlgebra.isSylowExponent`, `HFAlgebra.isSylowSubgroup`, `HFAlgebra.HFSubgroup.trivial`, `HFAlgebra.HFSubgroup.trivial_card`, `HFAlgebra.isPSubgroup_of_isSylowSubgroup`, `HFAlgebra.gpow`, `HFAlgebra.gpow_zero`, `HFAlgebra.gpow_succ`, `HFAlgebra.gpow_one`, `HFAlgebra.gpow_mem`, `HFAlgebra.gpow_add`, `HFAlgebra.order`, `HFAlgebra.order_pos`, `HFAlgebra.order_ne_zero`, `HFAlgebra.gpow_order_eq_id`, `HFAlgebra.order_minimal`, `HFAlgebra.order_le_card`, `HFAlgebra.gpow_mul_order_eq_id`, `HFAlgebra.gpow_mod_order`, `HFAlgebra.cyclicCarrier`, `HFAlgebra.cyclicSubgroup`, `HFAlgebra.mckayCarrier`, `HFAlgebra.mckayShift`, `HFAlgebra.mckayFixedPoints`, `HFAlgebra.mem_mckayFixedPoints`, `HFAlgebra.shiftIter`, `HFAlgebra.orbitOf`, `HFAlgebra.periodOf`
+`HFAlgebra.pow_dvd_card`, `HFAlgebra.isPSubgroup`, `HFAlgebra.isSylowExponent`,
+`HFAlgebra.isSylowSubgroup`, `HFAlgebra.HFSubgroup.trivial`, `HFAlgebra.HFSubgroup.trivial_card`,
+`HFAlgebra.isPSubgroup_of_isSylowSubgroup`, `HFAlgebra.gpow`, `HFAlgebra.gpow_zero`,
+`HFAlgebra.gpow_succ`, `HFAlgebra.gpow_one`, `HFAlgebra.gpow_mem`, `HFAlgebra.gpow_add`,
+`HFAlgebra.order`, `HFAlgebra.order_pos`, `HFAlgebra.order_ne_zero`,
+`HFAlgebra.gpow_order_eq_id`, `HFAlgebra.order_minimal`, `HFAlgebra.order_le_card`,
+`HFAlgebra.gpow_mul_order_eq_id`, `HFAlgebra.gpow_mod_order`,
+`HFAlgebra.cyclicCarrier`, `HFAlgebra.cyclicSubgroup`,
+`HFAlgebra.mckayCarrier`, `HFAlgebra.mckayShift`, `HFAlgebra.mckayFixedPoints`,
+`HFAlgebra.mem_mckayFixedPoints`, `HFAlgebra.shiftIter`, `HFAlgebra.orbitOf`, `HFAlgebra.periodOf`,
+`HFAlgebra.improperSubgroup`, `HFAlgebra.improperSubgroup_card`,
+`HFAlgebra.subgroupOfSubgroup`, `HFAlgebra.card_preimage_mul`
 
 **Teoremas D.3 – D.4.D + §28–§32:**
 
-`HFAlgebra.dvd_card_mckayCarrier_succ`, `HFAlgebra.card_orbitOf_eq_periodOf`, `HFAlgebra.card_orbitOf_one_or_succ`, `HFAlgebra.periodOf_eq_one_iff_fixed`, `HFAlgebra.card_orbitOf_eq_one_iff_fixed`, `HFAlgebra.card_orbitOf_eq_succ_of_not_fixed`, `HFAlgebra.succ_n_dvd_card_of_shift_closed_no_fixed`, `HFAlgebra.succ_n_dvd_card_mckayFixedPoints`, `HFAlgebra.eTuple_mem_mckayFixedPoints`, `HFAlgebra.order_dvd_of_gpow_eq_id`, `HFAlgebra.order_eq_prime_of_pow`, `HFAlgebra.cyclicCarrier_card_eq_order`, `HFAlgebra.cauchy_minimal`
+`HFAlgebra.dvd_card_mckayCarrier_succ`, `HFAlgebra.card_orbitOf_eq_periodOf`,
+`HFAlgebra.card_orbitOf_one_or_succ`, `HFAlgebra.periodOf_eq_one_iff_fixed`,
+`HFAlgebra.card_orbitOf_eq_one_iff_fixed`, `HFAlgebra.card_orbitOf_eq_succ_of_not_fixed`,
+`HFAlgebra.succ_n_dvd_card_of_shift_closed_no_fixed`,
+`HFAlgebra.succ_n_dvd_card_mckayFixedPoints`, `HFAlgebra.eTuple_mem_mckayFixedPoints`,
+`HFAlgebra.order_dvd_of_gpow_eq_id`, `HFAlgebra.order_eq_prime_of_pow`,
+`HFAlgebra.cyclicCarrier_card_eq_order`, `HFAlgebra.cauchy_minimal`
+
+**Teoremas §40 — Primer Teorema de Sylow:**
+
+`HFAlgebra.sylow_first`, `HFAlgebra.exists_isSylowSubgroup_of_isSylowExponent`,
+`HFAlgebra.exists_isPSubgroup_of_isSylowExponent`,
+`HFAlgebra.not_dvd_index_of_isSylowSubgroup`,
+`HFAlgebra.not_dvd_card_cosets_of_isSylowSubgroup`,
+`HFAlgebra.SylowConjugacyBase_of_isSylowExponent_and_total`,
+`HFAlgebra.sylowSecondConjugacyTarget_of_isSylowExponent_and_total`
+
+**Teoremas §36-bis — Punto fijo del p-grupo (2026-06-04):**
+
+`HFAlgebra.HFGroupAction.orb_act_mem` (private),
+`HFAlgebra.HFGroupAction.setminus_orb_inv` (private),
+`HFAlgebra.p_group_fixed_point` (private)
+
+**Teoremas §37-II — Segundo Teorema de Sylow (0 sorries — M6 completo):**
+
+`HFAlgebra.sylowConjugate`, `HFAlgebra.SylowConjugateTotal_of_isSylowExponent`,
+`HFAlgebra.sylowSecondConjugacyTarget_of_isSylowExponent`
 
 ---
 

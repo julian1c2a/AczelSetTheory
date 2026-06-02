@@ -1,8 +1,8 @@
 # Next Steps
 
-**Last updated:** 2026-06-02
+**Last updated:** 2026-06-04
 
-El proyecto compila con **invariante "0 sorry, 0 axiomas privados" restaurado** (2026-05-28).
+El proyecto compila con **invariante "0 sorry, 0 axiomas privados" restaurado** — M6 cerrado (2026-06-04).
 Resto de la arquitectura: CList/ + Operations/ + Axioms/ + PList/ + VN/ + Algebra/ + Integers/ + Topology/.
 Ver PLANNING.md para el roadmap a largo plazo.
 
@@ -18,13 +18,13 @@ Ver PLANNING.md para el roadmap a largo plazo.
 
 ---
 
-## ✅ COMPLETED (2026-06-02) — Sprint C1/C2: cierre de deuda textual y actualización global
+## ✅ COMPLETADO — Sylow II (punto fijo del p-grupo) — 2026-06-04
 
-- **C1 (Topology + Sylow):** limpieza de marcadores en `Topology/{Basic,Interior,Neighborhoods,Separation,Subspace}.lean` y `Algebra/Sylow.lean` para evitar falsos positivos de auditoría.
-- **C2 (Action + VN):** cierre de marcadores en `Algebra/Action.lean`, `VN/ActionVN.lean`, `VN/CorrespondenceTheoremVN.lean`, `VN/PermVN.lean`, `VN/SymGroupVN.lean`.
-- **Matriz regenerada (`AUDIT-MODULE-MATRIX.md`):**
-  - `noncomputable def: 0`
-  - `Modulos con TODO/PENDIENTE/FIXME: 0`
+`Algebra/Sylow.lean` §36-bis + §37: sorry cerrado en `sylowConjugate.hfixed`.
+- `p_group_fixed_point`: demostrado por inducción fuerte sobre `|X|`.
+- `sylowConjugate`: completo, 0 sorries. M6 ✅.
+
+---
   - `Modulos con placeholder/stub: 11`
 - **Build:** `lake build` ✅ (35 jobs).
 

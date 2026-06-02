@@ -1,12 +1,12 @@
 # Matriz de Auditoria Modulo por Modulo
 
-Generado: 2026-06-02 13:51:21
+Generado: 2026-06-03 (actualización manual post-Sylow II)
 
 ## Resumen Global
 
 - Archivos Lean: 174
-- Lineas totales: 24799
-- sorry: 0
+- Lineas totales: ~25255 (Sylow.lean +456 líneas)
+- sorry: 1  ← `Algebra/Sylow.lean` §37-II: punto fijo del p-grupo (deuda técnica documentada)
 - admit: 0
 - axiom: 0
 - noncomputable def: 0
@@ -38,7 +38,7 @@ Generado: 2026-06-02 13:51:21
 | AczelSetTheory\Algebra\RingHom.lean | Algebra | 158 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Algebra\SecondIsomorphism.lean | Algebra | 369 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Algebra\Subgroup.lean | Algebra | 337 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
-| AczelSetTheory\Algebra\Sylow.lean | Algebra | 3184 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
+| AczelSetTheory\Algebra\Sylow.lean | Algebra | 3640 | 1 | 0 | 0 | 0 | 0 | 0 | ⚠️ sorry ×1 (hfixed: punto fijo p-grupo) |
 | AczelSetTheory\Algebra\ThirdIsomorphism.lean | Algebra | 247 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Axioms.lean | Axioms.lean | 53 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Axioms\Adjunction.lean | Axioms | 39 | 0 | 0 | 0 | 0 | 0 | 0 | OK |

@@ -53,6 +53,8 @@ import AczelSetTheory.Axioms.Choice
 import AczelSetTheory.Operations.NPow
 import AczelSetTheory.Algebra.Action
 import AczelSetTheory.Algebra.CorrespondenceTheorem
+import AczelSetTheory.Algebra.CosetAction
+import AczelSetTheory.Combinatorics.Counting
 import Peano.PeanoNat.Combinatorics.Pow
 import Peano.PeanoNat.Arith
 import Peano.PeanoNat.Primes
@@ -85,6 +87,266 @@ theorem isPSubgroup_of_isSylowSubgroup {grp : HFGroup} {sub : HFSubgroup grp}
     {p : ℕ₀} (h : isSylowSubgroup sub p) : isPSubgroup sub p := by
   obtain ⟨n, _, hcard⟩ := h
   exact ⟨n, hcard⟩
+
+/-- La conjugación preserva la propiedad de `p`-subgrupo. -/
+theorem isPSubgroup_conjugate {grp : HFGroup} (sub : HFSubgroup grp)
+  {p : ℕ₀} {g : HFSet} (hg : g ∈ grp.G)
+    (hP : isPSubgroup sub p) :
+  isPSubgroup (sub.conjugate g hg) p := by
+  obtain ⟨k, hk⟩ := hP
+  refine ⟨k, ?_⟩
+  rw [sub.conjugate_card_eq hg, hk]
+
+/-- La conjugación preserva la propiedad de Sylow-`p`. -/
+theorem isSylowSubgroup_conjugate {grp : HFGroup} (sub : HFSubgroup grp)
+  {p : ℕ₀} {g : HFSet} (hg : g ∈ grp.G)
+    (hS : isSylowSubgroup sub p) :
+  isSylowSubgroup (sub.conjugate g hg) p := by
+  obtain ⟨n, hexp, hcard⟩ := hS
+  refine ⟨n, hexp, ?_⟩
+  rw [sub.conjugate_card_eq hg, hcard]
+
+/-- Conjugación de `p`-subgrupos como endomapa del subtipo correspondiente. -/
+def conjPSubgroupMap (grp : HFGroup) (p : ℕ₀) (g : HFSet) (hg : g ∈ grp.G) :
+    {sub : HFSubgroup grp // isPSubgroup sub p} →
+    {sub : HFSubgroup grp // isPSubgroup sub p}
+  | ⟨sub, hP⟩ => ⟨sub.conjugate g hg, isPSubgroup_conjugate sub hg hP⟩
+
+/-- Conjugación de subgrupos de Sylow-`p` como endomapa del subtipo correspondiente. -/
+def conjSylowSubgroupMap (grp : HFGroup) (p : ℕ₀) (g : HFSet) (hg : g ∈ grp.G) :
+    {sub : HFSubgroup grp // isSylowSubgroup sub p} →
+    {sub : HFSubgroup grp // isSylowSubgroup sub p}
+  | ⟨sub, hS⟩ => ⟨sub.conjugate g hg, isSylowSubgroup_conjugate sub hg hS⟩
+
+theorem conjPSubgroupMap_val (grp : HFGroup) (p : ℕ₀) (g : HFSet) (hg : g ∈ grp.G)
+    (S : {sub : HFSubgroup grp // isPSubgroup sub p}) :
+    (conjPSubgroupMap grp p g hg S).1 = S.1.conjugate g hg := rfl
+
+theorem conjSylowSubgroupMap_val (grp : HFGroup) (p : ℕ₀) (g : HFSet) (hg : g ∈ grp.G)
+    (S : {sub : HFSubgroup grp // isSylowSubgroup sub p}) :
+    (conjSylowSubgroupMap grp p g hg S).1 = S.1.conjugate g hg := rfl
+
+/-- Compatibilidad composicional (nivel de propiedad): dos conjugaciones preservan `isPSubgroup`. -/
+theorem isPSubgroup_conjugate_conjugate {grp : HFGroup} (sub : HFSubgroup grp)
+    {p : ℕ₀} {g h : HFSet} (hg : g ∈ grp.G) (hh : h ∈ grp.G)
+    (hP : isPSubgroup sub p) :
+    isPSubgroup ((sub.conjugate g hg).conjugate h hh) p := by
+  exact isPSubgroup_conjugate (sub.conjugate g hg) hh (isPSubgroup_conjugate sub hg hP)
+
+/-- Compatibilidad composicional (nivel de propiedad): dos conjugaciones preservan `isSylowSubgroup`. -/
+theorem isSylowSubgroup_conjugate_conjugate {grp : HFGroup} (sub : HFSubgroup grp)
+    {p : ℕ₀} {g h : HFSet} (hg : g ∈ grp.G) (hh : h ∈ grp.G)
+    (hS : isSylowSubgroup sub p) :
+    isSylowSubgroup ((sub.conjugate g hg).conjugate h hh) p := by
+  exact isSylowSubgroup_conjugate (sub.conjugate g hg) hh (isSylowSubgroup_conjugate sub hg hS)
+
+/-- Objetivo formal de Sylow II: cualquier par de Sylow-`p` es conjugado en `G`. -/
+def SylowSecondConjugacyTarget (grp : HFGroup) (p : ℕ₀) : Prop :=
+  ∀ (sub₁ sub₂ : HFSubgroup grp),
+    isSylowSubgroup sub₁ p →
+    isSylowSubgroup sub₂ p →
+    ∃ g : HFSet, ∃ hg : g ∈ grp.G,
+      sub₂.H = (sub₁.conjugate g hg).H
+
+/-- Reempaque del objetivo de Sylow II para uso directo en los subtipos de Sylow-`p`. -/
+theorem sylowSecondConjugacyTarget_subtype (grp : HFGroup) (p : ℕ₀)
+    (hT : SylowSecondConjugacyTarget grp p) :
+    ∀ (S T : {sub : HFSubgroup grp // isSylowSubgroup sub p}),
+      ∃ g : HFSet, ∃ hg : g ∈ grp.G,
+        T.1.H = (S.1.conjugate g hg).H := by
+  intro S T
+  exact hT S.1 T.1 S.2 T.2
+
+/-- Composición fuerte de mapas de conjugación de Sylow-`p` a nivel de portadores. -/
+theorem conjSylowSubgroupMap_comp_carrier
+    (grp : HFGroup) (p : ℕ₀) {g h : HFSet} (hg : g ∈ grp.G) (hh : h ∈ grp.G)
+    (S : {sub : HFSubgroup grp // isSylowSubgroup sub p}) :
+    ((conjSylowSubgroupMap grp p h hh) (conjSylowSubgroupMap grp p g hg S)).1.H =
+      (conjSylowSubgroupMap grp p (grp.op h g) (grp.op_closed hh hg) S).1.H := by
+  rw [conjSylowSubgroupMap_val, conjSylowSubgroupMap_val, conjSylowSubgroupMap_val]
+  exact HFSubgroup.conjugate_conjugate_carrier_eq S.1 hg hh
+
+/-- Congruencia por portador para `conjSylowSubgroupMap` (a `g` fijo). -/
+theorem conjSylowSubgroupMap_congr_carrier
+    (grp : HFGroup) (p : ℕ₀) {g : HFSet} (hg : g ∈ grp.G)
+    (S T : {sub : HFSubgroup grp // isSylowSubgroup sub p})
+    (hST : S.1.H = T.1.H) :
+    (conjSylowSubgroupMap grp p g hg S).1.H =
+      (conjSylowSubgroupMap grp p g hg T).1.H := by
+  rw [conjSylowSubgroupMap_val, conjSylowSubgroupMap_val]
+  exact HFSubgroup.conjugate_carrier_congr S.1 T.1 hST hg
+
+/-- Identidad (a nivel de portador) del mapa de conjugación de Sylow-`p`. -/
+theorem conjSylowSubgroupMap_id_carrier
+    (grp : HFGroup) (p : ℕ₀)
+    (S : {sub : HFSubgroup grp // isSylowSubgroup sub p}) :
+    (conjSylowSubgroupMap grp p grp.e grp.e_mem S).1.H = S.1.H := by
+  rw [conjSylowSubgroupMap_val]
+  exact S.1.conjugate_e_carrier_eq
+
+/-- Acción por conjugación sobre el subtipo de Sylow-`p` (versión explícita por testigo `g ∈ G`). -/
+def sylowConjAct (grp : HFGroup) (p : ℕ₀)
+    (g : HFSet) (hg : g ∈ grp.G)
+    (S : {sub : HFSubgroup grp // isSylowSubgroup sub p}) :
+    {sub : HFSubgroup grp // isSylowSubgroup sub p} :=
+  conjSylowSubgroupMap grp p g hg S
+
+/-- Compatibilidad de la acción `sylowConjAct` con el producto (a nivel de portadores). -/
+theorem sylowConjAct_comp_carrier
+    (grp : HFGroup) (p : ℕ₀) {g h : HFSet} (hg : g ∈ grp.G) (hh : h ∈ grp.G)
+    (S : {sub : HFSubgroup grp // isSylowSubgroup sub p}) :
+    (sylowConjAct grp p h hh (sylowConjAct grp p g hg S)).1.H =
+      (sylowConjAct grp p (grp.op h g) (grp.op_closed hh hg) S).1.H := by
+  exact conjSylowSubgroupMap_comp_carrier grp p hg hh S
+
+/-- Relación de órbita por conjugación sobre el subtipo de Sylow-`p`. -/
+def SylowConjugateSubtype (grp : HFGroup) (p : ℕ₀)
+    (S T : {sub : HFSubgroup grp // isSylowSubgroup sub p}) : Prop :=
+  ∃ g : HFSet, ∃ hg : g ∈ grp.G,
+    T.1.H = (conjSylowSubgroupMap grp p g hg S).1.H
+
+/-- Transitividad global de órbita para la acción por conjugación en Sylow-`p`. -/
+def SylowConjugateTotal (grp : HFGroup) (p : ℕ₀) : Prop :=
+  ∀ (S T : {sub : HFSubgroup grp // isSylowSubgroup sub p}),
+    SylowConjugateSubtype grp p S T
+
+/-- Esquema de arranque para Sylow II:
+    basta encontrar un representante base `S₀` conjugado con todo Sylow-`p`. -/
+def SylowConjugacyBase (grp : HFGroup) (p : ℕ₀) : Prop :=
+  ∃ (S₀ : {sub : HFSubgroup grp // isSylowSubgroup sub p}),
+    ∀ (T : {sub : HFSubgroup grp // isSylowSubgroup sub p}),
+      SylowConjugateSubtype grp p S₀ T
+
+/-- Reflexividad de la relación de conjugación en el subtipo de Sylow-`p`. -/
+theorem SylowConjugateSubtype_refl (grp : HFGroup) (p : ℕ₀)
+    (S : {sub : HFSubgroup grp // isSylowSubgroup sub p}) :
+    SylowConjugateSubtype grp p S S := by
+  refine ⟨grp.e, grp.e_mem, ?_⟩
+  exact (conjSylowSubgroupMap_id_carrier grp p S).symm
+
+/-- Simetría de la relación de conjugación en el subtipo de Sylow-`p`. -/
+theorem SylowConjugateSubtype_symm (grp : HFGroup) (p : ℕ₀)
+    {S T : {sub : HFSubgroup grp // isSylowSubgroup sub p}} :
+    SylowConjugateSubtype grp p S T → SylowConjugateSubtype grp p T S := by
+  intro hST
+  obtain ⟨g, hg, hEq⟩ := hST
+  let A : {sub : HFSubgroup grp // isSylowSubgroup sub p} :=
+    conjSylowSubgroupMap grp p g hg S
+  have hA : T.1.H = A.1.H := by
+    simpa [A] using hEq
+  have hcongr :
+      (conjSylowSubgroupMap grp p (grp.inv g) (grp.inv_closed hg) T).1.H =
+        (conjSylowSubgroupMap grp p (grp.inv g) (grp.inv_closed hg) A).1.H :=
+    conjSylowSubgroupMap_congr_carrier grp p (grp.inv_closed hg) T A hA
+  have hcompA :
+      (conjSylowSubgroupMap grp p (grp.inv g) (grp.inv_closed hg) A).1.H = S.1.H := by
+    simpa [A, conjSylowSubgroupMap_val] using (S.1.conjugate_then_inv_carrier_eq hg)
+  refine ⟨grp.inv g, grp.inv_closed hg, ?_⟩
+  exact (hcongr.trans hcompA).symm
+
+/-- Transitividad de la relación de conjugación en el subtipo de Sylow-`p`. -/
+theorem SylowConjugateSubtype_trans (grp : HFGroup) (p : ℕ₀)
+    {S T U : {sub : HFSubgroup grp // isSylowSubgroup sub p}} :
+    SylowConjugateSubtype grp p S T →
+    SylowConjugateSubtype grp p T U →
+    SylowConjugateSubtype grp p S U := by
+  intro hST hTU
+  obtain ⟨g, hg, hEqST⟩ := hST
+  obtain ⟨h, hh, hEqTU⟩ := hTU
+  let A : {sub : HFSubgroup grp // isSylowSubgroup sub p} :=
+    conjSylowSubgroupMap grp p g hg S
+  have hA : T.1.H = A.1.H := by
+    simpa [A] using hEqST
+  have hcongr :
+      (conjSylowSubgroupMap grp p h hh T).1.H =
+        (conjSylowSubgroupMap grp p h hh A).1.H :=
+    conjSylowSubgroupMap_congr_carrier grp p hh T A hA
+  have hcomp :
+      (conjSylowSubgroupMap grp p h hh A).1.H =
+        (conjSylowSubgroupMap grp p (grp.op h g) (grp.op_closed hh hg) S).1.H := by
+    simpa [A] using (conjSylowSubgroupMap_comp_carrier grp p hg hh S)
+  refine ⟨grp.op h g, grp.op_closed hh hg, ?_⟩
+  calc
+    U.1.H = (conjSylowSubgroupMap grp p h hh T).1.H := hEqTU
+    _ = (conjSylowSubgroupMap grp p h hh A).1.H := hcongr
+    _ = (conjSylowSubgroupMap grp p (grp.op h g) (grp.op_closed hh hg) S).1.H := hcomp
+
+/-- Primer argumento de transitividad por órbitas:
+    un representante base que alcance a todos implica órbita total. -/
+theorem SylowConjugateTotal_of_base (grp : HFGroup) (p : ℕ₀)
+    (hBase : SylowConjugacyBase grp p) :
+    SylowConjugateTotal grp p := by
+  intro S T
+  obtain ⟨S₀, hS₀⟩ := hBase
+  have hS₀S : SylowConjugateSubtype grp p S₀ S := hS₀ S
+  have hS₀T : SylowConjugateSubtype grp p S₀ T := hS₀ T
+  have hSS₀ : SylowConjugateSubtype grp p S S₀ :=
+    SylowConjugateSubtype_symm grp p hS₀S
+  exact SylowConjugateSubtype_trans grp p hSS₀ hS₀T
+
+/-- Paso de órbita total al objetivo estructural de Sylow II. -/
+theorem sylowSecondConjugacyTarget_of_total (grp : HFGroup) (p : ℕ₀)
+    (hTotal : SylowConjugateTotal grp p) :
+    SylowSecondConjugacyTarget grp p := by
+  intro sub₁ sub₂ hs₁ hs₂
+  let S : {sub : HFSubgroup grp // isSylowSubgroup sub p} := ⟨sub₁, hs₁⟩
+  let T : {sub : HFSubgroup grp // isSylowSubgroup sub p} := ⟨sub₂, hs₂⟩
+  obtain ⟨g, hg, hEq⟩ := hTotal S T
+  refine ⟨g, hg, ?_⟩
+  simpa [S, T, conjSylowSubgroupMap_val] using hEq
+
+/-- Corolario de arranque: una base de conjugación ya da el objetivo de Sylow II. -/
+theorem sylowSecondConjugacyTarget_of_base (grp : HFGroup) (p : ℕ₀)
+    (hBase : SylowConjugacyBase grp p) :
+    SylowSecondConjugacyTarget grp p := by
+  exact sylowSecondConjugacyTarget_of_total grp p
+    (SylowConjugateTotal_of_base grp p hBase)
+
+/-- Criterio operativo: el objetivo de Sylow II equivale a transitividad por órbita de conjugación. -/
+theorem sylowSecondConjugacyTarget_iff_orbit_total (grp : HFGroup) (p : ℕ₀) :
+    SylowSecondConjugacyTarget grp p ↔
+      ∀ (S T : {sub : HFSubgroup grp // isSylowSubgroup sub p}),
+        SylowConjugateSubtype grp p S T := by
+  constructor
+  · intro hT S T
+    obtain ⟨g, hg, hEq⟩ := hT S.1 T.1 S.2 T.2
+    refine ⟨g, hg, ?_⟩
+    simpa [conjSylowSubgroupMap_val] using hEq
+  · intro hOrbit sub₁ sub₂ hs₁ hs₂
+    let S : {sub : HFSubgroup grp // isSylowSubgroup sub p} := ⟨sub₁, hs₁⟩
+    let T : {sub : HFSubgroup grp // isSylowSubgroup sub p} := ⟨sub₂, hs₂⟩
+    obtain ⟨g, hg, hEq⟩ := hOrbit S T
+    refine ⟨g, hg, ?_⟩
+    simpa [S, T, conjSylowSubgroupMap_val] using hEq
+
+/-- Si el subtipo de Sylow-`p` es no vacío y hay órbita total, existe base de conjugación. -/
+theorem SylowConjugacyBase_of_exists_and_total (grp : HFGroup) (p : ℕ₀)
+    (hEx : ∃ sub : HFSubgroup grp, isSylowSubgroup sub p)
+    (hTotal : SylowConjugateTotal grp p) :
+    SylowConjugacyBase grp p := by
+  obtain ⟨sub₀, hs₀⟩ := hEx
+  refine ⟨⟨sub₀, hs₀⟩, ?_⟩
+  intro T
+  exact hTotal ⟨sub₀, hs₀⟩ T
+
+/-- Variante: desde el objetivo de Sylow II y no-vacío del subtipo, se obtiene base. -/
+theorem SylowConjugacyBase_of_exists_and_target (grp : HFGroup) (p : ℕ₀)
+    (hEx : ∃ sub : HFSubgroup grp, isSylowSubgroup sub p)
+    (hTarget : SylowSecondConjugacyTarget grp p) :
+    SylowConjugacyBase grp p := by
+  have hTotal : SylowConjugateTotal grp p :=
+    (sylowSecondConjugacyTarget_iff_orbit_total grp p).1 hTarget
+  exact SylowConjugacyBase_of_exists_and_total grp p hEx hTotal
+
+/-- Con no-vacío del subtipo Sylow-`p`, el objetivo de Sylow II equivale a tener base. -/
+theorem sylowSecondConjugacyTarget_iff_base_of_exists (grp : HFGroup) (p : ℕ₀)
+    (hEx : ∃ sub : HFSubgroup grp, isSylowSubgroup sub p) :
+    SylowSecondConjugacyTarget grp p ↔ SylowConjugacyBase grp p := by
+  constructor
+  · intro hTarget
+    exact SylowConjugacyBase_of_exists_and_target grp p hEx hTarget
+  · intro hBase
+    exact sylowSecondConjugacyTarget_of_base grp p hBase
 
 -- ─────────────────────────────────────────────────────────────────
 -- §1. Subgrupo trivial {e} y caso base n = 0
@@ -377,7 +639,7 @@ theorem orderExists (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G) :
 private def witnessBexLe (Pb : ℕ₀ → Bool) :
     (n : ℕ₀) → Peano.Order.bexLe Pb n = true → ℕ₀
   | .zero, _ => 𝟘
-  | .succ n, h =>
+  | .succ n, _ =>
       if hr : Peano.Order.bexLe Pb n = true then
         witnessBexLe Pb n hr
       else
@@ -390,8 +652,10 @@ private theorem witnessBexLe_le (Pb : ℕ₀ → Bool) :
   | .succ n, h => by
       unfold witnessBexLe
       by_cases hr : Peano.Order.bexLe Pb n = true
-      · simpa [hr] using (le_succ _ _ (witnessBexLe_le Pb hr))
-      · simp [hr, le_refl]
+      · simp [hr]
+        exact Peano.Order.le_succ _ _ (witnessBexLe_le Pb hr)
+      · simp [hr]
+        exact le_refl (σ n)
 
 private theorem witnessBexLe_true (Pb : ℕ₀ → Bool) :
     ∀ {n : ℕ₀} (h : Peano.Order.bexLe Pb n = true),
@@ -424,9 +688,8 @@ private theorem witnessBexLe_min
         | inl hmle =>
             simpa [hr] using witnessBexLe_min P Pb h_iff hr hmle hPm
         | inr hmeq =>
-            rw [hersoq:hr]
-            rw [hmeq]
-            exact witnessBexLe_le Pb hr
+            subst hmeq
+            simpa [hr] using (Peano.Order.le_succ _ _ (witnessBexLe_le Pb hr))
       · have hsplit : le₀ m n ∨ m = σ n := (le_succ_iff_le_or_eq m n).mp hm
         cases hsplit with
         | inl hmle =>
@@ -436,9 +699,8 @@ private theorem witnessBexLe_min
               Peano.Order.bexLe_false_imp_not_exists P Pb h_iff n hfalse
             exact hno ⟨m, hmle, hPm⟩
         | inr hmeq =>
-            rw [hersoq:hr]
-            rw [hmeq]
-            exact le_refl (σ n)
+            subst hmeq
+            simpa [hr] using (le_refl (σ n))
 
 /-- Selección constructiva del menor testigo de `P` bajo la cota `bound`. -/
 private def leastUnder (P : ℕ₀ → Prop) [DecidablePred P]
@@ -446,7 +708,9 @@ private def leastUnder (P : ℕ₀ → Prop) [DecidablePred P]
   let Pb : ℕ₀ → Bool := fun k => decide (P k)
   have h_iff : ∀ k : ℕ₀, Pb k = true ↔ P k := by
     intro k
-    exact decide_eq_true_eq
+    by_cases hk : P k
+    · simp [Pb, hk]
+    · simp [Pb, hk]
   have htrue : Peano.Order.bexLe Pb bound = true := by
     by_cases hb : Peano.Order.bexLe Pb bound = true
     · exact hb
@@ -465,7 +729,9 @@ private theorem leastUnder_spec
   let Pb : ℕ₀ → Bool := fun k => decide (P k)
   have h_iff : ∀ k : ℕ₀, Pb k = true ↔ P k := by
     intro k
-    exact decide_eq_true_eq
+    by_cases hk : P k
+    · simp [Pb, hk]
+    · simp [Pb, hk]
   have htrue : Peano.Order.bexLe Pb bound = true := by
     by_cases hb : Peano.Order.bexLe Pb bound = true
     · exact hb
@@ -3144,6 +3410,291 @@ theorem exists_isPSubgroup_of_isSylowExponent
   obtain ⟨sub, hsyl⟩ := exists_isSylowSubgroup_of_isSylowExponent grp p n hp hexp
   exact ⟨sub, isPSubgroup_of_isSylowSubgroup hsyl⟩
 
+open Peano Peano.Arith in
+/-- Con `isSylowExponent`, no-vacío + órbita total producen base de conjugación. -/
+theorem SylowConjugacyBase_of_isSylowExponent_and_total
+    (grp : HFGroup) (p n : ℕ₀)
+    (hp : Peano.Arith.Prime p)
+    (hexp : isSylowExponent grp p n)
+    (hTotal : SylowConjugateTotal grp p) :
+    SylowConjugacyBase grp p := by
+  obtain ⟨sub, hsyl⟩ := exists_isSylowSubgroup_of_isSylowExponent grp p n hp hexp
+  exact SylowConjugacyBase_of_exists_and_total grp p ⟨sub, hsyl⟩ hTotal
+
+open Peano Peano.Arith in
+/-- Con `isSylowExponent`, la órbita total cierra directamente el objetivo de Sylow II. -/
+theorem sylowSecondConjugacyTarget_of_isSylowExponent_and_total
+    (grp : HFGroup) (p n : ℕ₀)
+    (hp : Peano.Arith.Prime p)
+    (hexp : isSylowExponent grp p n)
+    (hTotal : SylowConjugateTotal grp p) :
+    SylowSecondConjugacyTarget grp p := by
+  exact sylowSecondConjugacyTarget_of_base grp p
+    (SylowConjugacyBase_of_isSylowExponent_and_total grp p n hp hexp hTotal)
+
+open Peano Peano.Arith in
+/-- Paso canónico de Sylow III: para un `p`-Sylow `sub`, `p` no divide su índice. -/
+theorem not_dvd_index_of_isSylowSubgroup
+    {grp : HFGroup} {sub : HFSubgroup grp} {p : ℕ₀}
+    (hsyl : isSylowSubgroup sub p) :
+    ¬ (p ∣ sub.index) := by
+  obtain ⟨n, ⟨_, hndvd⟩, hcardH⟩ := hsyl
+  intro hpdvd
+  obtain ⟨t, ht⟩ := hpdvd
+  have hindex : HFSet.card sub.cosets = mul p t := by
+    simpa [HFSubgroup.index] using ht
+  have hG_eq : HFSet.card grp.G = mul (p ^ (σ n)) t := by
+    calc
+      HFSet.card grp.G
+          = mul (HFSet.card sub.cosets) (HFSet.card sub.H) :=
+              sub.card_G_eq_card_H_mul_index
+      _   = mul (mul p t) (p ^ n) := by rw [hindex, hcardH]
+      _   = mul p (mul t (p ^ n)) := by rw [mul_assoc]
+      _   = mul p (mul (p ^ n) t) := by rw [mul_comm t (p ^ n)]
+      _   = mul (mul p (p ^ n)) t := by rw [← mul_assoc]
+      _   = mul (mul (p ^ n) p) t := by rw [mul_comm p (p ^ n)]
+      _   = mul (p ^ (σ n)) t := by
+              rw [pow_def]
+              exact congrArg (fun z => mul z t) (Peano.Pow.pow_succ p n)
+  have hpow : pow_dvd_card p (σ n) grp.G := ⟨t, hG_eq.symm⟩
+  exact hndvd hpow
+
+/-- Formulación equivalente de Sylow III sobre `card(cosets)`. -/
+theorem not_dvd_card_cosets_of_isSylowSubgroup
+    {grp : HFGroup} {sub : HFSubgroup grp} {p : ℕ₀}
+    (hsyl : isSylowSubgroup sub p) :
+    ¬ (p ∣ HFSet.card sub.cosets) := by
+  simpa [HFSubgroup.index] using not_dvd_index_of_isSylowSubgroup hsyl
+
+-- ─────────────────────────────────────────────────────────────────
+-- §36-bis. Punto fijo del p-grupo (lemas y teorema)
+-- ─────────────────────────────────────────────────────────────────
+
+/-- La órbita es cerrada bajo la acción: si `y ∈ ψ.orb x` y `g ∈ G`,
+    entonces `ψ.act g y ∈ ψ.orb x`. -/
+private theorem HFGroupAction.orb_act_mem {grp : HFGroup} {X : HFSet}
+    (ψ : HFGroupAction grp X) {x : HFSet} (hx : x ∈ X)
+    {g y : HFSet} (hg : g ∈ grp.G) (hy : y ∈ ψ.orb x) :
+    ψ.act g y ∈ ψ.orb x := by
+  rw [ψ.mem_orb_iff] at hy ⊢
+  obtain ⟨hyX, h, hh, hhx⟩ := hy
+  refine ⟨ψ.act_closed hg hyX, grp.op g h, grp.op_closed hg hh, ?_⟩
+  rw [← ψ.act_compat hg hh hx, hhx]
+
+/-- El complemento `X \ ψ.orb x` es invariante bajo la acción:
+    si `y ∉ ψ.orb x` entonces `ψ.act g y ∉ ψ.orb x`. -/
+private theorem HFGroupAction.setminus_orb_inv {grp : HFGroup} {X : HFSet}
+    (ψ : HFGroupAction grp X) {x : HFSet} (hx : x ∈ X)
+    {g y : HFSet} (hg : g ∈ grp.G) (hy : y ∈ HFSet.setminus X (ψ.orb x)) :
+    ψ.act g y ∈ HFSet.setminus X (ψ.orb x) := by
+  rw [HFSet.mem_setminus X (ψ.orb x)] at hy ⊢
+  obtain ⟨hyX, hyO⟩ := hy
+  refine ⟨ψ.act_closed hg hyX, fun hact_orb => hyO ?_⟩
+  rw [ψ.mem_orb_iff] at hact_orb
+  obtain ⟨_, h, hh, hhx⟩ := hact_orb
+  rw [ψ.mem_orb_iff]
+  have hginv : grp.inv g ∈ grp.G := grp.inv_closed hg
+  refine ⟨hyX, grp.op (grp.inv g) h, grp.op_closed hginv hh, ?_⟩
+  calc ψ.act (grp.op (grp.inv g) h) x
+      = ψ.act (grp.inv g) (ψ.act h x) := (ψ.act_compat hginv hh hx).symm
+    _ = ψ.act (grp.inv g) (ψ.act g y) := by rw [hhx]
+    _ = ψ.act (grp.op (grp.inv g) g) y := ψ.act_compat hginv hg hyX
+    _ = ψ.act grp.e y := by rw [grp.op_inv_left hg]
+    _ = y := ψ.act_id hyX
+
+open Peano Peano.Arith in
+/-- Teorema del punto fijo del p-grupo:
+    Si `|grp.G| = p^n`, `ψ` es una acción de `grp` sobre `X`, y `p ∤ |X|`,
+    entonces existe un punto fijo en `X`. -/
+private theorem p_group_fixed_point {grp : HFGroup} {p n : ℕ₀}
+    (hp : Peano.Arith.Prime p) (hpn : HFSet.card grp.G = p ^ n)
+    (X : HFSet) (ψ : HFGroupAction grp X)
+    (hndvd : ¬ p ∣ HFSet.card X) :
+    ∃ x ∈ X, ∀ g ∈ grp.G, ψ.act g x = x := by
+  refine (Peano.WellFounded.strongInductionOn (HFSet.card X)
+      (P := fun m => ∀ (Y : HFSet) (ψ' : HFGroupAction grp Y),
+          HFSet.card Y = m → ¬ p ∣ HFSet.card Y →
+          ∃ y ∈ Y, ∀ g ∈ grp.G, ψ'.act g y = y)
+      ?_ X ψ rfl hndvd)
+  intro m ih Y ψ' hcardY hndvdY
+  by_cases hY_empty : Y = HFSet.empty
+  · subst hY_empty; rw [HFSet.card_empty] at hndvdY
+    exact absurd (divides_zero p) hndvdY
+  obtain ⟨y₀, hy₀⟩ := HFSet.nonempty_of_ne_empty Y hY_empty
+  -- Caso 1: card(orb y₀) = 1 → y₀ es punto fijo
+  by_cases h_orb1 : HFSet.card (ψ'.orb y₀) = 𝟙
+  · have h_os := ψ'.orbit_stabilizer hy₀
+    rw [h_orb1, one_mul] at h_os
+    have hstab_eq : (ψ'.stab hy₀).H = grp.G :=
+      HFSet.eq_of_subset_of_card_eq (fun _ hx => (ψ'.stab hy₀).H_sub hx) h_os
+    exact ⟨y₀, hy₀, fun g hg =>
+      ((ψ'.mem_stab_iff hy₀ g).mp (hstab_eq ▸ hg)).2⟩
+  -- Caso 2: card(orb y₀) ≠ 1 → p | card(orb y₀)
+  have h_orb_dvd : HFSet.card (ψ'.orb y₀) ∣ p ^ n :=
+    ⟨HFSet.card (ψ'.stab hy₀).H, hpn ▸ (ψ'.orbit_stabilizer hy₀).symm⟩
+  have hp_dvd_orb : p ∣ HFSet.card (ψ'.orb y₀) :=
+    prime_dvd_of_dvd_prime_pow hp n h_orb_dvd h_orb1
+  -- Y' = Y \ orb y₀, invariante bajo ψ'
+  let Y' := HFSet.setminus Y (ψ'.orb y₀)
+  let ψ'_res : HFGroupAction grp Y' := {
+    act        := ψ'.act
+    act_closed := fun hg hz => ψ'.setminus_orb_inv hy₀ hg hz
+    act_id     := fun hz => ψ'.act_id ((HFSet.mem_setminus Y (ψ'.orb y₀) _).mp hz).1
+    act_compat := fun hg hh hz =>
+        ψ'.act_compat hg hh ((HFSet.mem_setminus Y (ψ'.orb y₀) _).mp hz).1
+  }
+  -- Descomposición card Y = card(orb y₀) + card Y'
+  have hO_sub : ψ'.orb y₀ ⊆ Y := fun z hz => ((ψ'.mem_orb_iff y₀ z).mp hz).1
+  have hY_split : Y = HFSet.union (ψ'.orb y₀) Y' := by
+    apply HFSet.extensionality; intro z
+    rw [HFSet.mem_union, HFSet.mem_setminus Y (ψ'.orb y₀)]
+    exact ⟨fun hz => if hzo : z ∈ ψ'.orb y₀ then Or.inl hzo else Or.inr ⟨hz, hzo⟩,
+           fun h => h.elim (fun hzO => hO_sub z hzO) (·.1)⟩
+  have hdisj : HFSet.inter (ψ'.orb y₀) Y' = HFSet.empty := by
+    apply HFSet.extensionality; intro z
+    constructor
+    · intro hz
+      have ⟨hzO, hzY'⟩ := (HFSet.mem_inter _ _ z).mp hz
+      exact absurd hzO ((HFSet.mem_setminus Y (ψ'.orb y₀) z).mp hzY').2
+    · intro hz; exact absurd hz (HFSet.not_mem_empty z)
+  have hcard_split : HFSet.card Y =
+      add (HFSet.card (ψ'.orb y₀)) (HFSet.card Y') :=
+    congrArg HFSet.card hY_split |>.trans (HFSet.card_union_disjoint _ _ hdisj)
+  -- card Y' < m
+  have hO_ne : ψ'.orb y₀ ≠ HFSet.empty :=
+    fun h => absurd (h ▸ ψ'.orb_self hy₀) (HFSet.not_mem_empty _)
+  have h_orb_pos : HFSet.card (ψ'.orb y₀) ≠ 𝟘 :=
+    fun h => hO_ne (HFSet.card_eq_zero_iff.mp h)
+  have hcard_lt : lt₀ (HFSet.card Y') m := by
+    rw [← hcardY, hcard_split]
+    exact Peano.Add.lt_self_add_l _ _ h_orb_pos
+  -- p ∤ card Y'
+  have hndvd_Y' : ¬ p ∣ HFSet.card Y' := fun hp_dvd_Y' =>
+    hndvdY (hcard_split ▸ divides_add hp_dvd_orb hp_dvd_Y')
+  -- Aplicar IH a Y' con ψ'_res
+  obtain ⟨y, hyY', hfix⟩ := ih (HFSet.card Y') hcard_lt Y' ψ'_res rfl hndvd_Y'
+  exact ⟨y, (HFSet.mem_setminus Y (ψ'.orb y₀) y).mp hyY' |>.1, hfix⟩
+
+-- ─────────────────────────────────────────────────────────────────
+-- §37. Sylow II: todo par de Sylow-p es conjugado (prueba por punto fijo)
+-- ─────────────────────────────────────────────────────────────────
+
+open Peano Peano.Arith in
+/-- Teorema de Sylow II: cualquier dos Sylow-p de un mismo grupo son conjugados.
+    Enunciado en términos de `SylowConjugateSubtype` para conectar directamente
+    con `SylowConjugateTotal`.
+    La prueba clásica: K actúa sobre los cosetes derechos de H por translación
+    derecha (acción izquierda vía inversos); K es p-grupo y p ∤ |H.cosets|,
+    luego existe un cosete Hg₀ fijo por K. Eso da g₀·K·g₀⁻¹ ⊆ H;
+    por igualdad de cardinales (sylow_card_eq + conjugate_card_eq), se tiene igualdad. -/
+theorem sylowConjugate
+    (grp : HFGroup) (p n : ℕ₀) (hp : Peano.Arith.Prime p)
+    (hexp : isSylowExponent grp p n)
+    (S T : {sub : HFSubgroup grp // isSylowSubgroup sub p}) :
+    SylowConjugateSubtype grp p S T := by
+  let H := S.1; let K := T.1
+  -- (1) Ambos Sylow-p tienen el mismo cardinal
+  have hcardHK : HFSet.card H.H = HFSet.card K.H := sylow_card_eq S.2 T.2
+  -- (2) p no divide |H.cosets|
+  have hndvd : ¬ (p ∣ HFSet.card H.cosets) :=
+    not_dvd_card_cosets_of_isSylowSubgroup S.2
+  -- (3) Paso clave (punto fijo del p-grupo): ∃ g₀ ∈ G con g₀·K·g₀⁻¹ ⊆ H.
+  --     K actúa sobre H.cosets por `act k C = H.cosetOf (H.cosetRep C · k⁻¹)`.
+  --     Como p ∤ |H.cosets| y |K| = p^n, alguna órbita tiene tamaño 1.
+  have hfixed : ∃ g₀ ∈ grp.G, ∀ k ∈ K.H,
+      grp.op g₀ (grp.op k (grp.inv g₀)) ∈ H.H := by
+    -- |K.toHFGroup.G| = |K.H| = p^n (K es Sylow-p con exponente n)
+    have hcardK : HFSet.card K.toHFGroup.G = p ^ n := by
+      obtain ⟨m, hm_exp, hcardKm⟩ := T.2
+      have hm_n : m = n := by
+        rcases trichotomy m n with h | h | h
+        · exact absurd (pow_dvd_card_of_le (lt_nm_then_le_nm m n h) hexp.1) hm_exp.2
+        · exact h
+        · exact absurd (pow_dvd_card_of_le (lt_nm_then_le_nm n m h) hm_exp.1) hexp.2
+      exact hm_n ▸ hcardKm
+    -- Aplicar el teorema del punto fijo del p-grupo
+    obtain ⟨C, hC, hfix⟩ := p_group_fixed_point hp hcardK H.cosets
+        (cosetAction K H) hndvd
+    -- g₀ = representante del cosete fijo C
+    let g₀ := H.cosetRep C
+    have hg₀G : g₀ ∈ grp.G := H.cosetRep_mem_G hC
+    have hrep : H.rightCoset g₀ = C := H.cosetRep_rightCoset_eq hC
+    refine ⟨g₀, hg₀G, fun k hk => ?_⟩
+    -- (cosetAction K H).act k C = C (cosete fijo)
+    have hfixC : (cosetAction K H).act k C = C := hfix k hk
+    -- H.rightCoset (g₀ · k⁻¹) = H.rightCoset g₀ (de la fijación del cosete)
+    have hkG : k ∈ grp.G := K.H_sub hk
+    have hkGinv : grp.inv k ∈ grp.G := grp.inv_closed hkG
+    have hRC_eq : H.rightCoset (grp.op g₀ (grp.inv k)) = H.rightCoset g₀ := by
+      have hC_form : C = H.cosetOf g₀ := hrep.symm
+      rw [hC_form] at hfixC
+      rw [cosetAction_act_cosetOf K H hk hg₀G] at hfixC
+      exact hfixC
+    -- cosetEq (g₀ · k⁻¹) g₀ : g₀ · inv(g₀ · k⁻¹) ∈ H.H
+    have hceq : H.cosetEq (grp.op g₀ (grp.inv k)) g₀ :=
+      (H.cosetEq_iff_rightCoset_eq (grp.op_closed hg₀G hkGinv) hg₀G).mpr hRC_eq
+    -- inv(g₀ · k⁻¹) = k · g₀⁻¹ (por inv_op + inv_inv)
+    have hinvop : grp.inv (grp.op g₀ (grp.inv k)) = grp.op k (grp.inv g₀) := by
+      rw [grp.inv_op hg₀G hkGinv, grp.inv_inv hkG]
+    -- g₀ · (k · g₀⁻¹) ∈ H.H
+    rwa [← hinvop]
+  obtain ⟨g₀, hg₀, hconj⟩ := hfixed
+  -- (4) Testigo: g = g₀⁻¹, de modo que K ⊆ g·H·g⁻¹ = H.conjugate g
+  let g := grp.inv g₀
+  have hg : g ∈ grp.G := grp.inv_closed hg₀
+  -- (5) K.H ⊆ (H.conjugate g hg).H
+  have hsubset : K.H ⊆ (H.conjugate g hg).H := by
+    intro k hk
+    rw [H.mem_conjugate_iff hg]
+    -- h := g₀·k·g₀⁻¹ ∈ H.H (de hfixed)
+    refine ⟨grp.op g₀ (grp.op k (grp.inv g₀)), hconj k hk, ?_⟩
+    -- Debemos mostrar: k = g·h·g⁻¹ = g₀⁻¹·(g₀·k·g₀⁻¹)·g₀ = k
+    have hkG  : k ∈ grp.G := K.H_sub hk
+    have hg0inv : grp.inv g₀ ∈ grp.G := grp.inv_closed hg₀
+    -- grp.inv g = grp.inv (grp.inv g₀) = g₀
+    have hginv : grp.inv g = g₀ := grp.inv_inv hg₀
+    rw [hginv]
+    -- Goal: k = grp.op (grp.op (grp.inv g₀) (grp.op g₀ (grp.op k (grp.inv g₀)))) g₀
+    symm
+    have hop1 : grp.op (grp.inv g₀) (grp.op g₀ (grp.op k (grp.inv g₀))) =
+                grp.op k (grp.inv g₀) := by
+      calc grp.op (grp.inv g₀) (grp.op g₀ (grp.op k (grp.inv g₀)))
+          = grp.op (grp.op (grp.inv g₀) g₀) (grp.op k (grp.inv g₀)) :=
+              (grp.op_assoc hg0inv hg₀ (grp.op_closed hkG hg0inv)).symm
+        _ = grp.op grp.e (grp.op k (grp.inv g₀)) := by rw [grp.op_inv_left hg₀]
+        _ = grp.op k (grp.inv g₀) := grp.op_id_left (grp.op_closed hkG hg0inv)
+    calc grp.op (grp.op (grp.inv g₀) (grp.op g₀ (grp.op k (grp.inv g₀)))) g₀
+        = grp.op (grp.op k (grp.inv g₀)) g₀ := by rw [hop1]
+      _ = grp.op k (grp.op (grp.inv g₀) g₀) := grp.op_assoc hkG hg0inv hg₀
+      _ = grp.op k grp.e := by rw [grp.op_inv_left hg₀]
+      _ = k := grp.op_id_right hkG
+  -- (6) |(H.conjugate g)| = |K| (por sylow_card_eq + conjugate_card_eq)
+  have hcard_eq : HFSet.card K.H = HFSet.card (H.conjugate g hg).H := by
+    rw [H.conjugate_card_eq hg]; exact hcardHK.symm
+  -- (7) Subconjunto + mismo cardinal ⟹ igualdad
+  have heq : K.H = (H.conjugate g hg).H :=
+    HFSet.eq_of_subset_of_card_eq hsubset hcard_eq
+  -- (8) Concluir SylowConjugateSubtype
+  exact ⟨g, hg, by simpa [conjSylowSubgroupMap_val] using heq⟩
+
+open Peano Peano.Arith in
+/-- Sylow II cierra `SylowConjugateTotal` para grupos con exponente de Sylow. -/
+theorem SylowConjugateTotal_of_isSylowExponent
+    (grp : HFGroup) (p n : ℕ₀) (hp : Peano.Arith.Prime p)
+    (hexp : isSylowExponent grp p n) :
+    SylowConjugateTotal grp p := by
+  intro S T
+  exact sylowConjugate grp p n hp hexp S T
+
+open Peano Peano.Arith in
+/-- Sylow II sin hipótesis de total: desde exponente, todo Sylow-p es conjugado. -/
+theorem sylowSecondConjugacyTarget_of_isSylowExponent
+    (grp : HFGroup) (p n : ℕ₀) (hp : Peano.Arith.Prime p)
+    (hexp : isSylowExponent grp p n) :
+    SylowSecondConjugacyTarget grp p :=
+  sylowSecondConjugacyTarget_of_isSylowExponent_and_total grp p n hp hexp
+    (SylowConjugateTotal_of_isSylowExponent grp p n hp hexp)
+
 end HFAlgebra
 
 -- ======================================================================
@@ -3210,3 +3761,24 @@ end HFAlgebra
 --       isSylowExponent grp p n → ∃ sub, isSylowSubgroup sub p
 --   exists_isPSubgroup_of_isSylowExponent :
 --       isSylowExponent grp p n → ∃ sub, isPSubgroup sub p
+--   not_dvd_index_of_isSylowSubgroup :
+--       isSylowSubgroup sub p → ¬ (p ∣ index sub)
+--   not_dvd_card_cosets_of_isSylowSubgroup :
+--       isSylowSubgroup sub p → ¬ (p ∣ card sub.cosets)
+--   conjPSubgroupMap / conjSylowSubgroupMap :
+--       conjugación como endomap en los subtipos de p-subgrupos / Sylow-p
+--   conjPSubgroupMap_val / conjSylowSubgroupMap_val :
+--       proyección al subgrupo conjugado sub.conjugate g hg
+--   SylowConjugacyBase_of_isSylowExponent_and_total :
+--       isSylowExponent ∧ total → SylowConjugacyBase                          (pre-Sylow II)
+--   sylowSecondConjugacyTarget_of_isSylowExponent_and_total :
+--       isSylowExponent ∧ total → SylowSecondConjugacyTarget                  (pre-Sylow II)
+--
+-- Público (HFAlgebra — §37-II: Segundo Teorema de Sylow):
+--   sylowConjugate                    :
+--       isSylowExponent grp p n → S T : Sylow-p → SylowConjugateSubtype S T
+--       isSylowExponent ∧ S T : Sylow-p → SylowConjugateSubtype S T          (Sylow II)
+--   SylowConjugateTotal_of_isSylowExponent :
+--       isSylowExponent grp p n → SylowConjugateTotal grp p                   (Sylow II)
+--   sylowSecondConjugacyTarget_of_isSylowExponent :
+--       isSylowExponent grp p n → SylowSecondConjugacyTarget grp p            (Sylow II)

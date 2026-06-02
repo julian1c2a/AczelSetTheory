@@ -62,7 +62,6 @@ theorem mem_KmodN_iff (sub_N sub_K : HFSubgroup grp)
       C ∈ sub_N.cosets ∧ ∃ k ∈ sub_K.H, C = sub_N.rightCoset k := by
   show C ∈ HFSet.sep _ _ ↔ _
   rw [HFSet.mem_sep]
-  rfl
 
 -- ─────────────────────────────────────────────────────────────────
 -- §2. K/N es normal en G/N
