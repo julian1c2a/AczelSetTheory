@@ -1,6 +1,6 @@
 # Technical Reference — AczelSetTheory
 
-**Last updated:** 2026-05-22
+**Last updated:** 2026-06-02
 **Author**: Julián Calderón Almendros
 **Lean version**: v4.29.0
 
@@ -542,5 +542,6 @@ Key proven theorems (non-sorry):
 | 2026-05-17 | Axioms/Rank (#83): `HFSet.rank`, `rank_empty`, `rank_insert` (rango de Von Neumann); VN/RankVN (#84): `VN.rank_vN` — fase B1 | Claude (AI assistant) |
 | 2026-05-21 | `Integers/PadicVal.lean` (#97), `Integers/MobiusLiouville.lean` (#98): `Omega_prime_mul` y `Omega_prime_mul_prime` probados sin sorry; `liouville_mul`, `liouville_prime_pow` ahora sorry-free; estado de módulos #97 y #98 actualizado a `✅ Complete`; API de PadicVal ampliada con todos los lemas (`padicVal_zero_right`, `padicVal_of_not_cond`, `padicVal_succ_dvd`, `padicVal_prime_self`, `padicVal_prime_of_ndvd`, `squarefree_one`, `squarefree_prime`, `not_squarefree_prime_sq`, `Omega_prime_zero`, `Omega_prime_one`, `Omega_prime_prime`); tabla §6.66 ampliada con 13 nuevos teoremas de PadicVal | Claude (AI assistant) |
 | 2026-05-22 | Integers/{Basic,Order,Functions,Arithmetic,Bijection,PadicVal,MobiusLiouville}.lean (#92–#98): entradas de módulos, cadena de dependencias, namespace `ℤ₀`, definiciones clave (negOnePow, mobius, liouville, Omega_prime), 17 teoremas incluyendo `liouville_prime_pow` — actualización_documentación completa de Integers/ | Claude (AI assistant) |
+| 2026-06-02 | Algebra/Sylow.lean: migración constructiva de `order` y `periodOf` (búsqueda acotada), limpieza de legado WOP (`order_wop`, `periodOf_wop`); Sprint B inicial en Algebra/{QuotientGroup,FirstIsomorphism,SecondIsomorphism,ThirdIsomorphism,CosetAction,CorrespondenceTheorem} reemplazando wrappers `noncomputable def` por `abbrev/def`; actualización de `doc/REFERENCE-Algebra.md` y matriz `AUDIT-MODULE-MATRIX.md` | GitHub Copilot |
 
 > To project a file: read it fully, then update sections 1–8 above following AI-GUIDE.md §4–14.

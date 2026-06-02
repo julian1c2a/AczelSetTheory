@@ -200,7 +200,7 @@ namespace HFSubgroup
 variable (sub₁ sub₂ : HFSubgroup grp) (hn : sub₂.isNormal)
 
 /-- Función subyacente: C ↦ N · rep_{H∩N}(C) (visto como coseto en HN/N). -/
-private noncomputable def secondIsoFun (C : HFSet) : HFSet :=
+private abbrev secondIsoFun (C : HFSet) : HFSet :=
   (N_in_subgroupHN sub₁ sub₂ hn).rightCoset
     ((interHN_as_subgroup_H sub₁ sub₂ hn).cosetRep C)
 
@@ -240,7 +240,7 @@ theorem secondIsoFun_eq {g : HFSet} (hg : g ∈ sub₁.H) :
 
 /-- El homomorfismo del Segundo Teorema de Isomorfía:
     `φ̄ : H/(H∩N) → HN/N`. -/
-noncomputable def secondIsoMap :
+abbrev secondIsoMap :
     HFGroupHom
       (quotientGroup sub₁.toHFGroup (interHN_as_subgroup_H sub₁ sub₂ hn)
         (interHN_as_subgroup_H_isNormal sub₁ sub₂ hn))

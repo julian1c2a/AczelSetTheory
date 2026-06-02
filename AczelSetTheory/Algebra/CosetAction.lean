@@ -67,8 +67,8 @@ end HFSubgroup
 -- ─────────────────────────────────────────────────────────────────
 
 /-- Acción izquierda de `sub_H` (como grupo) sobre los cosetes derechos
-    de `sub_K`: `act h (K·a) := K·(a · h⁻¹)`. -/
-noncomputable def cosetAction (sub_H sub_K : HFSubgroup grp) :
+  de `sub_K`: `act h (K·a) := K·(a · h⁻¹)`. -/
+abbrev cosetAction (sub_H sub_K : HFSubgroup grp) :
     HFGroupAction sub_H.toHFGroup sub_K.cosets where
   act h C := sub_K.rightCoset (grp.op (sub_K.cosetRep C) (grp.inv h))
   act_closed := fun {h C} hh hC => by

@@ -30,7 +30,7 @@ namespace HFSubgroup
 -- ─────────────────────────────────────────────────────────────────
 
 /-- La preimagen de `Q ≤ G/N` bajo `π : G → G/N`, `g ↦ Ng`. -/
-noncomputable def preimageSubgroup (sub_N : HFSubgroup grp) (hn_N : sub_N.isNormal)
+def preimageSubgroup (sub_N : HFSubgroup grp) (hn_N : sub_N.isNormal)
     (Q : HFSubgroup (quotientGroup grp sub_N hn_N)) : HFSubgroup grp where
   H := HFSet.sep grp.G (fun g => sub_N.rightCoset g ∈ Q.H)
   H_sub := fun hx => ((HFSet.mem_sep _ _ _).mp hx).1

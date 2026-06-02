@@ -1484,12 +1484,12 @@ theorem orbitOf_eq_or_disjoint (grp : HFGroup) (n : ℕ₀) (t s : HFSet)
 
 ```lean
 /-- Período mínimo de `t` bajo el shift: mínimo `k > 0` con `shiftIter k t = t`. -/
-noncomputable def periodOf (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+def periodOf (grp : HFGroup) (n : ℕ₀) (t : HFSet)
     (ht : t ∈ HFSet.nPow grp.G (σ n)) : ℕ₀
 ```
 
 - **Math**: Per(t) = min { k > 0 | shift^k(t) = t }.
-- `noncomputable` (usa `Peano.choose_unique` clásico).
+- **Computable**: sí, por búsqueda acotada constructiva en `0..σ n`.
 
 | Teorema | Lean signature |
 |---------|---------------|

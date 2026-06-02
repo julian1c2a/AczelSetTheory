@@ -1,29 +1,29 @@
 # Matriz de Auditoria Modulo por Modulo
 
-Generado: 2026-06-02 11:49:33
+Generado: 2026-06-02 13:12:33
 
 ## Resumen Global
 
 - Archivos Lean: 174
-- Lineas totales: 24633
+- Lineas totales: 24756
 - sorry: 0
 - admit: 0
 - axiom: 0
-- noncomputable: 21
+- noncomputable def: 1
 - Modulos con TODO/PENDIENTE/FIXME: 43
 - Modulos con placeholder/stub: 11
 
 ## Matriz
 
-| Modulo | Subsistema | Lineas | sorry | admit | axiom | noncomputable | TODO/PEND/FIXME | placeholder/stub | Estado |
+| Modulo | Subsistema | Lineas | sorry | admit | axiom | noncomputable def | TODO/PEND/FIXME | placeholder/stub | Estado |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---|
 | AczelSetTheory\_template.lean | _template.lean | 54 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Algebra\Action.lean | Algebra | 361 | 0 | 0 | 0 | 0 | 1 | 0 | PENDIENTE_DOC |
-| AczelSetTheory\Algebra\CorrespondenceTheorem.lean | Algebra | 169 | 0 | 0 | 0 | 1 | 1 | 0 | PENDIENTE_DOC |
-| AczelSetTheory\Algebra\CosetAction.lean | Algebra | 142 | 0 | 0 | 0 | 1 | 0 | 0 | OK_NONCOMP |
+| AczelSetTheory\Algebra\CorrespondenceTheorem.lean | Algebra | 169 | 0 | 0 | 0 | 0 | 1 | 0 | PENDIENTE_DOC |
+| AczelSetTheory\Algebra\CosetAction.lean | Algebra | 142 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Algebra\CosetCount.lean | Algebra | 353 | 0 | 0 | 0 | 0 | 2 | 0 | PENDIENTE_DOC |
 | AczelSetTheory\Algebra\Field.lean | Algebra | 305 | 0 | 0 | 0 | 0 | 4 | 0 | PENDIENTE_DOC |
-| AczelSetTheory\Algebra\FirstIsomorphism.lean | Algebra | 209 | 0 | 0 | 0 | 2 | 1 | 0 | PENDIENTE_DOC |
+| AczelSetTheory\Algebra\FirstIsomorphism.lean | Algebra | 209 | 0 | 0 | 0 | 0 | 1 | 0 | PENDIENTE_DOC |
 | AczelSetTheory\Algebra\Group.lean | Algebra | 182 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Algebra\GroupHom.lean | Algebra | 94 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Algebra\Lattice.lean | Algebra | 310 | 0 | 0 | 0 | 0 | 1 | 0 | PENDIENTE_DOC |
@@ -31,13 +31,13 @@ Generado: 2026-06-02 11:49:33
 | AczelSetTheory\Algebra\Module.lean | Algebra | 286 | 0 | 0 | 0 | 0 | 1 | 0 | PENDIENTE_DOC |
 | AczelSetTheory\Algebra\Monoid.lean | Algebra | 133 | 0 | 0 | 0 | 0 | 1 | 0 | PENDIENTE_DOC |
 | AczelSetTheory\Algebra\NormalSubgroup.lean | Algebra | 376 | 0 | 0 | 0 | 0 | 1 | 0 | PENDIENTE_DOC |
-| AczelSetTheory\Algebra\QuotientGroup.lean | Algebra | 390 | 0 | 0 | 0 | 7 | 0 | 0 | OK_NONCOMP |
+| AczelSetTheory\Algebra\QuotientGroup.lean | Algebra | 390 | 0 | 0 | 0 | 1 | 0 | 0 | OK_NONCOMP_DEF |
 | AczelSetTheory\Algebra\Ring.lean | Algebra | 165 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Algebra\RingHom.lean | Algebra | 158 | 0 | 0 | 0 | 0 | 1 | 0 | PENDIENTE_DOC |
-| AczelSetTheory\Algebra\SecondIsomorphism.lean | Algebra | 369 | 0 | 0 | 0 | 2 | 0 | 0 | OK_NONCOMP |
+| AczelSetTheory\Algebra\SecondIsomorphism.lean | Algebra | 369 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Algebra\Subgroup.lean | Algebra | 337 | 0 | 0 | 0 | 0 | 3 | 0 | PENDIENTE_DOC |
-| AczelSetTheory\Algebra\Sylow.lean | Algebra | 3061 | 0 | 0 | 0 | 4 | 7 | 0 | PENDIENTE_DOC |
-| AczelSetTheory\Algebra\ThirdIsomorphism.lean | Algebra | 247 | 0 | 0 | 0 | 3 | 0 | 0 | OK_NONCOMP |
+| AczelSetTheory\Algebra\Sylow.lean | Algebra | 3184 | 0 | 0 | 0 | 0 | 7 | 0 | PENDIENTE_DOC |
+| AczelSetTheory\Algebra\ThirdIsomorphism.lean | Algebra | 247 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Algebra.lean | Algebra.lean | 20 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Axioms\Adjunction.lean | Axioms | 39 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Axioms\Bijection.lean | Axioms | 138 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
@@ -180,7 +180,7 @@ Generado: 2026-06-02 11:49:33
 | AczelSetTheory\VN\PrimeVN.lean | VN | 175 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\VN\ProdBridgeVN.lean | VN | 59 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\VN\ProductVN.lean | VN | 62 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
-| AczelSetTheory\VN\QuotientGroupVN.lean | VN | 51 | 0 | 0 | 0 | 1 | 0 | 1 | PENDIENTE_DOC |
+| AczelSetTheory\VN\QuotientGroupVN.lean | VN | 51 | 0 | 0 | 0 | 0 | 0 | 1 | PENDIENTE_DOC |
 | AczelSetTheory\VN\RankVN.lean | VN | 37 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\VN\SecondIsomorphismVN.lean | VN | 49 | 0 | 0 | 0 | 0 | 0 | 1 | PENDIENTE_DOC |
 | AczelSetTheory\VN\SignVN.lean | VN | 49 | 0 | 0 | 0 | 0 | 0 | 2 | PENDIENTE_DOC |
@@ -194,10 +194,11 @@ Generado: 2026-06-02 11:49:33
 
 ## Modulos Prioritarios (por riesgo)
 
-| Modulo | Lineas | sorry | admit | axiom | noncomputable | TODO/PEND/FIXME | placeholder/stub |
+| Modulo | Lineas | sorry | admit | axiom | noncomputable def | TODO/PEND/FIXME | placeholder/stub |
 |---|---:|---:|---:|---:|---:|---:|---:|
+| AczelSetTheory\Algebra\QuotientGroup.lean | 390 | 0 | 0 | 0 | 1 | 0 | 0 |
 | AczelSetTheory\Topology\Separation.lean | 217 | 0 | 0 | 0 | 0 | 9 | 0 |
-| AczelSetTheory\Algebra\Sylow.lean | 3061 | 0 | 0 | 0 | 4 | 7 | 0 |
+| AczelSetTheory\Algebra\Sylow.lean | 3184 | 0 | 0 | 0 | 0 | 7 | 0 |
 | AczelSetTheory\Topology\Neighborhoods.lean | 243 | 0 | 0 | 0 | 0 | 5 | 0 |
 | AczelSetTheory\Topology\Interior.lean | 227 | 0 | 0 | 0 | 0 | 5 | 0 |
 | AczelSetTheory\Algebra\Field.lean | 305 | 0 | 0 | 0 | 0 | 4 | 0 |
@@ -214,8 +215,6 @@ Generado: 2026-06-02 11:49:33
 | AczelSetTheory\Operations\Order.lean | 157 | 0 | 0 | 0 | 0 | 2 | 0 |
 | AczelSetTheory\Axioms\CardImage.lean | 124 | 0 | 0 | 0 | 0 | 2 | 0 |
 | AczelSetTheory\VN\CorrespondenceTheoremVN.lean | 53 | 0 | 0 | 0 | 0 | 1 | 1 |
-| AczelSetTheory\Algebra\FirstIsomorphism.lean | 209 | 0 | 0 | 0 | 2 | 1 | 0 |
-| AczelSetTheory\Algebra\CorrespondenceTheorem.lean | 169 | 0 | 0 | 0 | 1 | 1 | 0 |
 | AczelSetTheory\PList\Lemmas.lean | 438 | 0 | 0 | 0 | 0 | 1 | 0 |
 | AczelSetTheory\Algebra\NormalSubgroup.lean | 376 | 0 | 0 | 0 | 0 | 1 | 0 |
 | AczelSetTheory\Algebra\Action.lean | 361 | 0 | 0 | 0 | 0 | 1 | 0 |
@@ -223,11 +222,13 @@ Generado: 2026-06-02 11:49:33
 | AczelSetTheory\Algebra\Module.lean | 286 | 0 | 0 | 0 | 0 | 1 | 0 |
 | AczelSetTheory\Algebra\LinearSpace.lean | 272 | 0 | 0 | 0 | 0 | 1 | 0 |
 | AczelSetTheory\Axioms\Order.lean | 247 | 0 | 0 | 0 | 0 | 1 | 0 |
+| AczelSetTheory\Algebra\FirstIsomorphism.lean | 209 | 0 | 0 | 0 | 0 | 1 | 0 |
 | AczelSetTheory\Axioms\Function.lean | 183 | 0 | 0 | 0 | 0 | 1 | 0 |
 | AczelSetTheory\Combinatorics\Counting.lean | 181 | 0 | 0 | 0 | 0 | 1 | 0 |
+| AczelSetTheory\Algebra\CorrespondenceTheorem.lean | 169 | 0 | 0 | 0 | 0 | 1 | 0 |
 | AczelSetTheory\Algebra\RingHom.lean | 158 | 0 | 0 | 0 | 0 | 1 | 0 |
-| AczelSetTheory\Topology\Basic.lean | 153 | 0 | 0 | 0 | 0 | 1 | 0 |
 | AczelSetTheory\CList\ExtEq.lean | 153 | 0 | 0 | 0 | 0 | 1 | 0 |
+| AczelSetTheory\Topology\Basic.lean | 153 | 0 | 0 | 0 | 0 | 1 | 0 |
 | AczelSetTheory\Algebra\Monoid.lean | 133 | 0 | 0 | 0 | 0 | 1 | 0 |
 | AczelSetTheory\Axioms\Ordinal.lean | 131 | 0 | 0 | 0 | 0 | 1 | 0 |
 | AczelSetTheory\VN\ModEqVN.lean | 131 | 0 | 0 | 0 | 0 | 1 | 0 |
@@ -242,12 +243,8 @@ Generado: 2026-06-02 11:49:33
 | AczelSetTheory\VN\OrbitVN.lean | 46 | 0 | 0 | 0 | 0 | 0 | 4 |
 | AczelSetTheory\VN\CountingVN.lean | 49 | 0 | 0 | 0 | 0 | 0 | 2 |
 | AczelSetTheory\VN\SignVN.lean | 49 | 0 | 0 | 0 | 0 | 0 | 2 |
-| AczelSetTheory\VN\QuotientGroupVN.lean | 51 | 0 | 0 | 0 | 1 | 0 | 1 |
 | AczelSetTheory\VN\NormalSubgroupVN.lean | 59 | 0 | 0 | 0 | 0 | 0 | 1 |
+| AczelSetTheory\VN\QuotientGroupVN.lean | 51 | 0 | 0 | 0 | 0 | 0 | 1 |
 | AczelSetTheory\VN\SecondIsomorphismVN.lean | 49 | 0 | 0 | 0 | 0 | 0 | 1 |
 | AczelSetTheory\VN\ThirdIsomorphismVN.lean | 48 | 0 | 0 | 0 | 0 | 0 | 1 |
 | AczelSetTheory\VN\FirstIsomorphismVN.lean | 47 | 0 | 0 | 0 | 0 | 0 | 1 |
-| AczelSetTheory\Algebra\QuotientGroup.lean | 390 | 0 | 0 | 0 | 7 | 0 | 0 |
-| AczelSetTheory\Algebra\ThirdIsomorphism.lean | 247 | 0 | 0 | 0 | 3 | 0 | 0 |
-| AczelSetTheory\Algebra\SecondIsomorphism.lean | 369 | 0 | 0 | 0 | 2 | 0 | 0 |
-| AczelSetTheory\Algebra\CosetAction.lean | 142 | 0 | 0 | 0 | 1 | 0 | 0 |

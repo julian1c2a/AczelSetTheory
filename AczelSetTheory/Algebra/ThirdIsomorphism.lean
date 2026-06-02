@@ -22,7 +22,7 @@ namespace HFSubgroup
 -- ─────────────────────────────────────────────────────────────────
 
 /-- `K/N = { N·k | k ∈ K }` como subgrupo de `G/N`. -/
-noncomputable def KmodN_subgroup (sub_N sub_K : HFSubgroup grp)
+abbrev KmodN_subgroup (sub_N sub_K : HFSubgroup grp)
     (hn_N : sub_N.isNormal)
     (_hNK : ∀ n ∈ sub_N.H, n ∈ sub_K.H) :
     HFSubgroup (quotientGroup grp sub_N hn_N) where
@@ -108,7 +108,7 @@ end HFSubgroup
 namespace HFSubgroup
 
 /-- Función subyacente del 3er TI: C ↦ K · rep_N(C). -/
-private noncomputable def thirdIsoFun (sub_N sub_K : HFSubgroup grp) (C : HFSet) : HFSet :=
+private abbrev thirdIsoFun (sub_N sub_K : HFSubgroup grp) (C : HFSet) : HFSet :=
   sub_K.rightCoset (sub_N.cosetRep C)
 
 theorem thirdIsoFun_eq (sub_N sub_K : HFSubgroup grp)
@@ -126,7 +126,7 @@ theorem thirdIsoFun_eq (sub_N sub_K : HFSubgroup grp)
     hNK _ hcoseq_N'
   exact (sub_K.cosetEq_iff_rightCoset_eq hr_G hg).mp hcoseq_K
 
-noncomputable def thirdIsoMap (sub_N sub_K : HFSubgroup grp)
+abbrev thirdIsoMap (sub_N sub_K : HFSubgroup grp)
     (hn_N : sub_N.isNormal) (hn_K : sub_K.isNormal)
     (hNK : ∀ n ∈ sub_N.H, n ∈ sub_K.H) :
     HFGroupHom

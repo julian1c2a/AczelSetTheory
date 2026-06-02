@@ -95,7 +95,7 @@ namespace HFGroupHom
 variable {G H : HFGroup} (φ : HFGroupHom G H)
 
 /-- La función subyacente `f̄ : C ↦ φ(cosetRep C)`, que enviará un coseto a su imagen. -/
-private noncomputable def firstIsoFun (C : HFSet) : HFSet :=
+private abbrev firstIsoFun (C : HFSet) : HFSet :=
   φ.f (φ.ker.cosetRep C)
 
 /-- **Bien-definición** sobre representantes: si `g ∈ G`,
@@ -139,7 +139,7 @@ theorem firstIsoFun_eq {g : HFSet} (hg : g ∈ G.G) :
   exact hmul.symm
 
 /-- El **mapa del Primer Teorema de Isomorfía**: φ̄ : G/ker φ → im φ. -/
-noncomputable def firstIsoMap :
+abbrev firstIsoMap :
     HFGroupHom (quotientGroup G φ.ker φ.ker_isNormal) φ.image.toHFGroup where
   f      := φ.firstIsoFun
   f_mem  := by

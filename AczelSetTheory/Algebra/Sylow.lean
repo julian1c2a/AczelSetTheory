@@ -368,27 +368,156 @@ theorem orderExists (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G) :
   · -- sub i j ≤ i ≤ N
     exact le_trans _ i _ (sub_le_self i j) hiN
 
--- ─────────────────────────────────────────────────────────────────
--- §7. Order vía WOP
--- ─────────────────────────────────────────────────────────────────
+-- ==================================================================
+-- §6.bis. Búsqueda acotada constructiva en ℕ₀
+-- ==================================================================
 
-/-- Especificación del orden vía WOP. -/
-private theorem order_wop (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G) :
-    ExistsUnique (fun n : ℕ₀ =>
-      (lt₀ 𝟘 n ∧ gpow grp g n = grp.e) ∧
-      ∀ m : ℕ₀, (lt₀ 𝟘 m ∧ gpow grp g m = grp.e) → le₀ n m) :=
-  Peano.WellFounded.well_ordering_principle
-    (fun n => lt₀ 𝟘 n ∧ gpow grp g n = grp.e)
-    (let ⟨n, hn1, hn2, _⟩ := orderExists grp hg; ⟨n, hn1, hn2⟩)
+/-- Extrae un testigo `k ≤ n` con `Pb k = true` a partir de la prueba booleana
+    `bexLe Pb n = true`, priorizando el prefijo `≤ n` para obtener minimalidad. -/
+private def witnessBexLe (Pb : ℕ₀ → Bool) :
+    (n : ℕ₀) → Peano.Order.bexLe Pb n = true → ℕ₀
+  | .zero, _ => 𝟘
+  | .succ n, h =>
+      if hr : Peano.Order.bexLe Pb n = true then
+        witnessBexLe Pb n hr
+      else
+        σ n
+
+private theorem witnessBexLe_le (Pb : ℕ₀ → Bool) :
+    ∀ {n : ℕ₀} (h : Peano.Order.bexLe Pb n = true),
+      le₀ (witnessBexLe Pb n h) n
+  | .zero, _ => le_refl 𝟘
+  | .succ n, h => by
+      unfold witnessBexLe
+      by_cases hr : Peano.Order.bexLe Pb n = true
+      · simpa [hr] using (le_succ _ _ (witnessBexLe_le Pb hr))
+      · simp [hr, le_refl]
+
+private theorem witnessBexLe_true (Pb : ℕ₀ → Bool) :
+    ∀ {n : ℕ₀} (h : Peano.Order.bexLe Pb n = true),
+      Pb (witnessBexLe Pb n h) = true
+  | .zero, h => by
+      simpa [Peano.Order.bexLe, witnessBexLe] using h
+  | .succ n, h => by
+      unfold witnessBexLe
+      by_cases hr : Peano.Order.bexLe Pb n = true
+      · simpa [hr] using witnessBexLe_true Pb hr
+      · have h_or : Pb (σ n) || Peano.Order.bexLe Pb n = true := by
+          simpa [Peano.Order.bexLe] using h
+        have h_top : Pb (σ n) = true := by simpa [hr] using h_or
+        simpa [hr] using h_top
+
+private theorem witnessBexLe_min
+    (P : ℕ₀ → Prop) (Pb : ℕ₀ → Bool)
+    (h_iff : ∀ k : ℕ₀, Pb k = true ↔ P k) :
+    ∀ {n : ℕ₀} (h : Peano.Order.bexLe Pb n = true) {m : ℕ₀},
+      le₀ m n → P m → le₀ (witnessBexLe Pb n h) m
+  | .zero, h, m, hm, hPm => by
+      have hm0 : m = 𝟘 := le_zero_eq_wp hm
+      rw [hm0]
+      exact le_refl 𝟘
+  | .succ n, h, m, hm, hPm => by
+      unfold witnessBexLe
+      by_cases hr : Peano.Order.bexLe Pb n = true
+      · have hsplit : le₀ m n ∨ m = σ n := (le_succ_iff_le_or_eq m n).mp hm
+        cases hsplit with
+        | inl hmle =>
+            simpa [hr] using witnessBexLe_min P Pb h_iff hr hmle hPm
+        | inr hmeq =>
+            rw [hersoq:hr]
+            rw [hmeq]
+            exact witnessBexLe_le Pb hr
+      · have hsplit : le₀ m n ∨ m = σ n := (le_succ_iff_le_or_eq m n).mp hm
+        cases hsplit with
+        | inl hmle =>
+            exfalso
+            have hfalse : Peano.Order.bexLe Pb n = false := Bool.eq_false_iff.mpr hr
+            have hno : ¬ ∃ k, le₀ k n ∧ P k :=
+              Peano.Order.bexLe_false_imp_not_exists P Pb h_iff n hfalse
+            exact hno ⟨m, hmle, hPm⟩
+        | inr hmeq =>
+            rw [hersoq:hr]
+            rw [hmeq]
+            exact le_refl (σ n)
+
+/-- Selección constructiva del menor testigo de `P` bajo la cota `bound`. -/
+private def leastUnder (P : ℕ₀ → Prop) [DecidablePred P]
+    (bound : ℕ₀) (hex : ∃ k : ℕ₀, le₀ k bound ∧ P k) : ℕ₀ := by
+  let Pb : ℕ₀ → Bool := fun k => decide (P k)
+  have h_iff : ∀ k : ℕ₀, Pb k = true ↔ P k := by
+    intro k
+    exact decide_eq_true_eq
+  have htrue : Peano.Order.bexLe Pb bound = true := by
+    by_cases hb : Peano.Order.bexLe Pb bound = true
+    · exact hb
+    · exfalso
+      have hfalse : Peano.Order.bexLe Pb bound = false := Bool.eq_false_iff.mpr hb
+      have hno : ¬ ∃ k, le₀ k bound ∧ P k :=
+        Peano.Order.bexLe_false_imp_not_exists P Pb h_iff bound hfalse
+      exact hno hex
+  exact witnessBexLe Pb bound htrue
+
+private theorem leastUnder_spec
+    (P : ℕ₀ → Prop) [DecidablePred P]
+    (bound : ℕ₀) (hex : ∃ k : ℕ₀, le₀ k bound ∧ P k) :
+    P (leastUnder P bound hex) ∧
+    (∀ m : ℕ₀, P m → le₀ (leastUnder P bound hex) m) := by
+  let Pb : ℕ₀ → Bool := fun k => decide (P k)
+  have h_iff : ∀ k : ℕ₀, Pb k = true ↔ P k := by
+    intro k
+    exact decide_eq_true_eq
+  have htrue : Peano.Order.bexLe Pb bound = true := by
+    by_cases hb : Peano.Order.bexLe Pb bound = true
+    · exact hb
+    · exfalso
+      have hfalse : Peano.Order.bexLe Pb bound = false := Bool.eq_false_iff.mpr hb
+      have hno : ¬ ∃ k, le₀ k bound ∧ P k :=
+        Peano.Order.bexLe_false_imp_not_exists P Pb h_iff bound hfalse
+      exact hno hex
+  have hPb : Pb (witnessBexLe Pb bound htrue) = true := witnessBexLe_true Pb htrue
+  have hPleast : P (witnessBexLe Pb bound htrue) := (h_iff _).mp hPb
+  refine ⟨?_, ?_⟩
+  · simpa [leastUnder, Pb, htrue] using hPleast
+  · intro m hPm
+    -- Si m > bound, la cota del testigo fuerza la desigualdad.
+    have hleast_le_bound : le₀ (witnessBexLe Pb bound htrue) bound :=
+      witnessBexLe_le Pb htrue
+    rcases trichotomy m bound with hmb | hmb | hbm
+    · -- m < bound
+      have hmle : le₀ m bound := lt_imp_le _ _ hmb
+      have hmin_local : le₀ (witnessBexLe Pb bound htrue) m :=
+        witnessBexLe_min P Pb h_iff htrue hmle hPm
+      simpa [leastUnder, Pb, htrue] using hmin_local
+    · -- m = bound
+      have hmle : le₀ m bound := by simpa [hmb] using (le_refl bound)
+      have hmin_local : le₀ (witnessBexLe Pb bound htrue) m :=
+        witnessBexLe_min P Pb h_iff htrue hmle hPm
+      simpa [leastUnder, Pb, htrue] using hmin_local
+    · -- bound < m
+      have hle : le₀ (witnessBexLe Pb bound htrue) m :=
+        le_trans _ bound _ hleast_le_bound (lt_imp_le _ _ hbm)
+      simpa [leastUnder, Pb, htrue] using hle
+
+-- ─────────────────────────────────────────────────────────────────
+-- §7. Order constructivo (búsqueda acotada)
+-- ─────────────────────────────────────────────────────────────────
 
 /-- El orden de `g` en `grp`: el mínimo `n > 0` con `g^n = e`. -/
-abbrev order (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G) : ℕ₀ :=
-  Peano.choose_unique (order_wop grp hg)
+def order (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G) : ℕ₀ :=
+  leastUnder
+    (fun n : ℕ₀ => lt₀ 𝟘 n ∧ gpow grp g n = grp.e)
+    (HFSet.card grp.G)
+    (let ⟨n, hn_pos, hn_eq, hn_le⟩ := orderExists grp hg
+     ⟨n, hn_le, ⟨hn_pos, hn_eq⟩⟩)
 
 private theorem order_spec (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G) :
     (lt₀ 𝟘 (order grp hg) ∧ gpow grp g (order grp hg) = grp.e) ∧
     ∀ m : ℕ₀, (lt₀ 𝟘 m ∧ gpow grp g m = grp.e) → le₀ (order grp hg) m :=
-  Peano.choose_spec_unique (order_wop grp hg)
+  leastUnder_spec
+    (fun n : ℕ₀ => lt₀ 𝟘 n ∧ gpow grp g n = grp.e)
+    (HFSet.card grp.G)
+    (let ⟨n, hn_pos, hn_eq, hn_le⟩ := orderExists grp hg
+     ⟨n, hn_le, ⟨hn_pos, hn_eq⟩⟩)
 
 theorem order_pos (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G) :
     lt₀ 𝟘 (order grp hg) := (order_spec grp hg).1.1
@@ -1311,21 +1440,13 @@ theorem orbitOf_eq_or_disjoint (grp : HFGroup) (n : ℕ₀) (t s : HFSet)
 -- §19. D.4.C parte 3: período mínimo de una tupla bajo el shift
 -- ==================================================================
 
-/-- Especificación del período mínimo vía WOP: existe único `k > 0` con
-    `shiftIter k t = t` y minimal entre tales. Existencia: `shiftIter_period`. -/
-private theorem periodOf_wop (grp : HFGroup) (n : ℕ₀) (t : HFSet)
-    (ht : t ∈ HFSet.nPow grp.G (σ n)) :
-    ExistsUnique (fun k : ℕ₀ =>
-      (lt₀ 𝟘 k ∧ shiftIter grp (σ n) k t = t) ∧
-      ∀ m : ℕ₀, (lt₀ 𝟘 m ∧ shiftIter grp (σ n) m t = t) → le₀ k m) :=
-  Peano.WellFounded.well_ordering_principle
-    (fun k => lt₀ 𝟘 k ∧ shiftIter grp (σ n) k t = t)
-    ⟨σ n, zero_lt_succ n, shiftIter_period grp n t ht⟩
-
 /-- Período mínimo de `t` bajo el shift: mínimo `k > 0` con `shiftIter k t = t`. -/
-abbrev periodOf (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+def periodOf (grp : HFGroup) (n : ℕ₀) (t : HFSet)
     (ht : t ∈ HFSet.nPow grp.G (σ n)) : ℕ₀ :=
-  Peano.choose_unique (periodOf_wop grp n t ht)
+  leastUnder
+    (fun k : ℕ₀ => lt₀ 𝟘 k ∧ shiftIter grp (σ n) k t = t)
+    (σ n)
+    ⟨σ n, le_refl (σ n), ⟨zero_lt_succ n, shiftIter_period grp n t ht⟩⟩
 
 private theorem periodOf_spec (grp : HFGroup) (n : ℕ₀) (t : HFSet)
     (ht : t ∈ HFSet.nPow grp.G (σ n)) :
@@ -1333,7 +1454,10 @@ private theorem periodOf_spec (grp : HFGroup) (n : ℕ₀) (t : HFSet)
      shiftIter grp (σ n) (periodOf grp n t ht) t = t) ∧
     ∀ m : ℕ₀, (lt₀ 𝟘 m ∧ shiftIter grp (σ n) m t = t) →
       le₀ (periodOf grp n t ht) m :=
-  Peano.choose_spec_unique (periodOf_wop grp n t ht)
+  leastUnder_spec
+    (fun k : ℕ₀ => lt₀ 𝟘 k ∧ shiftIter grp (σ n) k t = t)
+    (σ n)
+    ⟨σ n, le_refl (σ n), ⟨zero_lt_succ n, shiftIter_period grp n t ht⟩⟩
 
 theorem periodOf_pos (grp : HFGroup) (n : ℕ₀) (t : HFSet)
     (ht : t ∈ HFSet.nPow grp.G (σ n)) :

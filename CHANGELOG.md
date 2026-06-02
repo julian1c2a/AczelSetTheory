@@ -6,6 +6,33 @@ All notable changes to this project are documented here.
 
 ---
 
+## [2026-06-02] — Sylow constructivo + Sprint B inicial de cocientes/isomorfismos
+
+### Changed
+
+- **`Algebra/Sylow.lean`**:
+  - `order` y `periodOf` migrados a implementación **constructiva** (búsqueda acotada en `ℕ₀`) sin `Peano.choose_unique` en la definición pública.
+  - Añadida infraestructura privada: `firstLe`, `leastUnder` y sus lemas de especificación.
+  - Limpieza de legado: eliminados `order_wop` y `periodOf_wop` (ya redundantes tras la migración).
+
+- **Sprint B inicial (reducción de noncomputable wrappers)**:
+  - `Algebra/QuotientGroup.lean`: `quotientOp`, `quotientInv`, `quotientGroup`, `quotientHom` cambiados a `abbrev`.
+  - `Algebra/FirstIsomorphism.lean`: `firstIsoFun`, `firstIsoMap` cambiados a `abbrev`.
+  - `Algebra/SecondIsomorphism.lean`: `secondIsoFun`, `secondIsoMap` cambiados a `abbrev`.
+  - `Algebra/ThirdIsomorphism.lean`: `KmodN_subgroup`, `thirdIsoFun`, `thirdIsoMap` cambiados a `abbrev`.
+  - `Algebra/CosetAction.lean`: `cosetAction` cambiado a `abbrev`.
+  - `Algebra/CorrespondenceTheorem.lean`: `preimageSubgroup` cambiado a `def`.
+
+### Documentation
+
+- **`doc/REFERENCE-Algebra.md`**: `periodOf` actualizado como `def` computable por búsqueda acotada.
+- **`REFERENCE.md`**: actualización de fecha y registro de proyección de la sesión.
+- **`AUDIT-MODULE-MATRIX.md`** regenerado con métrica `noncomputable def`.
+
+**Project status: build OK (35 jobs), 0 sorry, 0 errors, 0 warnings visibles.**
+
+---
+
 ## [2026-05-23] — Topology/Separation.lean: axiomas T₀–T₄ (0 sorries)
 
 ### Added

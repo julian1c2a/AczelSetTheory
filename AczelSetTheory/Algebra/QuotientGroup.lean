@@ -153,11 +153,11 @@ theorem quotientOp_welldefined (sub : HFSubgroup grp) (hn : sub.isNormal)
 -- ─────────────────────────────────────────────────────────────────
 
 /-- Operación cociente: `C₁ · C₂ := H·(rep C₁ · rep C₂)`. -/
-noncomputable def quotientOp (sub : HFSubgroup grp) (C₁ C₂ : HFSet) : HFSet :=
+abbrev quotientOp (sub : HFSubgroup grp) (C₁ C₂ : HFSet) : HFSet :=
   sub.rightCoset (grp.op (sub.cosetRep C₁) (sub.cosetRep C₂))
 
 /-- Inversión cociente: `C⁻¹ := H·(rep C)⁻¹`. -/
-noncomputable def quotientInv (sub : HFSubgroup grp) (C : HFSet) : HFSet :=
+abbrev quotientInv (sub : HFSubgroup grp) (C : HFSet) : HFSet :=
   sub.rightCoset (grp.inv (sub.cosetRep C))
 
 /-- Identidad cociente: `H` (el coseto del neutro). -/
@@ -240,7 +240,7 @@ theorem quotientInv_cosetOf (sub : HFSubgroup grp) (hn : sub.isNormal)
 end HFSubgroup
 
 /-- El grupo cociente `G/H` para `H ⊴ G`. -/
-noncomputable def quotientGroup (grp : HFGroup) (sub : HFSubgroup grp)
+abbrev quotientGroup (grp : HFGroup) (sub : HFSubgroup grp)
     (hn : sub.isNormal) : HFGroup where
   G   := sub.cosets
   op  := sub.quotientOp
@@ -338,7 +338,7 @@ namespace HFSubgroup
 end HFSubgroup
 
 /-- El homomorfismo canónico `π : G → G/H`, definido por `π(g) = Hg`. -/
-noncomputable def quotientHom (grp : HFGroup) (sub : HFSubgroup grp)
+abbrev quotientHom (grp : HFGroup) (sub : HFSubgroup grp)
     (hn : sub.isNormal) : HFGroupHom grp (quotientGroup grp sub hn) where
   f      := sub.cosetOf
   f_mem  := fun hg => sub.cosetOf_mem_cosets hg
