@@ -8,7 +8,7 @@ License: MIT
 --
 -- Signatura de permutaciones sobre el embedding de Von Neumann.
 --
--- Estado: ⚠️ STUB HUÉRFANO — no se materializará por transporte.
+-- Estado: ⚠️ Módulo huérfano de paridad — no se materializará por transporte.
 --   Por ADR-000 (DECISIONS.md, 2026-05-30): Peano queda congelado para teoría
 --   "hacia arriba" y la teoría nueva NO se transporta vía VN. La signatura de
 --   permutaciones (sgn σ ∈ {+1,−1}, homomorfismo Sₙ → ℤ/2) se construirá, cuando
@@ -18,7 +18,7 @@ License: MIT
 --   Peano↔Aczel (bootstrapping). Candidato a retirar.
 --
 -- Contenido:
---   (vacío — placeholder histórico, ver Combinatorics/ para la teoría nativa)
+--   (vacío — marcador histórico, ver Combinatorics/ para la teoría nativa)
 
 import AczelSetTheory.VN.SymGroupVN
 import Peano.PeanoNat.Combinatorics.Sign

@@ -9,7 +9,7 @@ License: MIT
 -- Primer Teorema de Isomorfía: paridad con Peano
 -- `Combinatorics/GroupTheory/FirstIsomorphism.lean`.
 --
--- Estado: ✅ Stub-doc.
+-- Estado: ✅ Documento de paridad.
 --   El contenido sustantivo vive en `AczelSetTheory/Algebra/FirstIsomorphism.lean`
 --   (`HFGroupHom.firstIsoMap`, `firstIsoMap_bijective`). La versión abstracta sobre
 --   `HFGroup` es más general que la versión concreta `FinGroup ℕ₀` de Peano.

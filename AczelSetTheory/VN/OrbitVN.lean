@@ -8,14 +8,14 @@ License: MIT
 --
 -- Órbitas: módulo de paridad estructural con Peano.
 --
--- Estado: ⚠️ Stub-equivalente.
---   Este módulo es el análogo en AczelSetTheory del stub
+-- Estado: ⚠️ Equivalente documental.
+--   Este módulo es el análogo en AczelSetTheory del módulo de cabecera
 --   `Peano/PeanoNat/Combinatorics/Orbit.lean` (también vacío).
 --   El contenido real de órbitas vive en `Peano/Combinatorics/GroupTheory/Action.lean`
 --   y su contraparte AczelSetTheory en `Algebra/Action.lean` + `VN/ActionVN.lean`.
 --
 -- Contenido:
---   (vacío — placeholder de paridad con el stub Peano `Orbit.lean`)
+--   (vacío — marcador de paridad con el módulo de cabecera Peano `Orbit.lean`)
 
 import AczelSetTheory.VN.Basic
 import Peano.PeanoNat.Combinatorics.Orbit

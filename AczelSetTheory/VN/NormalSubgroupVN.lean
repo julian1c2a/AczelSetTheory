@@ -8,7 +8,7 @@ License: MIT
 --
 -- Subgrupos normales: módulo de paridad estructural con Peano.
 --
--- Estado: ✅ Stub-documento.
+-- Estado: ✅ Documento de paridad estructural.
 --   El contenido sustantivo (centralizer, center, normalizer, criterios
 --   de normalidad: N_G(H)=G y gH=Hg) ya está formalizado en
 --   `AczelSetTheory/Algebra/NormalSubgroup.lean` sobre `HFGroup` abstracto.

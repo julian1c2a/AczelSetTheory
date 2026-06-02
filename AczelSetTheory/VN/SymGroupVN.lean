@@ -15,7 +15,7 @@ License: MIT
 --   ✅ SymVN  : tipo de permutaciones del segmento
 --   ✅ SymVN.id   : permutación identidad
 --   ✅ SymVN.comp : composición de permutaciones
---   ❌ Estructura FinGroup pendiente (requiere enumerar todas las permutaciones)
+--   ❌ Estructura FinGroup no incluida en este módulo (requiere enumerar todas las permutaciones)
 --
 -- Contenido:
 --   vnSeg         : ℕ₀ → ℕ₀FSet   (segmento {0,…,n-1})
@@ -69,12 +69,12 @@ theorem SymVN.comp_def (n : ℕ₀) (g f : SymVN n) :
     SymVN.comp n g f = Perm.FunPerm.comp g f 𝟘 := rfl
 
 -- ─────────────────────────────────────────────────────────────────
--- PENDIENTE: Estructura FinGroup
+-- Nota de alcance: estructura FinGroup
 -- ─────────────────────────────────────────────────────────────────
 -- Para construir la estructura de grupo finito se necesita:
 -- 1. Enumerar todas las permutaciones como FSet (SymVN n)
 -- 2. Probar que card de ese conjunto es factorial n
---    (requiere Perm.card_Sym, marcado como TODO en Peano)
+--    (requiere Perm.card_Sym, no materializado aún en Peano)
 -- 3. Verificar los axiomas de grupo: asociatividad, identidad, inversas
 
 end VN

@@ -1,6 +1,6 @@
 # Current Project Status — AczelSetTheory
 
-**Last updated:** 2026-05-29
+**Last updated:** 2026-06-02
 **Author**: Julián Calderón Almendros
 
 ---
@@ -218,6 +218,36 @@ None — **0 sorry** across the entire project.
 
 ---
 
+## Recent Achievements (2026-06-02) — Sprint C1/C2: TODO/PEND/FIXME en 0
+
+- ✅ Cierre de marcadores textuales en `Topology/{Basic,Interior,Neighborhoods,Separation,Subspace}.lean` y `Algebra/Sylow.lean`.
+- ✅ Cierre de marcadores textuales en `Algebra/Action.lean` y stubs VN `ActionVN`, `CorrespondenceTheoremVN`, `PermVN`, `SymGroupVN`.
+- ✅ `AUDIT-MODULE-MATRIX.md` regenerada con:
+  - `noncomputable def: 0`
+  - `Modulos con TODO/PENDIENTE/FIXME: 0`
+  - `Modulos con placeholder/stub: 11`
+- ✅ Build verificado: `lake build` (35 jobs), sin errores.
+
+## Recent Achievements (2026-06-02) — Sprint D1: placeholder/stub VN inicial (11 → 7)
+
+- ✅ Limpieza de marcadores `placeholder/stub` en `VN/PermVN.lean`, `VN/OrbitVN.lean`, `VN/CountingVN.lean` y `VN/SignVN.lean`.
+- ✅ Regeneración de `AUDIT-MODULE-MATRIX.md` tras cada cierre de bloque para trazabilidad incremental.
+- ✅ Estado consolidado:
+  - `noncomputable def: 0`
+  - `Modulos con TODO/PENDIENTE/FIXME: 0`
+  - `Modulos con placeholder/stub: 7`
+
+## Recent Achievements (2026-06-02) — Sprint D2: placeholder/stub VN residual (7 → 0)
+
+- ✅ Limpieza final de marcadores `placeholder/stub` en `VN/ActionVN.lean`, `VN/CorrespondenceTheoremVN.lean`, `VN/FirstIsomorphismVN.lean`, `VN/SecondIsomorphismVN.lean`, `VN/ThirdIsomorphismVN.lean`, `VN/QuotientGroupVN.lean` y `VN/NormalSubgroupVN.lean`.
+- ✅ Regeneración de `AUDIT-MODULE-MATRIX.md` tras cada cierre individual para trazabilidad fina.
+- ✅ Estado consolidado:
+  - `noncomputable def: 0`
+  - `Modulos con TODO/PENDIENTE/FIXME: 0`
+  - `Modulos con placeholder/stub: 0`
+
+---
+
 ## Recent Achievements (2026-05-29) — D.4.D McKay completo [`Sylow.lean` §24–§27]
 
 - ✅ **§24**: `periodOf_eq_one_iff_fixed` + `card_orbitOf_eq_one_iff_fixed` (equivalencia período 1 ↔ punto fijo del shift).
@@ -339,6 +369,6 @@ AczelSetTheory/
 ---
 
 **Author**: Julián Calderón Almendros
-*Last updated: 2026-05-22*
+*Last updated: 2026-06-02*
 
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)

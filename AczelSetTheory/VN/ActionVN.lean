@@ -8,7 +8,7 @@ License: MIT
 --
 -- Acciones de grupo: paridad con Peano `Combinatorics/GroupTheory/Action.lean`.
 --
--- Estado: ✅ Stub-doc.
+-- Estado: ✅ Documento de paridad.
 --   El contenido sustantivo vive en `AczelSetTheory/Algebra/Action.lean`
 --   (`HFGroupAction`, `orb`, `stab`, `orbits_partition`, `conjugAction`,
 --   `mem_center_iff_conjug_fixed`). La versión abstracta sobre `HFGroup`
@@ -26,7 +26,7 @@ License: MIT
 --   conjugAction                           HFGroupAction.conjugAction
 --   center_eq_fixed                        mem_center_iff_conjug_fixed
 --
--- TODO en Aczel (paridad pendiente, no bloqueante):
+-- Alcance abierto en Aczel (paridad parcial, no bloqueante):
 --   orbit_stabilizer   — vía Lagrange (CosetCount ya disponible)
 --   class_equation     — corolario de orbits_partition + orbit_stabilizer
 

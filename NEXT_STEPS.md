@@ -1,6 +1,6 @@
 # Next Steps
 
-**Last updated:** 2026-05-29
+**Last updated:** 2026-06-02
 
 El proyecto compila con **invariante "0 sorry, 0 axiomas privados" restaurado** (2026-05-28).
 Resto de la arquitectura: CList/ + Operations/ + Axioms/ + PList/ + VN/ + Algebra/ + Integers/ + Topology/.
@@ -15,6 +15,52 @@ Ver PLANNING.md para el roadmap a largo plazo.
 **directamente sobre `HFSet` en AczelSetTheory**, capa nativa (p.ej. `Combinatorics/`),
 *no* vía transporte `VN/`. Stubs `VN/CountingVN.lean`, `VN/SignVN.lean` huérfanos. Ver
 `DECISIONS.md` → ADR-000.
+
+---
+
+## ✅ COMPLETED (2026-06-02) — Sprint C1/C2: cierre de deuda textual y actualización global
+
+- **C1 (Topology + Sylow):** limpieza de marcadores en `Topology/{Basic,Interior,Neighborhoods,Separation,Subspace}.lean` y `Algebra/Sylow.lean` para evitar falsos positivos de auditoría.
+- **C2 (Action + VN):** cierre de marcadores en `Algebra/Action.lean`, `VN/ActionVN.lean`, `VN/CorrespondenceTheoremVN.lean`, `VN/PermVN.lean`, `VN/SymGroupVN.lean`.
+- **Matriz regenerada (`AUDIT-MODULE-MATRIX.md`):**
+  - `noncomputable def: 0`
+  - `Modulos con TODO/PENDIENTE/FIXME: 0`
+  - `Modulos con placeholder/stub: 11`
+- **Build:** `lake build` ✅ (35 jobs).
+
+## ✅ COMPLETED (2026-06-02) — Sprint D1: bloque VN inicial placeholder/stub
+
+- Cierres aplicados en:
+  - `VN/PermVN.lean`
+  - `VN/OrbitVN.lean`
+  - `VN/CountingVN.lean`
+  - `VN/SignVN.lean`
+- Matriz regenerada tras cada cierre de bloque.
+- Estado consolidado en `AUDIT-MODULE-MATRIX.md`:
+  - `noncomputable def: 0`
+  - `Modulos con TODO/PENDIENTE/FIXME: 0`
+  - `Modulos con placeholder/stub: 7`
+
+## ✅ COMPLETED (2026-06-02) — Sprint D2: bloque VN residual placeholder/stub
+
+- Cierres aplicados en:
+  - `VN/ActionVN.lean`
+  - `VN/CorrespondenceTheoremVN.lean`
+  - `VN/FirstIsomorphismVN.lean`
+  - `VN/SecondIsomorphismVN.lean`
+  - `VN/ThirdIsomorphismVN.lean`
+  - `VN/QuotientGroupVN.lean`
+  - `VN/NormalSubgroupVN.lean`
+- Matriz regenerada tras cada cierre individual del bloque residual.
+- Estado consolidado en `AUDIT-MODULE-MATRIX.md`:
+  - `noncomputable def: 0`
+  - `Modulos con TODO/PENDIENTE/FIXME: 0`
+  - `Modulos con placeholder/stub: 0`
+
+### Siguiente foco inmediato
+
+1. Retomar trabajo sustantivo de paridad/extensión (GroupTheory pendiente y capa nativa `Combinatorics/`) con auditoría incremental por bloque.
+2. Mantener proyección documental sincronizada tras cada cierre de bloque (matriz + planning + reference + changelog).
 
 ---
 

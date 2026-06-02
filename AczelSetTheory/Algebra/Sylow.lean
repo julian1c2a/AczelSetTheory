@@ -80,7 +80,7 @@ def isSylowExponent (grp : HFGroup) (p n : ℕ₀) : Prop :=
 def isSylowSubgroup {grp : HFGroup} (sub : HFSubgroup grp) (p : ℕ₀) : Prop :=
   ∃ n : ℕ₀, isSylowExponent grp p n ∧ HFSet.card sub.H = p ^ n
 
-/-- Todo `p`-subgrupo de Sylow es, en particular, un `p`-subgrupo. -/
+/-- Cada `p`-subgrupo de Sylow es, en particular, un `p`-subgrupo. -/
 theorem isPSubgroup_of_isSylowSubgroup {grp : HFGroup} {sub : HFSubgroup grp}
     {p : ℕ₀} (h : isSylowSubgroup sub p) : isPSubgroup sub p := by
   obtain ⟨n, _, hcard⟩ := h
@@ -205,7 +205,7 @@ theorem gpow_add (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G) :
 -- ─────────────────────────────────────────────────────────────────
 
 /-- **Sylow I**, caso `n = 0`: existe un subgrupo de orden `p^0 = 1` (el trivial).
-    Caso inductivo `n+1` queda como TODO (M6.4.B-F). -/
+  El caso inductivo `n+1` queda diferido (M6.4.B-F). -/
 theorem sylow_first_zero (grp : HFGroup) (p : ℕ₀) :
     ∃ sub : HFSubgroup grp, HFSet.card sub.H = p ^ (𝟘 : ℕ₀) := by
   refine ⟨HFSubgroup.trivial grp, ?_⟩
@@ -344,7 +344,7 @@ theorem gpow_sub_eq_id (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G)
     hLHS ▸ hcancel
   exact (grp.right_cancel hgj grp.e_mem hgsub hboth).symm
 
-/-- **Existencia del orden**: para todo `g ∈ G`, existe `n > 0` con `g^n = e`
+/-- **Existencia del orden**: para cada `g ∈ G`, existe `n > 0` con `g^n = e`
     y `n ≤ card G`. -/
 theorem orderExists (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G) :
     ∃ n : ℕ₀, lt₀ 𝟘 n ∧ gpow grp g n = grp.e ∧ le₀ n (HFSet.card grp.G) := by
@@ -930,7 +930,7 @@ theorem dvd_card_pow_of_dvd_card (grp : HFGroup) (p : ℕ₀)
       show p ∣ Peano.Mul.mul ((HFSet.card grp.G) ^ m) (HFSet.card grp.G)
       exact Peano.Arith.divides_mul_left hp
 
-/-- **D.3**: Si `p ∣ |G|`, entonces `p ∣ |mckayCarrier (σ n)|` para todo `n ≠ 0`. -/
+/-- **D.3**: Si `p ∣ |G|`, entonces `p ∣ |mckayCarrier (σ n)|` para cada `n ≠ 0`. -/
 theorem dvd_card_mckayCarrier_succ (grp : HFGroup) (p : ℕ₀)
     (hp : p ∣ HFSet.card grp.G) {n : ℕ₀} (hn : n ≠ 𝟘) :
     p ∣ HFSet.card (mckayCarrier grp (σ n)) := by
@@ -2696,8 +2696,8 @@ private theorem conj_orb_closed_in_setminus {grp : HFGroup} {x : HFSet}
 -- ==================================================================
 
 open Peano Peano.Arith Peano.Primes in
-/-- Si para todo subgrupo propio M, `p^k ∤ |M|`, entonces `p ∣ |orb_conj(x)|`
-    para todo `x ∉ Z(G)`. -/
+/-- Si para cada subgrupo propio M, `p^k ∤ |M|`, entonces `p ∣ |orb_conj(x)|`
+  para cada `x ∉ Z(G)`. -/
 private theorem p_dvd_orbit_of_no_proper {grp : HFGroup} {p k : ℕ₀}
     (hp : Peano.Arith.Prime p) (_hk : k ≠ 𝟘)
     (hdvd : p ^ k ∣ HFSet.card grp.G)
@@ -2718,7 +2718,7 @@ private theorem p_dvd_orbit_of_no_proper {grp : HFGroup} {p k : ℕ₀}
     have h_orb_one : HFSet.card ((HFGroupAction.conjugAction grp).orb x) = 𝟙 := by
       apply mul_cancelation_right _ _ (HFSet.card grp.G) hG_ne
       rw [one_mul]; exact heq ▸ h_os
-    -- orb x tiene un solo elemento x → x es un punto fijo de todo g → x ∈ Z(G)
+    -- orb x tiene un solo elemento x → x es un punto fijo para cada g → x ∈ Z(G)
     apply hx_nc
     rw [HFAlgebra.mem_center_iff]
     refine ⟨hx, fun g hg => ?_⟩
@@ -3120,6 +3120,30 @@ theorem sylow_first (grp : HFGroup) (p k : ℕ₀)
           exact hps2.symm
         exact ⟨P, hP_card⟩
 
+open Peano Peano.Arith in
+/-- Si `p^n` es exponente de Sylow de `G`, existe un `p`-subgrupo de Sylow. -/
+theorem exists_isSylowSubgroup_of_isSylowExponent
+    (grp : HFGroup) (p n : ℕ₀)
+    (hp : Peano.Arith.Prime p)
+    (hexp : isSylowExponent grp p n) :
+    ∃ sub : HFSubgroup grp, isSylowSubgroup sub p := by
+  have hexp' : isSylowExponent grp p n := hexp
+  obtain ⟨hpowdvd, _⟩ := hexp
+  obtain ⟨m, hm⟩ := hpowdvd
+  have hdvd : p ^ n ∣ HFSet.card grp.G := ⟨m, hm.symm⟩
+  obtain ⟨sub, hcard⟩ := sylow_first grp p n hp hdvd
+  exact ⟨sub, ⟨n, hexp', hcard⟩⟩
+
+open Peano Peano.Arith in
+/-- Corolario: si `p^n` es exponente de Sylow de `G`, existe un `p`-subgrupo. -/
+theorem exists_isPSubgroup_of_isSylowExponent
+    (grp : HFGroup) (p n : ℕ₀)
+    (hp : Peano.Arith.Prime p)
+    (hexp : isSylowExponent grp p n) :
+    ∃ sub : HFSubgroup grp, isPSubgroup sub p := by
+  obtain ⟨sub, hsyl⟩ := exists_isSylowSubgroup_of_isSylowExponent grp p n hp hexp
+  exact ⟨sub, isPSubgroup_of_isSylowSubgroup hsyl⟩
+
 end HFAlgebra
 
 -- ======================================================================
@@ -3133,7 +3157,7 @@ end HFAlgebra
 --   isSylowSubgroup           : ∃ n, isSylowExponent ∧ card sub.H = p^n
 --   trivial / trivial_card    : subgrupo trivial y su cardinalidad = 1
 --   pow_dvd_card_of_le        : a ≤ b → p^b ∣ |G| → p^a ∣ |G|
---   sylow_card_eq             : todos los Sylow-p tienen el mismo cardinal
+--   sylow_card_eq             : los Sylow-p tienen el mismo cardinal
 --   sylow_first_zero          : caso n = 0 del primer teorema de Sylow
 --
 -- Público (HFAlgebra — gpow y order):
@@ -3182,3 +3206,7 @@ end HFAlgebra
 --       primo p, p^k ∣ |G| → ∃ subgrupo de orden p^k
 --       (inducción fuerte sobre |G|; ramas: subgrupo propio p-divisible,
 --        |G| = p^k, o Cauchy en Z(G) + cociente G/N + preimagen)
+--   exists_isSylowSubgroup_of_isSylowExponent :
+--       isSylowExponent grp p n → ∃ sub, isSylowSubgroup sub p
+--   exists_isPSubgroup_of_isSylowExponent :
+--       isSylowExponent grp p n → ∃ sub, isPSubgroup sub p

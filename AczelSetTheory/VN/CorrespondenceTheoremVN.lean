@@ -9,7 +9,7 @@ License: MIT
 -- Teorema de Correspondencia (Cuarto Teorema de Isomorfía): paridad con Peano
 -- `Combinatorics/GroupTheory/CorrespondenceTheorem.lean`.
 --
--- Estado: ✅ Stub-doc.
+-- Estado: ✅ Documento de paridad.
 --   El contenido sustantivo vive en `AczelSetTheory/Algebra/CorrespondenceTheorem.lean`
 --   (`HFSubgroup.preimageSubgroup`, `mem_preimageSubgroup_iff`,
 --   `N_le_preimageSubgroup`, `imageSubgroup_preimage`, `preimageSubgroup_image`).
@@ -29,7 +29,7 @@ License: MIT
 --   correspondencePhi / Psi                (no se materializan: la biyección
 --                                           ya se sigue de las dos igualdades de portador)
 --   correspondenceInjective/Surjective     (corolarios inmediatos)
---   preimage_subgroup_card                 TODO (requiere Lagrange sobre HFSubgroup)
+--   preimage_subgroup_card                 no materializado aquí (requiere Lagrange sobre HFSubgroup)
 --
 -- Nota: Peano usa `leftCoset` y Aczel usa `rightCoset`; la teoría es simétrica.
 

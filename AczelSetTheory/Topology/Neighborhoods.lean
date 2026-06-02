@@ -11,10 +11,10 @@ Un **sistema de entornos** asigna a cada punto `x ∈ X` una colección `𝒩(x)
 subconjuntos de `X` (los *entornos* de `x`) que satisface los axiomas de Hausdorff:
 
 1. Cada entorno `N ∈ 𝒩(x)` contiene a `x`.
-2. `X` es entorno de todo punto.
-3. Todo superconjunto (en X) de un entorno es entorno.
+2. `X` es entorno de cada punto.
+3. Cada superconjunto (en X) de un entorno es entorno.
 4. Intersección finita de entornos es entorno.
-5. (Interior) Todo entorno contiene un abierto que contiene a `x` y es entorno
+5. (Interior) Cada entorno contiene un abierto que contiene a `x` y es entorno
    de cada uno de sus puntos.
 
 El axioma 5 es el que garantiza la equivalencia con la definición de abiertos.
@@ -29,13 +29,13 @@ structure HFNeighborSpace where
   𝒩_sub     : ∀ {x N : HFSet}, x ∈ X → N ∈ 𝒩 x → N ⊆ X
   /-- `x` pertenece a cada uno de sus entornos. -/
   point_mem : ∀ {x N : HFSet}, x ∈ X → N ∈ 𝒩 x → x ∈ N
-  /-- `X` es entorno de todo punto. -/
+  /-- `X` es entorno de cada punto. -/
   univ_mem  : ∀ {x : HFSet}, x ∈ X → X ∈ 𝒩 x
   /-- Herencia hacia arriba: si `N ∈ 𝒩(x)` y `N ⊆ M ⊆ X`, entonces `M ∈ 𝒩(x)`. -/
   up_closed : ∀ {x N M : HFSet}, x ∈ X → N ∈ 𝒩 x → N ⊆ M → M ⊆ X → M ∈ 𝒩 x
   /-- Estabilidad por intersección finita: `N, M ∈ 𝒩(x) → N ∩ M ∈ 𝒩(x)`. -/
   inter_mem : ∀ {x N M : HFSet}, x ∈ X → N ∈ 𝒩 x → M ∈ 𝒩 x → HFSet.inter N M ∈ 𝒩 x
-  /-- Axioma de interior: todo entorno contiene un abierto (entorno de todos sus puntos). -/
+  /-- Axioma de interior: cada entorno contiene un abierto (entorno de cada uno de sus puntos). -/
   interior  : ∀ {x N : HFSet}, x ∈ X → N ∈ 𝒩 x →
                 ∃ M, M ∈ 𝒩 x ∧ M ⊆ N ∧ ∀ {y : HFSet}, y ∈ M → N ∈ 𝒩 y
 

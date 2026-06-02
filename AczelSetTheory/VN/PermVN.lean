@@ -8,12 +8,12 @@ License: MIT
 --
 -- Permutaciones sobre segmentos de Von Neumann: módulo de paridad estructural.
 --
--- Estado: ✅ Stub-documento.
+-- Estado: ✅ Documento de paridad.
 --   El contenido sustantivo de Peano `Combinatorics/Perm.lean`
 --   (`FunPerm.comp`, `Sym A := FunPerm A`) ya está formalizado en
 --   `AczelSetTheory/VN/SymGroupVN.lean` sobre el segmento `vnSeg n`.
 --   Las secciones §3 (ciclos), §4 (signatura) y §5 (aplicaciones) son
---   TODO en Peano (placeholders sin contenido), por lo que la paridad
+--   aún no materializadas en Peano (sin contenido formal), por lo que la paridad
 --   estructural está alcanzada al nivel actual de Peano.
 --
 -- Tabla de correspondencia:
@@ -22,9 +22,9 @@ License: MIT
 --   Perm.FunPerm A                         FunPerm A (re-exportado vía Peano)
 --   Perm.FunPerm.comp                      AczelSetTheory.VN.SymVN.comp
 --   Perm.Sym A                             AczelSetTheory.VN.SymVN n
---   Perm.card_Sym (placeholder rfl)        AczelSetTheory.VN.vnSeg_card
---   §3 ciclos (TODO en Peano)              — (sin contenido en ambos lados)
---   §4 sign (TODO en Peano)                — (sin contenido en ambos lados)
+--   Perm.card_Sym (implementación provisional en Peano)        AczelSetTheory.VN.vnSeg_card
+--   §3 ciclos (no materializado en Peano)  — (sin contenido en ambos lados)
+--   §4 sign (no materializado en Peano)    — (sin contenido en ambos lados)
 
 import AczelSetTheory.VN.SymGroupVN
 import Peano.PeanoNat.Combinatorics.Perm

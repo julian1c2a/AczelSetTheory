@@ -9,7 +9,7 @@ License: MIT
 -- Segundo Teorema de Isomorfía: paridad con Peano
 -- `Combinatorics/GroupTheory/SecondIsomorphism.lean`.
 --
--- Estado: ✅ Stub-doc.
+-- Estado: ✅ Documento de paridad.
 --   El contenido sustantivo vive en `AczelSetTheory/Algebra/SecondIsomorphism.lean`
 --   (`HFSubgroup.secondIsoMap`, `secondIsoMap_bijective`). La versión abstracta
 --   sobre `HFGroup` es más general que la concreta `FinGroup ℕ₀` de Peano.

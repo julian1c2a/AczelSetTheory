@@ -11,7 +11,7 @@ Dado un espacio topológico `(X, τ)` y un subconjunto `A ⊆ X`, la **topologí
 inducida** sobre `A` es `τ_A = {U ∩ A | U ∈ τ}`.
 
 Una **aplicación continua** `f : (X₁, τ₁) → (X₂, τ₂)` satisface que la
-preimagen de todo abierto es abierta.
+preimagen de cada abierto es abierta.
 -/
 
 /-! ## Preimagen -/
@@ -109,13 +109,13 @@ def HFTopSpace.subspace (ts : HFTopSpace) (A : HFSet) (hA : A ⊆ ts.X) :
 
 /-! ## Aplicaciones continuas -/
 
-/-- `f : X₁ → X₂` es continua si la preimagen de todo abierto es abierta. -/
+/-- `f : X₁ → X₂` es continua si la preimagen de cada abierto es abierta. -/
 structure HFContinuous (ts₁ ts₂ : HFTopSpace) where
   /-- La función subyacente. -/
   f             : HFSet → HFSet
   /-- `f` lleva `X₁` en `X₂`. -/
   f_mem         : ∀ {x : HFSet}, x ∈ ts₁.X → f x ∈ ts₂.X
-  /-- La preimagen de todo abierto es abierta. -/
+  /-- La preimagen de cada abierto es abierta. -/
   preimage_open : ∀ {V : HFSet}, V ∈ ts₂.τ → ts₁.preimage f V ∈ ts₁.τ
 
 namespace HFContinuous

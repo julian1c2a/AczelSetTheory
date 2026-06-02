@@ -10,7 +10,7 @@ namespace HFTopology
 
 Dado un espacio topológico `(X, τ)` y un subconjunto `A ⊆ X`:
 
-- **Interior** `int(A)`: la unión de todos los abiertos contenidos en `A`.
+- **Interior** `int(A)`: la unión de la familia de abiertos contenidos en `A`.
 - **Clausura** (adherencia) `cl(A)`: el complemento del interior del complemento: `X \ int(X \ A)`.
 - **Exterior** `ext(A)`: el interior del complemento: `int(X \ A)`.
 - **Frontera** `∂A`: `cl(A) \ int(A)`.
@@ -19,8 +19,8 @@ Un punto `x ∈ X` se clasifica respecto a `A` según su relación con éstos:
 - **Punto interior**: `x ∈ int(A)`.
 - **Punto exterior**: `x ∈ ext(A)`.
 - **Punto frontera**: `x ∉ int(A)` y `x ∉ ext(A)`.
-- **Punto de acumulación**: todo entorno de `x` contiene un punto de `A` distinto de `x`.
-- **Punto de adherencia**: todo entorno de `x` intersecta `A`.
+- **Punto de acumulación**: cada entorno de `x` contiene un punto de `A` distinto de `x`.
+- **Punto de adherencia**: cada entorno de `x` intersecta `A`.
 - **Punto aislado**: `x ∈ A` y existe un entorno de `x` que no contiene otros puntos de `A`.
 -/
 
@@ -152,12 +152,12 @@ def HFTopSpace.isExteriorPt (ts : HFTopSpace) (x A : HFSet) : Prop :=
 def HFTopSpace.isBoundaryPt (ts : HFTopSpace) (x A : HFSet) : Prop :=
   x ∈ ts.X ∧ ¬ts.isInteriorPt x A ∧ ¬ts.isExteriorPt x A
 
-/-- `x` es **punto de acumulación** de `A` si todo abierto que contiene `x`
+/-- `x` es **punto de acumulación** de `A` si cada abierto que contiene `x`
   intersecta `A` en algún punto distinto de `x`. -/
 def HFTopSpace.isAccumulationPt (ts : HFTopSpace) (x A : HFSet) : Prop :=
   x ∈ ts.X ∧ ∀ U, U ∈ ts.τ → x ∈ U → ∃ y, y ∈ A ∧ y ≠ x ∧ y ∈ U
 
-/-- `x` es **punto de adherencia** de `A` si todo abierto que contiene `x`
+/-- `x` es **punto de adherencia** de `A` si cada abierto que contiene `x`
   intersecta `A` (posiblemente en `x` mismo). -/
 def HFTopSpace.isAdherencePt (ts : HFTopSpace) (x A : HFSet) : Prop :=
   x ∈ ts.X ∧ ∀ U, U ∈ ts.τ → x ∈ U → ∃ y, y ∈ A ∧ y ∈ U
@@ -212,7 +212,7 @@ theorem HFTopSpace.isAdherencePt_iff_mem_closure (ts : HFTopSpace) {x A : HFSet}
 
 /-! ### Partición: interior ∪ exterior ∪ frontera = X -/
 
-/-- Todo punto de `X` es interior, exterior, o frontera de `A`. -/
+/-- Cada punto de `X` es interior, exterior, o frontera de `A`. -/
 theorem HFTopSpace.interior_exterior_boundary_partition (ts : HFTopSpace) {A : HFSet}
     (_hA : A ⊆ ts.X) :
     ∀ x, x ∈ ts.X →

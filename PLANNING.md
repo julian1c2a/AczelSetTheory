@@ -1,6 +1,6 @@
 # PLANNING — AczelSetTheory
 
-**Last updated:** 2026-05-29
+**Last updated:** 2026-06-02
 **Author:** Julián Calderón Almendros
 
 > Plan de largo plazo para AczelSetTheory. Cada fase es ejecutable de forma
@@ -26,6 +26,47 @@ módulos `VN/`. La combinatoria nueva vive en `AczelSetTheory/Combinatorics/` (p
 `Algebra/`, `Topology/`). Los stubs `VN/CountingVN.lean`, `VN/SignVN.lean` (espejos de
 stubs de Peano que ya no se materializarán) son huérfanos → re-etiquetar o retirar.
 Ver `DECISIONS.md` → ADR-000.
+
+---
+
+## ✅ Check-in (2026-06-02) — Sprint C1/C2 cerrado
+
+- Cierre de deuda textual `TODO/PEND/FIXME` en:
+  - `Topology/{Basic,Interior,Neighborhoods,Separation,Subspace}.lean`
+  - `Algebra/Sylow.lean`
+  - `Algebra/Action.lean`
+  - `VN/{ActionVN,CorrespondenceTheoremVN,PermVN,SymGroupVN}.lean`
+- Auditoría regenerada: `AUDIT-MODULE-MATRIX.md` con `noncomputable def: 0` y `TODO/PEND/FIXME: 0` en `.lean`.
+- Riesgo residual priorizado: `placeholder/stub` en módulos VN de paridad.
+
+## ✅ Check-in (2026-06-02) — Sprint D1 (bloque VN inicial) cerrado
+
+- Reducción de `placeholder/stub` en:
+  - `VN/PermVN.lean`
+  - `VN/OrbitVN.lean`
+  - `VN/CountingVN.lean`
+  - `VN/SignVN.lean`
+- Auditoría regenerada bloque a bloque en `AUDIT-MODULE-MATRIX.md`.
+- Nuevo residual global: `Modulos con placeholder/stub: 7`.
+
+## ✅ Check-in (2026-06-02) — Sprint D2 (bloque VN residual) cerrado
+
+- Reducción final de `placeholder/stub` en:
+  - `VN/ActionVN.lean`
+  - `VN/CorrespondenceTheoremVN.lean`
+  - `VN/FirstIsomorphismVN.lean`
+  - `VN/SecondIsomorphismVN.lean`
+  - `VN/ThirdIsomorphismVN.lean`
+  - `VN/QuotientGroupVN.lean`
+  - `VN/NormalSubgroupVN.lean`
+- Auditoría regenerada tras cada cierre individual en `AUDIT-MODULE-MATRIX.md`.
+- Nuevo residual global: `Modulos con placeholder/stub: 0`.
+
+### Reestimación rápida
+
+- Paridad base cerrada para métricas de `TODO/PEND/FIXME`.
+- Paridad base cerrada para métricas de `placeholder/stub` en VN.
+- Próximo hito operativo: retomar extensiones de Fase B (paridad sustantiva pendiente y teoría nueva nativa en `Combinatorics/`).
 
 ---
 

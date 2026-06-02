@@ -23,31 +23,31 @@ T₄ → T₃ → T₂ → T₁ → T₀
 
 ## Caracterización fundamental
 
-T₁ ↔ todo singleton `{x}` es cerrado.
+T₁ ↔ cada singleton `{x}` es cerrado.
 -/
 
 /-! ## Definiciones -/
 
-/-- **T₀ (Kolmogorov)**: para todo par de puntos distintos existe un abierto que
+/-- **T₀ (Kolmogorov)**: para cada par de puntos distintos existe un abierto que
     contiene a uno pero no al otro. -/
 def HFTopSpace.isT0 (ts : HFTopSpace) : Prop :=
   ∀ {x y : HFSet}, x ∈ ts.X → y ∈ ts.X → x ≠ y →
     ∃ U, U ∈ ts.τ ∧ ((x ∈ U ∧ y ∉ U) ∨ (y ∈ U ∧ x ∉ U))
 
-/-- **T₁ (Fréchet)**: para todo par de puntos distintos existen abiertos que
+/-- **T₁ (Fréchet)**: para cada par de puntos distintos existen abiertos que
     los separan mutuamente (cada abierto excluye al otro punto). -/
 def HFTopSpace.isT1 (ts : HFTopSpace) : Prop :=
   ∀ {x y : HFSet}, x ∈ ts.X → y ∈ ts.X → x ≠ y →
     ∃ U V, U ∈ ts.τ ∧ V ∈ ts.τ ∧ x ∈ U ∧ y ∉ U ∧ y ∈ V ∧ x ∉ V
 
-/-- **T₂ (Hausdorff)**: para todo par de puntos distintos existen abiertos
+/-- **T₂ (Hausdorff)**: para cada par de puntos distintos existen abiertos
     *disjuntos* que los contienen. -/
 def HFTopSpace.isT2 (ts : HFTopSpace) : Prop :=
   ∀ {x y : HFSet}, x ∈ ts.X → y ∈ ts.X → x ≠ y →
     ∃ U V, U ∈ ts.τ ∧ V ∈ ts.τ ∧ x ∈ U ∧ y ∈ V ∧
       HFSet.inter U V = HFSet.empty
 
-/-- **Espacio regular**: para todo punto `x` y cerrado `A` con `x ∉ A`,
+/-- **Espacio regular**: para cada punto `x` y cerrado `A` con `x ∉ A`,
     existen abiertos disjuntos que los separan. -/
 def HFTopSpace.isRegular (ts : HFTopSpace) : Prop :=
   ∀ {x A : HFSet}, x ∈ ts.X → ts.isClosed A → x ∉ A →
@@ -58,7 +58,7 @@ def HFTopSpace.isRegular (ts : HFTopSpace) : Prop :=
 def HFTopSpace.isT3 (ts : HFTopSpace) : Prop :=
   ts.isT1 ∧ ts.isRegular
 
-/-- **Espacio normal**: para todo par de cerrados disjuntos existen abiertos
+/-- **Espacio normal**: para cada par de cerrados disjuntos existen abiertos
     disjuntos que los contienen. -/
 def HFTopSpace.isNormal (ts : HFTopSpace) : Prop :=
   ∀ {A B : HFSet}, ts.isClosed A → ts.isClosed B →
@@ -94,7 +94,7 @@ theorem HFTopSpace.T1_implies_T0 {ts : HFTopSpace} (h : ts.isT1) : ts.isT0 := by
 
 /-! ## Caracterización: T₁ ↔ singletons cerrados -/
 
-/-- Si T₁, entonces todo singleton `{x}` es cerrado. -/
+/-- Si T₁, entonces cada singleton `{x}` es cerrado. -/
 theorem HFTopSpace.singletons_closed_of_T1 {ts : HFTopSpace} (h : ts.isT1)
     {x : HFSet} (hx : x ∈ ts.X) : ts.isClosed (HFSet.singleton x) := by
   show HFSet.setminus ts.X (HFSet.singleton x) ∈ ts.τ
@@ -118,7 +118,7 @@ theorem HFTopSpace.singletons_closed_of_T1 {ts : HFTopSpace} (h : ts.isT1)
   rw [HFSet.mem_sep] at hU
   exact hU.1
 
-/-- Si todo singleton es cerrado, entonces T₁. -/
+/-- Si cada singleton es cerrado, entonces T₁. -/
 theorem HFTopSpace.T1_of_singletons_closed {ts : HFTopSpace}
     (h : ∀ {x : HFSet}, x ∈ ts.X → ts.isClosed (HFSet.singleton x)) :
     ts.isT1 := by
@@ -143,7 +143,7 @@ theorem HFTopSpace.T1_of_singletons_closed {ts : HFTopSpace}
     rw [HFSet.mem_setminus, HFSet.mem_singleton] at hmem
     exact hmem.2 rfl
 
-/-- T₁ si y solo si todo singleton es cerrado. -/
+/-- T₁ si y solo si cada singleton es cerrado. -/
 theorem HFTopSpace.T1_iff_singletons_closed {ts : HFTopSpace} :
     ts.isT1 ↔ ∀ {x : HFSet}, x ∈ ts.X → ts.isClosed (HFSet.singleton x) :=
   ⟨fun h _ hx => HFTopSpace.singletons_closed_of_T1 h hx,

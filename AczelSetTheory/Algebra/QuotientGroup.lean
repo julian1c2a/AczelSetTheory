@@ -70,7 +70,7 @@ private def findRepList (sub : HFSubgroup grp) (C : HFSet) : List HFSet → Opti
   | g :: gs => if C = sub.rightCoset g then some g else findRepList sub C gs
 
 private theorem findRepList_sound (sub : HFSubgroup grp) (C : HFSet) :
-    ∀ {xs r : HFSet},
+  ∀ {xs : List HFSet} {r : HFSet},
       findRepList sub C xs = some r → r ∈ xs ∧ C = sub.rightCoset r
   | [], _, h => by cases h
   | g :: gs, r, h => by
@@ -83,7 +83,7 @@ private theorem findRepList_sound (sub : HFSubgroup grp) (C : HFSet) :
         exact ⟨by simp [hr_mem], hr_eq⟩
 
 private theorem findRepList_complete (sub : HFSubgroup grp) (C : HFSet) :
-    ∀ {xs g : HFSet}, g ∈ xs → C = sub.rightCoset g →
+  ∀ {xs : List HFSet} {g : HFSet}, g ∈ xs → C = sub.rightCoset g →
       ∃ r : HFSet, findRepList sub C xs = some r
   | [], _, hg, _ => by cases hg
   | x :: xs, g, hg, hEq => by

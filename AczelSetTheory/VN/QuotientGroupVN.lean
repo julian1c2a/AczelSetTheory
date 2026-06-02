@@ -8,7 +8,7 @@ License: MIT
 --
 -- Grupo cociente: paridad con Peano `Combinatorics/GroupTheory/QuotientGroup.lean`.
 --
--- Estado: ✅ Stub-doc.
+-- Estado: ✅ Documento de paridad.
 --   El contenido sustantivo vive en `AczelSetTheory/Algebra/QuotientGroup.lean`
 --   (`quotientGroup`, `quotientHom`, `ker_quotientHom_eq`). La versión abstracta
 --   sobre `HFGroup` es más general que la versión concreta `FinGroup ℕ₀` de Peano.

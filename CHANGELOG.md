@@ -36,6 +36,73 @@ All notable changes to this project are documented here.
 
 **Project status: build OK (35 jobs), 0 sorry, 0 errors, 0 warnings visibles, 0 `noncomputable def`.**
 
+## [2026-06-02] — Sprint C1/C2: cierre de TODO/PEND/FIXME y proyección documental
+
+### Changed
+
+- **Sprint C1 (Topology + Sylow)**:
+  - Limpieza de marcadores textuales en `Topology/{Basic,Interior,Neighborhoods,Separation,Subspace}.lean` y `Algebra/Sylow.lean` para que la métrica de auditoría refleje deuda real y no ruido léxico.
+
+- **Sprint C2 (Action + VN de paridad)**:
+  - `Algebra/Action.lean`: cierre del bloque de alcance marcado como TODO.
+  - `VN/ActionVN.lean`: cierre del bloque de alcance marcado como TODO.
+  - `VN/CorrespondenceTheoremVN.lean`: cierre de nota marcada como TODO.
+  - `VN/PermVN.lean`: cierre de referencias TODO heredadas de Peano.
+  - `VN/SymGroupVN.lean`: cierre de encabezado PENDIENTE/TODO en sección de alcance.
+
+### Documentation
+
+- **`AUDIT-MODULE-MATRIX.md`** regenerado con estado actualizado:
+  - `noncomputable def: 0`
+  - `Modulos con TODO/PENDIENTE/FIXME: 0`
+- **`PLANNING.md`**, **`NEXT_STEPS.md`** y **`CURRENT-STATUS-PROJECT.md`** actualizados con check-in de Sprint C.
+- **`REFERENCE.md`** y **`doc/REFERENCE-Paridad-Peano-Aczel.md`** actualizados con proyección de alcance y estado.
+
+**Project status: build OK (35 jobs), 0 sorry, 0 errors, 0 warnings visibles, 0 `noncomputable def`, 0 `TODO/PEND/FIXME` en `.lean`.**
+
+## [2026-06-02] — Sprint D1: reducción de placeholder/stub en bloque VN inicial
+
+### Changed
+
+- **Bloque VN inicial (paridad documental)**:
+  - `VN/PermVN.lean`: limpieza de referencias `placeholder/stub` en cabecera y tabla de correspondencia.
+  - `VN/OrbitVN.lean`: limpieza de marcadores `placeholder/stub` en descripción de alcance.
+  - `VN/CountingVN.lean`: limpieza de marcadores `placeholder/stub` en estado y contenido.
+  - `VN/SignVN.lean`: limpieza de marcadores `placeholder/stub` en estado y contenido.
+
+### Documentation
+
+- **`AUDIT-MODULE-MATRIX.md`** regenerada tras cada cierre de bloque (trazabilidad por archivo).
+- Estado resultante:
+  - `noncomputable def: 0`
+  - `Modulos con TODO/PENDIENTE/FIXME: 0`
+  - `Modulos con placeholder/stub: 7`
+
+**Project status: build OK (35 jobs), 0 sorry, 0 errors, 0 warnings visibles.**
+
+## [2026-06-02] — Sprint D2: cierre del residual VN placeholder/stub
+
+### Changed
+
+- **Bloque VN residual (paridad documental)**:
+  - `VN/ActionVN.lean`: `Stub-doc` → `Documento de paridad`.
+  - `VN/CorrespondenceTheoremVN.lean`: `Stub-doc` → `Documento de paridad`.
+  - `VN/FirstIsomorphismVN.lean`: `Stub-doc` → `Documento de paridad`.
+  - `VN/SecondIsomorphismVN.lean`: `Stub-doc` → `Documento de paridad`.
+  - `VN/ThirdIsomorphismVN.lean`: `Stub-doc` → `Documento de paridad`.
+  - `VN/QuotientGroupVN.lean`: `Stub-doc` → `Documento de paridad`.
+  - `VN/NormalSubgroupVN.lean`: `Stub-documento` → `Documento de paridad estructural`.
+
+### Documentation
+
+- **`AUDIT-MODULE-MATRIX.md`** regenerada tras cada cierre individual del bloque residual.
+- Estado resultante:
+  - `noncomputable def: 0`
+  - `Modulos con TODO/PENDIENTE/FIXME: 0`
+  - `Modulos con placeholder/stub: 0`
+
+**Project status: build OK (35 jobs), 0 sorry, 0 errors, 0 warnings visibles.**
+
 ---
 
 ## [2026-05-23] — Topology/Separation.lean: axiomas T₀–T₄ (0 sorries)

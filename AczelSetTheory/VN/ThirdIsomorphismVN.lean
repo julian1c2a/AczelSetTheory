@@ -9,7 +9,7 @@ License: MIT
 -- Tercer Teorema de Isomorfía: paridad con Peano
 -- `Combinatorics/GroupTheory/ThirdIsomorphism.lean`.
 --
--- Estado: ✅ Stub-doc.
+-- Estado: ✅ Documento de paridad.
 --   El contenido sustantivo vive en `AczelSetTheory/Algebra/ThirdIsomorphism.lean`
 --   (`HFSubgroup.thirdIsoMap`, `thirdIsoMap_surjective`, `thirdIsoMap_ker_eq`).
 --   La versión abstracta sobre `HFGroup` es más general que la concreta

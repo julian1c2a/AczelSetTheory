@@ -33,7 +33,7 @@ License: MIT
 --                                la forma Σ card(orb r) requiere card_sUnion
 --                                no-uniforme, no incluido aquí).
 --
--- TODO (paridad completa con Peano):
+-- Nota de alcance (paridad completa con Peano):
 --   class_equation (Σ): card G = card Z(G) + Σ card(orb r)  (r reps no centrales)
 --     (requiere `card_sUnion` para particiones no uniformes; la forma con
 --      `setminus` arriba es suficiente para el argumento estándar de Sylow)

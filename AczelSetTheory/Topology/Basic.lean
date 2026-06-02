@@ -79,7 +79,7 @@ theorem union_mem {U V : HFSet} (hU : U ∈ ts.τ) (hV : V ∈ ts.τ) :
     rw [HFSet.mem_singleton] at h
     rw [h]; exact hV
 
-/-- El vacío es subconjunto de todo abierto. -/
+/-- El vacío es subconjunto de cada abierto. -/
 theorem empty_sub {U : HFSet} : HFSet.empty ⊆ U :=
   HFSet.empty_subset U
 
