@@ -382,7 +382,7 @@ private theorem order_wop (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G) :
     (let ⟨n, hn1, hn2, _⟩ := orderExists grp hg; ⟨n, hn1, hn2⟩)
 
 /-- El orden de `g` en `grp`: el mínimo `n > 0` con `g^n = e`. -/
-noncomputable def order (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G) : ℕ₀ :=
+abbrev order (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G) : ℕ₀ :=
   Peano.choose_unique (order_wop grp hg)
 
 private theorem order_spec (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G) :
@@ -453,7 +453,7 @@ theorem gpow_op_gpow_sub_order (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G)
   exact h.symm.trans (gpow_order_eq_id grp hg)
 
 /-- Soporte del subgrupo cíclico: `{g^0, g^1, …, g^(ord)}` (con duplicidad en `g^0 = g^ord = e`). -/
-noncomputable def cyclicCarrier (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G) : HFSet :=
+abbrev cyclicCarrier (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G) : HFSet :=
   gpowImg grp g (order grp hg)
 
 theorem mem_cyclicCarrier (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G) (x : HFSet) :
@@ -509,7 +509,7 @@ theorem cyclicCarrier_inv_closed (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G)
   · rw [hgpow_eq, hinv_eq]
 
 /-- Subgrupo cíclico `⟨g⟩` generado por un elemento `g`. -/
-noncomputable def cyclicSubgroup (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G) :
+abbrev cyclicSubgroup (grp : HFGroup) {g : HFSet} (hg : g ∈ grp.G) :
     HFSubgroup grp where
   H          := cyclicCarrier grp hg
   H_sub      := fun hx => cyclicCarrier_subset_G grp hg _ hx
@@ -1323,7 +1323,7 @@ private theorem periodOf_wop (grp : HFGroup) (n : ℕ₀) (t : HFSet)
     ⟨σ n, zero_lt_succ n, shiftIter_period grp n t ht⟩
 
 /-- Período mínimo de `t` bajo el shift: mínimo `k > 0` con `shiftIter k t = t`. -/
-noncomputable def periodOf (grp : HFGroup) (n : ℕ₀) (t : HFSet)
+abbrev periodOf (grp : HFGroup) (n : ℕ₀) (t : HFSet)
     (ht : t ∈ HFSet.nPow grp.G (σ n)) : ℕ₀ :=
   Peano.choose_unique (periodOf_wop grp n t ht)
 
@@ -3058,4 +3058,3 @@ end HFAlgebra
 --       primo p, p^k ∣ |G| → ∃ subgrupo de orden p^k
 --       (inducción fuerte sobre |G|; ramas: subgrupo propio p-divisible,
 --        |G| = p^k, o Cauchy en Z(G) + cociente G/N + preimagen)
-
