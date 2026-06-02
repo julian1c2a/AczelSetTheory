@@ -1,6 +1,6 @@
 # Current Project Status — AczelSetTheory
 
-**Last updated:** 2026-06-04
+**Last updated:** 2026-06-05
 **Author**: Julián Calderón Almendros
 
 ---
@@ -9,9 +9,9 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules (non-barrel) | 133 |
-| Total modules (incl. barrels) | 142 |
-| Modules with 0 sorry | 134 / 134 |
+| Total modules (non-barrel) | 134 |
+| Total modules (incl. barrels) | 143 |
+| Modules with 0 sorry | 135 / 135 |
 | Total sorry | 0 |
 | Build status | ✅ Passing — 0 errors, 0 warnings |
 | Lean version | v4.30.0 |
@@ -163,7 +163,7 @@
 | VN/FermatVN.lean | `vN_fermat_little`, `vN_wilson` | ✅ |
 | VN/CRTVN.lean | `vN_chinese_remainder` | ✅ |
 
-### Algebra/ (20 modules)
+### Algebra/ (21 modules)
 
 | Module | Key exports | Status |
 |--------|-------------|--------|
@@ -187,6 +187,7 @@
 | Algebra/ThirdIsomorphism.lean | `thirdIsoMap`, `thirdIsoMap_ker_eq` | ✅ |
 | Algebra/CorrespondenceTheorem.lean | `preimageSubgroup`, `imageSubgroup_preimage`, `preimageSubgroup_image` | ✅ |
 | Algebra/Sylow.lean | `mckayCarrier`, `mckayShift`, `orbitOf`, `periodOf`, `succ_n_dvd_card_mckayFixedPoints` (D.4.D McKay), `p_group_fixed_point`, `sylowConjugate`, `SylowConjugateTotal_of_isSylowExponent`, 50+ teoremas | ✅ |
+| Algebra/Zassenhaus.lean | `prodSubgroup`, `mem_prodSubgroup_iff`, `prodNKHM`, `prodN_HK`, `prodN_HM`, `prodN_HM_normal_in_prodN_HK`, `zassenhaus_bijection` (Lema de la Mariposa) | ✅ |
 
 ### Integers/ (7 modules)
 
@@ -218,16 +219,19 @@ None — **0 sorry** across the entire project.
 
 ---
 
-## Recent Achievements (2026-06-04) — M6 completo: Sylow II sorry cerrado
+## Recent Achievements (2026-06-05) — M7 completo: Lema de la Mariposa de Zassenhaus — FASE A cerrada
 
-- ✅ **Segundo Teorema de Sylow** completamente demostrado — 0 sorries.
-  - `p_group_fixed_point` (private): si `|G| = p^n` y `p ∤ |X|`, existe punto fijo en X.
-    Demostrado por inducción fuerte sobre `|X|` con partición de órbitas.
-  - `sylowConjugate`: hfixed probado vía `p_group_fixed_point` + `cosetAction K H`.
-  - M6 (H13/H14/H15 Sylow) marcado ✅ en PLANNING.md.
-- ✅ Build: 88 jobs, **0 errores, 0 sorries**.
+- ✅ **Lema de Zassenhaus** completamente demostrado — 0 sorries.
+  - Nuevo módulo `AczelSetTheory/Algebra/Zassenhaus.lean` (~727 líneas).
+  - Construcciones: `prodSubgroup` (`N·S`), `prodNKHM` (`(N∩K)(H∩M)`), `prodN_HK` (`N(H∩K)`), `prodN_HM` (`N(H∩M)`), todas como `HFSubgroup`.
+  - Normalidades: `inter_N_K_normal_in_inter_H_K`, `inter_H_M_normal_in_inter_H_K`, `prodNKHM_normal`, `prodN_HM_normal_in_prodN_HK`.
+  - `zassenhaus_bijection` — `HFGroupHom.Bijective` del isomorfismo `(H∩K)/[(N∩K)(H∩M)] ≅ N(H∩K)/N(H∩M)`.
+  - M7 (H12 Zassenhaus) marcado ✅ en PLANNING.md.
+- ✅ Limpieza de warnings en `Sylow.lean` (`simpa`→`simp`, var no usada).
+- ✅ Build: 35 jobs, **0 errores, 0 warnings, 0 sorries**.
+- 🎉 **FASE A — Cierre de Paridad Peano: COMPLETA.** Todos los milestones M1–M7 cerrados; tabla de paridad §1–§7 con 0 ❌ en GroupTheory.
 
-## Previous Achievements (2026-06-03) — Sylow I completo + Sylow II estructura
+## Previous Achievements (2026-06-04) — M6 completo: Sylow II sorry cerrado
 
 - ✅ **Primer Teorema de Sylow** (`sylow_first`) completamente demostrado sin sorry.
   - Infraestructura: `improperSubgroup`, `subgroupOfSubgroup`, `card_preimage_mul`.

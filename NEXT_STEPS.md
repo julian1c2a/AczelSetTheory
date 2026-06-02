@@ -1,10 +1,11 @@
 # Next Steps
 
-**Last updated:** 2026-06-04
+**Last updated:** 2026-06-05
 
-El proyecto compila con **invariante "0 sorry, 0 axiomas privados" restaurado** — M6 cerrado (2026-06-04).
+🎉 **FASE A — Paridad Peano: COMPLETA (2026-06-05).** El proyecto compila con
+invariante "0 sorry, 0 axiomas privados, 0 warnings". Todos los milestones M1–M7 cerrados.
 Resto de la arquitectura: CList/ + Operations/ + Axioms/ + PList/ + VN/ + Algebra/ + Integers/ + Topology/.
-Ver PLANNING.md para el roadmap a largo plazo.
+Ver PLANNING.md para el roadmap a largo plazo (FASE B en adelante).
 
 ---
 
@@ -15,6 +16,17 @@ Ver PLANNING.md para el roadmap a largo plazo.
 **directamente sobre `HFSet` en AczelSetTheory**, capa nativa (p.ej. `Combinatorics/`),
 *no* vía transporte `VN/`. Stubs `VN/CountingVN.lean`, `VN/SignVN.lean` huérfanos. Ver
 `DECISIONS.md` → ADR-000.
+
+---
+
+## ✅ COMPLETADO — M7 Lema de la Mariposa de Zassenhaus — 2026-06-05
+
+`Algebra/Zassenhaus.lean` (NUEVO, ~727 líneas): prueba completa de
+`(H∩K)/[(N∩K)(H∩M)] ≅ N(H∩K)/N(H∩M)`.
+- Públicos: `prodSubgroup`, `mem_prodSubgroup_iff`, `prodNKHM`, `prodN_HK`, `prodN_HM`,
+  normalidades correspondientes y `zassenhaus_bijection`.
+- Build: 35 jobs, 0 errores, 0 warnings, 0 sorries.
+- M7 ✅ → **FASE A cerrada.**
 
 ---
 
@@ -198,7 +210,7 @@ Cerrado el argumento combinatorio de McKay completo (D.4.D). Todos los §§ sin 
 | 8 | H8, H9, H10 (3 iso theorems) | **M5 (1ª parte)** | Bundle en `IsomorphismsVN.lean`. |
 | 9 | H11 (Correspondence) | **M5 (2ª parte)** | Módulo separado. |
 | 10 | H13, H14, H15 (Sylow ×3) | **M6** | El bloque más denso. |
-| 11 | H12 (Zassenhaus) | **M7** | Cierre de paridad. |
+| 11 | H12 (Zassenhaus) | **M7** ✅ | Cierre de paridad. **Completado 2026-06-05** (`Algebra/Zassenhaus.lean`). |
 | 12 | Schreier, Jordan-Hölder | **MFUTURE** | Fuera de paridad Peano; aplazado. |
 
 ### Paralelización aplicable
@@ -216,14 +228,7 @@ Antes de tocar ℚ₀ extendido en la Fase B:
 
 ### Próxima acción inmediata
 
-**Arrancar M1 — `VN/CountingVN.lean`** (paso 1 = H1).
-
-Acciones de arranque:
-1. Leer `Peano/PeanoNat/Combinatorics/Counting.lean` y catalogar teoremas (pigeonhole, inclusión-exclusión, lemas auxiliares).
-2. Crear esqueleto `AczelSetTheory/VN/CountingVN.lean` con imports y namespace.
-3. Transportar cada lema vía `congrArg vN (peano_lemma ...)`.
-4. Build limpio + entrada en REFERENCE de paridad.
-5. Tras M1: registrar lecciones en `PLANNING.md`, recalcular estimación restante.
+**FASE A completa.** Próximo paso: definir prioridades de FASE B (consolidación post-paridad) según `PLANNING.md` §🅱️. Candidatos: ℚ₀ extendido (B1), bridge `ℤ₀ ↔ HFInt` (B2), anillos cocientes concretos (B3), o cierre documental (B4).
 
 ---
 
@@ -246,7 +251,7 @@ Acciones de arranque:
 | H9 | `GroupTheory/SecondIsomorphism.lean` | ⚠️ | `VN/SecondIsoVN.lean` | — |
 | H10 | `GroupTheory/ThirdIsomorphism.lean` | ⚠️ | `VN/ThirdIsoVN.lean` | — |
 | H11 | `GroupTheory/CorrespondenceTheorem.lean` | ⚠️ | `VN/CorrespondenceVN.lean` | — |
-| H12 | `GroupTheory/Zassenhaus.lean` | ❌ | `VN/ZassenhausVN.lean` | Schreier (futuro) |
+| H12 | `GroupTheory/Zassenhaus.lean` | ✅ | `Algebra/Zassenhaus.lean` | Schreier (futuro) |
 | H13 | `GroupTheory/Sylow/CosetAction.lean` | ✅ | `Algebra/Sylow.lean` (§9–§27) | McKay carrier + shift + orbitOf + D.4.D completo. |
 | H14 | `GroupTheory/Sylow/Cosets.lean` | ✅ | `Algebra/Sylow.lean` (§12–§27) | shiftIter, periodOf, orbitOf, card_orbitOf_eq_periodOf, card ∈ {1,p}, D.4.D. |
 | H15 | `GroupTheory/Sylow/Sylow.lean` | 🟡 | `Algebra/Sylow.lean` (parcial) | McKay lema ✅. **Pendiente:** cauchy_minimal + sylow_lift + Sylow I-III. |
@@ -275,7 +280,7 @@ H6 NormalSubgroup ──► H7 QuotientGroup ──► H8/H9/H10 Iso ──► H
 - **M4 — QuotientGroup concreto (H6, H7).** Puente desde `HFNormalSubgroup` abstracto a `vN`. **Coste:** 1–2 sesiones.
 - **M5 — Teoremas de isomorfismo VN (H8, H9, H10, H11).** Concretizar los abstractos ya existentes. **Coste:** 2 sesiones (mayormente especialización).
 - **M6 — Sylow (H13, H14, H15).** El más pesado: tres pasos clásicos (existencia, conjugación, conteo). **Coste:** 4–6 sesiones.
-- **M7 — Zassenhaus (H12).** Lema sandwich. **Coste:** 1 sesión post-Sylow.
+- **M7 — Zassenhaus (H12).** Lema sandwich. **Coste:** 1 sesión post-Sylow. ✅ **Completado 2026-06-05.**
 
 **Estimación total:** ~14–18 sesiones para cierre completo de paridad.
 

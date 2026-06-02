@@ -6,6 +6,35 @@ All notable changes to this project are documented here.
 
 ---
 
+## [2026-06-05] — M7 Zassenhaus: Lema de la Mariposa completo — FASE A cerrada
+
+### Added
+
+- **`AczelSetTheory/Algebra/Zassenhaus.lean`** (NUEVO, ~727 líneas):
+  - Prueba completa del **Lema de la Mariposa de Zassenhaus**:
+    `(H∩K)/[(N∩K)(H∩M)] ≅ N(H∩K)/N(H∩M)` cuando `N ⊴ H` y `M ⊴ K`.
+  - **Públicos:**
+    - `prodSubgroup` — `N·S` como `HFSubgroup` cuando `N ⊴ H` y `S ≤ H`.
+    - `mem_prodSubgroup_iff` — caracterización de membresía en `N·S`.
+    - `N_le_prodSubgroup`, `S_le_prodSubgroup` — inclusiones.
+    - `inter_N_K_normal_in_inter_H_K`, `inter_H_M_normal_in_inter_H_K` — normalidades de cortes.
+    - `prodNKHM`, `prodNKHM_normal` — `(N∩K)(H∩M)` con su normalidad en `H∩K`.
+    - `prodN_HK`, `prodN_HM` — `N(H∩K)` y `N(H∩M)`.
+    - `prodN_HM_le_prodN_HK`, `prodN_HM_normal_in_prodN_HK` — `N(H∩M) ⊴ N(H∩K)`.
+    - `zassenhaus_bijection` — `HFGroupHom.Bijective` del homomorfismo de Zassenhaus.
+- **`AczelSetTheory/Algebra.lean`**: import de `Zassenhaus`.
+
+### Changed
+
+- **`AczelSetTheory/Algebra/Sylow.lean`**: limpieza de warnings (`simpa` → `simp`, variable `h` no usada en `witnessBexLe`).
+- **`PLANNING.md`**: M7 marcado ✅; tabla de paridad GroupTheory §3 ahora `18 abstractos ✅ / 0 ⚠️ / 0 ❌`. **FASE A** marcada como completa.
+
+### Build
+
+- ✅ `lake build` limpio: 0 errores, **0 warnings**, 35 jobs OK.
+
+---
+
 ## [2026-06-04] — Sylow II: sorry cerrado — M6 completado (0 sorries en todo el proyecto)
 
 ### Added / Changed

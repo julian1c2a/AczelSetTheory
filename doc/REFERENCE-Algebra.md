@@ -1,6 +1,6 @@
 # Technical Reference — Algebra, Lattice & Structural Axioms
 
-**Last updated:** 2026-06-03 (Sylow I completo §33–§40 + Sylow II estructura §37-II, 1 sorry documentado)
+**Last updated:** 2026-06-05 (M7 cerrado: `Algebra/Zassenhaus.lean` ✅ — Lema de la Mariposa; FASE A completa)
 **Parent:** [../REFERENCE.md](../REFERENCE.md)
 **Related:** [REFERENCE-HFSets.md](REFERENCE-HFSets.md) | [REFERENCE-Relations.md](REFERENCE-Relations.md) | [REFERENCE-VN.md](REFERENCE-VN.md)
 
@@ -50,6 +50,7 @@ foundation, decidability).
 | 95 | `AczelSetTheory/Algebra/Module.lean` | ✅ Complete |
 | 96 | `AczelSetTheory/Algebra/LinearSpace.lean` | ✅ Complete |
 | 97 | `AczelSetTheory/Algebra/Sylow.lean` | ✅ Sylow I + II completos (§1–§40, §36-bis); 0 sorries (M6 cerrado 2026-06-04) |
+| 98 | `AczelSetTheory/Algebra/Zassenhaus.lean` | ✅ Lema de la Mariposa de Zassenhaus completo; 0 sorries (M7 cerrado 2026-06-05) |
 
 ---
 
@@ -1909,3 +1910,50 @@ theorem sylowSecondConjugacyTarget_of_isSylowExponent
 
 - `Algebra/` queda con **0 `noncomputable def`**.
 - Estado global del repositorio: **0 `noncomputable def`** en archivos `.lean` del workspace.
+
+---
+
+## 7. Algebra/Zassenhaus.lean — Lema de la Mariposa (M7 ✅, 2026-06-05)
+
+**Ruta:** AczelSetTheory/Algebra/Zassenhaus.lean
+**Namespace:** `HFAlgebra`
+**Estado:** ✅ Completo, 0 sorries, 0 warnings.
+
+Prueba del Lema de la Mariposa de Zassenhaus: dados `N ⊴ H` y `M ⊴ K` subgrupos normales en `grp : HFGroup`, existe un isomorfismo
+
+`(H ∩ K) / [(N ∩ K)(H ∩ M)]  ≅  N(H ∩ K) / N(H ∩ M)`
+
+### 7.1 Construcciones (def)
+
+- `HFAlgebra.prodSubgroup grp N S H hNH hSH hNN` — el producto `N · S = { n · s | n ∈ N, s ∈ S }` como HFSubgroup grp, cuando `N, S ≤ H` y `N ⊴ H`.
+- `HFAlgebra.prodNKHM H K N M hNH hMK hNN` — `(N ∩ K)(H ∩ M)` como HFSubgroup grp.
+- `HFAlgebra.prodN_HK H K N hNH hNN` — `N(H ∩ K)` como HFSubgroup grp.
+- `HFAlgebra.prodN_HM H N M hNH hNN` — `N(H ∩ M)` como HFSubgroup grp.
+
+### 7.2 Caracterización de membresía
+
+- `HFAlgebra.mem_prodSubgroup_iff` — `x ∈ N·S  ↔  x ∈ grp.G ∧ ∃ n ∈ N, ∃ s ∈ S, n · s = x`.
+- `HFAlgebra.N_le_prodSubgroup` — `N ⊆ N·S`.
+- `HFAlgebra.S_le_prodSubgroup` — `S ⊆ N·S`.
+
+### 7.3 Normalidades
+
+- `HFAlgebra.inter_N_K_normal_in_inter_H_K` — `N ∩ K ⊴ H ∩ K`.
+- `HFAlgebra.inter_H_M_normal_in_inter_H_K` — `H ∩ M ⊴ H ∩ K`.
+- `HFAlgebra.prodNKHM_normal` — `(N ∩ K)(H ∩ M) ⊴ H ∩ K`.
+- `HFAlgebra.prodN_HM_le_prodN_HK` — `N(H ∩ M) ⊆ N(H ∩ K)`.
+- `HFAlgebra.prodN_HM_normal_in_prodN_HK` — `N(H ∩ M) ⊴ N(H ∩ K)`.
+
+### 7.4 Teorema principal
+
+- `HFAlgebra.zassenhaus_bijection` — el homomorfismo de Zassenhaus
+
+  `(H ∩ K) / [(N ∩ K)(H ∩ M)]  ⟶  N(H ∩ K) / N(H ∩ M)`
+
+  es `HFGroupHom.Bijective`.
+
+### Notas técnicas
+
+- El módulo usa section Zassenhaus con variables `{grp} (H K N M : HFSubgroup grp) (hNH hMK hMH hNN hMM)`; el orden de declaración es relevante para el auto-binding de Lean.
+- Importa Algebra.QuotientGroup y Algebra.FirstIsomorphism (para Bijective).
+- Privados internos (prodNKHM_in_HK, prodN_HM_in_prodN_HK, zassenhaus_hom, zassenhaus_hom_injective, zassenhaus_hom_surjective, etc.) componen la prueba pero no se exportan.
