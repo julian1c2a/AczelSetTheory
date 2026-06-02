@@ -1,6 +1,6 @@
 # Technical Reference — Algebra, Lattice & Structural Axioms
 
-**Last updated:** 2026-05-29 (§28–§32 added: eTuple_mem_mckayFixedPoints, order theorems, cyclicCarrier_card_eq_order, cauchy_minimal)
+**Last updated:** 2026-06-02 (Sylow constructivo + Sprint B.2: 0 `noncomputable def` en `Algebra/`)
 **Parent:** [../REFERENCE.md](../REFERENCE.md)
 **Related:** [REFERENCE-HFSets.md](REFERENCE-HFSets.md) | [REFERENCE-Relations.md](REFERENCE-Relations.md) | [REFERENCE-VN.md](REFERENCE-VN.md)
 
@@ -1672,3 +1672,32 @@ theorem cauchy_minimal (grp : HFGroup) {n : ℕ₀} (hp : Peano.Arith.Prime (σ 
 **Teoremas D.3 – D.4.D + §28–§32:**
 
 `HFAlgebra.dvd_card_mckayCarrier_succ`, `HFAlgebra.card_orbitOf_eq_periodOf`, `HFAlgebra.card_orbitOf_one_or_succ`, `HFAlgebra.periodOf_eq_one_iff_fixed`, `HFAlgebra.card_orbitOf_eq_one_iff_fixed`, `HFAlgebra.card_orbitOf_eq_succ_of_not_fixed`, `HFAlgebra.succ_n_dvd_card_of_shift_closed_no_fixed`, `HFAlgebra.succ_n_dvd_card_mckayFixedPoints`, `HFAlgebra.eTuple_mem_mckayFixedPoints`, `HFAlgebra.order_dvd_of_gpow_eq_id`, `HFAlgebra.order_eq_prime_of_pow`, `HFAlgebra.cyclicCarrier_card_eq_order`, `HFAlgebra.cauchy_minimal`
+
+---
+
+### 7d. Proyección Sprint B.2 (Computabilidad en cocientes/isomorfismos)
+
+**Módulo base (`Algebra/QuotientGroup.lean`)**
+
+- `HFSubgroup.cosetRep` ahora es **computable** (`def`), implementado por búsqueda efectiva en `grp.G.toList`.
+- Nuevos auxiliares privados:
+  - `findRepList`
+  - `findRepList_sound`
+  - `findRepList_complete`
+- Revalidado sobre la nueva implementación:
+  - `cosetRep_mem_G`
+  - `cosetRep_rightCoset_eq`
+
+**Wrappers de cocientes/isomorfismos normalizados a `def`/`abbrev` (sin `noncomputable def`)**
+
+- `Algebra/QuotientGroup.lean`: `quotientOp`, `quotientInv`, `quotientGroup`, `quotientHom`.
+- `Algebra/FirstIsomorphism.lean`: `firstIsoFun`, `firstIsoMap`.
+- `Algebra/SecondIsomorphism.lean`: `secondIsoFun`, `secondIsoMap`.
+- `Algebra/ThirdIsomorphism.lean`: `KmodN_subgroup`, `thirdIsoFun`, `thirdIsoMap`.
+- `Algebra/CosetAction.lean`: `cosetAction`.
+- `Algebra/CorrespondenceTheorem.lean`: `preimageSubgroup`.
+
+**Estado proyectado (2026-06-02):**
+
+- `Algebra/` queda con **0 `noncomputable def`**.
+- Estado global del repositorio: **0 `noncomputable def`** en archivos `.lean` del workspace.

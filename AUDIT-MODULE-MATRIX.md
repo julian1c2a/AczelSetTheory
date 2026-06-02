@@ -1,6 +1,6 @@
 # Matriz de Auditoria Modulo por Modulo
 
-Generado: 2026-06-02 13:12:33
+Generado: 2026-06-02 13:23:16
 
 ## Resumen Global
 
@@ -9,7 +9,7 @@ Generado: 2026-06-02 13:12:33
 - sorry: 0
 - admit: 0
 - axiom: 0
-- noncomputable def: 1
+- noncomputable def: 0
 - Modulos con TODO/PENDIENTE/FIXME: 43
 - Modulos con placeholder/stub: 11
 
@@ -31,7 +31,7 @@ Generado: 2026-06-02 13:12:33
 | AczelSetTheory\Algebra\Module.lean | Algebra | 286 | 0 | 0 | 0 | 0 | 1 | 0 | PENDIENTE_DOC |
 | AczelSetTheory\Algebra\Monoid.lean | Algebra | 133 | 0 | 0 | 0 | 0 | 1 | 0 | PENDIENTE_DOC |
 | AczelSetTheory\Algebra\NormalSubgroup.lean | Algebra | 376 | 0 | 0 | 0 | 0 | 1 | 0 | PENDIENTE_DOC |
-| AczelSetTheory\Algebra\QuotientGroup.lean | Algebra | 390 | 0 | 0 | 0 | 1 | 0 | 0 | OK_NONCOMP_DEF |
+| AczelSetTheory\Algebra\QuotientGroup.lean | Algebra | 390 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Algebra\Ring.lean | Algebra | 165 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Algebra\RingHom.lean | Algebra | 158 | 0 | 0 | 0 | 0 | 1 | 0 | PENDIENTE_DOC |
 | AczelSetTheory\Algebra\SecondIsomorphism.lean | Algebra | 369 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
@@ -196,7 +196,6 @@ Generado: 2026-06-02 13:12:33
 
 | Modulo | Lineas | sorry | admit | axiom | noncomputable def | TODO/PEND/FIXME | placeholder/stub |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| AczelSetTheory\Algebra\QuotientGroup.lean | 390 | 0 | 0 | 0 | 1 | 0 | 0 |
 | AczelSetTheory\Topology\Separation.lean | 217 | 0 | 0 | 0 | 0 | 9 | 0 |
 | AczelSetTheory\Algebra\Sylow.lean | 3184 | 0 | 0 | 0 | 0 | 7 | 0 |
 | AczelSetTheory\Topology\Neighborhoods.lean | 243 | 0 | 0 | 0 | 0 | 5 | 0 |

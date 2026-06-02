@@ -6,7 +6,7 @@ All notable changes to this project are documented here.
 
 ---
 
-## [2026-06-02] — Sylow constructivo + Sprint B inicial de cocientes/isomorfismos
+## [2026-06-02] — Sylow constructivo + Sprint B (inicial + B.2) de cocientes/isomorfismos
 
 ### Changed
 
@@ -23,13 +23,18 @@ All notable changes to this project are documented here.
   - `Algebra/CosetAction.lean`: `cosetAction` cambiado a `abbrev`.
   - `Algebra/CorrespondenceTheorem.lean`: `preimageSubgroup` cambiado a `def`.
 
+- **Sprint B.2 (constructivización del representante de cosete)**:
+  - `Algebra/QuotientGroup.lean`: `cosetRep` migrado a `def` computable mediante búsqueda efectiva sobre `grp.G.toList` (sin `Classical.choose`).
+  - Añadidos auxiliares privados: `findRepList`, `findRepList_sound`, `findRepList_complete`.
+  - Teoremas revalidados con la nueva implementación: `cosetRep_mem_G`, `cosetRep_rightCoset_eq`.
+
 ### Documentation
 
 - **`doc/REFERENCE-Algebra.md`**: `periodOf` actualizado como `def` computable por búsqueda acotada.
-- **`REFERENCE.md`**: actualización de fecha y registro de proyección de la sesión.
-- **`AUDIT-MODULE-MATRIX.md`** regenerado con métrica `noncomputable def`.
+- **`REFERENCE.md`**: registro de proyección ampliado con Sprint B.2 y estado global de computabilidad.
+- **`AUDIT-MODULE-MATRIX.md`** regenerado con valor definitivo `noncomputable def: 0`.
 
-**Project status: build OK (35 jobs), 0 sorry, 0 errors, 0 warnings visibles.**
+**Project status: build OK (35 jobs), 0 sorry, 0 errors, 0 warnings visibles, 0 `noncomputable def`.**
 
 ---
 

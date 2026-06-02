@@ -11,16 +11,16 @@ License: MIT
 --   • Portador = sub.cosets (cosetes derechos, ya definidos en CosetCount).
 --   • Bajo normalidad, leftCoset g = rightCoset g, por lo que la operación
 --     (Hg)(Hh) := H(gh) está bien definida.
---   • Representante: Classical.choose sobre ∃ g ∈ G, C = Hg.
+--   • Representante: búsqueda efectiva en `grp.G.toList`.
 --
 -- Público:
 --   HFSubgroup.cosetOf            : g ↦ Hg como función G → cosets
---   HFSubgroup.cosetRep           : Classical.choose representante de C ∈ cosets
+--   HFSubgroup.cosetRep           : representante computable de C ∈ cosets
 --   HFSubgroup.cosetRep_mem_G     : cosetRep C ∈ G
 --   HFSubgroup.cosetRep_rightCoset_eq : H·(cosetRep C) = C
 --   HFSubgroup.quotientOp_welldefined : (a·b) define Hg·Hh bajo normalidad
---   HFSubgroup.quotientOp         : operación binaria sobre cosets (noncomputable)
---   HFSubgroup.quotientInv        : inversión sobre cosets (noncomputable)
+--   HFSubgroup.quotientOp         : operación binaria sobre cosets
+--   HFSubgroup.quotientInv        : inversión sobre cosets
 --   HFSubgroup.quotientOp_cosetOf : quotientOp (Hg) (Hh) = H(g·h)
 --   HFSubgroup.quotientInv_cosetOf: quotientInv (Hg) = H(g⁻¹)
 --   quotientGroup grp sub hn       : HFGroup sobre sub.cosets
@@ -38,6 +38,7 @@ License: MIT
 
 import AczelSetTheory.Algebra.NormalSubgroup
 import AczelSetTheory.Algebra.CosetCount
+import AczelSetTheory.Axioms.Fintype
 
 namespace HFAlgebra
 
@@ -63,23 +64,65 @@ theorem exists_rep_of_mem_cosets (sub : HFSubgroup grp) {C : HFSet}
     (hC : C ∈ sub.cosets) : ∃ g, g ∈ grp.G ∧ C = sub.rightCoset g :=
   (mem_cosets.mp hC)
 
-/-- Representante canónico de un coseto (vía elección clásica). -/
-noncomputable def cosetRep (sub : HFSubgroup grp) (C : HFSet) : HFSet :=
-  if h : ∃ g, g ∈ grp.G ∧ C = sub.rightCoset g then h.choose else grp.e
+/-- Búsqueda de representante en una lista de candidatos de `grp.G`. -/
+private def findRepList (sub : HFSubgroup grp) (C : HFSet) : List HFSet → Option HFSet
+  | [] => none
+  | g :: gs => if C = sub.rightCoset g then some g else findRepList sub C gs
+
+private theorem findRepList_sound (sub : HFSubgroup grp) (C : HFSet) :
+    ∀ {xs r : HFSet},
+      findRepList sub C xs = some r → r ∈ xs ∧ C = sub.rightCoset r
+  | [], _, h => by cases h
+  | g :: gs, r, h => by
+      by_cases hg : C = sub.rightCoset g
+      · simp [findRepList, hg] at h
+        cases h
+        exact ⟨by simp, hg⟩
+      · simp [findRepList, hg] at h
+        obtain ⟨hr_mem, hr_eq⟩ := findRepList_sound sub C h
+        exact ⟨by simp [hr_mem], hr_eq⟩
+
+private theorem findRepList_complete (sub : HFSubgroup grp) (C : HFSet) :
+    ∀ {xs g : HFSet}, g ∈ xs → C = sub.rightCoset g →
+      ∃ r : HFSet, findRepList sub C xs = some r
+  | [], _, hg, _ => by cases hg
+  | x :: xs, g, hg, hEq => by
+      simp at hg
+      cases hg with
+      | inl hx =>
+          subst hx
+          exact ⟨g, by simp [findRepList, hEq]⟩
+      | inr hmem =>
+          by_cases hx : C = sub.rightCoset x
+          · exact ⟨x, by simp [findRepList, hx]⟩
+          · obtain ⟨r, hr⟩ := findRepList_complete sub C hmem hEq
+            exact ⟨r, by simp [findRepList, hx, hr]⟩
+
+/-- Representante canónico de un coseto por búsqueda efectiva en `grp.G.toList`. -/
+def cosetRep (sub : HFSubgroup grp) (C : HFSet) : HFSet :=
+  match findRepList sub C grp.G.toList with
+  | some g => g
+  | none   => grp.e
 
 theorem cosetRep_mem_G (sub : HFSubgroup grp) {C : HFSet}
     (hC : C ∈ sub.cosets) : sub.cosetRep C ∈ grp.G := by
-  have hex := sub.exists_rep_of_mem_cosets hC
+  obtain ⟨g, hgG, hEq⟩ := sub.exists_rep_of_mem_cosets hC
+  have hgList : g ∈ grp.G.toList := (HFSet.mem_toList g grp.G).2 hgG
+  obtain ⟨r, hr⟩ := findRepList_complete sub C hgList hEq
+  have hsound := findRepList_sound sub C hr
   unfold cosetRep
-  rw [dif_pos hex]
-  exact hex.choose_spec.1
+  rw [hr]
+  exact (HFSet.mem_toList r grp.G).1 hsound.1
 
 theorem cosetRep_rightCoset_eq (sub : HFSubgroup grp) {C : HFSet}
     (hC : C ∈ sub.cosets) : sub.rightCoset (sub.cosetRep C) = C := by
-  have hex := sub.exists_rep_of_mem_cosets hC
+  obtain ⟨g, hgG, hEq⟩ := sub.exists_rep_of_mem_cosets hC
+  have hgList : g ∈ grp.G.toList := (HFSet.mem_toList g grp.G).2 hgG
+  obtain ⟨r, hr⟩ := findRepList_complete sub C hgList hEq
+  have hsound := findRepList_sound sub C hr
   unfold cosetRep
-  rw [dif_pos hex]
-  exact hex.choose_spec.2.symm
+  rw [hr]
+  exact hsound.2.symm
 
 -- ─────────────────────────────────────────────────────────────────
 -- §2. Bien-definición de la operación bajo normalidad

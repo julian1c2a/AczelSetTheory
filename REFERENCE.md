@@ -321,8 +321,8 @@ Key symbols:
 | `negOne` | def | Integers/Basic | `mk (𝟘, 𝟙)` = −1 |
 | `ofNat` | def | Integers/Basic | embedding ℕ₀ → ℤ₀ |
 | `negOnePow` | def | Integers/MobiusLiouville | (−1)^k ∈ ℤ₀, computable |
-| `mobius` | noncomputable def | Integers/MobiusLiouville | Möbius function μ : ℕ₀ → ℤ₀ |
-| `liouville` | noncomputable def | Integers/MobiusLiouville | Liouville function λ : ℕ₀ → ℤ₀ |
+| `mobius` | def | Integers/MobiusLiouville | Möbius function μ : ℕ₀ → ℤ₀ |
+| `liouville` | def | Integers/MobiusLiouville | Liouville function λ : ℕ₀ → ℤ₀ |
 | `squarefree` | def | Integers/PadicVal | predicate on ℕ₀ |
 | `padicVal` | def | Integers/PadicVal | p-adic valuation ℕ₀ |
 | `Omega_prime` | def | Integers/PadicVal | total prime-power exponent Ω : ℕ₀ → ℕ₀ |
@@ -543,5 +543,6 @@ Key proven theorems (non-sorry):
 | 2026-05-21 | `Integers/PadicVal.lean` (#97), `Integers/MobiusLiouville.lean` (#98): `Omega_prime_mul` y `Omega_prime_mul_prime` probados sin sorry; `liouville_mul`, `liouville_prime_pow` ahora sorry-free; estado de módulos #97 y #98 actualizado a `✅ Complete`; API de PadicVal ampliada con todos los lemas (`padicVal_zero_right`, `padicVal_of_not_cond`, `padicVal_succ_dvd`, `padicVal_prime_self`, `padicVal_prime_of_ndvd`, `squarefree_one`, `squarefree_prime`, `not_squarefree_prime_sq`, `Omega_prime_zero`, `Omega_prime_one`, `Omega_prime_prime`); tabla §6.66 ampliada con 13 nuevos teoremas de PadicVal | Claude (AI assistant) |
 | 2026-05-22 | Integers/{Basic,Order,Functions,Arithmetic,Bijection,PadicVal,MobiusLiouville}.lean (#92–#98): entradas de módulos, cadena de dependencias, namespace `ℤ₀`, definiciones clave (negOnePow, mobius, liouville, Omega_prime), 17 teoremas incluyendo `liouville_prime_pow` — actualización_documentación completa de Integers/ | Claude (AI assistant) |
 | 2026-06-02 | Algebra/Sylow.lean: migración constructiva de `order` y `periodOf` (búsqueda acotada), limpieza de legado WOP (`order_wop`, `periodOf_wop`); Sprint B inicial en Algebra/{QuotientGroup,FirstIsomorphism,SecondIsomorphism,ThirdIsomorphism,CosetAction,CorrespondenceTheorem} reemplazando wrappers `noncomputable def` por `abbrev/def`; actualización de `doc/REFERENCE-Algebra.md` y matriz `AUDIT-MODULE-MATRIX.md` | GitHub Copilot |
+| 2026-06-02 | Sprint B.2 en `Algebra/QuotientGroup.lean`: `cosetRep` migrado a versión constructiva (búsqueda en `grp.G.toList`) con nuevos auxiliares `findRepList`, `findRepList_sound`, `findRepList_complete`; ajuste de `cosetRep_mem_G` y `cosetRep_rightCoset_eq`; actualización de docs y matriz con **0 `noncomputable def`** global | GitHub Copilot |
 
 > To project a file: read it fully, then update sections 1–8 above following AI-GUIDE.md §4–14.
