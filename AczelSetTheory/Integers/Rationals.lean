@@ -493,4 +493,41 @@ theorem ofInt_injective {a b : ℤ₀} (h : ofInt a = ofInt b) : a = b := by
   simp only [ratEq, den1, ℤ₀.ofNat_one, ℤ₀.mul_one] at h2
   exact h2
 
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Negación: lemas auxiliares
+-- ─────────────────────────────────────────────────────────────────────────────
+
+theorem neg_zero : Neg.neg (0 : ℚ₀) = 0 := by
+  have h := add_neg_self (0 : ℚ₀)
+  rwa [zero_add] at h
+
+theorem neg_neg (q : ℚ₀) : Neg.neg (Neg.neg q) = q := by
+  refine Quotient.inductionOn q (fun p => ?_)
+  apply Quotient.sound
+  show ratEq (negRaw (negRaw p)) p
+  simp only [ratEq, negRaw, ℤ₀.neg_neg]
+
+theorem neg_le_neg {a b : ℚ₀} (h : a ≤ b) : Neg.neg b ≤ Neg.neg a := by
+  induction a using Quotient.inductionOn with
+  | _ p =>
+    induction b using Quotient.inductionOn with
+    | _ q =>
+      change Mul.mul p.1 (ℤ₀.ofNat q.2.val) ≤ Mul.mul q.1 (ℤ₀.ofNat p.2.val) at h
+      show Mul.mul (Neg.neg q.1) (ℤ₀.ofNat p.2.val)
+         ≤ Mul.mul (Neg.neg p.1) (ℤ₀.ofNat q.2.val)
+      rw [ℤ₀.neg_mul, ℤ₀.neg_mul]
+      exact ℤ₀.neg_le_neg h
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Decidibilidad del orden
+-- ─────────────────────────────────────────────────────────────────────────────
+
+instance instDecidableLE (a b : ℚ₀) : Decidable (a ≤ b) := by
+  refine Quotient.recOnSubsingleton₂ a b (fun p q => ?_)
+  show Decidable (Mul.mul p.1 (ℤ₀.ofNat q.2.val) ≤ Mul.mul q.1 (ℤ₀.ofNat p.2.val))
+  exact ℤ₀.instDecidableLE _ _
+
+instance instDecidableLT (a b : ℚ₀) : Decidable (a < b) :=
+  show Decidable (a ≤ b ∧ ¬ b ≤ a) from inferInstance
+
 end ℚ₀
