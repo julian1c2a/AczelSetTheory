@@ -20,28 +20,20 @@ inferencia + bridge `▸` para igualdad definitional `HAdd.hAdd ↔ Add.add`.
 
 ---
 
-## 🔴 ACTIVO — M3B: Sucesiones de Cauchy diádicas
+## ✅ COMPLETADO — M3B: Sucesiones de Cauchy diádicas
 
-**Archivo**: `AczelSetTheory/Reals/IsCauchy.lean`
-
-Sub-tareas:
+**Archivo**: `AczelSetTheory/Integers/Rationals/IsCauchy.lean`
+**Commit**: `5307913`
 
 | ID | Estado | Tarea |
 |----|--------|-------|
-| M3B-1 | ❌ TODO | `pow2 : ℕ₀ → ℚ₀` — potencias de 2 en ℚ₀ |
-| M3B-2 | ❌ TODO | `IsCauchy (f : ℕ₀ → ℚ₀) : Prop` — `absVal (f n - f m) ≤ pow2 n` para `n ≤ m` |
-| M3B-3 | ❌ TODO | `IsCauchy₂ (f : ℕ₀ → ℚ₀) : Prop` — def alternativa con `pow2 n` y `pow2 m` |
-| M3B-4 | ❌ TODO | `isCauchy_iff_isCauchy₂` — equivalencia entre las dos definiciones |
-| M3B-5 | ❌ TODO | Build + commit M3B |
+| M3B-1 | ✅ DONE | `pow2 : ℕ₀ → ℚ₀` — `1/2^n` vía `ℚ₀.mk` + `Peano.Pow.pow` |
+| M3B-2 | ✅ DONE | `IsCauchy (f : ℕ₀ → ℚ₀) : Prop` — simétrica: `absVal (f n - f m) ≤ pow2 (min n m)` |
+| M3B-3 | ✅ DONE | `IsCauchy₂ (f : ℕ₀ → ℚ₀) : Prop` — asimétrica: `n ≤ m → absVal (f m - f n) ≤ pow2 n` |
+| M3B-4 | ✅ DONE | `isCauchy_iff_isCauchy₂` — equivalencia; usa `Peano.Order.le_total` + `Peano.Lattice.*` |
+| M3B-5 | ✅ DONE | Build 239/239, 0 sorry, 0 errors — commit `5307913` |
 
-**Infraestructura disponible**:
-- `absVal_add_le` ✅ — para probar que suma de sucesiones Cauchy es Cauchy
-- `absVal_sub_comm` ✅ — para simetría de la condición
-- División en ℚ₀ vía `Mul` + inverso (a definir en Reals o usar como hipótesis)
-
-**Preguntas de diseño**:
-- ¿`pow2` como `def` en ℚ₀ o importar de peanolib?
-- ¿Abrir directorio `AczelSetTheory/Reals/` o poner `IsCauchy.lean` bajo `Integers/`?
+**Lección clave**: `pow`, `pow_ne_zero` de peanolib están en `Peano.Pow.*` (no al root sin `import Peano.lean`). `le_total` para ℕ₀ disponible como `Peano.Order.le_total`. `min` ambiguo — usar `Peano.Lattice.min`.
 
 ---
 

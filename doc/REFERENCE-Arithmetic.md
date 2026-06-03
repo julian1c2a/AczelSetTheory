@@ -2267,6 +2267,31 @@ Desigualdad triangular. Rama positiva: `add_le_add_left`/`add_le_add_right` + `l
 
 ---
 
+## Módulo: `AczelSetTheory/Integers/Rationals/IsCauchy.lean`
+
+**Namespace:** `ℚ₀`
+**Estado:** ✅ Completo
+**Descripción:** Sucesiones de Cauchy diádicas sobre ℚ₀. Dos condiciones equivalentes: simétrica (con `min`) y asimétrica (con `n ≤ m`).
+**Depende de:** `AczelSetTheory.Integers.Rationals`, `AczelSetTheory.Integers.Rationals.AbsVal`, `Peano.PeanoNat.Combinatorics.Pow`
+
+### Definiciones
+
+**[C1]** `ℚ₀.pow2 (n : ℕ₀) : ℚ₀`
+`pow2 n = 1 / 2^n`. Construido como `ℚ₀.mk (ℤ₀.ofNat 1) ⟨Peano.Pow.pow 2 n, Peano.Pow.pow_ne_zero ...⟩`.
+
+**[C2]** `ℚ₀.IsCauchy (f : ℕ₀ → ℚ₀) : Prop`
+Condición de Cauchy diádica **simétrica**: `∀ n m : ℕ₀, absVal (f n - f m) ≤ pow2 (Peano.Lattice.min n m)`.
+
+**[C3]** `ℚ₀.IsCauchy₂ (f : ℕ₀ → ℚ₀) : Prop`
+Condición de Cauchy diádica **asimétrica**: `∀ n m : ℕ₀, n ≤ m → absVal (f m - f n) ≤ pow2 n`.
+
+### Teoremas
+
+**[T-C1]** `ℚ₀.isCauchy_iff_isCauchy₂ (f : ℕ₀ → ℚ₀) : IsCauchy f ↔ IsCauchy₂ f`
+Equivalencia entre las dos condiciones. `(→)`: `le_then_min_eq_left` + `absVal_sub_comm`. `(←)`: `Peano.Order.le_total` da los dos casos; en cada uno, `min_comm` + `le_then_min_eq_left` fija el `min`, y `absVal_sub_comm` intercambia la diferencia.
+
+---
+
 ## Módulo: `AczelSetTheory/Integers/Rationals/Density.lean`
 
 **Namespace:** `ℚ₀`
