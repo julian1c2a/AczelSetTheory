@@ -19,5 +19,6 @@ import AczelSetTheory.Notation
 import AczelSetTheory.VN
 import AczelSetTheory.Algebra
 import AczelSetTheory.Integers
+import AczelSetTheory.Reals
 import AczelSetTheory.Topology
 import AczelSetTheory.Combinatorics

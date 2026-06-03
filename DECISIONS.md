@@ -328,6 +328,46 @@ proyecto Peano. Por tanto:
 
 ---
 
+## ADR-014: ℤ₀ como único entero canónico (sin `HFInt`) + representante normal
+
+**Date**: 2026-06-05
+**Status**: Accepted (FASE B / M4B, decisión del usuario 2026-06-05)
+
+**Context**: Durante el diseño de FASE B se planteó si introducir un tipo paralelo
+`HFInt` (entero como `HFSet`) además de `ℤ₀ := Quotient intSetoid`. Mantener dos tipos
+duplicaría API, biyecciones y lemas algebraicos sin ganancia conceptual.
+
+**Decision**:
+1. **No se introduce `HFInt`.** El único entero del proyecto es `ℤ₀`.
+2. Para soportar igualdad decidible eficiente y representación normalizada se añade
+   en `Integers/Canonical.lean` una **función de representante canónico** que devuelve
+   el par `(0, n)` (negativos), `(0, 0)` (cero) o `(n, 0)` (positivos).
+
+**API mínima** (a desarrollar en M4B):
+- `canonicalRep : ℕ₀ × ℕ₀ → ℕ₀ × ℕ₀`
+- `canonicalRep_idempotent`
+- `canonicalRep_equiv` (relación con `intEq`)
+- `canonicalRep_unique` (∀ p q, intEq p q → canonicalRep p = canonicalRep q)
+- `ℤ₀.repr : ℤ₀ → ℕ₀ × ℕ₀` (lift al cociente)
+- `ℤ₀.mk_repr` (sección)
+
+**Rationale**:
+- Un entero como par `(a-b)` con `b ≤ a` o `(b-a)` con `a ≤ b` da una representación
+  normal trivial sin cambiar el tipo subyacente.
+- Permite definir `DecidableEq ℤ₀` reduciendo a igualdad de pares canónicos sin
+  invocar la maquinaria del cociente en cada chequeo.
+- Compatible con M5B.0 (Bézout) y M5B (cuerpo `ZModN p`): los algoritmos extendidos
+  pueden operar directamente sobre representantes canónicos.
+
+**Consequences**:
+- Cualquier referencia a "entero como `HFSet`" en documentación o pruebas se redirige
+  a `ℤ₀` con `canonicalRep` cuando se necesite forma normal.
+- ADR-014 supersede cualquier diseño previo no escrito sobre `HFInt`.
+- `Integers/Canonical.lean` queda como módulo dedicado al representante; `Basic.lean`
+  no se reescribe.
+
+---
+
 ## Template for new decisions
 
 ## ADR-NNN: [Title]
