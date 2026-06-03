@@ -287,4 +287,57 @@ theorem mul_le_mul_left_ofNat_pos {k : ℕ₀} (hk : k ≠ 𝟘) (a b : ℤ₀) 
   rw [mul_comm (ofNat k) a, mul_comm (ofNat k) b]
   exact mul_le_mul_right_ofNat_pos hk a b
 
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Caracterización de no negativos: `0 ≤ a ↔ a = ofNat a.repr.1`
+-- ─────────────────────────────────────────────────────────────────────────────
+
+/-- Si `0 ≤ a` entonces `a` es la imagen vía `ofNat` de su numerador canónico. -/
+theorem nonneg_eq_ofNat {a : ℤ₀} (h : 0 ≤ a) : a = ofNat a.repr.1 := by
+  have h' := le_iff_mp h
+  have h0 : (0 : ℤ₀).repr = (𝟘, 𝟘) := by
+    show (ofNat 𝟘).repr = (𝟘, 𝟘); exact repr_ofNat 𝟘
+  rw [h0] at h'
+  apply repr_inj
+  rw [repr_ofNat]
+  rcases repr_normalized a with ha | ha
+  · -- a.repr.1 = 𝟘, luego h' fuerza a.repr.2 = 𝟘
+    have h2 : a.repr.2 = 𝟘 := by omega₀
+    exact Prod.ext rfl h2
+  · exact Prod.ext rfl ha
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- No negatividad del producto
+-- ─────────────────────────────────────────────────────────────────────────────
+
+private theorem neg_zero_local : Neg.neg (0 : ℤ₀) = 0 := by
+  have h := neg_add_self (0 : ℤ₀)
+  rwa [add_zero] at h
+
+/-- Si `0 ≤ a` y `0 ≤ b` entonces `0 ≤ a · b`. -/
+theorem mul_nonneg {a b : ℤ₀} (ha : 0 ≤ a) (hb : 0 ≤ b) : 0 ≤ Mul.mul a b := by
+  rw [nonneg_eq_ofNat ha, nonneg_eq_ofNat hb, ← ofNat_mul]
+  exact zero_le_ofNat _
+
+/-- Si `0 ≤ a` y `b ≤ 0` entonces `a · b ≤ 0`. -/
+theorem mul_nonpos_of_nonneg_of_nonpos {a b : ℤ₀}
+    (ha : 0 ≤ a) (hb : b ≤ 0) : Mul.mul a b ≤ 0 := by
+  have hnb : (0 : ℤ₀) ≤ -b := by
+    have h := neg_le_neg hb; rwa [neg_zero_local] at h
+  have hpos : (0 : ℤ₀) ≤ Mul.mul a (-b) := mul_nonneg ha hnb
+  rw [mul_neg] at hpos
+  have hflip := neg_le_neg hpos
+  rw [neg_zero_local, neg_neg] at hflip
+  exact hflip
+
+/-- Si `a ≤ 0` y `b ≤ 0` entonces `0 ≤ a · b`. -/
+theorem mul_nonneg_of_nonpos_of_nonpos {a b : ℤ₀}
+    (ha : a ≤ 0) (hb : b ≤ 0) : 0 ≤ Mul.mul a b := by
+  have hna : (0 : ℤ₀) ≤ -a := by
+    have h := neg_le_neg ha; rwa [neg_zero_local] at h
+  have hnb : (0 : ℤ₀) ≤ -b := by
+    have h := neg_le_neg hb; rwa [neg_zero_local] at h
+  have hpos : (0 : ℤ₀) ≤ Mul.mul (-a) (-b) := mul_nonneg hna hnb
+  rw [neg_mul, mul_neg, neg_neg] at hpos
+  exact hpos
+
 end ℤ₀

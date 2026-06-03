@@ -530,4 +530,112 @@ instance instDecidableLE (a b : ℚ₀) : Decidable (a ≤ b) := by
 instance instDecidableLT (a b : ℚ₀) : Decidable (a < b) :=
   show Decidable (a ≤ b ∧ ¬ b ≤ a) from inferInstance
 
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Distributividad de la negación sobre la suma
+-- ─────────────────────────────────────────────────────────────────────────────
+
+private theorem eq_neg_of_add_eq_zero {x y : ℚ₀}
+    (h : Add.add x y = 0) : x = Neg.neg y := by
+  have := (add_zero x).symm
+  rw [← add_neg_self y, ← add_assoc, h, zero_add] at this
+  exact this
+
+theorem neg_add (a b : ℚ₀) : Neg.neg (Add.add a b) = Add.add (Neg.neg a) (Neg.neg b) := by
+  -- Probamos (-a + -b) + (a + b) = 0 y luego aplicamos unicidad del inverso.
+  have hsum : Add.add (Add.add (Neg.neg a) (Neg.neg b)) (Add.add a b) = 0 := by
+    rw [add_assoc, ← add_assoc (Neg.neg b) a b, add_comm (Neg.neg b) a,
+        add_assoc a (Neg.neg b) b, neg_add_self, add_zero, neg_add_self]
+  -- De hsum: -a + -b = -(a + b), luego -(a + b) = -a + -b.
+  exact (eq_neg_of_add_eq_zero hsum).symm
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Caracterización de la no negatividad: 0 ≤ q ⟺ 0 ≤ p.1 (numerador)
+-- ─────────────────────────────────────────────────────────────────────────────
+
+private theorem zero_le_iff_num_nonneg (p : ℤ₀ × PosNat₀) :
+    ((0 : ℚ₀) ≤ (mkQ p.1 p.2 : ℚ₀)) ↔ (0 : ℤ₀) ≤ p.1 := by
+  show Mul.mul (0 : ℤ₀) (ℤ₀.ofNat p.2.val) ≤ Mul.mul p.1 (ℤ₀.ofNat den1.val) ↔ _
+  rw [ℤ₀.zero_mul, den1, ℤ₀.ofNat_one, ℤ₀.mul_one]
+
+private theorem le_zero_iff_num_nonpos (p : ℤ₀ × PosNat₀) :
+    ((mkQ p.1 p.2 : ℚ₀) ≤ (0 : ℚ₀)) ↔ p.1 ≤ (0 : ℤ₀) := by
+  show Mul.mul p.1 (ℤ₀.ofNat den1.val) ≤ Mul.mul (0 : ℤ₀) (ℤ₀.ofNat p.2.val) ↔ _
+  rw [ℤ₀.zero_mul, den1, ℤ₀.ofNat_one, ℤ₀.mul_one]
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Multiplicación y signos
+-- ─────────────────────────────────────────────────────────────────────────────
+
+theorem mul_nonneg {a b : ℚ₀} (ha : 0 ≤ a) (hb : 0 ≤ b) : 0 ≤ a * b := by
+  revert ha hb
+  refine Quotient.inductionOn₂ a b (fun p q ha hb => ?_)
+  have ha' : (0 : ℤ₀) ≤ p.1 := (zero_le_iff_num_nonneg p).mp ha
+  have hb' : (0 : ℤ₀) ≤ q.1 := (zero_le_iff_num_nonneg q).mp hb
+  exact (zero_le_iff_num_nonneg (mulRaw p q)).mpr (ℤ₀.mul_nonneg ha' hb')
+
+theorem mul_nonpos_of_nonneg_of_nonpos {a b : ℚ₀}
+    (ha : 0 ≤ a) (hb : b ≤ 0) : a * b ≤ 0 := by
+  revert ha hb
+  refine Quotient.inductionOn₂ a b (fun p q ha hb => ?_)
+  have ha' : (0 : ℤ₀) ≤ p.1 := (zero_le_iff_num_nonneg p).mp ha
+  have hb' : q.1 ≤ (0 : ℤ₀) := (le_zero_iff_num_nonpos q).mp hb
+  exact (le_zero_iff_num_nonpos (mulRaw p q)).mpr
+          (ℤ₀.mul_nonpos_of_nonneg_of_nonpos ha' hb')
+
+theorem mul_nonneg_of_nonpos_of_nonpos {a b : ℚ₀}
+    (ha : a ≤ 0) (hb : b ≤ 0) : 0 ≤ a * b := by
+  revert ha hb
+  refine Quotient.inductionOn₂ a b (fun p q ha hb => ?_)
+  have ha' : p.1 ≤ (0 : ℤ₀) := (le_zero_iff_num_nonpos p).mp ha
+  have hb' : q.1 ≤ (0 : ℤ₀) := (le_zero_iff_num_nonpos q).mp hb
+  exact (zero_le_iff_num_nonneg (mulRaw p q)).mpr
+          (ℤ₀.mul_nonneg_of_nonpos_of_nonpos ha' hb')
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Monotonía de la suma
+-- ─────────────────────────────────────────────────────────────────────────────
+
+theorem add_le_add_left {a b : ℚ₀} (h : a ≤ b) (c : ℚ₀) :
+    Add.add c a ≤ Add.add c b := by
+  revert h
+  refine Quotient.inductionOn₃ a b c (fun p q r h => ?_)
+  change Mul.mul p.1 (ℤ₀.ofNat q.2.val) ≤ Mul.mul q.1 (ℤ₀.ofNat p.2.val) at h
+  show Mul.mul (Add.add (Mul.mul r.1 (ℤ₀.ofNat p.2.val))
+                         (Mul.mul p.1 (ℤ₀.ofNat r.2.val)))
+                (ℤ₀.ofNat (Peano.Mul.mul r.2.val q.2.val))
+     ≤ Mul.mul (Add.add (Mul.mul r.1 (ℤ₀.ofNat q.2.val))
+                         (Mul.mul q.1 (ℤ₀.ofNat r.2.val)))
+                (ℤ₀.ofNat (Peano.Mul.mul r.2.val p.2.val))
+  rw [ℤ₀.ofNat_mul, ℤ₀.ofNat_mul, ℤ₀.right_distrib, ℤ₀.right_distrib]
+  -- A1 = (r.1·P)·(R·Q),  A2 = (p.1·R)·(R·Q)
+  -- B1 = (r.1·Q)·(R·P),  B2 = (q.1·R)·(R·P)
+  -- A1 = B1; A2 ≤ B2 (de h por R²).
+  have hA1B1 :
+      Mul.mul (Mul.mul r.1 (ℤ₀.ofNat p.2.val))
+              (Mul.mul (ℤ₀.ofNat r.2.val) (ℤ₀.ofNat q.2.val))
+    = Mul.mul (Mul.mul r.1 (ℤ₀.ofNat q.2.val))
+              (Mul.mul (ℤ₀.ofNat r.2.val) (ℤ₀.ofNat p.2.val)) := by
+    rw [mul_swap_inner r.1 (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat r.2.val) (ℤ₀.ofNat q.2.val),
+        mul_swap_inner r.1 (ℤ₀.ofNat q.2.val) (ℤ₀.ofNat r.2.val) (ℤ₀.ofNat p.2.val),
+        ℤ₀.mul_comm (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat q.2.val)]
+  have hA2B2 :
+      Mul.mul (Mul.mul p.1 (ℤ₀.ofNat r.2.val))
+              (Mul.mul (ℤ₀.ofNat r.2.val) (ℤ₀.ofNat q.2.val))
+    ≤ Mul.mul (Mul.mul q.1 (ℤ₀.ofNat r.2.val))
+              (Mul.mul (ℤ₀.ofNat r.2.val) (ℤ₀.ofNat p.2.val)) := by
+    rw [ℤ₀.mul_comm (ℤ₀.ofNat r.2.val) (ℤ₀.ofNat q.2.val),
+        mul_swap_inner p.1 (ℤ₀.ofNat r.2.val) (ℤ₀.ofNat q.2.val) (ℤ₀.ofNat r.2.val),
+        ℤ₀.mul_comm (ℤ₀.ofNat r.2.val) (ℤ₀.ofNat p.2.val),
+        mul_swap_inner q.1 (ℤ₀.ofNat r.2.val) (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat r.2.val)]
+    have hr2 : Peano.Mul.mul r.2.val r.2.val ≠ 𝟘 := mul_ne_zero₀ r.2.property r.2.property
+    rw [show Mul.mul (ℤ₀.ofNat r.2.val) (ℤ₀.ofNat r.2.val)
+          = ℤ₀.ofNat (Peano.Mul.mul r.2.val r.2.val) from (ℤ₀.ofNat_mul _ _).symm]
+    exact (ℤ₀.mul_le_mul_right_ofNat_pos hr2 _ _).mp h
+  rw [hA1B1]
+  exact ℤ₀.add_le_add_left _ _ _ hA2B2
+
+theorem add_le_add_right {a b : ℚ₀} (h : a ≤ b) (c : ℚ₀) :
+    Add.add a c ≤ Add.add b c := by
+  rw [add_comm a c, add_comm b c]; exact add_le_add_left h c
+
 end ℚ₀

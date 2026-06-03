@@ -16,10 +16,9 @@ License: MIT
 --   absVal_neg          : absVal (-q) = absVal q
 --   absVal_zero_iff     : absVal q = 0 ↔ q = 0
 --   absVal_idempotent   : absVal (absVal q) = absVal q
---
--- A desarrollar en sesiones futuras (ver §6):
---   absVal_sub_comm, absVal_mul, absVal_add_le (triangular)
---   — requieren `neg_add` en ℤ₀/ℚ₀ y análisis de casos sobre signos.
+--   absVal_sub_comm     : absVal (a - b) = absVal (b - a)
+--   absVal_mul          : absVal (a * b) = absVal a * absVal b
+--   absVal_add_le       : absVal (a + b) ≤ absVal a + absVal b   (triangular)
 --
 -- Dependencies: AczelSetTheory.Integers.Rationals
 -- @axiom_system: ZF (sin elección)
@@ -106,11 +105,75 @@ theorem absVal_zero_iff (q : ℚ₀) : absVal q = 0 ↔ q = 0 := by
     exact this
 
 -- ============================================================
--- Sección 6: A desarrollar en sesiones futuras
+-- Sección 6: Sub-conmutatividad, producto y desigualdad triangular
 -- ============================================================
--- A desarrollar (requieren helpers `neg_add`, `mul_pos_pos`, etc. en ℤ₀/ℚ₀):
---   absVal_sub_comm  : absVal (a - b) = absVal (b - a)
---   absVal_mul       : absVal (a * b) = absVal a * absVal b
---   absVal_add_le    : absVal (a + b) ≤ absVal a + absVal b   (triangular)
+
+theorem absVal_sub_comm (a b : ℚ₀) : absVal (a - b) = absVal (b - a) := by
+  have hkey : Neg.neg (b + Neg.neg a) = a + Neg.neg b := by
+    have h1 : Neg.neg (b + Neg.neg a) = Neg.neg b + Neg.neg (Neg.neg a) :=
+      neg_add b (Neg.neg a)
+    have h2 : Neg.neg (Neg.neg a) = a := neg_neg a
+    rw [h1, h2]
+    exact add_comm (Neg.neg b) a
+  have hsc : absVal (a - b) = absVal (Neg.neg (b - a)) := by
+    show absVal (a + Neg.neg b) = absVal (Neg.neg (b + Neg.neg a))
+    congr 1
+    exact hkey.symm
+  rw [hsc, absVal_neg]
+
+theorem absVal_mul (a b : ℚ₀) : absVal (a * b) = absVal a * absVal b := by
+  rcases le_total 0 a with ha | ha <;> rcases le_total 0 b with hb | hb
+  · -- 0 ≤ a, 0 ≤ b
+    have hab : 0 ≤ a * b := mul_nonneg ha hb
+    rw [absVal_of_nonneg hab, absVal_of_nonneg ha, absVal_of_nonneg hb]
+  · -- 0 ≤ a, b ≤ 0
+    have hab : a * b ≤ 0 := mul_nonpos_of_nonneg_of_nonpos ha hb
+    rw [absVal_of_nonpos hab, absVal_of_nonneg ha, absVal_of_nonpos hb, mul_neg]
+  · -- a ≤ 0, 0 ≤ b
+    have hab : a * b ≤ 0 := by
+      rw [mul_comm]; exact mul_nonpos_of_nonneg_of_nonpos hb ha
+    rw [absVal_of_nonpos hab, absVal_of_nonpos ha, absVal_of_nonneg hb, neg_mul]
+  · -- a ≤ 0, b ≤ 0
+    have hab : 0 ≤ a * b := mul_nonneg_of_nonpos_of_nonpos ha hb
+    rw [absVal_of_nonneg hab, absVal_of_nonpos ha, absVal_of_nonpos hb,
+        neg_mul, mul_neg, neg_neg]
+
+end ℚ₀
+
+-- ============================================================
+-- Sección 3: le_absVal y absVal_add_le
+-- Dentro del namespace ℚ₀ la notación + resuelve a ℚ₀.instAdd
+-- (backtracking desde la notación global de Peano). Los helpers
+-- q0_add_le_add_* del nivel raíz ya no son necesarios.
+-- ============================================================
+
+namespace ℚ₀
+
+private theorem le_absVal (q : ℚ₀) : q ≤ absVal q := by
+  by_cases h : (0 : ℚ₀) ≤ q
+  · rw [absVal_of_nonneg h]; exact le_refl q
+  · have hle : q ≤ 0 := (le_total 0 q).resolve_left h
+    rw [absVal_of_nonpos hle]
+    have h0nq : (0 : ℚ₀) ≤ -q := by
+      have := neg_le_neg hle; rwa [neg_zero] at this
+    exact le_trans hle h0nq
+
+theorem absVal_add_le (a b : ℚ₀) :
+    absVal (a + b) ≤ absVal a + absVal b := by
+  by_cases h : (0 : ℚ₀) ≤ a + b
+  · rw [absVal_of_nonneg h]
+    exact le_trans
+      (add_le_add_left (le_absVal b) a)
+      (add_le_add_right (le_absVal a) (absVal b))
+  · have hle := (le_total (0 : ℚ₀) _).resolve_left h
+    rw [absVal_of_nonpos hle]
+    have h1 : -a ≤ absVal a := by
+      have h' := le_absVal (-a); rwa [absVal_neg] at h'
+    have h2 : -b ≤ absVal b := by
+      have h' := le_absVal (-b); rwa [absVal_neg] at h'
+    -- -(a+b) es definitionally Neg.neg (Add.add a b); evitar notación + en calc
+    have hstep : Neg.neg (Add.add a b) = Add.add (Neg.neg a) (Neg.neg b) := neg_add a b
+    exact le_trans (hstep ▸ le_refl _)
+      (le_trans (add_le_add_right h1 _) (add_le_add_left h2 _))
 
 end ℚ₀
