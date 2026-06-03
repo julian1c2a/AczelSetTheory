@@ -1,8 +1,10 @@
 # Technical Reference — AczelSetTheory
 
-**Last updated:** 2026-06-02
+**Last updated:** 2026-06-05
 **Author**: Julián Calderón Almendros
-**Lean version**: v4.29.0
+**Lean version**: v4.30.0
+
+> **Nota (2026-06-05)**: la tabla §1 lista los 107 módulos del núcleo histórico. Para el inventario completo y al día (175 ficheros `.lean` totales — 172 bajo `AczelSetTheory/` más `Main.lean`, `lakefile.lean` y la raíz `AczelSetTheory.lean`), incluidos `Algebra/{Action,CosetAction,CorrespondenceTheorem,FirstIsomorphism,SecondIsomorphism,ThirdIsomorphism,Lattice,LinearSpace,Module,Monoid,NormalSubgroup,QuotientGroup,RingHom,Sylow,Zassenhaus}`, `Combinatorics/Counting`, varios `VN/*VN`, etc.) consulta [`AUDIT-MODULE-MATRIX.md`](AUDIT-MODULE-MATRIX.md). Documentación detallada por subsistema en [`doc/REFERENCE-Algebra.md`](doc/REFERENCE-Algebra.md), [`doc/REFERENCE-GroupTheory.md`](doc/REFERENCE-GroupTheory.md), [`doc/REFERENCE-Combinatorics.md`](doc/REFERENCE-Combinatorics.md) y [`doc/REFERENCE-VN.md`](doc/REFERENCE-VN.md).
 
 ---
 
@@ -548,5 +550,6 @@ Key proven theorems (non-sorry):
 | 2026-06-02 | Sprint D1: reducción de `placeholder/stub` en `VN/{PermVN,OrbitVN,CountingVN,SignVN}.lean`; matriz regenerada tras cada bloque, quedando **7** módulos con `placeholder/stub` | GitHub Copilot |
 | 2026-06-02 | Sprint D2: cierre del residual `placeholder/stub` en `VN/{ActionVN,CorrespondenceTheoremVN,FirstIsomorphismVN,SecondIsomorphismVN,ThirdIsomorphismVN,QuotientGroupVN,NormalSubgroupVN}.lean`; matriz regenerada tras cada cierre individual y estado final en **0** módulos con `placeholder/stub` | GitHub Copilot |
 | 2026-06-03 | **Algebra/Sylow.lean §33–§40 + §37-II**: Primer Teorema de Sylow completo (`sylow_first`, `exists_isSylowSubgroup_of_isSylowExponent`, `exists_isPSubgroup_of_isSylowExponent`, `not_dvd_index_of_isSylowSubgroup`, `not_dvd_card_cosets_of_isSylowSubgroup`); Segundo Teorema de Sylow estructura completa (`sylowConjugate`, `SylowConjugateTotal_of_isSylowExponent`, `sylowSecondConjugacyTarget_of_isSylowExponent`) con 1 sorry documentado (punto fijo del p-grupo); proyectado en `doc/REFERENCE-Algebra.md` | GitHub Copilot |
+| 2026-06-05 | **M7 Algebra/Zassenhaus.lean** (684 LOC): Lema de la Mariposa completo — `prodSubgroup`, `mem_prodSubgroup_iff`, `inter_N_K_normal_in_inter_H_K`, `inter_H_M_normal_in_inter_H_K`, `prodNKHM`, `prodNKHM_normal`, `prodN_HK`, `prodN_HM`, `prodN_HM_le_prodN_HK`, `prodN_HM_normal_in_prodN_HK`, `zassenhaus_bijection`; cierre del `sorry` residual de Sylow II §37; build limpio (0 errores / 0 warnings / 0 sorry / 0 noncomputable); upgrade a Lean v4.30.0; **FASE A (M1–M7) cerrada**; proyectado en `doc/REFERENCE-Algebra.md` §7 | GitHub Copilot |
 
 > To project a file: read it fully, then update sections 1–8 above following AI-GUIDE.md §4–14.
