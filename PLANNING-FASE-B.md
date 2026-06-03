@@ -28,7 +28,7 @@
 
 | # | Milestone | Módulos nuevos / tocados | Dep. previa | Coste estimado |
 |---|---|---|---|---:|
-| **M1B** | T1+T2: auditoría de ⚠️ embebidos y migración `CosetCount` | `Algebra/CosetCount.lean`, `doc/REFERENCE-Paridad-Peano-Aczel.md` | — | 1 sesión |
+| **M1B** | T1+T2: auditoría de ⚠️ embebidos + revisión `CosetCount` (sin migración) | `Algebra/CosetCount.lean`, `doc/REFERENCE-Paridad-Peano-Aczel.md`, `DECISIONS.md` (ADR-012, ADR-013) | — | 1 sesión |
 | **M2B** | ℚ₀ extendido: AbsVal + Density | `Integers/Rationals/AbsVal.lean`, `…/Density.lean` | M1B (cierra T1) | 2 sesiones |
 | **M3B** | ℚ₀ métrica + completitud parcial | `Integers/Rationals/Metric.lean` | M2B | 2 sesiones |
 | **M4B** | ADR-001 (no HFInt) **+** representante canónico único para `ℤ₀` | `DECISIONS.md` (ADR-001), `Integers/Basic.lean` (lema `canonicalRep`) | M1B | 1 sesión |
@@ -67,19 +67,19 @@ graph LR
 
 ## 4. Detalle por milestone
 
-### 4.1 M1B — Auditoría de ⚠️ embebidos + migración `CosetCount`
+### 4.1 M1B — Auditoría de ⚠️ embebidos + revisión `CosetCount` — **CERRADO 2026-06-05**
 
 **Tareas heredadas** de [`NEXT_STEPS.md`](NEXT_STEPS.md) §"Tareas de mantenimiento" (T1, T2, T3):
 
-- **T1 — Auditar ⚠️ residuales**:
-  - `WellFounded §1` y `EquivRel §6` en [`doc/REFERENCE-Paridad-Peano-Aczel.md`](doc/REFERENCE-Paridad-Peano-Aczel.md).
-  - Decisión por elemento: *(a)* formalizar como módulo `Axioms/`, *(b)* aceptar como embebido documentado, o *(c)* descartar.
-  - **Salida**: tabla de decisiones añadida a [`DECISIONS.md`](DECISIONS.md) (ADR-002).
-- **T2 — Migrar [`Algebra/CosetCount.lean`](AczelSetTheory/Algebra/CosetCount.lean)** (Lagrange abstracto) a un puente HF concreto, eliminando dependencia residual de `Peano.PeanoNat.Arith` que ya no necesita ser indirecta.
-  - Rev. del API: `card_cosets_eq_card_quotient`, `lagrange_concrete`.
-- **T3** (continuo): refrescar [`PLANNING.md`](PLANNING.md) y [`doc/REFERENCE-Paridad-Peano-Aczel.md`](doc/REFERENCE-Paridad-Peano-Aczel.md) con lecciones y recálculo.
+- **T1 — Auditar ⚠️ residuales** ✅:
+  - `WellFounded §1` y `EquivRel §6` en [`doc/REFERENCE-Paridad-Peano-Aczel.md`](doc/REFERENCE-Paridad-Peano-Aczel.md) → ambos clasificados como **opción (b) embebido documentado** (kernel + cocientes absorben el contenido).
+  - **Salida**: [ADR-012](DECISIONS.md) en [`DECISIONS.md`](DECISIONS.md); matriz de paridad actualizada ⚠️ → ✅ [embebido].
+- **T2 — Auditar [`Algebra/CosetCount.lean`](AczelSetTheory/Algebra/CosetCount.lean)** ✅:
+  - Diagnóstico: la dependencia `import Peano.PeanoNat.Arith` es **consumo fundacional legítimo** de aritmética sobre `ℕ₀ = Peano.PeanoNat`, no "teoría nueva en Peano". No hay migración necesaria.
+  - **Salida**: [ADR-013](DECISIONS.md) clarificando ADR-000 (consumo fundacional ≠ desarrollo nuevo).
+- **T3** (continuo) ✅: [`doc/REFERENCE-Paridad-Peano-Aczel.md`](doc/REFERENCE-Paridad-Peano-Aczel.md) refrescado con leyenda ✅ [embebido] y referencias a ADR-012.
 
-**Aceptación**: [`AUDIT-MODULE-MATRIX.md`](AUDIT-MODULE-MATRIX.md) regenerado, ADR-002 redactado, build invariante.
+**Aceptación**: ADR-012 + ADR-013 redactados, matriz de paridad **0 ⚠️**, [`AUDIT-MODULE-MATRIX.md`](AUDIT-MODULE-MATRIX.md) sin cambios estructurales (no hay código modificado), build invariante 0/0/0/0/0/0.
 
 ---
 
@@ -336,7 +336,7 @@ Empezar por **M1B (auditoría ⚠️ + CosetCount)** porque:
 1. Es prerequisito formal de M2B y M4B.
 2. Cierra deuda histórica de [`NEXT_STEPS.md`](NEXT_STEPS.md) (T1, T2, T3).
 3. Coste bajo (1 sesión) — produce momentum.
-4. Genera el **ADR-002** que estabiliza el frente Peano antes de avanzar a ℚ₀.
+4. Genera el **ADR-012/013** que estabiliza el frente Peano antes de avanzar a ℚ₀.
 
 En paralelo, si se quiere obtener avance visible rápido, **M7B (Combinatorics nativa)** puede atacarse simultáneamente: no comparte ficheros con M1B y materializa la directiva ADR-000.
 

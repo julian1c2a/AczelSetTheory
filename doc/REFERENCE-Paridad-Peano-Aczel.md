@@ -1,9 +1,9 @@
 # Paridad de Resultados: Peano → AczelSetTheory
 
-**Fecha de referencia:** 2026-06-04
+**Fecha de referencia:** 2026-06-05
 **Peano (feature-freeze desde 2026-05-10):** `E:\Dropbox\GitHub\lean4\Peano\`
 **AczelSetTheory (activo):** `E:\Dropbox\GitHub\lean4\AczelSetTheory\`
-**Estado build ambos proyectos:** AczelSetTheory: ✅ **0 sorry** (M6 cerrado 2026-06-04). Peano: ✅ 0 sorry.
+**Estado build ambos proyectos:** AczelSetTheory: ✅ **0 sorry / 0 ⚠️** (M7 Zassenhaus cerrado 2026-06-05; ⚠️ residuales de §1 y §6 reclasificados a ✅ [embebido] vía ADR-012). Peano: ✅ 0 sorry.
 
 ---
 
@@ -12,6 +12,7 @@
 | Símbolo | Significado |
 |---------|-------------|
 | ✅ | Portado completamente (módulo VN o equivalente) |
+| ✅ [embebido] | Resultado cubierto por kernel de Lean/cociente; sin módulo dedicado (ver ADR-012) |
 | ⚠️ | Portado parcialmente o con enfoque distinto |
 | ❌ | No portado — falta en AczelSetTheory |
 | 🆕 | Nuevo en AczelSetTheory (no existe en Peano) |
@@ -29,7 +30,7 @@
 | `PeanoNat/Arith.lean` | ✅ | `VN/Arithmetic.lean` + `VN/PeanoArith.lean` | Aritmética combinada; `PeanoArith` contiene propiedades de alto nivel |
 | `PeanoNat/Order.lean` | ✅ | `VN/Basic.lean` | Orden ≤ sobre VN; `vN_le_iff`, etc. |
 | `PeanoNat/StrictOrder.lean` | ✅ | `VN/Basic.lean` | Orden < sobre VN |
-| `PeanoNat/WellFounded.lean` | ⚠️ | `VN/Basic.lean` (parcial) | `well_founded_lt` se transfiere desde `ℕ₀` vía `Λ/Ψ`; AczelSetTheory usa recurso del kernel directamente |
+| `PeanoNat/WellFounded.lean` | ✅ [embebido] | `VN/Basic.lean` + kernel Lean 4 | `well_founded_lt` proviene del kernel (los inductivos generan principios `Acc/WellFounded` automáticos); paridad por absorción en infraestructura nativa, no por módulo espejo. Política: ADR-012. |
 | `PeanoNat/Decidable.lean` | ✅ | `Axioms/Decidable.lean` | `DecidableEq HFSet`; membresía decidible |
 | `PeanoNat/Isomorph.lean` | ✅ | `VN/Injective.lean` | Embedding `ℕ₀ ↪ HFSet` como VN; injectividad y propiedades |
 | `PeanoNat/Div.lean` | ✅ | `VN/DivVN.lean` | División euclídea sobre VN; `div_vN`, `mod_vN` |
@@ -110,7 +111,7 @@
 
 | Módulo Peano | Estado | Equivalente en AczelSetTheory | Notas |
 |---|---|---|---|
-| `ListsAndSets/EquivRel.lean` | ⚠️ | `CList/ExtEq.lean` + `CList/SetEquiv.lean` | Peano define `EquivRelOn`: clases de equivalencia, `classOf`, disjunción o igualdad de clases. En AczelSetTheory la teoría de equivalencia está embebida: `CList/ExtEq.lean` provee `extEq`, `CList/SetEquiv.lean` provee equivalencia de conjuntos, y `HFSet` es directamente un tipo cociente `Quotient CList.Setoid`. No hay módulo `EquivRelVN` explícito. |
+| `ListsAndSets/EquivRel.lean` | ✅ [embebido] | `CList/ExtEq.lean` + `CList/SetEquiv.lean` + `Quotient` (kernel) | Peano define `EquivRelOn`: clases de equivalencia, `classOf`, disjunción o igualdad de clases. En AczelSetTheory la teoría de equivalencia está absorbida por el kernel: `CList/ExtEq.lean` provee `extEq`, `CList/SetEquiv.lean` provee equivalencia de conjuntos, y `HFSet := Quotient CList.Setoid` cubre `classOf`/disjunción/igualdad de clases vía `Quotient.mk`/`Quotient.sound`/`Quotient.exact`. Política: ADR-012. |
 | `ListsAndSets/FSet.lean` | ✅ | `VN/FSet.lean` | Conjuntos finitos de VN-naturales |
 | `ListsAndSets/FSetFunction.lean` | ✅ | `VN/MapBridgeVN.lean` | Funciones sobre conjuntos finitos VN; puente `FSet → HFSet` |
 | `ListsAndSets/List.lean` | ✅ | `VN/ListBridgeVN.lean` | Listas de VN-naturales; puente `List ℕ₀ ↔ HFSet` |

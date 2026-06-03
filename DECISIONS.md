@@ -239,6 +239,95 @@ lemma is necessary.
 
 ---
 
+## ADR-012: ⚠️ residuales en paridad Peano↔Aczel — política de "embebido documentado"
+
+**Date**: 2026-06-05
+**Status**: Accepted (FASE B / M1B-T1)
+
+**Context**: La matriz de paridad `doc/REFERENCE-Paridad-Peano-Aczel.md` arrastraba dos
+módulos marcados ⚠️ ("portado parcialmente o con enfoque distinto"):
+
+1. **§1 `PeanoNat/WellFounded.lean`** — Peano lo expone como módulo dedicado; en
+   AczelSetTheory `well_founded_lt` sobre `ℕ₀` se obtiene del kernel de Lean 4 (los
+   inductivos generan principios de buena fundación automáticos) y se usa puntualmente
+   en `VN/Basic.lean` y derivados sin necesidad de un módulo `WellFoundedVN.lean`.
+2. **§6 `ListsAndSets/EquivRel.lean`** — Peano construye `EquivRelOn`, `classOf`,
+   etc., como teoría manual; en AczelSetTheory toda la maquinaria de equivalencia está
+   absorbida por `Quotient` del kernel (`HFSet := Quotient CList.Setoid`,
+   `CList/ExtEq.lean`, `CList/SetEquiv.lean`).
+
+**Decision**: Para ambos casos se **adopta la opción (b) "embebido documentado"** del
+plan FASE B §4.1: no se crea módulo dedicado, no se reformula como `Axioms/*.lean`, no
+se descarta del registro. Se actualiza la matriz de paridad para etiquetar estas filas
+como ✅ con el sufijo **"[embebido]"** y referencia a este ADR, dejando explícito que
+la paridad se cumple por absorción en infraestructura nativa (kernel + cocientes) en
+lugar de un módulo espejo.
+
+**Rationale**:
+- Crear `Axioms/WellFoundedNat.lean` o `Axioms/EquivRel.lean` *ad hoc* duplicaría sin
+  ganancia: el kernel ya provee `WellFounded`/`Acc` y `Quotient` con sus principios.
+- Descartarlos rompería la trazabilidad histórica con Peano.
+- El criterio rector es: *paridad de **resultados**, no paridad de **organización de
+  archivos***. Un teorema cubierto por el kernel sigue siendo "cubierto".
+
+**Consequences**:
+- `doc/REFERENCE-Paridad-Peano-Aczel.md` queda **0 ⚠️** tras actualizar §1 y §6.
+- Se establece precedente: futuros casos donde Peano tenga un módulo y AczelSetTheory
+  resuelva el contenido vía kernel/cociente serán ✅ [embebido] + cita de ADR-012.
+- No hay cambio de código; cambio puramente documental.
+
+---
+
+## ADR-013: Aritmética fundacional `ℕ₀` desde Peano ≠ "teoría nueva en Peano"
+
+**Date**: 2026-06-05
+**Status**: Accepted (FASE B / M1B-T2, refinamiento de ADR-000)
+
+**Context**: ADR-000 congeló Peano e impuso que "toda la teoría matemática nueva se
+construye directamente sobre `HFSet`". Durante la auditoría de M1B-T2 se observó que
+`AczelSetTheory/Algebra/CosetCount.lean` contiene:
+
+```lean
+import Peano.PeanoNat.Arith
+open Peano.Arith
+```
+
+usado para operaciones básicas (`mul`, `add`) sobre `ℕ₀ = Peano.PeanoNat`. El plan
+inicial de FASE B sugería "eliminar la indirección residual a Peano". Tras revisión,
+esa simplificación era **apresurada**: `ℕ₀` *es* el tipo natural de Peano, y su
+aritmética básica es una capa **fundacional**, no "teoría nueva".
+
+**Decision**: ADR-000 **no prohíbe consumir aritmética fundacional de Peano** sobre
+`ℕ₀` desde AczelSetTheory. Lo que prohíbe es **desarrollar teoría nueva** dentro del
+proyecto Peano. Por tanto:
+
+- `import Peano.PeanoNat.Arith` y `open Peano.Arith` son **lícitos** cuando se usan
+  exclusivamente para operaciones aritméticas básicas sobre `ℕ₀` (`+`, `*`, `≤`,
+  `add_assoc`, `mul_comm`, etc.).
+- `Algebra/CosetCount.lean` se conserva **sin migrar**: su dependencia es legítima.
+- Se considera "teoría nueva en Peano" cualquier definición/teorema **añadido a
+  archivos Peano** posterior al congelamiento (2026-05-10), o cualquier puerto VN
+  desarrollado para soportar nueva teoría.
+
+**Rationale**:
+- `ℕ₀` está definido en Peano por la arquitectura del proyecto (Peano-as-foundation).
+  Reimplementar `add`/`mul` sobre `ℕ₀` desde AczelSetTheory sería duplicación pura.
+- La distinción "consumir fundación" vs "extender teoría" es operativa: la primera
+  es apilar trabajo nuevo *encima* de bases congeladas; la segunda añadiría trabajo
+  *dentro* de las bases.
+- Los módulos `VN/` de AczelSetTheory ya cumplen el rol de "espejo aritmético": no
+  necesitamos eliminar `import Peano.PeanoNat.Arith` mientras `mul`/`add` de `ℕ₀`
+  sigan viniendo de allí.
+
+**Consequences**:
+- `Algebra/CosetCount.lean` **no se migra** en M1B; queda registrado en plan.
+- Cualquier futura auditoría que detecte `import Peano.PeanoNat.*` en código Aczel
+  debe usar este ADR para distinguir consumo legítimo (✅) de violación de ADR-000
+  (❌, p.ej. desarrollar nuevos lemas aritméticos *dentro* de `Peano/`).
+- M1B-T2 se cierra como **auditoría sin cambios de código**.
+
+---
+
 ## Template for new decisions
 
 ## ADR-NNN: [Title]
