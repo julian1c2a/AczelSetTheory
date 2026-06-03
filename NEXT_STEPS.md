@@ -4,59 +4,54 @@
 
 ---
 
-## 🔴 ACTIVO — M2B: Completar AbsVal.lean (sprint en curso)
+## ✅ COMPLETADO — M2B: absVal en ℚ₀ (2026-06-03)
 
-### Diagnóstico: por qué falla `absVal_add_le` dentro de `namespace ℚ₀`
-
-`peanolib/Peano.lean` usa `export Peano.Add (add ...)` y `export Peano.Order (le_trans ...)`
-para exponer nombres Peano en el namespace **raíz**. Esto significa que en cualquier archivo
-que importe peanolib, los nombres `add`, `le_trans`, `le_total`, etc. están en el namespace
-raíz. Cuando dentro de `namespace ℚ₀` se definen helpers privados en el namespace raíz y se
-los llama desde dentro del namespace, la resolución de instancias puede confundirse entre
-`Add.add : ℕ₀ → ℕ₀ → ℕ₀` (Peano, exportado) y `Add.add : ℚ₀ → ℚ₀ → ℚ₀`.
-
-### Regla de infraestructura derivada
-
-> **Regla M2B-01**: Los teoremas que usan `add_le_add_left/right` de ℚ₀ y
-> llaman a helpers privados del namespace raíz deben definirse **fuera** de
-> `namespace ℚ₀`, usando nombres completamente cualificados (`ℚ₀.foo`).
-
-### Sub-tareas M2B restantes
+**Técnica clave aprendida**: La notation global `Peano.Add.add` hace que `+` en contextos sin
+expected-type fuerce el tipo ℕ₀. Solución: segunda apertura de `namespace ℚ₀` + `_` para
+inferencia + bridge `▸` para igualdad definitional `HAdd.hAdd ↔ Add.add`.
 
 | ID | Estado | Tarea |
 |----|--------|-------|
-| M2B-1 | ✅ DONE | `absVal_sub_comm` — compila sin errores |
-| M2B-2 | ✅ DONE | `absVal_mul` — compila sin errores |
-| M2B-3 | ❌ TODO | `absVal_add_le` — mover fuera de `namespace ℚ₀` |
-| M2B-4 | ❌ TODO | Build completo AczelSetTheory + auditoría 0-errores |
-| M2B-5 | ❌ TODO | Commit + push M2B |
-
-### Plan concreto para M2B-3
-
-Extraer de `namespace ℚ₀`:
-1. `private theorem le_absVal` → `private theorem q0_le_absVal` al nivel raíz,
-   con referencias `ℚ₀.absVal_of_nonneg`, `ℚ₀.le_refl`, `ℚ₀.le_total`, etc.
-2. `theorem absVal_add_le` → `theorem ℚ₀.absVal_add_le` al nivel raíz, usando
-   `ℚ₀.absVal_of_nonneg`, `ℚ₀.neg_add`, `q0_add_le_add_left`, `ℚ₀.le_trans`, etc.
+| M2B-1 | ✅ DONE | `absVal_sub_comm` |
+| M2B-2 | ✅ DONE | `absVal_mul` |
+| M2B-3 | ✅ DONE | `absVal_add_le` (desigualdad triangular) |
+| M2B-4 | ✅ DONE | Build 238/238 jobs, 0 sorry, 0 errores |
+| M2B-5 | ✅ DONE | Commit `cbdc88e8` + proyección REFERENCE |
 
 ---
 
-## 🔵 PENDIENTE — M3B: Sucesiones de Cauchy diádicas
+## 🔴 ACTIVO — M3B: Sucesiones de Cauchy diádicas
 
 **Archivo**: `AczelSetTheory/Reals/IsCauchy.lean`
 
 Sub-tareas:
 
-| ID | Tarea |
-|----|-------|
-| M3B-1 | `pow2 : ℕ₀ → ℚ₀` — potencias de 2 en ℚ₀ |
-| M3B-2 | `IsCauchy (f : ℕ₀ → ℚ₀) : Prop` — |f(n) - f(m)| ≤ 1/2^n para n ≤ m |
-| M3B-3 | `IsCauchy₂ (f : ℕ₀ → ℚ₀) : Prop` — def alternativa con 2^(-n) y 2^(-m) |
-| M3B-4 | `isCauchy_iff_isCauchy₂` — equivalencia entre las dos definiciones |
-| M3B-5 | Build + commit M3B |
+| ID | Estado | Tarea |
+|----|--------|-------|
+| M3B-1 | ❌ TODO | `pow2 : ℕ₀ → ℚ₀` — potencias de 2 en ℚ₀ |
+| M3B-2 | ❌ TODO | `IsCauchy (f : ℕ₀ → ℚ₀) : Prop` — `absVal (f n - f m) ≤ pow2 n` para `n ≤ m` |
+| M3B-3 | ❌ TODO | `IsCauchy₂ (f : ℕ₀ → ℚ₀) : Prop` — def alternativa con `pow2 n` y `pow2 m` |
+| M3B-4 | ❌ TODO | `isCauchy_iff_isCauchy₂` — equivalencia entre las dos definiciones |
+| M3B-5 | ❌ TODO | Build + commit M3B |
 
-**Infraestructura necesaria antes de M3B**:
-- `absVal_add_le` (M2B-3) — para probar que suma de Cauchy es Cauchy
+**Infraestructura disponible**:
+- `absVal_add_le` ✅ — para probar que suma de sucesiones Cauchy es Cauchy
+- `absVal_sub_comm` ✅ — para simetría de la condición
+- División en ℚ₀ vía `Mul` + inverso (a definir en Reals o usar como hipótesis)
+
+**Preguntas de diseño**:
+- ¿`pow2` como `def` en ℚ₀ o importar de peanolib?
+- ¿Abrir directorio `AczelSetTheory/Reals/` o poner `IsCauchy.lean` bajo `Integers/`?
+
+---
+
+## 🔵 PENDIENTE — M4B: Representación canónica en ℚ₀
+
+`AczelSetTheory/Reals/CanonicalRep.lean`: `canonicalRep`, `repr`, `Decidable` en ℚ₀.
+
+---
+
+## 🔵 PENDIENTE — M5B: ℤ/Nℤ y campos finitos
 
 ---
 

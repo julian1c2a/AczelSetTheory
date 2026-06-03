@@ -2181,4 +2181,107 @@ Embedding del natural $n$: `ofInt (ℤ₀.ofNat n)`.
 **[T-Q21]** `ℚ₀.ofInt_injective {a b : ℤ₀} (h : ofInt a = ofInt b) : a = b`
 El embedding $\mathbb{Z}_0 \hookrightarrow \mathbb{Q}_0$ es inyectivo.
 
+### Negación
+
+**[T-Q22]** `ℚ₀.neg_zero : Neg.neg (0 : ℚ₀) = 0`
+
+**[T-Q23]** `ℚ₀.neg_neg (q : ℚ₀) : Neg.neg (Neg.neg q) = q`
+
+**[T-Q24]** `ℚ₀.neg_le_neg {a b : ℚ₀} (h : a ≤ b) : Neg.neg b ≤ Neg.neg a`
+La negación revierte el orden.
+
+**[T-Q25]** `ℚ₀.neg_add (a b : ℚ₀) : Neg.neg (Add.add a b) = Add.add (Neg.neg a) (Neg.neg b)`
+Distributividad de la negación sobre la suma.
+
+### Signos y multiplicación
+
+**[T-Q26]** `ℚ₀.mul_nonneg {a b : ℚ₀} (ha : 0 ≤ a) (hb : 0 ≤ b) : 0 ≤ a * b`
+
+**[T-Q27]** `ℚ₀.mul_nonpos_of_nonneg_of_nonpos {a b : ℚ₀} (ha : 0 ≤ a) (hb : b ≤ 0) : a * b ≤ 0`
+
+**[T-Q28]** `ℚ₀.mul_nonneg_of_nonpos_of_nonpos {a b : ℚ₀} (ha : a ≤ 0) (hb : b ≤ 0) : 0 ≤ a * b`
+Producto de dos negativos es no-negativo.
+
+### Monotonía de la suma
+
+**[T-Q29]** `ℚ₀.add_le_add_left {a b : ℚ₀} (h : a ≤ b) (c : ℚ₀) : Add.add c a ≤ Add.add c b`
+Nota: el tipo de retorno usa `Add.add` explícito (no notación `+`) por el shadowing global de Peano.
+
+**[T-Q30]** `ℚ₀.add_le_add_right {a b : ℚ₀} (h : a ≤ b) (c : ℚ₀) : Add.add a c ≤ Add.add b c`
+
+---
+
+## Módulo: `AczelSetTheory/Integers/Rationals/AbsVal.lean`
+
+**Namespace:** `ℚ₀`
+**Descripción:** Valor absoluto sobre ℚ₀ y sus propiedades fundamentales (M2B).
+**Depende de:** `AczelSetTheory.Integers.Rationals`
+**@axiom_system:** ZF (sin elección)
+**@importance:** high
+
+### Definición
+
+**[AV1]** `ℚ₀.absVal (q : ℚ₀) : ℚ₀`
+
+```lean
+def absVal (q : ℚ₀) : ℚ₀ := if 0 ≤ q then q else -q
+```
+
+Computable gracias a `instDecidableLE`. No usa `noncomputable`.
+
+### Propiedades de casos
+
+**[T-AV1]** `ℚ₀.absVal_of_nonneg {q : ℚ₀} (h : 0 ≤ q) : absVal q = q`
+
+**[T-AV2]** `ℚ₀.absVal_of_nonpos {q : ℚ₀} (h : q ≤ 0) : absVal q = -q`
+Maneja el caso `q = 0` por separado (en ese caso `-0 = 0`).
+
+**[T-AV3]** `ℚ₀.absVal_zero : absVal (0 : ℚ₀) = 0`
+
+### No-negatividad e idempotencia
+
+**[T-AV4]** `ℚ₀.absVal_nonneg (q : ℚ₀) : 0 ≤ absVal q`
+Prueba por casos; en el negativo usa `neg_le_neg`.
+
+**[T-AV5]** `ℚ₀.absVal_idempotent (q : ℚ₀) : absVal (absVal q) = absVal q`
+Consecuencia directa de `absVal_of_nonneg` + `absVal_nonneg`.
+
+### Simetría bajo negación
+
+**[T-AV6]** `ℚ₀.absVal_neg (q : ℚ₀) : absVal (Neg.neg q) = absVal q`
+
+### Caracterización del cero
+
+**[T-AV7]** `ℚ₀.absVal_zero_iff (q : ℚ₀) : absVal q = 0 ↔ q = 0`
+
+### Sub-conmutatividad, producto y desigualdad triangular
+
+**[T-AV8]** `ℚ₀.absVal_sub_comm (a b : ℚ₀) : absVal (a - b) = absVal (b - a)`
+Prueba usando `neg_add` + `add_comm` + `absVal_neg`.
+
+**[T-AV9]** `ℚ₀.absVal_mul (a b : ℚ₀) : absVal (a * b) = absVal a * absVal b`
+Prueba por casos de signo (`rcases le_total`); usa `mul_nonneg`, `mul_nonpos_of_nonneg_of_nonpos`, `mul_nonneg_of_nonpos_of_nonpos`.
+
+**[T-AV10]** `ℚ₀.absVal_add_le (a b : ℚ₀) : absVal (a + b) ≤ absVal a + absVal b`
+Desigualdad triangular. Rama positiva: `add_le_add_left`/`add_le_add_right` + `le_absVal`. Rama negativa: bridge definitional `HAdd.hAdd ↔ Add.add` con `▸`, luego `neg_add` + monotonía.
+
+---
+
+## Módulo: `AczelSetTheory/Integers/Rationals/Density.lean`
+
+**Namespace:** `ℚ₀`
+**Estado:** 🚧 Esqueleto — cuerpo a desarrollar
+**Descripción:** Densidad de ℚ₀: entre dos racionales distintos existe un tercero.
+**Depende de:** `AczelSetTheory.Integers.Rationals`, `AczelSetTheory.Integers.Rationals.AbsVal`
+
+### API planificada
+
+**[D1]** `ℚ₀.midpoint (a b : ℚ₀) : ℚ₀` — $(a + b) / 2$
+
+**[T-D1]** `ℚ₀.lt_midpoint {a b : ℚ₀} (h : a < b) : a < midpoint a b`
+
+**[T-D2]** `ℚ₀.midpoint_lt {a b : ℚ₀} (h : a < b) : midpoint a b < b`
+
+**[T-D3]** `ℚ₀.exists_between {a b : ℚ₀} (h : a < b) : ∃ c : ℚ₀, a < c ∧ c < b`
+
 ---
