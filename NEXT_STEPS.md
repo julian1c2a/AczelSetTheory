@@ -54,9 +54,16 @@ inferencia + bridge `▸` para igualdad definitional `HAdd.hAdd ↔ Add.add`.
 
 ---
 
+## ✅ COMPLETADO — M5B.0: Bezout en ℤ₀ (2026-06-XX)
+
+`AczelSetTheory/Integers/Bezout.lean` — commit `4c276fb`:
+- `bezout_ofNat`: ∀ a b : ℕ₀, ∃ x y : ℤ₀, ofNat a · x + ofNat b · y = ofNat (gcd a b) — **sin sorry**
+- `bezout_coprime_ofNat`: gcd a b = 1 → ∃ x y : ℤ₀, … = 1 — **sin sorry**
+- `bezout` / `bezout_coprime` para ℤ₀ general — `sorry` (requiere descomposición por signo)
+
 ## 🔵 PENDIENTE — M5B: ℤ/Nℤ y campos finitos
 
-`AczelSetTheory/Integers/ZModN.lean`: Bezout extendido → ZModN → IsField (ZModN p).
+`AczelSetTheory/Integers/ZModN.lean`: completar ZModN → IsField (ZModN p), usando `bezout_ofNat`.
 
 ---
 
