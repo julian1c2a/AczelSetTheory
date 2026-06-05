@@ -25,3 +25,6 @@
 .claude/*.json
 .env
 *.env
+modelos.json
+prueba.bash
+test.json
