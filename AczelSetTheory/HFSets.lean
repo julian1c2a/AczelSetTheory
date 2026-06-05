@@ -149,4 +149,3 @@ theorem not_mem_empty (x : HFSet) : ¬ (x ∈ empty) := by
   show CList.mem xc CList.empty = true → False
   unfold CList.empty
   rw [mem_nil]; exact Bool.false_ne_true
-

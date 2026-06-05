@@ -40,7 +40,8 @@ open Peano Peano.Add Peano.Sub Peano.Mul Peano.Order
 -- Relación de equivalencia en ℕ₀ × ℕ₀
 -- ─────────────────────────────────────────────────────────────────────────────
 
-private def intEq (p q : ℕ₀ × ℕ₀) : Prop :=
+/-- Relación de equivalencia que define ℤ₀: (a,b) ~ (c,d) ↔ a+d = b+c. -/
+def intEq (p q : ℕ₀ × ℕ₀) : Prop :=
   add p.1 q.2 = add p.2 q.1
 
 private theorem intEq_refl (p : ℕ₀ × ℕ₀) : intEq p p :=

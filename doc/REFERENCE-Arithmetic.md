@@ -2095,6 +2095,123 @@ Cota superior: $n < (k+1)^2$. Se deriva de [T21.5] + [T21.6] + la identidad $(k+
 
 ---
 
+## Módulo: `AczelSetTheory/Integers/Basic.lean`
+
+**Namespace:** `ℤ₀`
+**Descripción:** Enteros de Peano como cociente de ℕ₀ × ℕ₀ por la relación $(a,b) \sim (c,d) \iff a+d = b+c$. Implementa estructura de anillo conmutativo con representante canónico computable (un componente siempre 𝟘).
+**Última proyección:** 2026-06-05
+
+**Depende de:** `AczelSetTheory.PList.Omega0`, `Peano.PeanoNat.Sub`, `Peano.PeanoNat.Mul`, `Peano.PeanoNat.Decidable`
+
+**Usado por:** `AczelSetTheory.Integers.Rationals`, `AczelSetTheory.Integers.Canonical`
+
+### Relación de equivalencia
+
+**[Z1]** `intEq (p q : ℕ₀ × ℕ₀) : Prop`
+- **Lean 4:** `def intEq (p q : ℕ₀ × ℕ₀) : Prop := add p.1 q.2 = add p.2 q.1`
+- **Matemática:** $(a,b) \sim (c,d) \iff a + d = b + c$
+- **Computable:** Sí (proposición decidible vía `omega₀`)
+
+### Tipo y construcción
+
+**[Z2]** `ℤ₀ : Type`
+- **Lean 4:** `def ℤ₀ := Quotient intSetoid` donde `intSetoid : Setoid (ℕ₀ × ℕ₀)` con `r := intEq`
+- **Matemática:** $\mathbb{Z}_0 = (\mathbb{N}_0 \times \mathbb{N}_0)/{\sim}$
+
+**[Z3]** `ℤ₀.repr (z : ℤ₀) : ℕ₀ × ℕ₀`
+- **Lean 4:** `def repr (z : ℤ₀) : ℕ₀ × ℕ₀ := Quotient.lift normalize (normalize_eq_of_equiv) z`
+- **Matemática:** Representante canónico; se verifica `z.repr.1 = 𝟘 ∨ z.repr.2 = 𝟘`.
+
+**[Z4]** `ℤ₀.negOne : ℤ₀`
+- **Lean 4:** `def negOne : ℤ₀ := mk (𝟘, 𝟙)` — el entero $-1$
+
+**[Z5]** `ℤ₀.ofNat (n : ℕ₀) : ℤ₀`
+- **Lean 4:** `def ofNat (n : ℕ₀) : ℤ₀ := mk (n, 𝟘)` — embedding inyectivo $\mathbb{N}_0 \hookrightarrow \mathbb{Z}_0$
+
+### Instancias algebraicas
+
+**[Z6]** `instance : Zero ℤ₀` — `mk (𝟘, 𝟘)`  
+**[Z7]** `instance : One ℤ₀` — `mk (𝟙, 𝟘)`  
+**[Z8]** `instance : Add ℤ₀` — $(a,b) + (c,d) = (a+c,\, b+d)$  
+**[Z9]** `instance : Neg ℤ₀` — $-(a,b) = (b,a)$  
+**[Z10]** `instance : Mul ℤ₀` — $(a,b) \cdot (c,d) = (ac+bd,\, ad+bc)$  
+**[Z11]** `instance : Sub ℤ₀` — $a - b = a + (-b)$
+
+### Lemas de cómputo (definitional)
+
+**[T-Z1]** `ℤ₀.add_mk (p q : ℕ₀ × ℕ₀) : HAdd.hAdd (mk p) (mk q) = mk (addRaw p q)`  
+**[T-Z2]** `ℤ₀.neg_mk (p : ℕ₀ × ℕ₀) : Neg.neg (mk p) = mk (negRaw p)`  
+**[T-Z3]** `ℤ₀.mul_mk (p q : ℕ₀ × ℕ₀) : HMul.hMul (mk p) (mk q) = mk (mulRaw p q)`
+
+### Propiedades del representante canónico
+
+**[T-Z4]** `ℤ₀.mk_repr (a : ℤ₀) : mk a.repr = a`  
+**[T-Z5]** `ℤ₀.repr_normalized (a : ℤ₀) : a.repr.1 = 𝟘 ∨ a.repr.2 = 𝟘`  
+**[T-Z6]** `ℤ₀.repr_inj {a b : ℤ₀} (h : a.repr = b.repr) : a = b`  
+**[T-Z7]** `ℤ₀.repr_add_intEq (a b : ℤ₀) : add (HAdd.hAdd a b).repr.1 (add a.repr.2 b.repr.2) = add (HAdd.hAdd a b).repr.2 (add a.repr.1 b.repr.1)`  
+**[T-Z8]** `ℤ₀.repr_neg_intEq (a : ℤ₀) : add (Neg.neg a).repr.1 a.repr.1 = add (Neg.neg a).repr.2 a.repr.2`  
+**[T-Z9]** `ℤ₀.repr_ofNat (n : ℕ₀) : (ofNat n).repr = (n, 𝟘)`
+
+### Leyes de anillo conmutativo
+
+**[T-Z10]** `ℤ₀.add_comm (a b : ℤ₀) : Add.add a b = Add.add b a`  
+**[T-Z11]** `ℤ₀.add_assoc (a b c : ℤ₀) : Add.add (Add.add a b) c = Add.add a (Add.add b c)`  
+**[T-Z12]** `ℤ₀.zero_add (a : ℤ₀) : Add.add 0 a = a`  
+**[T-Z13]** `ℤ₀.add_zero (a : ℤ₀) : Add.add a 0 = a`  
+**[T-Z14]** `ℤ₀.add_neg_self (a : ℤ₀) : Add.add a (Neg.neg a) = 0`  
+**[T-Z15]** `ℤ₀.neg_add_self (a : ℤ₀) : Add.add (Neg.neg a) a = 0`  
+**[T-Z16]** `ℤ₀.neg_neg (a : ℤ₀) : Neg.neg (Neg.neg a) = a`  
+**[T-Z17]** `ℤ₀.mul_comm (a b : ℤ₀) : Mul.mul a b = Mul.mul b a`  
+**[T-Z18]** `ℤ₀.mul_assoc (a b c : ℤ₀) : Mul.mul (Mul.mul a b) c = Mul.mul a (Mul.mul b c)`  
+**[T-Z19]** `ℤ₀.one_mul (a : ℤ₀) : Mul.mul 1 a = a`  
+**[T-Z20]** `ℤ₀.mul_one (a : ℤ₀) : Mul.mul a 1 = a`  
+**[T-Z21]** `ℤ₀.zero_mul (a : ℤ₀) : Mul.mul 0 a = 0`  
+**[T-Z22]** `ℤ₀.mul_zero (a : ℤ₀) : Mul.mul a 0 = 0`  
+**[T-Z23]** `ℤ₀.left_distrib (a b c : ℤ₀) : Mul.mul a (Add.add b c) = Add.add (Mul.mul a b) (Mul.mul a c)`  
+**[T-Z24]** `ℤ₀.right_distrib (a b c : ℤ₀) : Mul.mul (Add.add a b) c = Add.add (Mul.mul a c) (Mul.mul b c)`  
+**[T-Z25]** `ℤ₀.neg_mul (a b : ℤ₀) : Mul.mul (Neg.neg a) b = Neg.neg (Mul.mul a b)`  
+**[T-Z26]** `ℤ₀.mul_neg (a b : ℤ₀) : Mul.mul a (Neg.neg b) = Neg.neg (Mul.mul a b)`
+
+### Embedding ℕ₀ → ℤ₀
+
+**[T-Z27]** `ℤ₀.ofNat_zero : ofNat 𝟘 = 0`  
+**[T-Z28]** `ℤ₀.ofNat_one : ofNat 𝟙 = 1`  
+**[T-Z29]** `ℤ₀.ofNat_add (m n : ℕ₀) : ofNat (Peano.Add.add m n) = Add.add (ofNat m) (ofNat n)`  
+**[T-Z30]** `ℤ₀.ofNat_mul (m n : ℕ₀) : ofNat (Peano.Mul.mul m n) = Mul.mul (ofNat m) (ofNat n)`  
+**[T-Z31]** `ℤ₀.ofNat_injective {m n : ℕ₀} (h : ofNat m = ofNat n) : m = n`
+
+### Cancelación y compatibilidad
+
+**[T-Z32]** `ℤ₀.mul_left_cancel_ofNat {k : ℕ₀} (hk : k ≠ 𝟘) {x y : ℤ₀} (h : Mul.mul (ofNat k) x = Mul.mul (ofNat k) y) : x = y`  
+**[T-Z33]** `ℤ₀.repr_mul_ofNat_intEq (a : ℤ₀) (k : ℕ₀) : add (Mul.mul a (ofNat k)).repr.1 (Peano.Mul.mul a.repr.2 k) = add (Mul.mul a (ofNat k)).repr.2 (Peano.Mul.mul a.repr.1 k)`
+
+---
+
+## Módulo: `AczelSetTheory/Integers/Canonical.lean`
+
+**Namespace:** `ℤ₀`
+**Descripción:** Función `canonicalRep` que produce el representante canónico de un par ℕ₀ × ℕ₀ de forma directa (sin pasar por el cociente). Los teoremas de idempotencia, equivalencia e unicidad están en desarrollo (M4B).
+**Estado:** 🔵 En progreso — `canonicalRep` es computable; teoremas con sorry.
+**Última proyección:** 2026-06-05
+
+**Depende de:** `AczelSetTheory.Integers.Basic`
+
+### Definición
+
+**[Zc1]** `ℤ₀.canonicalRep : ℕ₀ × ℕ₀ → ℕ₀ × ℕ₀`
+- **Lean 4:** `def canonicalRep : ℕ₀ × ℕ₀ → ℕ₀ × ℕ₀ | (a, b) => if h : b ≤ a then (a - b, 0) else (0, b - a)`
+- **Matemática:** El representante canónico de $(a,b)$: $(a-b,\, 0)$ si $b \leq a$, $(0,\, b-a)$ si $a < b$.
+- **Computable:** Sí
+
+### Teoremas en desarrollo (M4B — sorry)
+
+Los siguientes teoremas son esqueletos con sorry, pendientes de completar:
+- `canonicalRep_idempotent (p : ℕ₀ × ℕ₀) : canonicalRep (canonicalRep p) = canonicalRep p`
+- `canonicalRep_equiv (p : ℕ₀ × ℕ₀) : intEq p (canonicalRep p)`
+- `canonicalRep_unique {p q : ℕ₀ × ℕ₀} (h : intEq p q) : canonicalRep p = canonicalRep q`
+
+---
+
 ## Módulo: `AczelSetTheory/Integers/Rationals.lean`
 
 **Namespace:** `ℚ₀`

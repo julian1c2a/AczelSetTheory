@@ -37,19 +37,20 @@ inferencia + bridge `▸` para igualdad definitional `HAdd.hAdd ↔ Add.add`.
 
 ---
 
-## 🔵 PENDIENTE — M4B: Representación canónica en ℚ₀
+## 🔵 EN PROGRESO — M4B: Representación canónica en ℤ₀
 
-`AczelSetTheory/Reals/CanonicalRep.lean`: `canonicalRep`, `repr`, `Decidable` en ℚ₀.
+`AczelSetTheory/Integers/Canonical.lean`: esqueleto creado 2026-06-05.
 
----
+| ID | Estado | Tarea |
+|----|--------|-------|
+| M4B-1 | ✅ DONE | `canonicalRep : ℕ₀ × ℕ₀ → ℕ₀ × ℕ₀` — computable, definido |
+| M4B-2 | 🔵 sorry | `canonicalRep_idempotent` — `canonicalRep ∘ canonicalRep = canonicalRep` |
+| M4B-3 | 🔵 sorry | `canonicalRep_equiv` — `intEq p (canonicalRep p)` |
+| M4B-4 | 🔵 sorry | `canonicalRep_unique` — `intEq p q → canonicalRep p = canonicalRep q` |
+| M4B-5 | ⏳ PENDING | Vincular `canonicalRep` con `repr` de `Basic.lean` (igualdad vía `intEq`) |
 
-## 🔵 PENDIENTE — M5B: ℤ/Nℤ y campos finitos
-
----
-
-## 🔵 PENDIENTE — M4B: Representación canónica en ℚ₀
-
-`AczelSetTheory/Reals/CanonicalRep.lean`: `canonicalRep`, `repr`, `Decidable` en ℚ₀.
+**Nota de diseño:** `intEq` hecho público en `Basic.lean`. `repr`/`mk_repr` viven en
+`Basic.lean` (via `normalize`); `Canonical.lean` no los reduplica. Ver ADR-014.
 
 ---
 
