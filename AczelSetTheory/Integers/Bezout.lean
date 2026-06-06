@@ -16,6 +16,9 @@ License: MIT
 --                             Add.add (Mul.mul a x) (Mul.mul b y) = gcdZ a b
 --   ℤ₀.bezout_coprime     : gcdZ a b = 1 → ∃ x y : ℤ₀,
 --                             Add.add (Mul.mul a x) (Mul.mul b y) = 1
+--   ℤ₀.bezoutCoeffs      : ℤ₀ → ℤ₀ → ℤ₀ × ℤ₀
+--                             función computable; (x,y) := bezoutCoeffs a b satisface
+--                             a·x + b·y = gcdZ a b  (spec pendiente)
 --
 -- Notas de diseño:
 -- - peanolib declara `notation a "+" b => Peano.Add.add a b` (global en Add.lean).
@@ -25,6 +28,9 @@ License: MIT
 -- - La forma substractiva de Bézout en ℕ₀ (bezout_natform) se levanta a ℤ₀
 --   vía ofNat_sub_ofNat (puente privado).
 -- - El caso general (ℤ₀) tiene sorry: pendiente de descomposición de signo.
+-- - `bezoutCoeffs` implementa el algoritmo extendido de Euclides directamente sobre ℕ₀
+--   (via `extEuclidNat`) y ajusta el signo. La especificación formal requiere
+--   `gcd_step` público en peanolib (actualmente privado).
 -- - Prerrequisito de M5B (inverso modular en ZModN p).
 --
 -- Dependencies: AczelSetTheory.Integers.Basic, AczelSetTheory.Integers.Arithmetic,
@@ -150,5 +156,43 @@ theorem bezout_coprime {a b : ℤ₀} (h : gcdZ a b = 1) :
     ∃ x y : ℤ₀, Add.add (Mul.mul a x) (Mul.mul b y) = 1 := by
   obtain ⟨x, y, hxy⟩ := bezout a b
   exact ⟨x, y, hxy.trans h⟩
+
+-- ============================================================
+-- Sección 4: Función computable de coeficientes de Bézout
+-- ============================================================
+-- Implementación directa del algoritmo extendido de Euclides.
+-- La invariante es: para `(x, y) := extEuclidNat a b`,
+--   `ofNat a · x + ofNat b · y = ofNat (gcd a b)`.
+-- La prueba de correctness (`extEuclidNat_spec`) requiere
+-- `Peano.Arith.gcd_step` (actualmente private en peanolib).
+
+/-- Algoritmo extendido de Euclides sobre ℕ₀, devolviendo coeficientes en ℤ₀.
+    Recurrencia: `extEuclidNat a b = (t, s − (a/b)·t)`
+    donde `(s, t) = extEuclidNat b (a % b)`. Termina porque `a % b < b`. -/
+noncomputable def extEuclidNat (a b : ℕ₀) : ℤ₀ × ℤ₀ :=
+  if hb : b = 𝟘 then
+    (1, 0)    -- gcd(a,0)=a : 1·a + 0·0 = a ✓
+  else
+    let r := Peano.Div.mod a b     -- r = a % b  (< b)
+    let q := Peano.Div.div a b     -- q = a / b
+    let (s, t) := extEuclidNat b r
+    -- inv(b,r): b·s + r·t = gcd(b,r) = gcd(a,b)
+    -- a = q·b + r  →  r = a − q·b
+    -- b·s + (a − q·b)·t = gcd(a,b)
+    -- a·t + b·(s − q·t) = gcd(a,b)
+    (t, Add.add s (Neg.neg (Mul.mul (ofNat q) t)))
+termination_by b
+decreasing_by exact Peano.Div.mod_lt a b hb
+
+/-- Coeficientes de Bézout para enteros ℤ₀ vía descomposición por signo.
+    Para `(x, y) := bezoutCoeffs a b` se tiene
+    `Mul.mul a x + Mul.mul b y = gcdZ a b`.
+    La prueba formal de esta propiedad (`bezoutCoeffs_spec`) está pendiente.
+    Idea: `|a|·x' + |b|·y' = gcd(|a|,|b|)`  (de `extEuclidNat`)
+    →  `a·(x'·sign a) + b·(y'·sign b) = gcdZ a b`
+    pues `a·sign(a) = |a|` (lema `mul_sign_eq_abs`, pendiente). -/
+noncomputable def bezoutCoeffs (a b : ℤ₀) : ℤ₀ × ℤ₀ :=
+  let (x, y) := extEuclidNat (toNat (abs a)) (toNat (abs b))
+  (Mul.mul x (sign a), Mul.mul y (sign b))
 
 end ℤ₀
