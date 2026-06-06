@@ -2270,6 +2270,40 @@ Los siguientes teoremas son esqueletos con sorry, pendientes de completar:
 
 ---
 
+## Módulo: `AczelSetTheory/Integers/ZModN.lean`
+
+**Namespace:** `HFAlgebra`
+**Descripción:** El anillo ℤ/nℤ construido como un `HFRing` **finito** (`n ≠ 𝟘`). Por ADR-016 (finitud hereditaria de `HFSet`), no se construye como cociente de ℤ₀ (infinito) sino como un anillo finito cuyo portador es el **ordinal de von Neumann** `vN n = {vN 0, …, vN (n−1)}`; cada residuo es el HFSet `vN k` con `k < n`. Las operaciones usan el puente `card`/`vN` con reducción módulo `n`, y los axiomas de anillo se reducen a la aritmética modular de ℕ₀ (`Peano.ModEq`).
+**Estado:** ✅ Completo — 0 sorry, 0 noncomputable, 0 warnings.
+**Última proyección:** 2026-06-06
+
+**Depende de:** `AczelSetTheory.Algebra.Ring`, `AczelSetTheory.VN.{Arithmetic,IsNat,CardVN}`, `Peano.PeanoNat.NumberTheory.ModEq`
+
+**Usado por:** (futuro) estructura de cuerpo `IsField (ZModN p)` para `p` primo, vía `bezout_coprime_ofNat`.
+
+### Construcción
+
+**[ZM1]** `HFAlgebra.ZModN (n : ℕ₀) (hn : n ≠ 𝟘) : HFRing`
+- **Matemática:** el anillo unitario ℤ/nℤ. Portador `vN n`; con
+  - `add x y := vN ((card x + card y) mod n)`,
+  - `mul x y := vN ((card x · card y) mod n)`,
+  - `zero := vN 𝟘`, `one := vN (𝟙 mod n)`, `neg x := vN ((n − card x) mod n)`.
+- **Estrategia:** los axiomas se prueban con `show` (β-reducción del campo) + `simp only [card_vN]` (colapsa `card (vN k) → k`) + reescritura con lemas de absorción modular (`zmod_add_left/right`, `zmod_mul_left/right`, derivados de `Peano.ModEq.{add_mod,mul_mod,mod_mod}`) y las leyes de anillo de ℕ₀. El cierre usa `mod_lt`; `zero_mem` usa `pos_of_ne_zero n hn`; `neg_add` usa `sub_k_add_k` + `mod_self`.
+
+### Lemas auxiliares (privados)
+
+- `zmod_add_left`, `zmod_add_right`, `zmod_mul_left`, `zmod_mul_right` — absorción de `mod` en sumas/productos: `(a%n ∘ c) % n = (a ∘ c) % n`.
+- `zmod_mem (hn : n ≠ 𝟘) (k) : vN (k mod n) ∈ vN n` — todo residuo pertenece al portador.
+- `zmod_eq_vN_card (hx : x ∈ vN n) : x = vN (card x)` — todo elemento del ordinal es el von-Neumann de su cardinal (vía `isNat_mem_isNat` + `vN_mem_range` + `card_vN`).
+- `zmod_card_lt (hx : x ∈ vN n) : card x < n`.
+- `zmod_eq_vN_mod (hx : x ∈ vN n) : x = vN (card x mod n)` — forma reducida (usa `mod_of_lt`).
+
+### Pendientes (trabajo futuro)
+
+- `ZModN.mk : ℤ₀ → ... ` (proyección de un entero a su residuo), `IsCommRing`/conmutatividad explícita, y `IsField (ZModN p)` para `p` primo (inverso modular vía Bézout). No desarrollado en esta fase.
+
+---
+
 ## Módulo: `AczelSetTheory/Integers/Rationals.lean`
 
 **Namespace:** `ℚ₀`

@@ -6,6 +6,35 @@ All notable changes to this project are documented here.
 
 ---
 
+## [2026-06-06] — M5B: anillo ℤ/nℤ (`ZModN`) como HFRing finito
+
+### Added
+
+- **`AczelSetTheory/Integers/ZModN.lean`** (reescrito desde esqueleto):
+  - `HFAlgebra.ZModN (n : ℕ₀) (hn : n ≠ 𝟘) : HFRing` — anillo ℤ/nℤ finito.
+  - Portador = ordinal de von Neumann `vN n = {vN 0, …, vN (n−1)}`; cada residuo es
+    `vN k` con `k < n`. Operaciones vía puente `card`/`vN` con reducción módulo `n`.
+  - Axiomas de anillo reducidos a la aritmética modular de ℕ₀ (`Peano.ModEq`).
+  - Helpers privados: `zmod_add_left/right`, `zmod_mul_left/right` (absorción de `mod`),
+    `zmod_mem`, `zmod_eq_vN_card`, `zmod_card_lt`, `zmod_eq_vN_mod`.
+- **`doc/REFERENCE-Arithmetic.md`**: nueva sección del módulo ZModN ([ZM1]).
+- **`REFERENCE.md`**: fila #109 (Topology renumerado #110–#113); barrel `Integers.lean`
+  actualizado con `ZModN`.
+
+### Notes
+
+- **ADR-016**: por la finitud hereditaria de `HFSet`, ℤ/nℤ se construye como HFRing
+  finito (portador `vN n`), no como cociente de ℤ₀ (infinito).
+- Pendiente (trabajo futuro): `ZModN.mk : ℤ₀ → …`, conmutatividad explícita,
+  e `IsField (ZModN p)` para `p` primo (inverso modular vía Bézout).
+
+### Build
+
+- ✅ `lake build` limpio: 0 errores, 0 warnings, 35 jobs OK.
+- `ZModN.lean`: **0 sorry / 0 noncomputable / 0 warnings** (compiló a la primera).
+
+---
+
 ## [2026-06-06] — M5B: anillo cociente genérico + identidad de Bézout en ℤ₀
 
 ### Added

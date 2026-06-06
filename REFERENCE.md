@@ -146,14 +146,15 @@ Below are the keys for reading and searching theorems.
 | 106 | `AczelSetTheory/Integers/Rationals/AbsVal.lean` | `ℚ₀` | ✅ Complete | Integers/Rationals | Integers/Rationals/IsCauchy, Integers/Rationals/Density, Integers.lean |
 | 107 | `AczelSetTheory/Integers/Rationals/IsCauchy.lean` | `ℚ₀` | ✅ Complete | Integers/Rationals, Integers/Rationals/AbsVal, `Peano.PeanoNat.Combinatorics.Pow` | Integers.lean |
 | 108 | `AczelSetTheory/Integers/Rationals/Density.lean` | `ℚ₀` | 🚧 Skeleton | Integers/Rationals, Integers/Rationals/AbsVal | Integers.lean |
-| 109 | `AczelSetTheory/Topology/Basic.lean` | `HFTopology` | ✅ Complete | HFSets, Axioms/{Union,Intersection,Setminus,Subset,Singleton} | Topology/Interior, Topology/Neighborhoods, Topology/Subspace |
-| 110 | `AczelSetTheory/Topology/Interior.lean` | `HFTopology` | ⚠️ sorry | Topology/Basic, Axioms/{Separation,Intersection,Setminus} | — |
-| 111 | `AczelSetTheory/Topology/Neighborhoods.lean` | `HFTopology` | ⚠️ sorry | Topology/Basic, Axioms/{Separation,Powerset} | — |
-| 112 | `AczelSetTheory/Topology/Subspace.lean` | `HFTopology` | ⚠️ sorry | Topology/Basic, Axioms/{Separation,Powerset} | — |
+| 109 | `AczelSetTheory/Integers/ZModN.lean` | `HFAlgebra` | ✅ Complete | Algebra/Ring, VN/{Arithmetic,IsNat,CardVN}, `Peano.PeanoNat.NumberTheory.ModEq` | Integers.lean |
+| 110 | `AczelSetTheory/Topology/Basic.lean` | `HFTopology` | ✅ Complete | HFSets, Axioms/{Union,Intersection,Setminus,Subset,Singleton} | Topology/Interior, Topology/Neighborhoods, Topology/Subspace |
+| 111 | `AczelSetTheory/Topology/Interior.lean` | `HFTopology` | ⚠️ sorry | Topology/Basic, Axioms/{Separation,Intersection,Setminus} | — |
+| 112 | `AczelSetTheory/Topology/Neighborhoods.lean` | `HFTopology` | ⚠️ sorry | Topology/Basic, Axioms/{Separation,Powerset} | — |
+| 113 | `AczelSetTheory/Topology/Subspace.lean` | `HFTopology` | ⚠️ sorry | Topology/Basic, Axioms/{Separation,Powerset} | — |
 | — | `AczelSetTheory/Topology.lean` | — | ✅ Barrel | Topology/{Basic,Interior,Neighborhoods,Subspace} | AczelSetTheory.lean |
 | — | `AczelSetTheory/VN.lean` | — | ✅ Complete | VN/{Basic,Injective,IsNat,Arithmetic,FSet,PeanoAxioms,PeanoArith,PowVN,SubVN,DivVN,FactorialVN,CardVN,RankVN} | AczelSetTheory.lean |
 | — | `AczelSetTheory/PList.lean` | — | ✅ Complete | PList/{Basic,Lemmas,Omega0} | AczelSetTheory.lean |
-| — | `AczelSetTheory/Integers.lean` | — | ✅ Complete | Integers/{Basic,Order,Functions,Arithmetic,Bijection,PadicVal,MobiusLiouville,Canonical,Bezout,Rationals,Rationals/AbsVal,Rationals/IsCauchy,Rationals/Density} | AczelSetTheory.lean |
+| — | `AczelSetTheory/Integers.lean` | — | ✅ Complete | Integers/{Basic,Order,Functions,Arithmetic,Bijection,PadicVal,MobiusLiouville,Canonical,Bezout,ZModN,Rationals,Rationals/AbsVal,Rationals/IsCauchy,Rationals/Density} | AczelSetTheory.lean |
 | — | `AczelSetTheory.lean` | — | ✅ Complete | PList, CList, HFSets, Operations/*, Axioms/*, Integers, Notation | Main |
 | — | `Main.lean` | — | ✅ Complete | CList.Basic | — |
 
@@ -559,5 +560,6 @@ Key proven theorems (non-sorry):
 | 2026-06-06 | **M5B.0 Integers/Bezout.lean** (#104): proyección de la identidad de Bézout en ℤ₀ — `bezout_ofNat`, `bezout_coprime_ofNat` (sin sorry), algoritmo extendido de Euclides `extEuclidNat` + correctness `extEuclidNat_spec` (sin sorry), `bezoutCoeffs` (computable); `bezout`/`bezout_coprime` generales marcados como pendientes (1 sorry, descomposición por signo); actualización a peanolib `b7ccbd0` (`gcd_step` público); nueva sección en `doc/REFERENCE-Arithmetic.md`, fila #104 en índice raíz (renumerado #104–#112) | GitHub Copilot |
 | 2026-06-06 | **M5B Algebra/QuotientRing.lean**: constructor genérico del anillo cociente `R/I` — `HFIdeal` (ideal bilátero), `HFIdeal.toAddSubgroup` + `toAddSubgroup_isNormal` (todo ideal normal en grupo aditivo abeliano), `quotientMul` + `mul_welldefined` (buena-definición vía absorción y telescopio `(g'h')−(gh) = g'(h'−h)+(g'−g)h`), `quotientMul_cosetOf`, `quotientAdd_cosetOf`, `HFRing.quotient` (HFRing completo reutilizando `quotientGroup` para la parte aditiva); 0 sorry / 0 noncomputable / 0 warnings; ADR-016 (bloqueo de finitud: no hay `HFRing_of_ℤ₀`); proyectado en `doc/REFERENCE-Algebra.md` §8 | GitHub Copilot |
 | 2026-06-06 | **Bézout general ℤ₀ completado** (#104): cierre del único `sorry` de `bezout`/`bezout_coprime` vía descomposición de signo (`self_eq_or_neg_ofNat_toNat_abs`, `mul_ofNat_toNat_abs`, privados) reduciendo a `bezout_ofNat (toNat |a|) (toNat |b|)`; Bezout.lean ahora **0 sorry**; fila #104 a ✅ Complete; proyecto entero **0 sorry**; doc/REFERENCE-Arithmetic.md actualizado ([T-Zb4], [T-Zb5]) | GitHub Copilot |
+| 2026-06-06 | **M5B Integers/ZModN.lean** (#109): anillo ℤ/nℤ como `HFRing` finito `HFAlgebra.ZModN (n) (hn : n ≠ 𝟘)` — portador = ordinal de von Neumann `vN n`, operaciones vía puente `card`/`vN` con reducción módulo n; axiomas reducidos a aritmética modular de ℕ₀ (`Peano.ModEq`); helpers privados `zmod_{add,mul}_{left,right}`, `zmod_mem`, `zmod_eq_vN_{card,mod}`, `zmod_card_lt`; 0 sorry / 0 noncomputable / 0 warnings (build a la primera); ADR-016 (finitud hereditaria); fila #109 en índice (Topology renumerado #110–#113); proyectado en doc/REFERENCE-Arithmetic.md | GitHub Copilot |
 
 > To project a file: read it fully, then update sections 1–8 above following AI-GUIDE.md §4–14.

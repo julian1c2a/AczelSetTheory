@@ -9,9 +9,9 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules (non-barrel) | 136 |
-| Total modules (incl. barrels) | 145 |
-| Modules with 0 sorry | 137 / 137 |
+| Total modules (non-barrel) | 137 |
+| Total modules (incl. barrels) | 146 |
+| Modules with 0 sorry | 138 / 138 |
 | Total sorry | 0 |
 | Build status | ✅ Passing — 0 errors, 0 warnings |
 | Lean version | v4.30.0 |
@@ -190,8 +190,7 @@
 | Algebra/Zassenhaus.lean | `prodSubgroup`, `mem_prodSubgroup_iff`, `prodNKHM`, `prodN_HK`, `prodN_HM`, `prodN_HM_normal_in_prodN_HK`, `zassenhaus_bijection` (Lema de la Mariposa) | ✅ |
 | Algebra/QuotientRing.lean | `HFIdeal`, `toAddSubgroup`, `toAddSubgroup_isNormal`, `quotientMul`, `mul_welldefined`, `HFRing.quotient` (anillo cociente genérico) | ✅ |
 
-### Integers/ (8 modules)
-
+### Integers/ (9 modules)
 | Module | Key exports | Status |
 |--------|-------------|--------|
 | Integers/Basic.lean | `ℤ₀`, ring instances, 18 ring laws, `ofNat` | ✅ |
@@ -202,6 +201,7 @@
 | Integers/PadicVal.lean | `padic_val`, `Omega_prime`, multiplicatividad | ✅ |
 | Integers/MobiusLiouville.lean | `μ` (Möbius), `λ` (Liouville), multiplicatividad | ✅ |
 | Integers/Bezout.lean | `bezout_ofNat`, `bezout`, `bezout_coprime`, `extEuclidNat`, `extEuclidNat_spec`, `bezoutCoeffs` | ✅ |
+| Integers/ZModN.lean | `HFAlgebra.ZModN (n) (hn : n ≠ 𝟘) : HFRing` (ℤ/nℤ finito sobre `vN n`) | ✅ |
 
 ### Topology/ (5 modules)
 
@@ -222,7 +222,6 @@ None — **0 sorry** across the entire project.
 ---
 
 ## Recent Achievements (2026-06-06) — M5B: anillo cociente genérico + Bézout en ℤ₀
-
 - ✅ **Anillo cociente `R/I`** genérico sobre `HFRing` — nuevo módulo
   `AczelSetTheory/Algebra/QuotientRing.lean` (0 sorry / 0 noncomputable / 0 warnings).
   - `HFIdeal` (ideal bilátero), `HFRing.quotient` (anillo cociente completo).
@@ -233,6 +232,10 @@ None — **0 sorry** across the entire project.
   - `bezout_ofNat`, `bezout_coprime_ofNat`, `bezoutCoeffs` (computable).
   - `bezout` / `bezout_coprime` generales sobre ℤ₀ completos (reducción a `bezout_ofNat`
     vía descomposición de signo); **0 sorry**.
+- ✅ **Anillo ℤ/nℤ (`ZModN`)** — módulo `AczelSetTheory/Integers/ZModN.lean`.
+  - `HFAlgebra.ZModN (n) (hn : n ≠ 𝟘) : HFRing` — HFRing finito con portador `vN n`
+    (ordinal de von Neumann), operaciones módulo `n` vía puente `card`/`vN`.
+  - Axiomas reducidos a la aritmética modular de ℕ₀ (`Peano.ModEq`); compiló a la primera.
 - ✅ Actualización a peanolib `b7ccbd0` (`gcd_step` público).
 
 ---
