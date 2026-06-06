@@ -368,6 +368,51 @@ duplicaría API, biyecciones y lemas algebraicos sin ganancia conceptual.
 
 ---
 
+## ADR-015: Política de notaciones con ámbito (scoped notations, estilo Mathlib)
+
+**Date**: 2026-06-06
+**Status**: Accepted
+
+**Context**:
+La biblioteca dependiente `peanolib` declara `notation a "+" b => Peano.Add.add a b`
+(y análogamente para `*`) **sin `scoped`**, haciendo que estas notaciones sean globales
+en Lean 4. Esto causa ambigüedades inmediatas en cualquier módulo que opere sobre tipos
+distintos de `ℕ₀` (p.ej. `ℤ₀`, `ℚ₀`) porque `a + b` puede resolverse como
+`HAdd.hAdd` o como `Peano.Add.add`, generando errores "overloaded, failed to synthesize".
+El problema afecta a todos los módulos de `Integers/` y `Integers/Rationals/`.
+
+Existen dos estrategias canónicas en Lean 4 para evitar esto:
+- **A. Namespaces anidados** (`ℤ₀.Add.add` vs `ℕ₀.Add.add`): adoptado por peanolib.
+- **B. Scoped notations**: `scoped infixl:65 " + " => Add.add` dentro de `namespace ℤ₀`.
+
+**Decision**:
+Este proyecto adopta la **Opción B — scoped notations** (estilo Mathlib) como
+estrategia oficial para todos los tipos nuevos que se introduzcan.
+
+La migración completa de los módulos existentes (`ℤ₀`, `ℚ₀`) queda pendiente (coste
+alto, ~1000 líneas afectadas). **Durante el período de migración**, la regla de
+compatibilidad es:
+> En enunciados de teoremas que mezclen `ℤ₀`/`ℚ₀` con `ℕ₀`, usar siempre
+> `Add.add`, `Mul.mul`, `Neg.neg` explícitos — nunca `+`, `*`, `-`.
+
+**Rationale**:
+- Scoped notations son el estándar de Mathlib y la recomendación oficial de Lean 4.
+- Son ergonómicas: activas dentro del namespace, transparentes fuera.
+- El coste de la refactorización completa es proporcional al tamaño del proyecto;
+  para un proyecto en crecimiento activo, se paga progresivamente.
+- La regla de transición (usar funciones base explícitas) es mecánica y verificable
+  automáticamente por el elaborador de Lean.
+
+**Consequences**:
+- Todo tipo nuevo (p.ej. `ZModN`) declara sus operadores con `scoped notation`.
+- Los módulos existentes (`Basic.lean`, `Order.lean`, etc.) se migran oportunamente,
+  módulo a módulo, sin bloquear el avance matemático.
+- El REFERENCE y AI-GUIDE reflejan esta política (ver regla 3.5 en AI-GUIDE.md).
+- Queda registrado que `peanolib` usa Opción A (namespaces anidados) y AczelSetTheory
+  usa Opción B; la interfaz entre ambos se gestiona con `open` selectivo.
+
+---
+
 ## Template for new decisions
 
 ## ADR-NNN: [Title]

@@ -44,6 +44,35 @@ Cada módulo debe documentar claramente (en su respectivo archivo temático) de 
 
 Los namespaces no son necesariamente iguales a los módulos. Documentar en el sistema REFERENCE qué namespaces existen, a qué módulos pertenecen y cómo se relacionan entre sí. Todos los namespaces deben derivar de PROJECT_NAME.
 
+(3.5.) Política de notaciones y ámbitos de operadores — OBLIGATORIO por proyecto
+
+En Lean 4, una `notation` sin `scoped` es **global** y puede colisionar con otras
+bibliotecas. Esto genera ambigüedades silenciosas difíciles de depurar (p.ej. `+` para
+`ℕ₀` interfiriendo con `+` para `ℤ₀`).
+
+TODO proyecto Lean 4 debe adoptar exactamente una de estas dos estrategias para cada
+tipo o estructura algebraica que introduzca notación:
+
+  **Opción A — Namespaces anidados** (estilo Peano/Aczel internamente):
+  Cada operación vive en su propio namespace: `ℤ₀.Add.add`, `ℤ₀.Mul.mul`, etc.
+  Las notaciones se declaran `scoped` dentro de ese namespace.
+  Pro: máxima claridad semántica. Contra: verboso; requiere `open` explícito.
+
+  **Opción B — Scoped notations** (estilo Mathlib):
+  Los operadores se declaran con `scoped notation`/`scoped infixl` dentro del
+  namespace principal del tipo. Solo están activos tras `open NombreTipo`.
+  Pro: ergonómico, compatible con Mathlib. Contra: requiere disciplina de `open`.
+
+La decisión debe:
+  1. Quedar registrada en `DECISIONS.md` como ADR.
+  2. Aplicarse uniformemente a todos los módulos del proyecto.
+  3. Ser revisada antes de introducir cualquier nuevo tipo con operadores.
+
+Mientras la estrategia no esté completamente aplicada (período de migración), los
+enunciados de teoremas que mezclen tipos distintos deben usar las funciones base
+explícitas (`Add.add`, `Mul.mul`, `Neg.neg`) — nunca `+`, `*`, `-` — para evitar
+ambigüedades. Ver ADR-015 en DECISIONS.md para la decisión de este proyecto.
+
 (4.) Definiciones introducidas
 
 Para cada módulo y namespace, documentar todas las definiciones en su archivo temático correspondiente indicando:

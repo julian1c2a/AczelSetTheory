@@ -1676,3 +1676,9 @@ $b^{-1}ab \in A$, luego $ab = b(b^{-1}ab) \in BA$. Por simetría $AB = BA$.
 *(Pasos 5–7: normalidades de $N(H \cap M) \unlhd N(H \cap K)$ y $M(N \cap K) \unlhd M(H \cap K)$,
 y el isomorfismo final por Primer Teorema de Isomorfismo — pendiente de completar en esta
 referencia.)*
+
+# Necesidad de una refactorización a nivel de `namespace`s en este proyecto
+
+He visto algunas dificultades a la hora de trabajar con números naturales y enteros, por confusión entre los signos de operadores `+` entre sí. Esta ambigüedad, que es de preveer, se puede resolver exactamente como en el proyecto Peano: definiendo namespaces separados y anidados para cada estructura algebraica, de modo que `$N_0$.add` y `$Z_0$.add` sean claramente distinguibles. Esto es especialmente importante para funciones multiplicativas como μ y λ, donde el signo es crucial. Para μ(n), el valor es 0 si n no es squarefree, y (-1)^ω(n) si n es squarefree. Para λ(n), el valor es (-1)^Ω(n). Sin un tipo de enteros con signo, no podemos representar estos valores directamente.
+
+DECISIÓN: Portar el esquema de `namespace`s que se puede observar en Peano a todos los niveles acá. Estúdialo con detalle. Haz un plan y consulta conmigo. Realmente debería ser una regla en `AI-GUIDE.md`.
