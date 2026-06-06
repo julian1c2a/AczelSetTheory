@@ -6,6 +6,45 @@ All notable changes to this project are documented here.
 
 ---
 
+## [2026-06-06] — M5B: anillo cociente genérico + identidad de Bézout en ℤ₀
+
+### Added
+
+- **`AczelSetTheory/Algebra/QuotientRing.lean`** (NUEVO): constructor genérico del
+  anillo cociente `R/I` sobre cualquier `HFRing`.
+  - **Públicos:**
+    - `HFIdeal` — ideal bilátero (subgrupo aditivo + absorción `absorb_left`/`absorb_right`).
+    - `HFIdeal.toAddSubgroup`, `HFIdeal.toAddSubgroup_isNormal` — el ideal como subgrupo
+      normal del grupo aditivo (trivial por ser abeliano).
+    - `HFIdeal.quotientMul`, `HFIdeal.mul_welldefined` — multiplicación de cosets y su
+      buena-definición vía la identidad telescópica `(g'h')−(gh) = g'(h'−h)+(g'−g)h ∈ I`.
+    - `HFIdeal.quotientMul_cosetOf`, `HFIdeal.quotientAdd_cosetOf` — `cosetOf` como morfismo.
+    - `HFRing.quotient` — el `HFRing` cociente completo (reutiliza `quotientGroup` para
+      toda la parte aditiva).
+- **`AczelSetTheory/Integers/Bezout.lean`** (NUEVO): identidad de Bézout en ℤ₀.
+  - `bezout_ofNat`, `bezout_coprime_ofNat` (sin sorry).
+  - `extEuclidNat` (algoritmo extendido de Euclides, computable) + `extEuclidNat_spec`
+    (correctness, sin sorry).
+  - `bezoutCoeffs` (computable).
+  - `bezout`/`bezout_coprime` generales: 1 sorry documentado (descomposición por signo).
+- **`AczelSetTheory/Algebra.lean`**: import de `QuotientRing`.
+
+### Changed
+
+- **`lake-manifest.json`**: actualización a peanolib `b7ccbd0` (`gcd_step` público).
+- **`DECISIONS.md`**: nuevo **ADR-016** — anillo cociente genérico sobre `HFRing`
+  (no sobre `ℤ₀`) por el bloqueo de finitud hereditaria de `HFSet`.
+- **`REFERENCE.md`**, **`doc/REFERENCE-Algebra.md`** (§8), **`doc/REFERENCE-Arithmetic.md`**:
+  proyección de los nuevos módulos.
+
+### Build
+
+- ✅ `lake build` limpio: 0 errores, **0 warnings**, 35 jobs OK.
+- `QuotientRing.lean`: **0 sorry / 0 noncomputable / 0 warnings**.
+- `Bezout.lean`: 1 sorry intencional (`bezout` general, pendiente descomposición por signo).
+
+---
+
 ## [2026-06-05] — M7 Zassenhaus: Lema de la Mariposa completo — FASE A cerrada
 
 ### Added

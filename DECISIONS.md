@@ -413,6 +413,48 @@ compatibilidad es:
 
 ---
 
+## ADR-016: Anillo cociente genérico sobre `HFRing` (no sobre `ℤ₀`)
+
+**Date**: 2026-06-06
+**Status**: Accepted
+
+**Context**:
+El plan M5B preveía construir `ZModN` (enteros módulo n) definiendo primero un
+`HFRing_of_ℤ₀ : HFRing` y luego su cociente. Esto es **imposible**: el portador de
+un `HFRing` es `R : HFSet`, y `HFSet := Quotient CList.Setoid` es
+**hereditariamente finito**. Como `ℤ₀` es infinito, no puede ser el portador `R` de
+ningún `HFRing`. No existe en el proyecto ningún `HFRing` concreto de carrier
+infinito (sólo conversiones `toHFRing` de estructuras ya finitas).
+
+**Decision**:
+Se construye un **constructor genérico de anillo cociente** sobre cualquier
+`HFRing` arbitrario, no ligado a `ℤ₀`:
+- `HFIdeal (rng : HFRing)`: ideal bilátero (subgrupo aditivo + absorción bilateral).
+- `HFRing.quotient (rng) (J : HFIdeal rng) : HFRing`: el anillo cociente `R/I`.
+
+La parte **aditiva** se hereda íntegra de `quotientGroup rng.toAdditiveHFGroup
+J.toAddSubgroup hn` (todo ideal es normal en el grupo aditivo abeliano). Sólo se
+define la **multiplicación** sobre cosets, con buena-definición vía la absorción del
+ideal: `(g'·h') − (g·h) = g'·(h'−h) + (g'−g)·h ∈ I`.
+
+**Rationale**:
+- Respeta la restricción de finitud hereditaria de `HFSet` sin hacks.
+- Maximiza reutilización: toda la maquinaria de cosets/representantes de
+  `QuotientGroup.lean` se aprovecha para la estructura aditiva.
+- Es la construcción matemáticamente correcta y reutilizable (sirve para cualquier
+  anillo finito futuro: `ZModN` sobre un `HFRing` finito de `ℤ/nℤ`, anillos de
+  matrices finitas, etc.).
+
+**Consequences**:
+- `ZModN` sobre `ℤ₀` requerirá primero un `HFRing` **finito** que represente
+  `ℤ/nℤ` (carrier `{0,…,n−1}` finito), y luego aplicar `HFRing.quotient` o una
+  construcción directa; queda como trabajo futuro.
+- El módulo `Integers/ZModN.lean` (esqueleto) no se desarrolla en esta fase.
+- `HFRing.quotient` es no-conmutativo por defecto (igual que `HFRing`); el cociente
+  de un anillo conmutativo es conmutativo, pero `HFRing` no rastrea conmutatividad.
+
+---
+
 ## Template for new decisions
 
 ## ADR-NNN: [Title]

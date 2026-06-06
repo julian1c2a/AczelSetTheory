@@ -141,18 +141,19 @@ Below are the keys for reading and searching theorems.
 | 101 | `AczelSetTheory/Integers/Bijection.lean` | `ℤ₀` | ✅ Complete | Integers/Functions, `Peano.PeanoNat.Pairing` | Integers.lean |
 | 102 | `AczelSetTheory/Integers/PadicVal.lean` | `ℤ₀` | ✅ Complete | PList/Omega0, `Peano.PeanoNat.{Arith,Primes,WellFounded,Div}` | Integers/MobiusLiouville |
 | 103 | `AczelSetTheory/Integers/MobiusLiouville.lean` | `ℤ₀` | ✅ Complete | Integers/Basic, Integers/PadicVal | Integers.lean |
-| 104 | `AczelSetTheory/Integers/Rationals.lean` | `ℚ₀` | ✅ Complete | Integers/{Basic,Order,Functions,Arithmetic}, `Peano.PeanoNat.{Arith,Mul}` | Integers/Rationals/AbsVal, Integers/Rationals/Density, Integers.lean |
-| 105 | `AczelSetTheory/Integers/Rationals/AbsVal.lean` | `ℚ₀` | ✅ Complete | Integers/Rationals | Integers/Rationals/IsCauchy, Integers/Rationals/Density, Integers.lean |
-| 106 | `AczelSetTheory/Integers/Rationals/IsCauchy.lean` | `ℚ₀` | ✅ Complete | Integers/Rationals, Integers/Rationals/AbsVal, `Peano.PeanoNat.Combinatorics.Pow` | Integers.lean |
-| 107 | `AczelSetTheory/Integers/Rationals/Density.lean` | `ℚ₀` | 🚧 Skeleton | Integers/Rationals, Integers/Rationals/AbsVal | Integers.lean |
-| 108 | `AczelSetTheory/Topology/Basic.lean` | `HFTopology` | ✅ Complete | HFSets, Axioms/{Union,Intersection,Setminus,Subset,Singleton} | Topology/Interior, Topology/Neighborhoods, Topology/Subspace |
-| 109 | `AczelSetTheory/Topology/Interior.lean` | `HFTopology` | ⚠️ sorry | Topology/Basic, Axioms/{Separation,Intersection,Setminus} | — |
-| 110 | `AczelSetTheory/Topology/Neighborhoods.lean` | `HFTopology` | ⚠️ sorry | Topology/Basic, Axioms/{Separation,Powerset} | — |
-| 111 | `AczelSetTheory/Topology/Subspace.lean` | `HFTopology` | ⚠️ sorry | Topology/Basic, Axioms/{Separation,Powerset} | — |
+| 104 | `AczelSetTheory/Integers/Bezout.lean` | `ℤ₀` | 🔵 Parcial (1 sorry) | Integers/Basic, Integers/Arithmetic, Integers/Order, `Peano.PeanoNat.Arith` | (futuro) Integers/ZModN |
+| 105 | `AczelSetTheory/Integers/Rationals.lean` | `ℚ₀` | ✅ Complete | Integers/{Basic,Order,Functions,Arithmetic}, `Peano.PeanoNat.{Arith,Mul}` | Integers/Rationals/AbsVal, Integers/Rationals/Density, Integers.lean |
+| 106 | `AczelSetTheory/Integers/Rationals/AbsVal.lean` | `ℚ₀` | ✅ Complete | Integers/Rationals | Integers/Rationals/IsCauchy, Integers/Rationals/Density, Integers.lean |
+| 107 | `AczelSetTheory/Integers/Rationals/IsCauchy.lean` | `ℚ₀` | ✅ Complete | Integers/Rationals, Integers/Rationals/AbsVal, `Peano.PeanoNat.Combinatorics.Pow` | Integers.lean |
+| 108 | `AczelSetTheory/Integers/Rationals/Density.lean` | `ℚ₀` | 🚧 Skeleton | Integers/Rationals, Integers/Rationals/AbsVal | Integers.lean |
+| 109 | `AczelSetTheory/Topology/Basic.lean` | `HFTopology` | ✅ Complete | HFSets, Axioms/{Union,Intersection,Setminus,Subset,Singleton} | Topology/Interior, Topology/Neighborhoods, Topology/Subspace |
+| 110 | `AczelSetTheory/Topology/Interior.lean` | `HFTopology` | ⚠️ sorry | Topology/Basic, Axioms/{Separation,Intersection,Setminus} | — |
+| 111 | `AczelSetTheory/Topology/Neighborhoods.lean` | `HFTopology` | ⚠️ sorry | Topology/Basic, Axioms/{Separation,Powerset} | — |
+| 112 | `AczelSetTheory/Topology/Subspace.lean` | `HFTopology` | ⚠️ sorry | Topology/Basic, Axioms/{Separation,Powerset} | — |
 | — | `AczelSetTheory/Topology.lean` | — | ✅ Barrel | Topology/{Basic,Interior,Neighborhoods,Subspace} | AczelSetTheory.lean |
 | — | `AczelSetTheory/VN.lean` | — | ✅ Complete | VN/{Basic,Injective,IsNat,Arithmetic,FSet,PeanoAxioms,PeanoArith,PowVN,SubVN,DivVN,FactorialVN,CardVN,RankVN} | AczelSetTheory.lean |
 | — | `AczelSetTheory/PList.lean` | — | ✅ Complete | PList/{Basic,Lemmas,Omega0} | AczelSetTheory.lean |
-| — | `AczelSetTheory/Integers.lean` | — | ✅ Complete | Integers/{Basic,Order,Functions,Arithmetic,Bijection,PadicVal,MobiusLiouville,Rationals,Rationals/AbsVal,Rationals/IsCauchy,Rationals/Density} | AczelSetTheory.lean |
+| — | `AczelSetTheory/Integers.lean` | — | ✅ Complete | Integers/{Basic,Order,Functions,Arithmetic,Bijection,PadicVal,MobiusLiouville,Canonical,Bezout,Rationals,Rationals/AbsVal,Rationals/IsCauchy,Rationals/Density} | AczelSetTheory.lean |
 | — | `AczelSetTheory.lean` | — | ✅ Complete | PList, CList, HFSets, Operations/*, Axioms/*, Integers, Notation | Main |
 | — | `Main.lean` | — | ✅ Complete | CList.Basic | — |
 
@@ -211,7 +212,7 @@ PList/Omega0 + Peano.PeanoNat.{Arith,Primes,WellFounded,Div}
 | `HFSet` | HFSets, Operations/*, Axioms/*, Notation | Quotient type and its API |
 | `PList` | PList/Basic, PList/Lemmas | Polymorphic list type with ℕ₀ indexing; bridge to `List` |
 | `PList.Omega0` | PList/Omega0 | Bridge lemmas `ψ_*` used internally by the `omega₀` tactic |
-| `ℤ₀` | Integers/{Basic,Order,Functions,Arithmetic,Bijection,PadicVal,MobiusLiouville} | Integers as quotient `Quotient intSetoid`; ring operations, p-adic val, μ, λ |
+| `ℤ₀` | Integers/{Basic,Order,Functions,Arithmetic,Bijection,PadicVal,MobiusLiouville,Canonical,Bezout} | Integers as quotient `Quotient intSetoid`; ring operations, p-adic val, μ, λ, Bézout |
 | (top-level) | Basic | `CList` inductive type defined at top level, operations inside `namespace CList` |
 
 ---
@@ -555,5 +556,7 @@ Key proven theorems (non-sorry):
 | 2026-06-02 | Sprint D2: cierre del residual `placeholder/stub` en `VN/{ActionVN,CorrespondenceTheoremVN,FirstIsomorphismVN,SecondIsomorphismVN,ThirdIsomorphismVN,QuotientGroupVN,NormalSubgroupVN}.lean`; matriz regenerada tras cada cierre individual y estado final en **0** módulos con `placeholder/stub` | GitHub Copilot |
 | 2026-06-03 | **Algebra/Sylow.lean §33–§40 + §37-II**: Primer Teorema de Sylow completo (`sylow_first`, `exists_isSylowSubgroup_of_isSylowExponent`, `exists_isPSubgroup_of_isSylowExponent`, `not_dvd_index_of_isSylowSubgroup`, `not_dvd_card_cosets_of_isSylowSubgroup`); Segundo Teorema de Sylow estructura completa (`sylowConjugate`, `SylowConjugateTotal_of_isSylowExponent`, `sylowSecondConjugacyTarget_of_isSylowExponent`) con 1 sorry documentado (punto fijo del p-grupo); proyectado en `doc/REFERENCE-Algebra.md` | GitHub Copilot |
 | 2026-06-05 | **M7 Algebra/Zassenhaus.lean** (684 LOC): Lema de la Mariposa completo — `prodSubgroup`, `mem_prodSubgroup_iff`, `inter_N_K_normal_in_inter_H_K`, `inter_H_M_normal_in_inter_H_K`, `prodNKHM`, `prodNKHM_normal`, `prodN_HK`, `prodN_HM`, `prodN_HM_le_prodN_HK`, `prodN_HM_normal_in_prodN_HK`, `zassenhaus_bijection`; cierre del `sorry` residual de Sylow II §37; build limpio (0 errores / 0 warnings / 0 sorry / 0 noncomputable); upgrade a Lean v4.30.0; **FASE A (M1–M7) cerrada**; proyectado en `doc/REFERENCE-Algebra.md` §7 | GitHub Copilot |
+| 2026-06-06 | **M5B.0 Integers/Bezout.lean** (#104): proyección de la identidad de Bézout en ℤ₀ — `bezout_ofNat`, `bezout_coprime_ofNat` (sin sorry), algoritmo extendido de Euclides `extEuclidNat` + correctness `extEuclidNat_spec` (sin sorry), `bezoutCoeffs` (computable); `bezout`/`bezout_coprime` generales marcados como pendientes (1 sorry, descomposición por signo); actualización a peanolib `b7ccbd0` (`gcd_step` público); nueva sección en `doc/REFERENCE-Arithmetic.md`, fila #104 en índice raíz (renumerado #104–#112) | GitHub Copilot |
+| 2026-06-06 | **M5B Algebra/QuotientRing.lean**: constructor genérico del anillo cociente `R/I` — `HFIdeal` (ideal bilátero), `HFIdeal.toAddSubgroup` + `toAddSubgroup_isNormal` (todo ideal normal en grupo aditivo abeliano), `quotientMul` + `mul_welldefined` (buena-definición vía absorción y telescopio `(g'h')−(gh) = g'(h'−h)+(g'−g)h`), `quotientMul_cosetOf`, `quotientAdd_cosetOf`, `HFRing.quotient` (HFRing completo reutilizando `quotientGroup` para la parte aditiva); 0 sorry / 0 noncomputable / 0 warnings; ADR-016 (bloqueo de finitud: no hay `HFRing_of_ℤ₀`); proyectado en `doc/REFERENCE-Algebra.md` §8 | GitHub Copilot |
 
 > To project a file: read it fully, then update sections 1–8 above following AI-GUIDE.md §4–14.

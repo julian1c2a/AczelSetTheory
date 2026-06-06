@@ -1957,3 +1957,96 @@ Prueba del Lema de la Mariposa de Zassenhaus: dados `N ⊴ H` y `M ⊴ K` subgru
 - El módulo usa section Zassenhaus con variables `{grp} (H K N M : HFSubgroup grp) (hNH hMK hMH hNN hMM)`; el orden de declaración es relevante para el auto-binding de Lean.
 - Importa Algebra.QuotientGroup y Algebra.FirstIsomorphism (para Bijective).
 - Privados internos (prodNKHM_in_HK, prodN_HM_in_prodN_HK, zassenhaus_hom, zassenhaus_hom_injective, zassenhaus_hom_surjective, etc.) componen la prueba pero no se exportan.
+
+---
+
+## 8. Algebra/QuotientRing.lean — Anillo cociente R/I (M5B ✅, 2026-06-06)
+
+**Ruta:** AczelSetTheory/Algebra/QuotientRing.lean
+**Namespace:** `HFAlgebra`
+**Estado:** ✅ Completo, 0 sorries, 0 noncomputable, 0 warnings.
+
+Constructor genérico del **anillo cociente** `R/I` para un ideal bilátero `I` de
+un `HFRing` arbitrario. La estructura **aditiva** se hereda íntegra del grupo
+cociente `quotientGroup R.toAdditiveHFGroup I.toAddSubgroup hn` (todo ideal es
+normal en el grupo aditivo, que es abeliano); sólo se define la **multiplicación**
+sobre cosets y se prueba su buena-definición vía absorción del ideal.
+
+### 8.1 Estructura `HFIdeal`
+
+```lean
+structure HFIdeal (rng : HFRing) where
+  I            : HFSet
+  I_sub        : ∀ {x : HFSet}, x ∈ I → x ∈ rng.R
+  zero_mem     : rng.zero ∈ I
+  add_closed   : ∀ {a b : HFSet}, a ∈ I → b ∈ I → rng.add a b ∈ I
+  neg_closed   : ∀ {a : HFSet}, a ∈ I → rng.neg a ∈ I
+  absorb_left  : ∀ {r a : HFSet}, r ∈ rng.R → a ∈ I → rng.mul r a ∈ I
+  absorb_right : ∀ {r a : HFSet}, r ∈ rng.R → a ∈ I → rng.mul a r ∈ I
+```
+
+- **Math**: Ideal bilátero `I ⊴ R`: subgrupo aditivo cerrado por absorción multiplicativa por ambos lados.
+
+### 8.2 El ideal como subgrupo aditivo normal
+
+```lean
+def HFIdeal.toAddSubgroup (J : HFIdeal rng) : HFSubgroup rng.toAdditiveHFGroup
+
+theorem HFIdeal.toAddSubgroup_isNormal (J : HFIdeal rng) : J.toAddSubgroup.isNormal
+
+abbrev HFIdeal.addQuot (J : HFIdeal rng) : HFGroup :=
+  quotientGroup rng.toAdditiveHFGroup J.toAddSubgroup J.toAddSubgroup_isNormal
+```
+
+- **Math**: Todo ideal es normal en el grupo aditivo (abeliano): `g + n − g = n ∈ I`.
+- **Prueba** (`toAddSubgroup_isNormal`): conmutatividad y cancelación: `(g + n) + (−g) = (n + g) + (−g) = n + (g + (−g)) = n + 0 = n`.
+
+### 8.3 Multiplicación cociente y buena-definición
+
+```lean
+abbrev HFIdeal.quotientMul (J : HFIdeal rng) (C₁ C₂ : HFSet) : HFSet :=
+  J.toAddSubgroup.rightCoset
+    (rng.mul (J.toAddSubgroup.cosetRep C₁) (J.toAddSubgroup.cosetRep C₂))
+
+theorem HFIdeal.mul_welldefined (J : HFIdeal rng) {g g' h h' : HFSet}
+    (hg : g ∈ rng.R) (hg' : g' ∈ rng.R) (hh : h ∈ rng.R) (hh' : h' ∈ rng.R)
+    (hgg' : J.toAddSubgroup.rightCoset g = J.toAddSubgroup.rightCoset g')
+    (hhh' : J.toAddSubgroup.rightCoset h = J.toAddSubgroup.rightCoset h') :
+    J.toAddSubgroup.rightCoset (rng.mul g h)
+      = J.toAddSubgroup.rightCoset (rng.mul g' h')
+
+theorem HFIdeal.quotientMul_cosetOf (J : HFIdeal rng) {g h : HFSet}
+    (hg : g ∈ rng.R) (hh : h ∈ rng.R) :
+    J.quotientMul (J.toAddSubgroup.cosetOf g) (J.toAddSubgroup.cosetOf h)
+      = J.toAddSubgroup.cosetOf (rng.mul g h)
+
+theorem HFIdeal.quotientAdd_cosetOf (J : HFIdeal rng) {g h : HFSet}
+    (hg : g ∈ rng.R) (hh : h ∈ rng.R) :
+    J.toAddSubgroup.quotientOp (J.toAddSubgroup.cosetOf g) (J.toAddSubgroup.cosetOf h)
+      = J.toAddSubgroup.cosetOf (rng.add g h)
+```
+
+- **Math**: La multiplicación de cosets `(I+g)(I+h) := I + g·h` está bien definida.
+- **Prueba** (`mul_welldefined`): identidad telescópica `(g'·h') − (g·h) = g'·(h'−h) + (g'−g)·h`. Como `h'−h ∈ I` y `g'−g ∈ I`, la absorción (`absorb_left g'`, `absorb_right h`) y la cerradura aditiva sitúan el resultado en `I`. El lema privado `add_telescope` establece `(A−B)+(B−C) = A−C` en el grupo aditivo.
+
+### 8.4 Anillo cociente
+
+```lean
+def HFRing.quotient (rng : HFRing) (J : HFIdeal rng) : HFRing
+```
+
+- **Math**: `R/I` es un anillo (unitario, no necesariamente conmutativo). Portador `R/I = I.cosets`; suma, cero y negación heredadas de `addQuot`; multiplicación `quotientMul`, uno `I + 1`.
+- **Prueba**: los axiomas aditivos (`add_assoc`, `zero_add`, `neg_add`, pertenencias) se toman directamente de `addQuot`; `add_comm` por `rng.add_comm` sobre representantes; los axiomas multiplicativos (`mul_assoc`, `mul_one`, `one_mul`, `left_distrib`, `right_distrib`) se reducen vía los morfismos `quotientMul_cosetOf` / `quotientAdd_cosetOf` a las leyes correspondientes de `rng` sobre representantes (`cosetRep`), siguiendo el patrón de `quotientGroup.op_assoc`.
+
+### Notas técnicas
+
+- **Decisión arquitectónica (ADR-016)**: no existe `HFRing_of_ℤ₀` porque `HFSet` es hereditariamente finito y `ℤ₀` es infinito; ningún anillo infinito puede ser portador `HFRing`. Por ello el cociente se construye de forma **genérica** sobre cualquier `HFRing`, no sobre `ℤ₀`.
+- El lema `add_telescope` es `private`.
+- Reutiliza toda la maquinaria de `Algebra/QuotientGroup.lean` (`cosetRep`, `cosetOf`, `quotientOp`, `quotientOp_cosetOf`, `cosetEq_iff_rightCoset_eq`) para la parte aditiva.
+
+**Exports públicos:**
+
+`HFAlgebra.HFIdeal`, `HFAlgebra.HFIdeal.toAddSubgroup`, `HFAlgebra.HFIdeal.toAddSubgroup_isNormal`,
+`HFAlgebra.HFIdeal.addQuot`, `HFAlgebra.HFIdeal.quotientMul`, `HFAlgebra.HFIdeal.mul_welldefined`,
+`HFAlgebra.HFIdeal.quotientMul_cosetOf`, `HFAlgebra.HFIdeal.quotientAdd_cosetOf`,
+`HFAlgebra.HFRing.quotient`

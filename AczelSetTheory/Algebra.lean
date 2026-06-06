@@ -14,6 +14,7 @@ import AczelSetTheory.Algebra.Module
 import AczelSetTheory.Algebra.LinearSpace
 import AczelSetTheory.Algebra.Lattice
 import AczelSetTheory.Algebra.QuotientGroup
+import AczelSetTheory.Algebra.QuotientRing
 import AczelSetTheory.Algebra.FirstIsomorphism
 import AczelSetTheory.Algebra.SecondIsomorphism
 import AczelSetTheory.Algebra.ThirdIsomorphism

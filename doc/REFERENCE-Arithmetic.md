@@ -2,7 +2,7 @@
 
 > **Proyecto**: Peano
 > **Rama**: `migracion_de_REFERENCE`
-> **Fecha**: 2026-05-21
+> **Fecha**: 2026-06-06
 > **Nodo**: `doc/REFERENCE-Arithmetic.md`
 > **Volver al índice**: [REFERENCE.md](../REFERENCE.md)
 > **Nodos relacionados**: [REFERENCE-Prelim.md](REFERENCE-Prelim.md) · [REFERENCE-NumberTheory.md](REFERENCE-NumberTheory.md) · [REFERENCE-Combinatorics.md](REFERENCE-Combinatorics.md)
@@ -2209,6 +2209,56 @@ Los siguientes teoremas son esqueletos con sorry, pendientes de completar:
 - `canonicalRep_idempotent (p : ℕ₀ × ℕ₀) : canonicalRep (canonicalRep p) = canonicalRep p`
 - `canonicalRep_equiv (p : ℕ₀ × ℕ₀) : intEq p (canonicalRep p)`
 - `canonicalRep_unique {p q : ℕ₀ × ℕ₀} (h : intEq p q) : canonicalRep p = canonicalRep q`
+
+---
+
+## Módulo: `AczelSetTheory/Integers/Bezout.lean`
+
+**Namespace:** `ℤ₀`
+**Descripción:** Identidad de Bézout sobre ℤ₀. Levanta la forma natural disyuntiva (`Peano.Arith.bezout_natform`) a coeficientes en ℤ₀, deriva corolarios de coprimalidad, y provee el algoritmo extendido de Euclides (`extEuclidNat`) con su prueba de correctness (`extEuclidNat_spec`). Prerrequisito de M5B (inverso modular en `ZModN p`).
+**Estado:** 🔵 Parcial — API sobre ℕ₀ y algoritmo extendido sin sorry; caso general ℤ₀ (`bezout`) con sorry pendiente (descomposición por signo).
+**Última proyección:** 2026-06-06
+
+**Depende de:** `AczelSetTheory.Integers.Basic`, `AczelSetTheory.Integers.Arithmetic`, `AczelSetTheory.Integers.Order`, `Peano.PeanoNat.Arith`
+
+**Usado por:** (futuro) `AczelSetTheory.Integers.ZModN` (M5B)
+
+> **Nota de diseño:** peanolib declara `notation a "+" b => Peano.Add.add a b` global, lo que hace `a + b` ambiguo para `a b : ℤ₀`. Por ello los enunciados usan `Add.add` y `Mul.mul` explícitos. Requiere `Peano.Arith.gcd_step` público (peanolib ≥ `v2.0.0-12-gb7ccbd0`).
+
+### Bézout para ℕ₀ (coeficientes en ℤ₀) — sin sorry
+
+**[T-Zb1]** `ℤ₀.bezout_ofNat (a b : ℕ₀) : ∃ x y : ℤ₀, Add.add (Mul.mul (ofNat a) x) (Mul.mul (ofNat b) y) = ofNat (gcd a b)`
+- **Matemática:** Identidad de Bézout: $\exists x, y \in \mathbb{Z}_0,\ a\,x + b\,y = \gcd(a,b)$.
+- **Estrategia:** descomposición de la forma natural disyuntiva `bezout_natform` (`gcd a b = n·a − m·b ∨ gcd a b = n·b − m·a`); puente `ofNat_sub_ofNat` (privado) para la resta truncada.
+
+**[T-Zb2]** `ℤ₀.bezout_coprime_ofNat {a b : ℕ₀} (h : gcd a b = 𝟙) : ∃ x y : ℤ₀, Add.add (Mul.mul (ofNat a) x) (Mul.mul (ofNat b) y) = 1`
+- **Matemática:** Si $\gcd(a,b) = 1$ entonces $\exists x, y,\ a\,x + b\,y = 1$.
+- **Estrategia:** corolario directo de `bezout_ofNat` con `ofNat_one`.
+
+### Algoritmo extendido de Euclides — sin sorry
+
+**[Zb1]** `ℤ₀.extEuclidNat (a b : ℕ₀) : ℤ₀ × ℤ₀` *(noncomputable)*
+- **Lean 4:** recurrencia bien fundada sobre `b`:
+  `extEuclidNat a b = if b = 𝟘 then (1, 0) else (t, s − (a/b)·t)` donde `(s, t) := extEuclidNat b (a % b)`.
+- **Matemática:** coeficientes de Bézout del algoritmo extendido de Euclides; termina porque `a % b < b` (`Peano.Div.mod_lt`).
+- **Computable:** `noncomputable` (depende de operaciones de ℤ₀ vía `Quotient`).
+
+**[T-Zb3]** `ℤ₀.extEuclidNat_spec (a b : ℕ₀) : Add.add (Mul.mul (ofNat a) (extEuclidNat a b).1) (Mul.mul (ofNat b) (extEuclidNat a b).2) = ofNat (Peano.Arith.gcd a b)`
+- **Matemática:** correctness: los coeficientes devueltos satisfacen $a\cdot x + b\cdot y = \gcd(a,b)$.
+- **Estrategia:** inducción bien fundada (`Peano.WellFounded.well_founded_lt.induction`) sobre `b`; caso base `b = 𝟘` vía `extEuclidNat.eq_1 … dif_pos`; caso recursivo usa `gcd_step`, `divMod_spec` y cancelación algebraica (`bezout_ring_cancel`, privado).
+
+### Coeficientes de Bézout para ℤ₀ (función computable)
+
+**[Zb2]** `ℤ₀.bezoutCoeffs (a b : ℤ₀) : ℤ₀ × ℤ₀` *(noncomputable)*
+- **Lean 4:** `let (x, y) := extEuclidNat (toNat (abs a)) (toNat (abs b)); (Mul.mul x (sign a), Mul.mul y (sign b))`
+- **Matemática:** ajusta por signo los coeficientes de Bézout de $|a|, |b|$ para obtener los de $a, b$.
+- **Nota:** la especificación formal `bezoutCoeffs_spec` (que `a·x + b·y = gcdZ a b`) está pendiente (requiere `mul_sign_eq_abs`).
+
+### Pendientes (sorry — NO forman parte de la API estable)
+
+- `ℤ₀.bezout (a b : ℤ₀) : ∃ x y : ℤ₀, Add.add (Mul.mul a x) (Mul.mul b y) = gcdZ a b` — **sorry**; requiere descomposición por signo (`a = sign a · |a|`). No bloquea M5B (que usa `bezout_coprime_ofNat`).
+- `ℤ₀.bezout_coprime {a b : ℤ₀} (h : gcdZ a b = 1) : ∃ x y : ℤ₀, Add.add (Mul.mul a x) (Mul.mul b y) = 1` — depende de `bezout` (sorry).
+- `bezoutCoeffs_spec` — aún no escrita.
 
 ---
 

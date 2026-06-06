@@ -163,8 +163,8 @@ theorem bezout_coprime {a b : ℤ₀} (h : gcdZ a b = 1) :
 -- Implementación directa del algoritmo extendido de Euclides.
 -- La invariante es: para `(x, y) := extEuclidNat a b`,
 --   `ofNat a · x + ofNat b · y = ofNat (gcd a b)`.
--- La prueba de correctness (`extEuclidNat_spec`) requiere
--- `Peano.Arith.gcd_step` (actualmente private en peanolib).
+-- `extEuclidNat_spec` prueba la correctness usando `Peano.Arith.gcd_step`
+-- (público desde peanolib v2.0.0-12-gb7ccbd0).
 
 /-- Algoritmo extendido de Euclides sobre ℕ₀, devolviendo coeficientes en ℤ₀.
     Recurrencia: `extEuclidNat a b = (t, s − (a/b)·t)`
@@ -184,11 +184,79 @@ noncomputable def extEuclidNat (a b : ℕ₀) : ℤ₀ × ℤ₀ :=
 termination_by b
 decreasing_by exact Peano.Div.mod_lt a b hb
 
+/-- Lema algebraico auxiliar: `(A+C)+(D+(-A)) = D+C` en ℤ₀. -/
+private theorem bezout_ring_cancel (A C D : ℤ₀) :
+    Add.add (Add.add A C) (Add.add D (Neg.neg A)) = Add.add D C := by
+  rw [← add_assoc (Add.add A C) D (Neg.neg A),
+      add_assoc A C D,
+      add_assoc A (Add.add C D) (Neg.neg A),
+      add_comm (Add.add C D) (Neg.neg A),
+      ← add_assoc A (Neg.neg A) (Add.add C D),
+      add_neg_self A,
+      zero_add,
+      add_comm C D]
+
+/-- Correctness de `extEuclidNat`: los coeficientes satisfacen la identidad de Bézout. -/
+theorem extEuclidNat_spec (a b : ℕ₀) :
+    Add.add (Mul.mul (ofNat a) (extEuclidNat a b).1)
+            (Mul.mul (ofNat b) (extEuclidNat a b).2) =
+    ofNat (Peano.Arith.gcd a b) := by
+  induction b using Peano.WellFounded.well_founded_lt.induction generalizing a with
+  | h b ih =>
+    by_cases hb : b = 𝟘
+    · -- Caso base: b = 0 → extEuclidNat a 0 = (1, 0)
+      subst hb
+      have h_base : extEuclidNat a 𝟘 = (1, 0) := by
+        rw [extEuclidNat.eq_1 a 𝟘, dif_pos rfl]
+      have h1 : (extEuclidNat a 𝟘).1 = 1 := by rw [h_base]
+      have h2 : (extEuclidNat a 𝟘).2 = 0 := by rw [h_base]
+      rw [h1, h2, Peano.Arith.gcd_zero_right, mul_one, ofNat_zero, mul_zero, add_zero]
+    · -- Caso recursivo: b ≠ 0
+      -- Componentes de extEuclidNat a b en función de extEuclidNat b r
+      have heq : extEuclidNat a b =
+          ((extEuclidNat b (Peano.Div.mod a b)).2,
+           Add.add (extEuclidNat b (Peano.Div.mod a b)).1
+                   (Neg.neg (Mul.mul (ofNat (Peano.Div.div a b))
+                                     (extEuclidNat b (Peano.Div.mod a b)).2))) := by
+        rw [extEuclidNat.eq_1 a b, dif_neg hb]
+      have hc1 : (extEuclidNat a b).1 = (extEuclidNat b (Peano.Div.mod a b)).2 :=
+        congrArg Prod.fst heq
+      have hc2 : (extEuclidNat a b).2 =
+                 Add.add (extEuclidNat b (Peano.Div.mod a b)).1
+                         (Neg.neg (Mul.mul (ofNat (Peano.Div.div a b))
+                                           (extEuclidNat b (Peano.Div.mod a b)).2)) :=
+        congrArg Prod.snd heq
+      -- Hipótesis inductiva: ofNat b · x + ofNat r · y = ofNat (gcd b r)
+      have hlt : Peano.Div.mod a b < b := Peano.Div.mod_lt a b hb
+      have ih_br := ih (Peano.Div.mod a b) hlt b
+      -- Reescribir los coeficientes del objetivo
+      -- hgcd_eq expresa gcd_step con Peano.Div.mod para compatibilidad con ih_br
+      have hgcd_eq : Peano.Arith.gcd a b = Peano.Arith.gcd b (Peano.Div.mod a b) :=
+        Peano.Arith.gcd_step a b hb
+      rw [hc1, hc2, hgcd_eq, ← ih_br]
+      -- Expandir ofNat a = ofNat q · ofNat b + ofNat r
+      have hrw_a : ofNat a = Add.add (Mul.mul (ofNat (Peano.Div.div a b)) (ofNat b))
+                                      (ofNat (Peano.Div.mod a b)) := by
+        have hd := congrArg ofNat (Peano.Div.divMod_spec a b hb)
+        rw [ofNat_add, ofNat_mul] at hd
+        exact hd
+      rw [hrw_a, right_distrib, left_distrib, mul_neg]
+      -- Reescribir (q·b)·y = b·(q·y) para cancelar con -(b·(q·y))
+      have hcomm :
+          Mul.mul (Mul.mul (ofNat (Peano.Div.div a b)) (ofNat b))
+                  (extEuclidNat b (Peano.Div.mod a b)).2 =
+          Mul.mul (ofNat b) (Mul.mul (ofNat (Peano.Div.div a b))
+                                      (extEuclidNat b (Peano.Div.mod a b)).2) := by
+        rw [mul_comm (ofNat (Peano.Div.div a b)) (ofNat b), mul_assoc]
+      rw [hcomm]
+      -- Ahora la meta tiene la forma (A+C)+(D+(-A)) = D+C
+      exact bezout_ring_cancel _ _ _
+
 /-- Coeficientes de Bézout para enteros ℤ₀ vía descomposición por signo.
     Para `(x, y) := bezoutCoeffs a b` se tiene
     `Mul.mul a x + Mul.mul b y = gcdZ a b`.
     La prueba formal de esta propiedad (`bezoutCoeffs_spec`) está pendiente.
-    Idea: `|a|·x' + |b|·y' = gcd(|a|,|b|)`  (de `extEuclidNat`)
+    Idea: `|a|·x' + |b|·y' = gcd(|a|,|b|)`  (de `extEuclidNat_spec`)
     →  `a·(x'·sign a) + b·(y'·sign b) = gcdZ a b`
     pues `a·sign(a) = |a|` (lema `mul_sign_eq_abs`, pendiente). -/
 noncomputable def bezoutCoeffs (a b : ℤ₀) : ℤ₀ × ℤ₀ :=

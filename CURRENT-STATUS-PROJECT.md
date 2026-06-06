@@ -1,6 +1,6 @@
 # Current Project Status — AczelSetTheory
 
-**Last updated:** 2026-06-05
+**Last updated:** 2026-06-06
 **Author**: Julián Calderón Almendros
 
 ---
@@ -9,10 +9,10 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules (non-barrel) | 134 |
-| Total modules (incl. barrels) | 143 |
-| Modules with 0 sorry | 135 / 135 |
-| Total sorry | 0 |
+| Total modules (non-barrel) | 136 |
+| Total modules (incl. barrels) | 145 |
+| Modules with 0 sorry | 136 / 137 |
+| Total sorry | 1 (Integers/Bezout.lean, intencional) |
 | Build status | ✅ Passing — 0 errors, 0 warnings |
 | Lean version | v4.30.0 |
 | Naming convention | Mathlib-style (see NAMING-CONVENTIONS.md) |
@@ -163,7 +163,7 @@
 | VN/FermatVN.lean | `vN_fermat_little`, `vN_wilson` | ✅ |
 | VN/CRTVN.lean | `vN_chinese_remainder` | ✅ |
 
-### Algebra/ (21 modules)
+### Algebra/ (22 modules)
 
 | Module | Key exports | Status |
 |--------|-------------|--------|
@@ -188,8 +188,9 @@
 | Algebra/CorrespondenceTheorem.lean | `preimageSubgroup`, `imageSubgroup_preimage`, `preimageSubgroup_image` | ✅ |
 | Algebra/Sylow.lean | `mckayCarrier`, `mckayShift`, `orbitOf`, `periodOf`, `succ_n_dvd_card_mckayFixedPoints` (D.4.D McKay), `p_group_fixed_point`, `sylowConjugate`, `SylowConjugateTotal_of_isSylowExponent`, 50+ teoremas | ✅ |
 | Algebra/Zassenhaus.lean | `prodSubgroup`, `mem_prodSubgroup_iff`, `prodNKHM`, `prodN_HK`, `prodN_HM`, `prodN_HM_normal_in_prodN_HK`, `zassenhaus_bijection` (Lema de la Mariposa) | ✅ |
+| Algebra/QuotientRing.lean | `HFIdeal`, `toAddSubgroup`, `toAddSubgroup_isNormal`, `quotientMul`, `mul_welldefined`, `HFRing.quotient` (anillo cociente genérico) | ✅ |
 
-### Integers/ (7 modules)
+### Integers/ (8 modules)
 
 | Module | Key exports | Status |
 |--------|-------------|--------|
@@ -200,6 +201,7 @@
 | Integers/Bijection.lean | biyecciones entre ℤ₀ y ℕ₀ | ✅ |
 | Integers/PadicVal.lean | `padic_val`, `Omega_prime`, multiplicatividad | ✅ |
 | Integers/MobiusLiouville.lean | `μ` (Möbius), `λ` (Liouville), multiplicatividad | ✅ |
+| Integers/Bezout.lean | `bezout_ofNat`, `extEuclidNat`, `extEuclidNat_spec`, `bezoutCoeffs` | 🔵 1 sorry |
 
 ### Topology/ (5 modules)
 
@@ -215,11 +217,27 @@
 
 ## Known Sorry Locations
 
-None — **0 sorry** across the entire project.
+- `Integers/Bezout.lean` — **1 sorry**: `bezout`/`bezout_coprime` generales sobre ℤ₀
+  (pendiente descomposición por signo; las versiones `_ofNat` están completas).
 
 ---
 
-## Recent Achievements (2026-06-05) — M7 completo: Lema de la Mariposa de Zassenhaus — FASE A cerrada
+## Recent Achievements (2026-06-06) — M5B: anillo cociente genérico + Bézout en ℤ₀
+
+- ✅ **Anillo cociente `R/I`** genérico sobre `HFRing` — nuevo módulo
+  `AczelSetTheory/Algebra/QuotientRing.lean` (0 sorry / 0 noncomputable / 0 warnings).
+  - `HFIdeal` (ideal bilátero), `HFRing.quotient` (anillo cociente completo).
+  - Parte aditiva reutiliza `quotientGroup`; multiplicación bien-definida vía absorción.
+  - **ADR-016**: construcción genérica (no sobre `ℤ₀`) por finitud hereditaria de `HFSet`.
+- ✅ **Identidad de Bézout en ℤ₀** — nuevo módulo `AczelSetTheory/Integers/Bezout.lean`.
+  - `extEuclidNat` + `extEuclidNat_spec` (algoritmo extendido de Euclides, sin sorry).
+  - `bezout_ofNat`, `bezout_coprime_ofNat`, `bezoutCoeffs` (computable).
+  - 1 sorry intencional en `bezout` general (descomposición por signo).
+- ✅ Actualización a peanolib `b7ccbd0` (`gcd_step` público).
+
+---
+
+## Previous Achievements (2026-06-05) — M7 completo: Lema de la Mariposa de Zassenhaus — FASE A cerrada
 
 - ✅ **Lema de Zassenhaus** completamente demostrado — 0 sorries.
   - Nuevo módulo `AczelSetTheory/Algebra/Zassenhaus.lean` (~727 líneas).

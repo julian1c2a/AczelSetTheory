@@ -5,7 +5,7 @@
    "type": "git",
    "subDir": null,
    "scope": "",
-   "rev": "5a6c1987992814184ad5d7e3aeaad98b7b12dd20",
+   "rev": "b7ccbd075c41de1fd6857134edd830853def8737",
    "name": "peanolib",
    "manifestFile": "lake-manifest.json",
    "inputRev": "master",
