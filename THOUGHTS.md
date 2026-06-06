@@ -1677,8 +1677,18 @@ $b^{-1}ab \in A$, luego $ab = b(b^{-1}ab) \in BA$. Por simetría $AB = BA$.
 y el isomorfismo final por Primer Teorema de Isomorfismo — pendiente de completar en esta
 referencia.)*
 
-# Necesidad de una refactorización a nivel de `namespace`s en este proyecto
+## Necesidad de una refactorización a nivel de `namespace`s en este proyecto
 
 He visto algunas dificultades a la hora de trabajar con números naturales y enteros, por confusión entre los signos de operadores `+` entre sí. Esta ambigüedad, que es de preveer, se puede resolver exactamente como en el proyecto Peano: definiendo namespaces separados y anidados para cada estructura algebraica, de modo que `$N_0$.add` y `$Z_0$.add` sean claramente distinguibles. Esto es especialmente importante para funciones multiplicativas como μ y λ, donde el signo es crucial. Para μ(n), el valor es 0 si n no es squarefree, y (-1)^ω(n) si n es squarefree. Para λ(n), el valor es (-1)^Ω(n). Sin un tipo de enteros con signo, no podemos representar estos valores directamente.
 
 DECISIÓN: Portar el esquema de `namespace`s que se puede observar en Peano a todos los niveles acá. Estúdialo con detalle. Haz un plan y consulta conmigo. Realmente debería ser una regla en `AI-GUIDE.md`.
+
+**RESUELTO (2026-06-06):** Tras discutirlo, se optó por la **Opción B — scoped notations (estilo Mathlib)** en lugar de namespaces anidados, dado el coste de refactorización (~1000 líneas afectadas). La regla de transición (usar `Add.add`/`Mul.mul`/`Neg.neg` explícitos en enunciados que mezclen tipos) se codificó como **regla (3.5) en `AI-GUIDE.md`** y como **ADR-015 en `DECISIONS.md`**. Los tipos nuevos (p.ej. `ZModN`) usarán `scoped notation` desde el principio.
+
+---
+
+## `gcd_step` privado en peanolib bloqueaba `bezoutCoeffs_spec`
+
+Al implementar `bezoutCoeffs` (función computable del algoritmo extendido de Euclides en `Bezout.lean`), la prueba de correctness `bezoutCoeffs_spec` requería el lema `gcd_step (a b : ℕ₀) (hb : b ≠ 𝟘) : gcd a b = gcd b (a % b)`, que estaba declarado `private` en `peanolib/Peano/PeanoNat/Arith.lean` y por tanto inaccesible desde AczelSetTheory.
+
+**RESUELTO (2026-06-06):** Se quitó `private` de `gcd_step` en `Arith.lean` y se añadió al bloque `export` de `Peano.lean`. Build de peanolib: 66 jobs, 0 errores. Commit `084dea7` en master local de peanolib. Push pendiente de autenticación GitHub (hacer `git push origin master` desde el terminal con credenciales).
