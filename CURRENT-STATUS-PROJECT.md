@@ -11,8 +11,8 @@
 |--------|-------|
 | Total modules (non-barrel) | 136 |
 | Total modules (incl. barrels) | 145 |
-| Modules with 0 sorry | 136 / 137 |
-| Total sorry | 1 (Integers/Bezout.lean, intencional) |
+| Modules with 0 sorry | 137 / 137 |
+| Total sorry | 0 |
 | Build status | ✅ Passing — 0 errors, 0 warnings |
 | Lean version | v4.30.0 |
 | Naming convention | Mathlib-style (see NAMING-CONVENTIONS.md) |
@@ -201,7 +201,7 @@
 | Integers/Bijection.lean | biyecciones entre ℤ₀ y ℕ₀ | ✅ |
 | Integers/PadicVal.lean | `padic_val`, `Omega_prime`, multiplicatividad | ✅ |
 | Integers/MobiusLiouville.lean | `μ` (Möbius), `λ` (Liouville), multiplicatividad | ✅ |
-| Integers/Bezout.lean | `bezout_ofNat`, `extEuclidNat`, `extEuclidNat_spec`, `bezoutCoeffs` | 🔵 1 sorry |
+| Integers/Bezout.lean | `bezout_ofNat`, `bezout`, `bezout_coprime`, `extEuclidNat`, `extEuclidNat_spec`, `bezoutCoeffs` | ✅ |
 
 ### Topology/ (5 modules)
 
@@ -217,8 +217,7 @@
 
 ## Known Sorry Locations
 
-- `Integers/Bezout.lean` — **1 sorry**: `bezout`/`bezout_coprime` generales sobre ℤ₀
-  (pendiente descomposición por signo; las versiones `_ofNat` están completas).
+None — **0 sorry** across the entire project.
 
 ---
 
@@ -232,7 +231,8 @@
 - ✅ **Identidad de Bézout en ℤ₀** — nuevo módulo `AczelSetTheory/Integers/Bezout.lean`.
   - `extEuclidNat` + `extEuclidNat_spec` (algoritmo extendido de Euclides, sin sorry).
   - `bezout_ofNat`, `bezout_coprime_ofNat`, `bezoutCoeffs` (computable).
-  - 1 sorry intencional en `bezout` general (descomposición por signo).
+  - `bezout` / `bezout_coprime` generales sobre ℤ₀ completos (reducción a `bezout_ofNat`
+    vía descomposición de signo); **0 sorry**.
 - ✅ Actualización a peanolib `b7ccbd0` (`gcd_step` público).
 
 ---

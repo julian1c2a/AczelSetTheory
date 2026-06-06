@@ -26,7 +26,8 @@ All notable changes to this project are documented here.
   - `extEuclidNat` (algoritmo extendido de Euclides, computable) + `extEuclidNat_spec`
     (correctness, sin sorry).
   - `bezoutCoeffs` (computable).
-  - `bezout`/`bezout_coprime` generales: 1 sorry documentado (descomposición por signo).
+  - `bezout`/`bezout_coprime` generales sobre ℤ₀: completos, reducidos a `bezout_ofNat`
+    vía descomposición de signo (`self_eq_or_neg_ofNat_toNat_abs`, `mul_ofNat_toNat_abs`).
 - **`AczelSetTheory/Algebra.lean`**: import de `QuotientRing`.
 
 ### Changed
@@ -39,9 +40,9 @@ All notable changes to this project are documented here.
 
 ### Build
 
-- ✅ `lake build` limpio: 0 errores, **0 warnings**, 35 jobs OK.
+- ✅ `lake build` limpio: 0 errores, **0 warnings** (salvo 1 linter cosmético preexistente), 35 jobs OK.
 - `QuotientRing.lean`: **0 sorry / 0 noncomputable / 0 warnings**.
-- `Bezout.lean`: 1 sorry intencional (`bezout` general, pendiente descomposición por signo).
+- `Bezout.lean`: **0 sorry** (caso general ℤ₀ cerrado vía descomposición de signo).
 
 ---
 

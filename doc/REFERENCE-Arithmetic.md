@@ -2216,7 +2216,7 @@ Los siguientes teoremas son esqueletos con sorry, pendientes de completar:
 
 **Namespace:** `ℤ₀`
 **Descripción:** Identidad de Bézout sobre ℤ₀. Levanta la forma natural disyuntiva (`Peano.Arith.bezout_natform`) a coeficientes en ℤ₀, deriva corolarios de coprimalidad, y provee el algoritmo extendido de Euclides (`extEuclidNat`) con su prueba de correctness (`extEuclidNat_spec`). Prerrequisito de M5B (inverso modular en `ZModN p`).
-**Estado:** 🔵 Parcial — API sobre ℕ₀ y algoritmo extendido sin sorry; caso general ℤ₀ (`bezout`) con sorry pendiente (descomposición por signo).
+**Estado:** ✅ Completo — API sobre ℕ₀, algoritmo extendido y caso general ℤ₀ (`bezout`, `bezout_coprime`) sin sorry. Pendiente solo la especificación `bezoutCoeffs_spec` (no parte de la API estable).
 **Última proyección:** 2026-06-06
 
 **Depende de:** `AczelSetTheory.Integers.Basic`, `AczelSetTheory.Integers.Arithmetic`, `AczelSetTheory.Integers.Order`, `Peano.PeanoNat.Arith`
@@ -2247,6 +2247,16 @@ Los siguientes teoremas son esqueletos con sorry, pendientes de completar:
 - **Matemática:** correctness: los coeficientes devueltos satisfacen $a\cdot x + b\cdot y = \gcd(a,b)$.
 - **Estrategia:** inducción bien fundada (`Peano.WellFounded.well_founded_lt.induction`) sobre `b`; caso base `b = 𝟘` vía `extEuclidNat.eq_1 … dif_pos`; caso recursivo usa `gcd_step`, `divMod_spec` y cancelación algebraica (`bezout_ring_cancel`, privado).
 
+### Bézout general para ℤ₀ — sin sorry
+
+**[T-Zb4]** `ℤ₀.bezout (a b : ℤ₀) : ∃ x y : ℤ₀, Add.add (Mul.mul a x) (Mul.mul b y) = gcdZ a b`
+- **Matemática:** Identidad de Bézout para enteros con signo: $\exists x, y \in \mathbb{Z}_0,\ a\,x + b\,y = \gcd_{\mathbb{Z}}(a,b)$.
+- **Estrategia:** reducción a `bezout_ofNat (toNat |a|) (toNat |b|)`. Descomposición de signo (`self_eq_or_neg_ofNat_toNat_abs`, privado): todo entero es `ofNat (toNat |a|)` o su negativo (vía `nonneg_eq_ofNat` + `abs_nonneg`). Absorción del signo en el coeficiente (`mul_ofNat_toNat_abs`, privado): `ofNat (toNat |a|) · x = a · x'` con `x' = x` o `x' = −x` (vía `neg_mul`, `mul_neg`). `gcdZ a b = ofNat (gcd (toNat |a|) (toNat |b|))` por definición (`rfl`).
+
+**[T-Zb5]** `ℤ₀.bezout_coprime {a b : ℤ₀} (h : gcdZ a b = 1) : ∃ x y : ℤ₀, Add.add (Mul.mul a x) (Mul.mul b y) = 1`
+- **Matemática:** Si $\gcd_{\mathbb{Z}}(a,b) = 1$ entonces $\exists x, y,\ a\,x + b\,y = 1$.
+- **Estrategia:** corolario directo de `bezout` vía `hxy.trans h`.
+
 ### Coeficientes de Bézout para ℤ₀ (función computable)
 
 **[Zb2]** `ℤ₀.bezoutCoeffs (a b : ℤ₀) : ℤ₀ × ℤ₀` *(noncomputable)*
@@ -2254,11 +2264,9 @@ Los siguientes teoremas son esqueletos con sorry, pendientes de completar:
 - **Matemática:** ajusta por signo los coeficientes de Bézout de $|a|, |b|$ para obtener los de $a, b$.
 - **Nota:** la especificación formal `bezoutCoeffs_spec` (que `a·x + b·y = gcdZ a b`) está pendiente (requiere `mul_sign_eq_abs`).
 
-### Pendientes (sorry — NO forman parte de la API estable)
+### Pendientes (NO forman parte de la API estable)
 
-- `ℤ₀.bezout (a b : ℤ₀) : ∃ x y : ℤ₀, Add.add (Mul.mul a x) (Mul.mul b y) = gcdZ a b` — **sorry**; requiere descomposición por signo (`a = sign a · |a|`). No bloquea M5B (que usa `bezout_coprime_ofNat`).
-- `ℤ₀.bezout_coprime {a b : ℤ₀} (h : gcdZ a b = 1) : ∃ x y : ℤ₀, Add.add (Mul.mul a x) (Mul.mul b y) = 1` — depende de `bezout` (sorry).
-- `bezoutCoeffs_spec` — aún no escrita.
+- `bezoutCoeffs_spec` (que `a·x + b·y = gcdZ a b` para la función computable `bezoutCoeffs`) — aún no escrita; requiere `mul_sign_eq_abs`. No bloquea M5B.
 
 ---
 

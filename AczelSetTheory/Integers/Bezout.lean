@@ -27,10 +27,10 @@ License: MIT
 --   usar Add.add y Mul.mul explícitamente en los enunciados de teoremas.
 -- - La forma substractiva de Bézout en ℕ₀ (bezout_natform) se levanta a ℤ₀
 --   vía ofNat_sub_ofNat (puente privado).
--- - El caso general (ℤ₀) tiene sorry: pendiente de descomposición de signo.
+-- - El caso general (ℤ₀) se reduce a bezout_ofNat vía descomposición de signo
+--   (todo entero es ±ofNat de su valor absoluto): sin sorry.
 -- - `bezoutCoeffs` implementa el algoritmo extendido de Euclides directamente sobre ℕ₀
---   (via `extEuclidNat`) y ajusta el signo. La especificación formal requiere
---   `gcd_step` público en peanolib (actualmente privado).
+--   (via `extEuclidNat`) y ajusta el signo. `gcd_step` ya es público en peanolib (b7ccbd0).
 -- - Prerrequisito de M5B (inverso modular en ZModN p).
 --
 -- Dependencies: AczelSetTheory.Integers.Basic, AczelSetTheory.Integers.Arithmetic,
@@ -38,6 +38,7 @@ License: MIT
 -- @axiom_system: ZF (sin elección)
 -- @importance: high
 -- M5B.0 (2026-06-06): bezout_ofNat y bezout_coprime_ofNat completos.
+-- M5B   (2026-06-06): bezout y bezout_coprime generales completos (0 sorry).
 
 import AczelSetTheory.Integers.Basic
 import AczelSetTheory.Integers.Arithmetic
@@ -142,14 +143,46 @@ theorem bezout_coprime_ofNat {a b : ℕ₀} (h : gcd a b = 𝟙) :
 -- ============================================================
 -- Sección 3: Bézout general para ℤ₀
 -- ============================================================
--- Pendiente: reducir a bezout_ofNat via descomposición de signo
--- (a = sign a * |a|).  No bloquea M5B (que usa bezout_coprime_ofNat).
+-- Reducción a bezout_ofNat vía descomposición de signo
+-- (todo entero es ±ofNat de su valor absoluto).
+
+/-- Descomposición de signo: todo entero es `ofNat (toNat |a|)` o su negativo. -/
+private theorem self_eq_or_neg_ofNat_toNat_abs (a : ℤ₀) :
+    a = ofNat (toNat (abs a)) ∨ a = Neg.neg (ofNat (toNat (abs a))) := by
+  have habs : abs a = ofNat (toNat (abs a)) := nonneg_eq_ofNat (abs_nonneg a)
+  by_cases h : (0 : ℤ₀) ≤ a
+  · left
+    have haa : abs a = a := by unfold abs; rw [if_pos h]
+    exact haa.symm.trans habs
+  · right
+    have haa : abs a = Neg.neg a := by unfold abs; rw [if_neg h]
+    have key : Neg.neg a = ofNat (toNat (abs a)) := haa.symm.trans habs
+    have hneg := congrArg Neg.neg key
+    rwa [neg_neg] at hneg
+
+/-- Absorción del signo en un coeficiente de Bézout: para todo `x`, existe `x'`
+    tal que `ofNat (toNat |a|) · x = a · x'`. -/
+private theorem mul_ofNat_toNat_abs (a x : ℤ₀) :
+    ∃ x' : ℤ₀, Mul.mul (ofNat (toNat (abs a))) x = Mul.mul a x' := by
+  rcases self_eq_or_neg_ofNat_toNat_abs a with ha | ha
+  · exact ⟨x, by rw [← ha]⟩
+  · refine ⟨Neg.neg x, ?_⟩
+    have heq : ofNat (toNat (abs a)) = Neg.neg a := by
+      have hc := congrArg Neg.neg ha
+      rw [neg_neg] at hc
+      exact hc.symm
+    rw [heq, neg_mul, mul_neg]
 
 /-- Identidad de Bézout para enteros: existen `x y : ℤ₀` con `a·x + b·y = gcdZ a b`. -/
 theorem bezout (a b : ℤ₀) :
     ∃ x y : ℤ₀, Add.add (Mul.mul a x) (Mul.mul b y) = gcdZ a b := by
-  -- a desarrollar: reducir a bezout_ofNat por descomposición de signo
-  sorry
+  obtain ⟨x, y, hxy⟩ := bezout_ofNat (toNat (abs a)) (toNat (abs b))
+  obtain ⟨x', hx'⟩ := mul_ofNat_toNat_abs a x
+  obtain ⟨y', hy'⟩ := mul_ofNat_toNat_abs b y
+  refine ⟨x', y', ?_⟩
+  have hg : gcdZ a b = ofNat (Peano.Arith.gcd (toNat (abs a)) (toNat (abs b))) := rfl
+  rw [hg, ← hx', ← hy']
+  exact hxy
 
 /-- Si `gcdZ a b = 1`, existen `x y : ℤ₀` con `a·x + b·y = 1`. -/
 theorem bezout_coprime {a b : ℤ₀} (h : gcdZ a b = 1) :
