@@ -593,7 +593,7 @@ private theorem zassenhaus_fun_eq {k : HFSet} (hk : k ∈ (H.inter K).H) :
   exact hcoseq_NHM
 
 /-- El homomorfismo de Zassenhaus. -/
-private noncomputable def zassenhaus_hom :
+private def zassenhaus_hom :
     HFGroupHom
       (quotientGroup (H.inter K).toHFGroup
          (prodNKHM_in_HK H K N M hNH hMK hNN)
