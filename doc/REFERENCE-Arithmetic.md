@@ -2273,13 +2273,13 @@ Los siguientes teoremas son esqueletos con sorry, pendientes de completar:
 ## Módulo: `AczelSetTheory/Integers/ZModN.lean`
 
 **Namespace:** `HFAlgebra`
-**Descripción:** El anillo ℤ/nℤ construido como un `HFRing` **finito** (`n ≠ 𝟘`). Por ADR-016 (finitud hereditaria de `HFSet`), no se construye como cociente de ℤ₀ (infinito) sino como un anillo finito cuyo portador es el **ordinal de von Neumann** `vN n = {vN 0, …, vN (n−1)}`; cada residuo es el HFSet `vN k` con `k < n`. Las operaciones usan el puente `card`/`vN` con reducción módulo `n`, y los axiomas de anillo se reducen a la aritmética modular de ℕ₀ (`Peano.ModEq`).
+**Descripción:** El anillo ℤ/nℤ (`ZModN`) y el cuerpo ℤ/pℤ (`ZModFieldP`, `p` primo) construidos como estructuras **finitas** (`n ≠ 𝟘`). Por ADR-016 (finitud hereditaria de `HFSet`), no se construyen como cociente de ℤ₀ (infinito) sino como estructuras finitas cuyo portador es el **ordinal de von Neumann** `vN n = {vN 0, …, vN (n−1)}`; cada residuo es el HFSet `vN k` con `k < n`. Las operaciones usan el puente `card`/`vN` con reducción módulo `n`, y los axiomas se reducen a la aritmética modular de ℕ₀ (`Peano.ModEq`); el inverso del cuerpo usa `Peano.Wilson.modInv` (Fermat).
 **Estado:** ✅ Completo — 0 sorry, 0 noncomputable, 0 warnings.
-**Última proyección:** 2026-06-06
+**Última proyección:** 2026-06-07
 
 **Depende de:** `AczelSetTheory.Algebra.Ring`, `AczelSetTheory.VN.{Arithmetic,IsNat,CardVN}`, `Peano.PeanoNat.NumberTheory.ModEq`
 
-**Usado por:** (futuro) estructura de cuerpo `IsField (ZModN p)` para `p` primo, vía `bezout_coprime_ofNat`.
+**Usado por:** (futuro) proyección `ZModN.mk : ℤ₀ → ZModN`.
 
 ### Construcción
 
@@ -2298,9 +2298,24 @@ Los siguientes teoremas son esqueletos con sorry, pendientes de completar:
 - `zmod_card_lt (hx : x ∈ vN n) : card x < n`.
 - `zmod_eq_vN_mod (hx : x ∈ vN n) : x = vN (card x mod n)` — forma reducida (usa `mod_of_lt`).
 
+### Conmutatividad y cuerpo ℤ/pℤ
+
+**[ZM2]** `HFAlgebra.ZModN_mul_comm (n : ℕ₀) (hn : n ≠ 𝟘) (x y : HFSet) : (ZModN n hn).mul x y = (ZModN n hn).mul y x`
+- **Matemática:** ℤ/nℤ es un anillo **conmutativo** (`HFRing` no rastrea `mul_comm`, por eso se expone aparte).
+- **Estrategia:** `show` + `mul_comm` de ℕ₀ sobre los cardinales.
+
+**[ZM3]** `HFAlgebra.ZModFieldP (p : ℕ₀) (hp : Peano.Arith.Prime p) : HFField`
+- **Matemática:** el **cuerpo** ℤ/pℤ para `p` primo. Reutiliza el portador y todas las operaciones de anillo de `ZModN p (prime_ne_zero hp)`; el inverso multiplicativo es `inv_mul x := vN (modInv p (card x))`, donde `modInv p a = a^(p−2) mod p` (pequeño teorema de Fermat).
+- **Estrategia:** los campos de anillo se delegan directamente a `ZModN p hp_ne` (definicionalmente iguales). Campos nuevos:
+  - `inv_closed` — `vN (modInv p (card x)) ∈ vN p` vía `mem_vN_iff_lt` + `Peano.Wilson.modInv_lt`.
+  - `mul_comm` — vía `ZModN_mul_comm`.
+  - `mul_inv` — `x · x⁻¹ = 1` para `x ≠ 0`: reduce a `mod (card x · modInv p (card x)) p = mod 𝟙 p`, que es exactamente `Peano.Wilson.modInv_mul hp` (necesita `0 < card x < p`, de `zmod_card_lt` + `zmod_eq_vN_card`).
+  - `zero_ne_one` — `vN 𝟘 ≠ vN (mod 𝟙 p)` vía `mod_of_lt 𝟙 p (one_lt_prime hp)` + `vN_injective`.
+- **Dependencia clave:** `Peano.Wilson.{modInv, modInv_mul, modInv_lt}` (hechos públicos en peanolib `0f5dd7b`; inverso modular `a^(p−2) mod p` por Fermat).
+
 ### Pendientes (trabajo futuro)
 
-- `ZModN.mk : ℤ₀ → ... ` (proyección de un entero a su residuo), `IsCommRing`/conmutatividad explícita, y `IsField (ZModN p)` para `p` primo (inverso modular vía Bézout). No desarrollado en esta fase.
+- `ZModN.mk : ℤ₀ → ...` (proyección de un entero a su residuo). No desarrollado en esta fase.
 
 ---
 

@@ -201,7 +201,7 @@
 | Integers/PadicVal.lean | `padic_val`, `Omega_prime`, multiplicatividad | ✅ |
 | Integers/MobiusLiouville.lean | `μ` (Möbius), `λ` (Liouville), multiplicatividad | ✅ |
 | Integers/Bezout.lean | `bezout_ofNat`, `bezout`, `bezout_coprime`, `extEuclidNat`, `extEuclidNat_spec`, `bezoutCoeffs` | ✅ |
-| Integers/ZModN.lean | `HFAlgebra.ZModN (n) (hn : n ≠ 𝟘) : HFRing` (ℤ/nℤ finito sobre `vN n`) | ✅ |
+| Integers/ZModN.lean | `HFAlgebra.ZModN` (ℤ/nℤ anillo), `ZModN_mul_comm`, `ZModFieldP` (ℤ/pℤ cuerpo, `p` primo) | ✅ |
 
 ### Topology/ (5 modules)
 

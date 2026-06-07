@@ -21,17 +21,22 @@ License: MIT
 --
 -- Público:
 --   HFAlgebra.ZModN (n : ℕ₀) (hn : n ≠ 𝟘) : HFRing
+--   HFAlgebra.ZModN_mul_comm                : ℤ/nℤ es anillo conmutativo
+--   HFAlgebra.ZModFieldP (p : ℕ₀) (hp : Prime p) : HFField  (cuerpo ℤ/pℤ)
 --
--- Dependencies: AczelSetTheory.Algebra.Ring, AczelSetTheory.VN.{Arithmetic,IsNat,CardVN},
---               Peano.PeanoNat.NumberTheory.ModEq
+-- Dependencies: AczelSetTheory.Algebra.Ring, AczelSetTheory.Algebra.Field,
+--               AczelSetTheory.VN.{Arithmetic,IsNat,CardVN},
+--               Peano.PeanoNat.NumberTheory.{ModEq,Wilson}
 -- @axiom_system: ZF (sin elección)
 -- @importance: high
 
 import AczelSetTheory.Algebra.Ring
+import AczelSetTheory.Algebra.Field
 import AczelSetTheory.VN.Arithmetic
 import AczelSetTheory.VN.IsNat
 import AczelSetTheory.VN.CardVN
 import Peano.PeanoNat.NumberTheory.ModEq
+import Peano.PeanoNat.NumberTheory.Wilson
 
 open Peano
 open Peano.Add Peano.Mul Peano.Div Peano.Sub Peano.ModEq Peano.StrictOrder Peano.Order
@@ -191,5 +196,61 @@ theorem ZModN_mul_comm (n : ℕ₀) (hn : n ≠ 𝟘) (x y : HFSet) :
   show vN (mod (mul (HFSet.card x) (HFSet.card y)) n)
      = vN (mod (mul (HFSet.card y) (HFSet.card x)) n)
   rw [mul_comm (HFSet.card x) (HFSet.card y)]
+
+-- ============================================================
+-- Sección 4: Cuerpo ℤ/pℤ para p primo
+-- ============================================================
+
+/-- **Cuerpo ℤ/pℤ** para `p` primo, como `HFField`.
+    Reutiliza el portador y las operaciones de `ZModN p (prime_ne_zero hp)`;
+    el inverso multiplicativo de `x` es `vN (modInv p (card x))`, donde
+    `modInv p a = a^(p−2) mod p` satisface `a · modInv p a ≡ 1 [MOD p]`
+    (pequeño teorema de Fermat, `Peano.Wilson.modInv_mul`). -/
+def ZModFieldP (p : ℕ₀) (hp : Peano.Arith.Prime p) : HFField :=
+  let hp_ne : p ≠ 𝟘 := Peano.Primes.prime_ne_zero hp
+  let R := ZModN p hp_ne
+  { F        := R.R
+    add      := R.add
+    mul      := R.mul
+    zero     := R.zero
+    one      := R.one
+    neg      := R.neg
+    inv_mul  := fun x => vN (Peano.Wilson.modInv p (HFSet.card x))
+    zero_mem := R.zero_mem
+    one_mem  := R.one_mem
+    add_closed := R.add_closed
+    mul_closed := R.mul_closed
+    neg_closed := R.neg_closed
+    inv_closed := fun {x} _ =>
+      (mem_vN_iff_lt (Peano.Wilson.modInv p (HFSet.card x)) p).mpr
+        (Peano.Wilson.modInv_lt hp)
+    add_assoc  := R.add_assoc
+    add_comm   := R.add_comm
+    zero_add   := R.zero_add
+    neg_add    := R.neg_add
+    mul_assoc  := R.mul_assoc
+    mul_comm   := fun {a b} _ _ => ZModN_mul_comm p hp_ne a b
+    mul_one    := R.mul_one
+    left_distrib := R.left_distrib
+    mul_inv := by
+      intro x hx hx_ne
+      have hcard_lt : lt₀ (HFSet.card x) p := zmod_card_lt hx
+      have hcard_ne : HFSet.card x ≠ 𝟘 := by
+        intro h0
+        have hx0 : x = vN 𝟘 := (zmod_eq_vN_card hx).trans (by rw [h0])
+        exact hx_ne hx0
+      have hcard_pos : 𝟘 < HFSet.card x := pos_of_ne_zero _ hcard_ne
+      show vN (mod (mul (HFSet.card x)
+              (HFSet.card (vN (Peano.Wilson.modInv p (HFSet.card x))))) p) = vN (mod 𝟙 p)
+      rw [card_vN]
+      have hinv : mod (mul (HFSet.card x) (Peano.Wilson.modInv p (HFSet.card x))) p = mod 𝟙 p :=
+        Peano.Wilson.modInv_mul hp hcard_pos hcard_lt
+      rw [hinv]
+    zero_ne_one := by
+      have h1 : mod 𝟙 p = 𝟙 := mod_of_lt 𝟙 p (Peano.Primes.one_lt_prime hp)
+      show vN 𝟘 ≠ vN (mod 𝟙 p)
+      rw [h1]
+      intro h
+      exact (zero_ne_succ 𝟘) (vN_injective h) }
 
 end HFAlgebra

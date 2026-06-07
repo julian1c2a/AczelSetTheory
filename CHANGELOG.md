@@ -6,6 +6,41 @@ All notable changes to this project are documented here.
 
 ---
 
+## [2026-06-07] — M5B: cuerpo ℤ/pℤ + conmutatividad de ℤ/nℤ
+
+### Added
+
+- **`AczelSetTheory/Integers/ZModN.lean`**:
+  - `HFAlgebra.ZModN_mul_comm (n) (hn) (x y)` — ℤ/nℤ es anillo conmutativo.
+  - `HFAlgebra.ZModFieldP (p : ℕ₀) (hp : Prime p) : HFField` — el **cuerpo** ℤ/pℤ para
+    `p` primo. Reutiliza el portador y operaciones de `ZModN p (prime_ne_zero hp)`;
+    inverso `inv_mul x := vN (modInv p (card x))` con `modInv p a = a^(p−2) mod p`
+    (pequeño teorema de Fermat, `Peano.Wilson.modInv_mul`).
+
+### Changed
+
+- **`AczelSetTheory/Integers/Bezout.lean`**: `extEuclidNat` y `bezoutCoeffs` pasan de
+  `noncomputable def` a `def` (el marcador era espurio; ambos son computables).
+  El proyecto baja de 3 a 1 `noncomputable` (solo queda `Zassenhaus.zassenhaus_hom`).
+- **`lake-manifest.json`**: bump peanolib `b7ccbd0` → `0f5dd7b`.
+
+### peanolib (dependencia, repo `julian1c2a/Peano`)
+
+- **`Peano/PeanoNat/NumberTheory/Wilson.lean`** (commit `0f5dd7b`): se exponen
+  (`private` → público + `export`) `modInv`, `modInv_lt`, `modInv_mul`, `modInv_pos`
+  (inverso modular `a^(p−2) mod p`), necesarios para `ZModFieldP`. Helpers internos
+  (`pow_pred_one`, etc.) siguen privados.
+  > ⚠️ **Pendiente**: el push de peanolib falló por autenticación; el commit existe
+  > en el clon local y el manifest apunta a él. Hacer `git push origin master` en
+  > `.lake/packages/peanolib` para CI / otras máquinas.
+
+### Build
+
+- ✅ `lake build` limpio: 0 errores, 0 warnings, 35 jobs OK.
+- `ZModN.lean`: **0 sorry / 0 noncomputable / 0 warnings**.
+
+---
+
 ## [2026-06-06] — M5B: anillo ℤ/nℤ (`ZModN`) como HFRing finito
 
 ### Added
