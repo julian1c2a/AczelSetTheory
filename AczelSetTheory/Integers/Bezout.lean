@@ -199,10 +199,11 @@ theorem bezout_coprime {a b : ℤ₀} (h : gcdZ a b = 1) :
 -- `extEuclidNat_spec` prueba la correctness usando `Peano.Arith.gcd_step`
 -- (público desde peanolib v2.0.0-12-gb7ccbd0).
 
+set_option linter.unusedVariables false in
 /-- Algoritmo extendido de Euclides sobre ℕ₀, devolviendo coeficientes en ℤ₀.
     Recurrencia: `extEuclidNat a b = (t, s − (a/b)·t)`
     donde `(s, t) = extEuclidNat b (a % b)`. Termina porque `a % b < b`. -/
-noncomputable def extEuclidNat (a b : ℕ₀) : ℤ₀ × ℤ₀ :=
+def extEuclidNat (a b : ℕ₀) : ℤ₀ × ℤ₀ :=
   if hb : b = 𝟘 then
     (1, 0)    -- gcd(a,0)=a : 1·a + 0·0 = a ✓
   else
@@ -292,7 +293,7 @@ theorem extEuclidNat_spec (a b : ℕ₀) :
     Idea: `|a|·x' + |b|·y' = gcd(|a|,|b|)`  (de `extEuclidNat_spec`)
     →  `a·(x'·sign a) + b·(y'·sign b) = gcdZ a b`
     pues `a·sign(a) = |a|` (lema `mul_sign_eq_abs`, pendiente). -/
-noncomputable def bezoutCoeffs (a b : ℤ₀) : ℤ₀ × ℤ₀ :=
+def bezoutCoeffs (a b : ℤ₀) : ℤ₀ × ℤ₀ :=
   let (x, y) := extEuclidNat (toNat (abs a)) (toNat (abs b))
   (Mul.mul x (sign a), Mul.mul y (sign b))
 

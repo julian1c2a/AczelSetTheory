@@ -180,4 +180,16 @@ def ZModN (n : ℕ₀) (hn : n ≠ 𝟘) : HFRing where
         ← add_mod (mul (HFSet.card a) (HFSet.card c))
                   (mul (HFSet.card b) (HFSet.card c)) n]
 
+-- ============================================================
+-- Sección 3: Conmutatividad multiplicativa explícita
+-- ============================================================
+
+/-- El producto de `ZModN n hn` es conmutativo: `ℤ/nℤ` es un anillo conmutativo.
+    (HFRing no rastrea `mul_comm`; se expone como teorema independiente.) -/
+theorem ZModN_mul_comm (n : ℕ₀) (hn : n ≠ 𝟘) (x y : HFSet) :
+    (ZModN n hn).mul x y = (ZModN n hn).mul y x := by
+  show vN (mod (mul (HFSet.card x) (HFSet.card y)) n)
+     = vN (mod (mul (HFSet.card y) (HFSet.card x)) n)
+  rw [mul_comm (HFSet.card x) (HFSet.card y)]
+
 end HFAlgebra

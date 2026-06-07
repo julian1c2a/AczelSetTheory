@@ -2237,11 +2237,11 @@ Los siguientes teoremas son esqueletos con sorry, pendientes de completar:
 
 ### Algoritmo extendido de Euclides — sin sorry
 
-**[Zb1]** `ℤ₀.extEuclidNat (a b : ℕ₀) : ℤ₀ × ℤ₀` *(noncomputable)*
+**[Zb1]** `ℤ₀.extEuclidNat (a b : ℕ₀) : ℤ₀ × ℤ₀` *(computable)*
 - **Lean 4:** recurrencia bien fundada sobre `b`:
   `extEuclidNat a b = if b = 𝟘 then (1, 0) else (t, s − (a/b)·t)` donde `(s, t) := extEuclidNat b (a % b)`.
 - **Matemática:** coeficientes de Bézout del algoritmo extendido de Euclides; termina porque `a % b < b` (`Peano.Div.mod_lt`).
-- **Computable:** `noncomputable` (depende de operaciones de ℤ₀ vía `Quotient`).
+- **Computable:** sí (`def`). El algoritmo de Euclides extendido con recursión bien fundada genera código ejecutable; las operaciones de ℤ₀ son `Quotient.liftOn` (computables).
 
 **[T-Zb3]** `ℤ₀.extEuclidNat_spec (a b : ℕ₀) : Add.add (Mul.mul (ofNat a) (extEuclidNat a b).1) (Mul.mul (ofNat b) (extEuclidNat a b).2) = ofNat (Peano.Arith.gcd a b)`
 - **Matemática:** correctness: los coeficientes devueltos satisfacen $a\cdot x + b\cdot y = \gcd(a,b)$.
@@ -2259,7 +2259,7 @@ Los siguientes teoremas son esqueletos con sorry, pendientes de completar:
 
 ### Coeficientes de Bézout para ℤ₀ (función computable)
 
-**[Zb2]** `ℤ₀.bezoutCoeffs (a b : ℤ₀) : ℤ₀ × ℤ₀` *(noncomputable)*
+**[Zb2]** `ℤ₀.bezoutCoeffs (a b : ℤ₀) : ℤ₀ × ℤ₀` *(computable)*
 - **Lean 4:** `let (x, y) := extEuclidNat (toNat (abs a)) (toNat (abs b)); (Mul.mul x (sign a), Mul.mul y (sign b))`
 - **Matemática:** ajusta por signo los coeficientes de Bézout de $|a|, |b|$ para obtener los de $a, b$.
 - **Nota:** la especificación formal `bezoutCoeffs_spec` (que `a·x + b·y = gcdZ a b`) está pendiente (requiere `mul_sign_eq_abs`).
