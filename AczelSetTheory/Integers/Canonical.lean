@@ -7,7 +7,7 @@ License: MIT
 -- AczelSetTheory/Integers/Canonical.lean
 -- Representante canónico único para ℤ₀: `(0, n)` o `(n, 0)`.
 --
--- ESTADO: esqueleto M4B (2026-06-05). Cuerpo a desarrollar.
+-- ESTADO: M4B completo (cerrado 2026-06-05, commit b9484c7). 0 sorry.
 --
 -- DECISIÓN: ADR-014 — opción B: NO se introduce un tipo `HFInt` separado;
 -- ℤ₀ = Quotient intSetoid se mantiene como único entero, pero se añade

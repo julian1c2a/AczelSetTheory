@@ -177,7 +177,7 @@
 | VN/SymGroupVN.lean | grupo simétrico `SymVN n` sobre vN | ✅ |
 | VN/ThirdIsomorphismVN.lean | tercer teorema de isomorfismo sobre vN | ✅ |
 
-### Algebra/ (22 modules)
+### Algebra/ (23 modules)
 
 | Module | Key exports | Status |
 |--------|-------------|--------|
@@ -250,7 +250,7 @@ None — **0 sorry** across the entire project.
   - Operaciones `matAdd`, `matNeg`, `matZero`, `matOne`, `matMul` con fórmulas de entrada (`nthEntry_mat*`).
   - **`HFMatrixRing n rng : HFRing`** — todos los axiomas de anillo demostrados entrada a entrada (`nPow_ext`).
   - Punto técnico: `mat_mul_assoc` vía `finSumRing_swap` + `symm` (sin `conv_rhs`, ausente sin Mathlib).
-- ✅ **FASE B → 7/9 milestones cerrados** (M6B Matrices). Pendientes: M8B (cierre doc + RFC FASE C).
+- ✅ **FASE B → 8/9 milestones cerrados** (M6B Matrices + M7B Combinatorics). Único pendiente: M8B (cierre doc + RFC FASE C).
 - ✅ **Build:** `lake build AczelSetTheory` → 241 jobs, 0 errores, 0 warnings.
 
 ---

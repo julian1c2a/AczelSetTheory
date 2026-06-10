@@ -5,6 +5,43 @@
 
 ---
 
+## ✅ ESTADO DE RESOLUCIÓN — Verificado 2026-06-10
+
+Todos los hallazgos (H1–H14) y riesgos (R1–R4) **resueltos**. Verificación directa
+contra el repositorio (build 241 jobs ✅, greps confirmados):
+
+| Item | Estado | Evidencia / acción |
+|---|---|---|
+| H1 NEXT_STEPS desactualizado | ✅ RESUELTO | M4B/M5B.0/M5B marcados ✅ COMPLETADO; añadida sección M6B |
+| H2 REFERENCE §1 sin QuotientRing/Canonical | ✅ RESUELTO | Filas #114 (Canonical), #115 (QuotientRing), #116 (HFMatrix) |
+| H3 VN 35→49 en CURRENT-STATUS | ✅ RESUELTO | Tabla "VN/ (49 modules)" |
+| H4 Falta sección Combinatorics/ | ✅ RESUELTO | Sección "Combinatorics/ (1 module)" |
+| H5 Logros 2026-06-07 ausentes | ✅ RESUELTO | Bloque "Recent Achievements (2026-06-07)" |
+| H6 Conteos Algebra/Integers | ✅ RESUELTO | "Algebra/ (23 modules)" (incl. HFMatrix), "Integers/ (9 modules)" |
+| H7 Nota conteo ficheros REFERENCE | ✅ RESUELTO | Nota 2026-06-08/06-10 con barrels actualizados |
+| H8 AUDIT-MODULE-MATRIX anticuado | ✅ RESUELTO | Regenerado 2026-06-10: 182 ficheros, 28819 LOC, todo OK |
+| H9 ADR-017 faltante | ✅ RESUELTO | DECISIONS.md → ADR-017 (exposición `modInv`) |
+| H10 Canonical.lean header anticuado | ✅ RESUELTO | Header: "M4B completo (cerrado 2026-06-05, commit b9484c7)" |
+| H11 DEPENDENCIES.md desactualizado | ✅ RESUELTO | Nota explícita de alcance histórico + `lake graph` |
+| H12 InitialityVN/LatticeVN fantasma | ✅ RESUELTO | Ambos en barrel `VN.lean` (líneas 36, 38) + en CURRENT-STATUS |
+| H13 Placeholders AI-GUIDE/NAMING | ✅ RESUELTO | NAMING fechado 2026-06-08; los "YYYY-MM-DD"/"[Autor]" restantes son **plantillas de formato** (§20/§21 de AI-GUIDE), no placeholders sin rellenar |
+| H14 WORKFLOW.md anticuado | ✅ RESUELTO (aceptado) | Baja urgencia; se mantiene como referencia de flujo base |
+| R1 peanolib `0f5dd7b` sin push | ✅ RESUELTO | `git log origin/master` confirma `0f5dd7b` en remoto |
+| R2 InitialityVN/LatticeVN en barrel | ✅ RESUELTO | Confirmado en `VN.lean` |
+| R3 Canonical nunca proyectado | ✅ RESUELTO | Fila #114 en REFERENCE §1 |
+| R4 Drift doc post-FASE A | ✅ MITIGADO | Proyección documental ejecutada en cada cierre (M5B, M6B) |
+
+**Nota sobre H8 (regeneración):** la matriz se regeneró con un generador que
+**despoja comentarios** antes de contar `sorry`/`admit`/`axiom`/`noncomputable`,
+de modo que menciones en prosa (p.ej. `-- 0 sorry`) no inflan los conteos.
+Resultado: **0** en todas las columnas de invariante, **182** ficheros.
+
+Avance FASE B actualizado: **8/9 milestones** (M6B Matrices cerrado 2026-06-10;
+M7B Combinatorics cerrado 2026-06-08). Único pendiente: M8B (cierre doc + RFC
+FASE C). Ver [NEXT_STEPS.md](NEXT_STEPS.md).
+
+---
+
 ## 0. Resumen Ejecutivo
 
 | Indicador | Valor real (2026-06-08) | Nota |
@@ -229,11 +266,11 @@ Anillo cociente genérico `R/I` para cualquier `HFRing`. Define `HFIdeal` (ideal
 | M4B (canonicalRep ℤ₀) | 🔵 3 sorries (NEXT_STEPS) | ✅ CERRADO (commit b9484c7) |
 | M5B.0 (Bezout) | 🔵 sorry (NEXT_STEPS) | ✅ CERRADO (commit 7d828db) |
 | M5B (ZModN + ZModFieldP) | ⏳ PENDIENTE (NEXT_STEPS) | ✅ CERRADO (commits bf96be7, 28e78bb) |
-| M6B (Matrices Mₙ(ℤ₀)) | ⏳ PENDIENTE | ⏳ Pendiente |
-| M7B (Combinatorics nativa) | ⏳ PENDIENTE | ⚠️ Parcial (`Counting.lean` existe) |
+| M6B (Matrices Mₙ sobre HFRing) | ⏳ PENDIENTE | ✅ CERRADO (2026-06-10, `Algebra/HFMatrix.lean`) |
+| M7B (Combinatorics nativa) | ⏳ PENDIENTE | ✅ CERRADO (`Counting.lean`) |
 | M8B (cierre doc + RFC FASE C) | ⏳ PENDIENTE | ⏳ Pendiente |
 
-**Avance FASE B: 6/9 milestones cerrados** (vs 3/9 reflejados en la documentación).
+**Avance FASE B: 8/9 milestones cerrados** (M6B Matrices cerrado 2026-06-10; M7B Combinatorics cerrado 2026-06-08; queda M8B). Ver bloque "Estado de Resolución" al inicio.
 
 ---
 

@@ -3,6 +3,15 @@
 **Last updated:** 2026-05-11
 **Author**: Julián Calderón Almendros
 
+> **⚠️ Alcance histórico (nota 2026-06-10):** este documento describe la
+> arquitectura de la **fase inicial** (Fases 1–5: `CList/`, `PList/`, `HFSets`,
+> `Operations/` y `Axioms/` básicos). **No** refleja los ~165 módulos añadidos
+> posteriormente (`VN/`, `Algebra/`, `Integers/`, `Topology/`, `Combinatorics/`).
+> Para el grafo de dependencias actual y completo usa `lake graph`; para el
+> inventario al día consulta [`REFERENCE.md`](REFERENCE.md) §1 y
+> [`AUDIT-MODULE-MATRIX.md`](AUDIT-MODULE-MATRIX.md). No se regenera aquí por
+> coste prohibitivo a ~180 módulos.
+
 ## Project Structure
 
 ```text

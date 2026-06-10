@@ -4,7 +4,7 @@
 **Author**: Julián Calderón Almendros
 **Lean version**: v4.30.0
 
-> **Nota (2026-06-08)**: la tabla §1 lista los módulos del núcleo histórico más las últimas adiciones. Para el inventario completo y al día (181 ficheros `.lean` totales bajo `AczelSetTheory/`), incluidos `Algebra/{Action,CosetAction,CorrespondenceTheorem,FirstIsomorphism,SecondIsomorphism,ThirdIsomorphism,Lattice,LinearSpace,Module,Monoid,NormalSubgroup,QuotientGroup,RingHom,Sylow,Zassenhaus,QuotientRing}`, `Integers/Canonical`, `Combinatorics/Counting`, 14 módulos adicionales en `VN/`, etc., consulta [`AUDIT-MODULE-MATRIX.md`](AUDIT-MODULE-MATRIX.md). Documentación detallada por subsistema en [`doc/REFERENCE-Algebra.md`](doc/REFERENCE-Algebra.md), [`doc/REFERENCE-GroupTheory.md`](doc/REFERENCE-GroupTheory.md), [`doc/REFERENCE-Combinatorics.md`](doc/REFERENCE-Combinatorics.md) y [`doc/REFERENCE-VN.md`](doc/REFERENCE-VN.md).
+> **Nota (2026-06-08)**: la tabla §1 lista los módulos del núcleo histórico más las últimas adiciones. Para el inventario completo y al día (181 ficheros `.lean` totales bajo `AczelSetTheory/`), incluidos `Algebra/{Action,CosetAction,CorrespondenceTheorem,FirstIsomorphism,SecondIsomorphism,ThirdIsomorphism,Lattice,LinearSpace,Module,Monoid,NormalSubgroup,QuotientGroup,RingHom,Sylow,Zassenhaus,QuotientRing,HFMatrix}`, `Integers/Canonical`, `Combinatorics/Counting`, 14 módulos adicionales en `VN/`, etc., consulta [`AUDIT-MODULE-MATRIX.md`](AUDIT-MODULE-MATRIX.md). Documentación detallada por subsistema en [`doc/REFERENCE-Algebra.md`](doc/REFERENCE-Algebra.md), [`doc/REFERENCE-GroupTheory.md`](doc/REFERENCE-GroupTheory.md), [`doc/REFERENCE-Combinatorics.md`](doc/REFERENCE-Combinatorics.md) y [`doc/REFERENCE-VN.md`](doc/REFERENCE-VN.md).
 
 ---
 
@@ -153,6 +153,7 @@ Below are the keys for reading and searching theorems.
 | 113 | `AczelSetTheory/Topology/Subspace.lean` | `HFTopology` | ✅ Complete | Topology/Basic, Axioms/{Separation,Powerset} | — |
 | 114 | `AczelSetTheory/Integers/Canonical.lean` | `ℤ₀` | ✅ Complete | Integers/Basic, Integers/Order, `Peano.PeanoNat.{Sub,Order}` | Integers.lean |
 | 115 | `AczelSetTheory/Algebra/QuotientRing.lean` | `HFAlgebra` | ✅ Complete | Algebra/{Ring,QuotientGroup}, Axioms/{Separation,Decidable} | Integers/ZModN (futuro) |
+| 116 | `AczelSetTheory/Algebra/HFMatrix.lean` | `HFAlgebra` | ✅ Complete | Algebra/Ring, Axioms/{OrdinalNat,Cardinal}, HFList | Algebra.lean |
 | — | `AczelSetTheory/Topology.lean` | — | ✅ Barrel | Topology/{Basic,Interior,Neighborhoods,Subspace} | AczelSetTheory.lean |
 | — | `AczelSetTheory/VN.lean` | — | ✅ Complete | VN/{Basic,Injective,IsNat,Arithmetic,FSet,PeanoAxioms,PeanoArith,PowVN,SubVN,DivVN,FactorialVN,CardVN,RankVN} | AczelSetTheory.lean |
 | — | `AczelSetTheory/PList.lean` | — | ✅ Complete | PList/{Basic,Lemmas,Omega0} | AczelSetTheory.lean |
