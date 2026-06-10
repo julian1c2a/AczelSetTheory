@@ -4,8 +4,9 @@
 
 **Author**: Julián Calderón Almendros
 **License**: MIT
-**Lean version**: v4.29.0
-**Build status**: ✅ 0 `sorry` — 0 errors, 0 warnings — 133 modules (142 incl. barrels)
+**Lean version**: v4.30.0
+**Build status**: ✅ 0 `sorry` — 0 `noncomputable` — 0 errors, 0 warnings — 182 `.lean` files (~28 800 LOC), build 241 jobs
+**Roadmap**: FASE A (paridad Peano) ✅ completa · FASE B (consolidación) 8/9 milestones cerrados (solo resta M8B: cierre documental)
 
 ---
 
@@ -17,11 +18,11 @@ The Zermelo axioms (Extensionality, Empty Set, Pairs, Union, Separation, Interse
 
 Key properties of this set theory:
 
-- **Constructive**: no axiom of choice, no excluded middle (fully intuitionistic)
-- **Computable**: all definitions are decidable and executable
-- **No axiom of infinity**: natural numbers are constructed from sets
-- **Well-founded recursion and induction** over sets
-- **Axiom-free**: Zermelo axioms are derived theorems, not axioms
+- **Computable core**: all set definitions are decidable and executable (0 `noncomputable def`)
+- **No axiom of infinity**: natural numbers are constructed from sets (`vN : ℕ₀ → HFSet`)
+- **Well-founded recursion and induction** over sets (`∈` is well-founded)
+- **Axiom-free foundations**: the Zermelo axioms are derived theorems, not postulates
+- **Minimal classical footprint**: the foundational layer is constructive; some advanced results in the algebra layer (e.g. Sylow's theorems) reduce to the standard `{propext, Classical.choice, Quot.sound}` — verifiable per theorem with `#print axioms`
 
 ### Derived Zermelo Axioms
 
@@ -68,20 +69,26 @@ AczelSetTheory/
     Replacement, FunctionComp, Identity, Product, Image, Adjunction,
     Induction, CartProd, Ordinal, OrdinalNat, Fintype, NPow, Rank,
     Order, WellOrder, LinearOrder
-  VN/                — Von Neumann embedding vN : ℕ₀ → HFSet (35 sub-modules)
+  VN/                — Von Neumann embedding vN : ℕ₀ → HFSet (49 sub-modules)
     Basic, Injective, IsNat, Arithmetic, FSet, PeanoAxioms, PeanoArith,
     PowVN, SubVN, DivVN, FactorialVN, CardVN, RankVN, GcdVN, FibVN, BinomVN,
     SummationVN, SqrtVN, LogVN, DigitsVN, ModEqVN, TotientVN, PrimesVN,
     CantorPairingVN, PairingVN, NewtonBinomVN, ProductVN, GodelBetaVN,
     HFGroupVN, ProdBridgeVN, MapBridgeVN, ListBridgeVN,
-    PrimeVN, FermatVN, CRTVN
-  Algebra/           — Native algebraic structures in HFSet (20 sub-modules)
+    PrimeVN, FermatVN, CRTVN, InitialityVN, LatticeVN, ActionVN, OrbitVN,
+    PermVN, SignVN, SymGroupVN, CountingVN, NormalSubgroupVN, QuotientGroupVN,
+    FirstIsomorphismVN, SecondIsomorphismVN, ThirdIsomorphismVN,
+    CorrespondenceTheoremVN
+  Algebra/           — Native algebraic structures in HFSet (23 sub-modules)
     Group, Subgroup, GroupHom, NormalSubgroup, Ring, CosetCount, Monoid, RingHom,
     Field, Module, LinearSpace, Lattice, Action, CosetAction, QuotientGroup,
     FirstIsomorphism, SecondIsomorphism, ThirdIsomorphism, CorrespondenceTheorem,
-    Sylow
-  Integers/          — Integer type ℤ₀ as quotient of ℕ₀×ℕ₀ (7 sub-modules)
-    Basic, Order, Functions, Arithmetic, Bijection, PadicVal, MobiusLiouville
+    Sylow, Zassenhaus, QuotientRing, HFMatrix
+  Integers/          — Integer type ℤ₀ + ℚ₀ (9 sub-modules + Rationals/)
+    Basic, Order, Functions, Arithmetic, Bijection, PadicVal, MobiusLiouville,
+    Canonical, Bezout, ZModN, Rationals/{AbsVal, Density, IsCauchy}
+  Combinatorics/     — Native finite combinatorics in HFSet (1 sub-module)
+    Counting  — pigeonhole, inclusion–exclusion (2 and 3 sets), card lemmas
   Topology/          — Topological spaces over HFSet (5 sub-modules)
     Basic, Interior, Subspace, Neighborhoods, Separation
 ```
@@ -92,18 +99,20 @@ Beyond the Zermelo axioms, the library includes:
 
 | Area | Highlights |
 |------|-----------|
-| **Von Neumann arithmetic** | `vN : ℕ₀ → HFSet`; GCD, Fibonacci, binomial, totient, Cantor pairing, Gödel beta, primes (TFA, Gauss lemma), Fermat–Wilson, CRT |
-| **Abstract algebra** | `HFGroup`, `HFSubgroup`, `HFGroupHom`, `HFNormalSubgroup`, `HFRing`, `HFField`, `HFModule`, quotient groups, three isomorphism theorems, correspondence theorem |
-| **Group actions & Sylow** | `HFGroupAction`, orbits, stabilizers, orbit-stabilizer (via Lagrange); McKay's combinatorial proof of Cauchy's theorem (complete, §1–§32 in `Algebra/Sylow.lean`): D.4.D McKay lemma + Cauchy's theorem (`cauchy_minimal`) |
+| **Von Neumann arithmetic** | `vN : ℕ₀ → HFSet`; GCD, Fibonacci, binomial, totient, Cantor pairing, Gödel beta, primes (TFA, Gauss lemma), Fermat–Wilson, CRT; Peano-system initiality (`InitialityVN`) |
+| **Abstract algebra** | `HFGroup`, `HFSubgroup`, `HFGroupHom`, `HFNormalSubgroup`, `HFRing`, `HFField`, `HFModule`, quotient groups, three isomorphism theorems, correspondence theorem, **Zassenhaus' butterfly lemma** |
+| **Group actions & Sylow** | `HFGroupAction`, orbits, stabilizers, orbit-stabilizer (via Lagrange); McKay's combinatorial proof of Cauchy's theorem; **Sylow I + II** (`sylow_first`, `sylowConjugate` via the p-group fixed-point theorem) |
+| **Rings, fields & matrices** | Generic quotient ring `R/I` (`HFIdeal`, `HFRing.quotient`); `ℤ/nℤ` ring and `ℤ/pℤ` field (`ZModN`, `ZModFieldP`, inverse via Fermat); n×n matrix ring `HFMatrixRing` over any `HFRing` |
+| **Integers & rationals** | `ℤ₀ = Quotient (ℕ₀×ℕ₀)`, commutative ring laws, order, GCD, p-adic valuation, Möbius μ, Liouville λ, Bézout, canonical representative; `ℚ₀` with absolute value, density, dyadic Cauchy sequences |
+| **Combinatorics** | Native pigeonhole principle, inclusion–exclusion (2 and 3 sets), cardinality/injectivity/surjectivity lemmas (`Combinatorics/Counting`) |
 | **Order theory** | Preorder, partial/total/well order; `wf_induction`, `no_infinite_descent` |
-| **Integers** | `ℤ₀ = Quotient (ℕ₀×ℕ₀)`, commutative ring laws, order, GCD, p-adic valuation, Möbius μ, Liouville λ |
 | **Topology** | `HFTopSpace`, interior/closure/boundary, subspace topology, continuous maps, neighborhood spaces, separation axioms T₀–T₄ |
 
 
 
 | Type | Definition | Module |
 |------|-----------|--------|
-| `CList` | `inductive CList \| mk : List CList → CList` | Basic |
+| `CList` | `inductive CList \| mk : PList CList → CList` | Basic |
 | `HFSet` | `Quotient CList.Setoid` | HFSets |
 
 ### Core pipeline
@@ -126,7 +135,7 @@ CList  ──normalize──▶  CList (canonical form)
 lake build AczelSetTheory
 ```
 
-Requires Lean v4.29.0 (see `lean-toolchain`).
+Requires Lean v4.30.0 (see `lean-toolchain`).
 
 ### Running
 
@@ -141,8 +150,10 @@ lake build Main && lake env lean --run Main.lean
 - [NAMING-CONVENTIONS.md](NAMING-CONVENTIONS.md) — Extended naming rules and symbol dictionary
 - [CHANGELOG.md](CHANGELOG.md) — Change history
 - [CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md) — Project status overview
-- [DEPENDENCIES.md](DEPENDENCIES.md) — Module dependency diagram
-- [NEXT_STEPS.md](NEXT_STEPS.md) — Development roadmap
+- [DEPENDENCIES.md](DEPENDENCIES.md) — Module dependency diagram (initial-phase scope; use `lake graph` for the full graph)
+- [NEXT_STEPS.md](NEXT_STEPS.md) — Development roadmap (tactical)
+- [PLANNING.md](PLANNING.md) / [PLANNING-FASE-B.md](PLANNING-FASE-B.md) — Long-term roadmap and FASE B milestone tracking
+- [AUDIT-MODULE-MATRIX.md](AUDIT-MODULE-MATRIX.md) — Per-module audit (LOC, sorry/axiom/noncomputable counts)
 
 ### Documentación heredada de Peano
 

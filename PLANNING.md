@@ -1,6 +1,6 @@
 # PLANNING — AczelSetTheory
 
-**Last updated:** 2026-06-02
+**Last updated:** 2026-06-10
 **Author:** Julián Calderón Almendros
 
 > Plan de largo plazo para AczelSetTheory. Cada fase es ejecutable de forma
@@ -12,6 +12,27 @@
 > [doc/peano/INTUICIONES.md](doc/peano/INTUICIONES.md) y la documentación de
 > referencia de sus módulos en `doc/REFERENCE-{Arithmetic,Combinatorics,Foundation,
 > GroupTheory,ListsAndSets,NumberTheory,Prelim}.md`.
+
+---
+
+## ✅ Check-in (2026-06-10) — FASE B casi cerrada (8/9 milestones)
+
+Detalle completo en [`PLANNING-FASE-B.md`](PLANNING-FASE-B.md). Estado de los 9 milestones:
+
+| Milestone | Estado | Salida |
+|---|---|---|
+| M1B (auditoría ⚠️ + CosetCount) | ✅ CERRADO 2026-06-05 | ADR-012/013 |
+| M2B (ℚ₀ AbsVal + Density) | ✅ CERRADO | `Integers/Rationals/{AbsVal,Density}.lean` |
+| M3B (ℚ₀ métrica / Cauchy diádico) | ✅ CERRADO | `Integers/Rationals/IsCauchy.lean` |
+| M4B (canonicalRep ℤ₀) | ✅ CERRADO commit b9484c7 | `Integers/Canonical.lean` (ADR-014) |
+| M5B.0 (Bézout ℤ₀) | ✅ CERRADO commit 7d828db | `Integers/Bezout.lean` |
+| M5B (ℤ/nℤ + ℤ/pℤ) | ✅ CERRADO commits bf96be7/28e78bb | `Integers/ZModN.lean` (ADR-016) |
+| M6B (matrices Mₙ sobre HFRing) | ✅ CERRADO 2026-06-10 | `Algebra/HFMatrix.lean` |
+| M7B (Combinatorics nativa) | ✅ CERRADO 2026-06-08 | `Combinatorics/Counting.lean` |
+| **M8B (cierre doc + RFC FASE C)** | ⏳ **PENDIENTE** | único restante |
+
+Invariante 0/0/0/0 mantenido (0 sorry / 0 noncomputable / 0 axiomas privados / 0 warnings).
+Build: 241 jobs ✅, Lean v4.30.0. Próximo y último paso de FASE B: **M8B**.
 
 ---
 
@@ -140,14 +161,14 @@ Detalle táctico en `NEXT_STEPS.md`. Orden de ejecución aprobado (2026-05-28):
 
 **Criterio de cierre:** tabla §1–§7 del REFERENCE de paridad con 0 ❌.
 
-### 🅱️ FASE B — Consolidación post-paridad (~6–8 sesiones)
+### 🅱️ FASE B — Consolidación post-paridad — **8/9 cerrada (2026-06-10)**
 
 Una vez cerrada la paridad, atacar las extensiones naturales que Peano no podía expresar pero que cierran el discurso aritmético:
 
-1. **B1. ℚ₀ extendido**: densidad, completitud parcial, valor absoluto, métrica `|p−q|`.
-2. **B2. Bridge `ℤ₀ ↔ HFInt`** (si todavía hay drift entre ambos): unificación.
-3. **B3. Anillos cocientes concretos** sobre HFRing: `ℤ₀/(n)`, anillos de matrices `Mₙ(ℤ₀)` (uso de `FinList`/`NPow`).
-4. **B4. Documentación de cierre**: revisar `THOUGHTS.md`, congelar `REFERENCE-Paridad-Peano-Aczel.md` con sello "Paridad completa".
+1. **B1. ℚ₀ extendido** ✅: valor absoluto (`AbsVal`), densidad (`Density`), Cauchy diádico (`IsCauchy`). Métrica/completitud total se difiere a FASE C (requiere ASet₁).
+2. **B2. Bridge `ℤ₀ ↔ HFInt`** ✅ *resuelto por decisión*: **ADR-014** descarta `HFInt`; se fija representante canónico único `canonicalRep` en `Integers/Canonical.lean`. No hay drift.
+3. **B3. Anillos cocientes concretos** ✅: `ℤ/nℤ` y cuerpo `ℤ/pℤ` (`Integers/ZModN.lean`, sobre `vN n`; **ADR-016**: no `HFRing_of_ℤ₀` por finitud hereditaria); anillo cociente genérico `R/I` (`Algebra/QuotientRing.lean`); matrices n×n `HFMatrixRing` sobre cualquier `HFRing` (`Algebra/HFMatrix.lean`, M6B). Determinante diferido a FASE C.
+4. **B4. Documentación de cierre** ⏳ **PENDIENTE (= M8B)**: congelar `REFERENCE-Paridad-Peano-Aczel.md` con sello "Paridad completa" y redactar `RFC-FASE-C.md` (C1/C2/C3). Es el único milestone restante de FASE B.
 
 ### 🅲️ FASE C — Decisión: ¿extender HF o saltar a ASet₁? (punto de inflexión)
 

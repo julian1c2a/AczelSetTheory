@@ -12,6 +12,42 @@
 > [`AUDIT-MODULE-MATRIX.md`](AUDIT-MODULE-MATRIX.md). No se regenera aquí por
 > coste prohibitivo a ~180 módulos.
 
+## Capas actuales (vista a nivel de subsistema, 2026-06-10)
+
+Diagrama estable de dependencias entre subsistemas (las flechas indican "depende de").
+A diferencia del grafo módulo-a-módulo de abajo, esta vista de alto nivel no se
+desactualiza al añadir módulos dentro de una capa.
+
+```text
+peanolib (dep. externa: ℕ₀, aritmética de Robinson, Ψ/Λ, FSet, Wilson)
+   │
+   ▼
+PList/  ──►  CList/  ──►  HFSets  ──►  Operations/  ──►  Axioms/
+                                                            │
+                          ┌─────────────────────────────────┤
+                          ▼                                  ▼
+                        VN/  (vN : ℕ₀ → HFSet,            Combinatorics/
+                              paridad Peano)               (pigeonhole, incl-excl)
+                          │
+        ┌─────────────────┼───────────────────┬───────────────────┐
+        ▼                 ▼                   ▼                   ▼
+   Algebra/          Integers/            Topology/          (otras capas
+   (HFGroup,         (ℤ₀, ℚ₀, ZModN,      (HFTopSpace,        nativas futuras)
+    HFRing,           Bezout,              T₀–T₄)
+    Sylow,            Canonical)
+    QuotientRing,        │
+    HFMatrix)           ▼
+        ▲           Rationals/ (AbsVal, Density, IsCauchy)
+        └───── Algebra/Ring consumido por Integers/ZModN, Algebra/HFMatrix
+```
+
+**Notas de capa:**
+
+- `Combinatorics/` y `VN/` consumen `Axioms/` (cardinalidad, ordinales); son la teoría nativa (ADR-000).
+- `Integers/ZModN` y `Algebra/HFMatrix` consumen `Algebra/Ring` (estructura `HFRing`).
+- `Algebra/Sylow` consume `Combinatorics`-equivalentes vía `Axioms/Cardinal` + cuentas de cosets.
+- Todas las capas terminan importadas en el barrel raíz `AczelSetTheory.lean`.
+
 ## Project Structure
 
 ```text
