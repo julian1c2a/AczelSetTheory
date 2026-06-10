@@ -1,6 +1,6 @@
 # Current Project Status — AczelSetTheory
 
-**Last updated:** 2026-06-06
+**Last updated:** 2026-06-10
 **Author**: Julián Calderón Almendros
 
 ---
@@ -9,11 +9,11 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules (non-barrel) | 137 |
-| Total modules (incl. barrels) | 146 |
-| Modules with 0 sorry | 138 / 138 |
+| Total modules (non-barrel) | 153 |
+| Total modules (incl. barrels) | 164 |
+| Modules with 0 sorry | 153 / 153 |
 | Total sorry | 0 |
-| Build status | ✅ Passing — 0 errors, 0 warnings |
+| Build status | ✅ Passing — 0 errors, 0 warnings (241 jobs) |
 | Lean version | v4.30.0 |
 | Naming convention | Mathlib-style (see NAMING-CONVENTIONS.md) |
 
@@ -123,7 +123,7 @@
 | Axioms/WellOrder.lean | ✅ |
 | Axioms/LinearOrder.lean | ✅ |
 
-### VN/ (35 modules)
+### VN/ (49 modules)
 
 | Module | Key exports | Status |
 |--------|-------------|--------|
@@ -162,6 +162,20 @@
 | VN/PrimeVN.lean | `prime_HF`, `dvd_HF`, TFA, Gauss, 15 theorems | ✅ |
 | VN/FermatVN.lean | `vN_fermat_little`, `vN_wilson` | ✅ |
 | VN/CRTVN.lean | `vN_chinese_remainder` | ✅ |
+| VN/ActionVN.lean | acción de grupo sobre vN; puente orbital | ✅ |
+| VN/CorrespondenceTheoremVN.lean | puente teorema de correspondencia sobre vN | ✅ |
+| VN/CountingVN.lean | pigeonhole + inclusión-exclusión sobre vN | ✅ |
+| VN/FirstIsomorphismVN.lean | primer teorema de isomorfismo instanciado sobre vN | ✅ |
+| VN/InitialityVN.lean | `HFNat`, `HFNatPeanoSystem`, `vN_nat`, `vN_morph`, `vN_morph_unique` | ✅ |
+| VN/LatticeVN.lean | `minVN`, `maxVN` — imágenes de min/max bajo vN; 14+ teoremas | ✅ |
+| VN/NormalSubgroupVN.lean | puente subgrupo normal sobre vN | ✅ |
+| VN/OrbitVN.lean | órbitas y estabilizadores sobre vN | ✅ |
+| VN/PermVN.lean | permutaciones sobre vN n como `SymVN n` | ✅ |
+| VN/QuotientGroupVN.lean | grupo cociente instanciado sobre vN | ✅ |
+| VN/SecondIsomorphismVN.lean | segundo teorema de isomorfismo sobre vN | ✅ |
+| VN/SignVN.lean | signo de permutación sobre vN | ✅ |
+| VN/SymGroupVN.lean | grupo simétrico `SymVN n` sobre vN | ✅ |
+| VN/ThirdIsomorphismVN.lean | tercer teorema de isomorfismo sobre vN | ✅ |
 
 ### Algebra/ (22 modules)
 
@@ -189,6 +203,7 @@
 | Algebra/Sylow.lean | `mckayCarrier`, `mckayShift`, `orbitOf`, `periodOf`, `succ_n_dvd_card_mckayFixedPoints` (D.4.D McKay), `p_group_fixed_point`, `sylowConjugate`, `SylowConjugateTotal_of_isSylowExponent`, 50+ teoremas | ✅ |
 | Algebra/Zassenhaus.lean | `prodSubgroup`, `mem_prodSubgroup_iff`, `prodNKHM`, `prodN_HK`, `prodN_HM`, `prodN_HM_normal_in_prodN_HK`, `zassenhaus_bijection` (Lema de la Mariposa) | ✅ |
 | Algebra/QuotientRing.lean | `HFIdeal`, `toAddSubgroup`, `toAddSubgroup_isNormal`, `quotientMul`, `mul_welldefined`, `HFRing.quotient` (anillo cociente genérico) | ✅ |
+| Algebra/HFMatrix.lean | `finSumRing` (+ congr/swap/mul), `matrixCarrier`, `matAdd`, `matNeg`, `matZero`, `matOne`, `matMul`, `HFMatrixRing` (anillo de matrices n×n) | ✅ |
 
 ### Integers/ (9 modules)
 | Module | Key exports | Status |
@@ -202,6 +217,12 @@
 | Integers/MobiusLiouville.lean | `μ` (Möbius), `λ` (Liouville), multiplicatividad | ✅ |
 | Integers/Bezout.lean | `bezout_ofNat`, `bezout`, `bezout_coprime`, `extEuclidNat`, `extEuclidNat_spec`, `bezoutCoeffs` | ✅ |
 | Integers/ZModN.lean | `HFAlgebra.ZModN` (ℤ/nℤ anillo), `ZModN_mul_comm`, `ZModFieldP` (ℤ/pℤ cuerpo, `p` primo) | ✅ |
+
+### Combinatorics/ (1 module)
+
+| Module | Key exports | Status |
+|--------|-------------|--------|
+| Combinatorics/Counting.lean | `pigeonhole`, `exists_collision_of_card_lt`, `eq_of_subset_of_card_eq`, `surjective_of_injective_of_card_eq`, `not_surjective_of_card_ne`, `card_union_add_card_inter`, `card_union`, `card_sep_le`, `card_union_three_add` (218 LOC) | ✅ |
 
 ### Topology/ (5 modules)
 
@@ -218,6 +239,43 @@
 ## Known Sorry Locations
 
 None — **0 sorry** across the entire project.
+
+---
+
+## Recent Achievements (2026-06-10) — M6B: anillo de matrices n×n `HFMatrixRing`
+
+- ✅ **Nuevo módulo `AczelSetTheory/Algebra/HFMatrix.lean`** (~720 LOC, 0 sorry / 0 noncomputable / 0 warnings).
+  - Matrices n×n sobre un `HFRing` arbitrario, representadas como tuplas en `nPow rng.R (n²)`.
+  - `finSumRing` (suma finita en anillo) + `finSumRing_congr/swap/mul/add`, `mul_finSumRing`, `finSumRing_mul`.
+  - Operaciones `matAdd`, `matNeg`, `matZero`, `matOne`, `matMul` con fórmulas de entrada (`nthEntry_mat*`).
+  - **`HFMatrixRing n rng : HFRing`** — todos los axiomas de anillo demostrados entrada a entrada (`nPow_ext`).
+  - Punto técnico: `mat_mul_assoc` vía `finSumRing_swap` + `symm` (sin `conv_rhs`, ausente sin Mathlib).
+- ✅ **FASE B → 7/9 milestones cerrados** (M6B Matrices). Pendientes: M8B (cierre doc + RFC FASE C).
+- ✅ **Build:** `lake build AczelSetTheory` → 241 jobs, 0 errores, 0 warnings.
+
+---
+
+## Recent Achievements (2026-06-08) — Auditoría y cierre de deuda documental
+
+- ✅ **INFORME-AUDITORIA-2026-06-08.md** generado: 14 hallazgos (H1–H14), 4 riesgos, plan de acción prioritario.
+- ✅ **NEXT_STEPS.md** corregido: M4B, M5B.0 y M5B marcados como ✅ COMPLETADO.
+- ✅ **Memoria del proyecto** actualizada con estado real FASE B (6/9 milestones cerrados).
+- ✅ **Riesgos R1/R2 verificados y cerrados**: peanolib `0f5dd7b` en `origin/master`; `InitialityVN`/`LatticeVN` en barrel VN.lean.
+- ✅ **AI-GUIDE.md / NAMING-CONVENTIONS.md**: placeholders `YYYY-MM-DD` y `[Autor]` rellenados.
+
+---
+
+## Recent Achievements (2026-06-07) — M5B: ZModN conmutativo + ZModFieldP + cierre noncomputable
+
+- ✅ **`ZModN_mul_comm`** — conmutatividad de ℤ/nℤ (commit `182131f`).
+  - `HFRing` no rastrea `mul_comm`; expuesto como teorema independiente.
+- ✅ **`ZModFieldP (p : ℕ₀) (hp : Prime p) : HFField`** — cuerpo ℤ/pℤ (commit `28e78bb`).
+  - Inverso: `modInv p a = a^(p−2) mod p` vía pequeño Teorema de Fermat.
+  - Requiere peanolib `0f5dd7b` (expone `Wilson.{modInv,modInv_lt,modInv_mul,modInv_pos}`).
+- ✅ **Noncomputable eliminado** en `Algebra/GroupHom.lean` y dependientes (commit `07720ff`).
+  - `HFGroupHom.Bijective` y `Zassenhaus` migrados a definición computable.
+  - Métrica global: **0 noncomputable def** mantenida.
+- ✅ **M5B cerrado**: ZModN + ZModFieldP + Bezout completo. FASE B → 6/9 milestones.
 
 ---
 

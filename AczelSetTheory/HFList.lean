@@ -311,4 +311,108 @@ def drop (k : ℕ₀) (t : FinList n) (h : k ≤ n) : FinList (Peano.Sub.sub n k
   ⟨HFList.drop k t.val, by
     rw [HFList.length_drop_le k t.val (by rw [t.property]; exact h), t.property]⟩
 
+-- ─────────────────────────────────────────────────────────────────
+-- get sobre cons: lemas de reducción
+-- ─────────────────────────────────────────────────────────────────
+
+theorem get_cons_zero (x : HFSet) (t : FinList n) (h : 𝟘 < σ n) :
+    (cons x t).get ⟨𝟘, h⟩ = x := rfl
+
+theorem get_cons_succ (x : HFSet) (t : FinList n) (j : ℕ₀) (h : σ j < σ n) :
+    (cons x t).get ⟨σ j, h⟩ = t.get ⟨j, by
+      simp only [PList.Omega0.ψ_lt_iff, PList.Omega0.ψ_succ] at h
+      simp only [PList.Omega0.ψ_lt_iff]; omega⟩ := rfl
+
+/-- `get ⟨0, _⟩` de cualquier (σ n)-tupla es su `head`. -/
+theorem get_zero_eq_head (t : FinList (σ n)) (h : 𝟘 < σ n) :
+    t.get ⟨𝟘, h⟩ = t.head := by
+  rcases t with ⟨l, hl⟩
+  match l with
+  | PList.nil => simp [HFList.length_nil] at hl
+  | PList.cons _ _ => rfl
+
+/-- `tail.get ⟨j,_⟩` coincide con `t.get ⟨σ j, _⟩`. -/
+theorem get_tail_succ (t : FinList (σ n)) (j : ℕ₀) (hj : j < n) :
+    t.tail.get ⟨j, hj⟩ = t.get ⟨σ j, by
+      simp only [PList.Omega0.ψ_lt_iff, PList.Omega0.ψ_succ]
+      simp only [PList.Omega0.ψ_lt_iff] at hj; omega⟩ := by
+  rcases t with ⟨l, hl⟩
+  match l with
+  | PList.nil => simp [HFList.length_nil] at hl
+  | PList.cons _ _ => rfl
+
+-- ─────────────────────────────────────────────────────────────────
+-- set: reemplazo en posición i
+-- ─────────────────────────────────────────────────────────────────
+
+private def setAux : (n : ℕ₀) → FinList n → ℕ₀ → HFSet → FinList n
+  | 𝟘,   t, _,   _ => t
+  | σ _, t, 𝟘,   v => cons v t.tail
+  | σ k, t, σ j, v => cons t.head (setAux k t.tail j v)
+
+/-- Reemplaza el i-ésimo componente de una n-tupla con `v`. -/
+def set (t : FinList n) (i : Fin₀ n) (v : HFSet) : FinList n :=
+  setAux n t i.val v
+
+-- ─────────────────────────────────────────────────────────────────
+-- set_get: lemas de acceso tras reemplazo
+-- ─────────────────────────────────────────────────────────────────
+
+private theorem setAux_get_eq :
+    ∀ (n : ℕ₀) (t : FinList n) (j : ℕ₀) (h : j < n) (v : HFSet),
+    (setAux n t j v).get ⟨j, h⟩ = v := by
+  intro n; induction n with
+  | zero  => intro _ j h; exact (Fin₀.elim_zero ⟨j, h⟩).elim
+  | succ k ih =>
+    intro t j h v; cases j with
+    | zero   => simp [setAux, get_cons_zero]
+    | succ j' =>
+      simp only [setAux, get_cons_succ]
+      exact ih t.tail j' (by
+        simp only [PList.Omega0.ψ_lt_iff, PList.Omega0.ψ_succ] at h
+        simp only [PList.Omega0.ψ_lt_iff]; omega) v
+
+set_option linter.unusedVariables false in
+private theorem setAux_get_ne :
+    ∀ (n : ℕ₀) (t : FinList n) (i j : ℕ₀) (hi : i < n) (hj : j < n)
+    (v : HFSet), i ≠ j → (setAux n t i v).get ⟨j, hj⟩ = t.get ⟨j, hj⟩ := by
+  intro n; induction n with
+  | zero  => intro _ i _ hi; exact (Fin₀.elim_zero ⟨i, hi⟩).elim
+  | succ k ih =>
+    intro t i j _hi hj v hne
+    cases i with
+    | zero =>
+      cases j with
+      | zero   => exact absurd rfl hne
+      | succ j' =>
+        simp only [setAux, get_cons_succ]
+        rw [← get_tail_succ t j' (by
+          simp only [PList.Omega0.ψ_lt_iff, PList.Omega0.ψ_succ] at hj
+          simp only [PList.Omega0.ψ_lt_iff]; omega)]
+    | succ i' =>
+      cases j with
+      | zero =>
+        simp only [setAux, get_cons_zero]
+        rw [← get_zero_eq_head t (Peano.StrictOrder.lt_zero_succ k)]
+      | succ j' =>
+        simp only [setAux, get_cons_succ]
+        rw [← get_tail_succ t j' (by
+          simp only [PList.Omega0.ψ_lt_iff, PList.Omega0.ψ_succ] at hj
+          simp only [PList.Omega0.ψ_lt_iff]; omega)]
+        exact ih t.tail i' j'
+          (by simp only [PList.Omega0.ψ_lt_iff, PList.Omega0.ψ_succ] at _hi
+              simp only [PList.Omega0.ψ_lt_iff]; omega)
+          (by simp only [PList.Omega0.ψ_lt_iff, PList.Omega0.ψ_succ] at hj
+              simp only [PList.Omega0.ψ_lt_iff]; omega)
+          v
+          (fun heq => hne (by rw [heq]))
+
+@[simp] theorem set_get_eq (t : FinList n) (i : Fin₀ n) (v : HFSet) :
+    (t.set i v).get i = v :=
+  setAux_get_eq n t i.val i.isLt v
+
+theorem set_get_ne (t : FinList n) (i j : Fin₀ n) (v : HFSet)
+    (h : i.val ≠ j.val) : (t.set i v).get j = t.get j :=
+  setAux_get_ne n t i.val j.val i.isLt j.isLt v h
+
 end FinList

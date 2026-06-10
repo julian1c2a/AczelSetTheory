@@ -3,8 +3,8 @@ Convenciones de Nombres — Estilo Estricto Mathlib
 Documento de referencia permanente para este proyecto.
 Todas las reglas se basan estrictamente en las Mathlib Naming Conventions.
 
-Última actualización: YYYY-MM-DD
-Autor: [Nombre del Autor]
+Última actualización: 2026-06-08
+Autor: Julián Calderón Almendros
 
 1. La Regla de Oro: Ante la duda, busca en Mathlib
 

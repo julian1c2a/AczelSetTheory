@@ -1,6 +1,6 @@
 # Design Decisions — AczelSetTheory
 
-**Last updated:** 2026-05-22
+**Last updated:** 2026-06-08
 **Author**: Julián Calderón Almendros
 
 Architectural Decision Records (ADR) for this project.
@@ -452,6 +452,44 @@ ideal: `(g'·h') − (g·h) = g'·(h'−h) + (g'−g)·h ∈ I`.
 - El módulo `Integers/ZModN.lean` (esqueleto) no se desarrolla en esta fase.
 - `HFRing.quotient` es no-conmutativo por defecto (igual que `HFRing`); el cociente
   de un anillo conmutativo es conmutativo, pero `HFRing` no rastrea conmutatividad.
+
+---
+
+## ADR-017: Exposición pública de `Wilson.modInv` en peanolib
+
+**Date**: 2026-06-07
+**Status**: Accepted
+
+**Context**:
+`ZModFieldP` requiere calcular el inverso multiplicativo de `a` en ℤ/pℤ usando la
+fórmula de Fermat: `modInv p a = a^(p−2) mod p`. Esta función y sus lemas asociados
+(`modInv_lt`, `modInv_mul`, `modInv_pos`) existían en peanolib como definiciones
+**privadas** en `Peano.PeanoNat.NumberTheory.Wilson`. Sin exponerlos, la implementación
+de `ZModFieldP` en AczelSetTheory no podía importar ni usar estos resultados.
+
+**Decision**:
+Se realiza un commit en peanolib (`0f5dd7b`) que hace públicos los cuatro símbolos:
+
+- `Peano.Wilson.modInv (p a : ℕ₀) : ℕ₀` — `a^(p−2) mod p`
+- `Peano.Wilson.modInv_lt (hp : Prime p) : modInv p a < p`
+- `Peano.Wilson.modInv_mul (hp : Prime p) (ha_pos : 0 < a) (ha_lt : a < p) : a * modInv p a ≡ 1 [MOD p]`
+- `Peano.Wilson.modInv_pos (hp : Prime p) (ha_ne : a ≠ 0) : 0 < modInv p a`
+
+**Rationale**:
+- `modInv` es la única manera computable de obtener el inverso en ℤ/pℤ sin recurrir
+  a `Classical.choose` (que violaría el invariante `0 noncomputable def`).
+- Los lemas privados ya estaban demostrados; el commit solo cambia visibilidad.
+- ADR-001 (sin Mathlib) impide usar `ZMod` de Mathlib; la implementación propia
+  en peanolib es la alternativa legítima.
+
+**Consequences**:
+- `Integers/ZModN.lean` puede importar `Peano.PeanoNat.NumberTheory.Wilson` y usar
+  directamente `modInv`, `modInv_lt`, `modInv_mul`.
+- Cualquier módulo futuro que necesite inverso modular en ℕ₀ debe usar esta API.
+- Commit `0f5dd7b` está en `origin/master` de peanolib (verificado 2026-06-08).
+- Este ADR documenta la razón por la que peanolib recibió un commit de "solo visibilidad"
+  después del congelamiento declarado en ADR-000 — el congelamiento afecta a teoría nueva,
+  no a la exposición de infraestructura ya existente.
 
 ---
 

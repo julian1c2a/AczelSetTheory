@@ -20,3 +20,4 @@ import AczelSetTheory.Algebra.SecondIsomorphism
 import AczelSetTheory.Algebra.ThirdIsomorphism
 import AczelSetTheory.Algebra.CorrespondenceTheorem
 import AczelSetTheory.Algebra.Zassenhaus
+import AczelSetTheory.Algebra.HFMatrix

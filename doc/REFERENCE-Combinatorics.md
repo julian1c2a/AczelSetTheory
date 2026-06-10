@@ -603,3 +603,84 @@ Los siguientes módulos están declarados pero contienen solo secciones comentad
 | `Binom` | `binom`, `binom_pascal`, `binom_mul_factorials`, `prime_dvd_binom_prime` | high |
 | `NewtonBinom` | `newton_binom`, `sum_binom_eq_pow_two`, `binomTerm` | high |
 | `Group` | `FinGroup`, `Subgroup`, `GroupHom`, `gpow`, `order`, `cyclicSubgroup` | high |
+
+---
+
+## AczelSetTheory/Combinatorics/ — capa nativa (ADR-000)
+
+> **Proyecto**: AczelSetTheory  
+> **Actualizado**: 2026-06-08  
+> Teoría combinatoria construida directamente sobre `HFSet` (no transporte de Peano).  
+> Módulo único por ahora; ver `Combinatorics.lean` (barrel).
+
+### Módulo: `Combinatorics/Counting.lean`
+
+**Archivo**: `AczelSetTheory/Combinatorics/Counting.lean`  
+**Namespace**: `HFSet`  
+**LOC**: 218  
+**Estado**: ✅ Complete — 0 sorry, 0 noncomputable def
+
+---
+
+#### §1. Principio del palomar — forma directa
+
+| Símbolo | Firma | Importancia |
+| --- | --- | --- |
+| `pigeonhole` | `(∀ x, x∈A → f x∈B) → (f inyectiva sobre A) → card A ≤ card B` | high |
+
+---
+
+#### §2. Principio del palomar — forma de colisión
+
+| Símbolo | Firma | Importancia |
+| --- | --- | --- |
+| `exists_collision_of_card_lt` | `(f : A→B) → card B < card A → ∃ x≠y ∈ A, f x = f y` | high |
+
+---
+
+#### §3. Inyectiva ↔ biyectiva para tallas iguales
+
+| Símbolo | Enunciado resumido | Importancia |
+| --- | --- | --- |
+| `eq_of_subset_of_card_eq` | `A ⊆ B ∧ card A = card B → A = B` | high |
+| `surjective_of_injective_of_card_eq` | `f inyectiva A→B ∧ card A = card B → f sobreyectiva` | high |
+| `not_surjective_of_card_ne` | `f inyectiva A→B ∧ card A ≠ card B → ∃ y∈B sin preimagen` | medium |
+
+---
+
+#### §4. Inclusión-exclusión — dos conjuntos
+
+| Símbolo | Enunciado resumido | Importancia |
+| --- | --- | --- |
+| `card_union_add_card_inter` | `card(A∪B) + card(A∩B) = card A + card B` | high |
+| `card_union` | `card(A∪B) = card A + card B − card(A∩B)` (resta truncada) | medium |
+
+---
+
+#### §5. Cota de cardinalidad para sep
+
+| Símbolo | Firma | Importancia |
+| --- | --- | --- |
+| `card_sep_le` | `[DecidablePred P] → card (sep A P) ≤ card A` | medium |
+
+---
+
+#### §6. Inclusión-exclusión — tres conjuntos
+
+| Símbolo | Enunciado resumido | Importancia |
+| --- | --- | --- |
+| `card_union_three_add` | `card(A∪B∪C) + card(A∩B) + card(A∩C) + card(B∩C) = card A + card B + card C + card(A∩B∩C)` | high |
+
+---
+
+#### Lemas en otros módulos (referencia cruzada)
+
+| Símbolo | Módulo | Enunciado resumido |
+| --- | --- | --- |
+| `card_cartProd` | `Axioms/OrdinalNat` | `card(A ×ₕ B) = card A * card B` |
+| `card_nPow` | `Axioms/OrdinalNat` | `card(nPow A n) = (card A)^n` |
+| `card_powerset` | `Axioms/Cardinal` | `card(powerset A) = 2^(card A)` |
+| `card_inter_le` | `Axioms/OrdinalNat` | `card(A∩B) ≤ card A` |
+| `card_setminus_le` | `Axioms/OrdinalNat` | `card(A\B) ≤ card A` |
+| `card_symDiff` | `Axioms/OrdinalNat` | `card(A△B) = card(A\B) + card(B\A)` |
+| `card_partition` | `Axioms/OrdinalNat` | `card A = card(A∩B) + card(A\B)` |

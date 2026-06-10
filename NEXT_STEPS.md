@@ -1,6 +1,32 @@
 # Next Steps
 
-**Last updated:** 2026-06-03
+**Last updated:** 2026-06-10 (M6B cerrado — matrices n×n sobre HFRing)
+
+---
+
+## ✅ COMPLETADO — M6B: Matrices Mₙ sobre HFRing (2026-06-10)
+
+`AczelSetTheory/Algebra/HFMatrix.lean` (~720 LOC, **0 sorry, 0 noncomputable, 0 warnings**).
+
+Construcción de matrices n×n como `HFSet` (portador `nPow rng.R (n²)`) con estructura
+**`HFMatrixRing n rng : HFRing`** completa: `add`, `mul`, `zero`, `one`, `neg` + todos los
+axiomas de anillo.
+
+| ID | Estado | Tarea |
+|----|--------|-------|
+| M6B-1 | ✅ DONE | `buildNPow`/`deconNPow` ↔ `FinList` (round-trip `buildNPow_decon`, `mem_buildNPow`) |
+| M6B-2 | ✅ DONE | `buildEntries`/`nthEntry` + `buildEntries_get` (indexado posicional) |
+| M6B-3 | ✅ DONE | `matAdd`, `matMul`, `matZero`, `matOne`, `matNeg` + lemas de cierre |
+| M6B-4 | ✅ DONE | `nthEntry_matAdd/matNeg/matMul` (fórmula de entrada por operación) |
+| M6B-5 | ✅ DONE | `finSumRing` + `finSumRing_congr/swap/mul/add`, `mul_finSumRing`, `finSumRing_mul` |
+| M6B-6 | ✅ DONE | `mat_add_assoc`, `mat_mul_assoc` (asociatividad vía intercambio de sumas dobles) |
+| M6B-7 | ✅ DONE | `HFMatrixRing n rng : HFRing` ensamblado + barrel `Algebra.lean` |
+
+**Lecciones técnicas (en `feedback_lean.md`):**
+- `conv_rhs`/`conv_lhs` NO disponibles (macros Mathlib) → usar `symm` para reescribir el RHS.
+- `rw [finSumRing_congr cb]` siempre reescribe la PRIMERA ocurrencia (LHS de la meta).
+- `induction n generalizing start` con `{start}` implícito → en el IH sigue implícito:
+  pasar con named arg `ih (start := σ start) ...`.
 
 ---
 
@@ -37,33 +63,40 @@ inferencia + bridge `▸` para igualdad definitional `HAdd.hAdd ↔ Add.add`.
 
 ---
 
-## 🔵 EN PROGRESO — M4B: Representación canónica en ℤ₀
+## ✅ COMPLETADO — M4B: Representación canónica en ℤ₀ (2026-06-05)
 
-`AczelSetTheory/Integers/Canonical.lean`: esqueleto creado 2026-06-05.
+`AczelSetTheory/Integers/Canonical.lean` — commit `b9484c7`.
 
 | ID | Estado | Tarea |
 |----|--------|-------|
 | M4B-1 | ✅ DONE | `canonicalRep : ℕ₀ × ℕ₀ → ℕ₀ × ℕ₀` — computable, definido |
-| M4B-2 | 🔵 sorry | `canonicalRep_idempotent` — `canonicalRep ∘ canonicalRep = canonicalRep` |
-| M4B-3 | 🔵 sorry | `canonicalRep_equiv` — `intEq p (canonicalRep p)` |
-| M4B-4 | 🔵 sorry | `canonicalRep_unique` — `intEq p q → canonicalRep p = canonicalRep q` |
-| M4B-5 | ⏳ PENDING | Vincular `canonicalRep` con `repr` de `Basic.lean` (igualdad vía `intEq`) |
+| M4B-2 | ✅ DONE | `canonicalRep_idempotent` — `canonicalRep ∘ canonicalRep = canonicalRep` |
+| M4B-3 | ✅ DONE | `canonicalRep_equiv` — `intEq p (canonicalRep p)` |
+| M4B-4 | ✅ DONE | `canonicalRep_unique` — `intEq p q → canonicalRep p = canonicalRep q` |
+| M4B-5 | ✅ DONE | Vínculo `canonicalRep` ↔ `repr` via `intEq` |
 
 **Nota de diseño:** `intEq` hecho público en `Basic.lean`. `repr`/`mk_repr` viven en
 `Basic.lean` (via `normalize`); `Canonical.lean` no los reduplica. Ver ADR-014.
 
 ---
 
-## ✅ COMPLETADO — M5B.0: Bezout en ℤ₀ (2026-06-XX)
+## ✅ COMPLETADO — M5B.0: Bezout en ℤ₀ (2026-06-07)
 
-`AczelSetTheory/Integers/Bezout.lean` — commit `4c276fb`:
+`AczelSetTheory/Integers/Bezout.lean` — commit `7d828db`:
 - `bezout_ofNat`: ∀ a b : ℕ₀, ∃ x y : ℤ₀, ofNat a · x + ofNat b · y = ofNat (gcd a b) — **sin sorry**
 - `bezout_coprime_ofNat`: gcd a b = 1 → ∃ x y : ℤ₀, … = 1 — **sin sorry**
-- `bezout` / `bezout_coprime` para ℤ₀ general — `sorry` (requiere descomposición por signo)
+- `bezout` / `bezout_coprime` para ℤ₀ general — **sin sorry** (descomposición de signo completada)
+- `bezoutCoeffs : ℤ₀ → ℤ₀ → ℤ₀ × ℤ₀` — par computable de coeficientes
 
-## 🔵 PENDIENTE — M5B: ℤ/Nℤ y campos finitos
+## ✅ COMPLETADO — M5B: ℤ/nℤ y campos finitos (2026-06-07)
 
-`AczelSetTheory/Integers/ZModN.lean`: completar ZModN → IsField (ZModN p), usando `bezout_ofNat`.
+`AczelSetTheory/Integers/ZModN.lean` — commits `bf96be7`, `28e78bb`, `182131f`:
+
+- `ZModN (n : ℕ₀) (hn : n ≠ 𝟘) : HFRing` — portador `vN n`, ops vía `card`/`vN` + `mod`
+- `ZModN_mul_comm` — conmutatividad explícita (HFRing no rastrea `mul_comm`)
+- `ZModFieldP (p : ℕ₀) (hp : Prime p) : HFField` — inverso vía `modInv p a = a^(p−2) mod p`
+- Requiere peanolib commit `0f5dd7b` (expone `Wilson.{modInv,modInv_lt,modInv_mul}`)
+- ⚠️ **Nota**: commit `0f5dd7b` **ya está en `origin/master`** de peanolib (verificado 2026-06-08)
 
 ---
 
@@ -73,6 +106,24 @@ inferencia + bridge `▸` para igualdad definitional `HAdd.hAdd ↔ Add.add`.
 invariante "0 sorry, 0 axiomas privados, 0 warnings". Todos los milestones M1–M7 cerrados.
 Resto de la arquitectura: CList/ + Operations/ + Axioms/ + PList/ + VN/ + Algebra/ + Integers/ + Topology/.
 Ver PLANNING.md para el roadmap a largo plazo (FASE B en adelante).
+
+---
+
+## ✅ COMPLETADO — M7B: Combinatorics nativa (2026-06-08)
+
+`AczelSetTheory/Combinatorics/Counting.lean` — 218 LOC, 0 sorry, build ✅ (35 jobs).
+
+| ID | Estado | Tarea |
+|----|--------|-------|
+| M7B-1 | ✅ DONE | `pigeonhole` + `exists_collision_of_card_lt` (palomar directo y colisión) |
+| M7B-2 | ✅ DONE | `eq_of_subset_of_card_eq`, `surjective_of_injective_of_card_eq`, `not_surjective_of_card_ne` |
+| M7B-3 | ✅ DONE | `card_union_add_card_inter`, `card_union` (inclusión-exclusión 2 conjuntos) |
+| M7B-4 | ✅ DONE | `card_sep_le [DecidablePred P]` — cota para separación |
+| M7B-5 | ✅ DONE | `card_union_three_add` — inclusión-exclusión 3 conjuntos (forma aditiva sin resta) |
+| M7B-6 | ✅ DONE | `doc/REFERENCE-Combinatorics.md` proyectado con §1–§6 + referencias cruzadas |
+
+**Nota**: `card_cartProd`, `card_nPow`, `card_powerset` ya existían en `Axioms/OrdinalNat`
+y `Axioms/Cardinal`; no se duplican. `Counting.lean` documenta las referencias cruzadas.
 
 ---
 

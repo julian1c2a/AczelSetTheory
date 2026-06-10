@@ -1,7 +1,7 @@
 Guía Maestra de la IA — Estándares de Documentación y Desarrollo
 
-Última actualización: YYYY-MM-DD
-Autor: [Nombre del Autor]
+Última actualización: 2026-06-08
+Autor: Julián Calderón Almendros
 
 Este documento establece los requisitos universales y estándares para la documentación técnica, escritura de código y flujo de trabajo de este proyecto Lean 4.
 

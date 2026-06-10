@@ -1,10 +1,10 @@
 # Technical Reference — AczelSetTheory
 
-**Last updated:** 2026-06-05
+**Last updated:** 2026-06-08
 **Author**: Julián Calderón Almendros
 **Lean version**: v4.30.0
 
-> **Nota (2026-06-05)**: la tabla §1 lista los 107 módulos del núcleo histórico. Para el inventario completo y al día (175 ficheros `.lean` totales — 172 bajo `AczelSetTheory/` más `Main.lean`, `lakefile.lean` y la raíz `AczelSetTheory.lean`), incluidos `Algebra/{Action,CosetAction,CorrespondenceTheorem,FirstIsomorphism,SecondIsomorphism,ThirdIsomorphism,Lattice,LinearSpace,Module,Monoid,NormalSubgroup,QuotientGroup,RingHom,Sylow,Zassenhaus}`, `Combinatorics/Counting`, varios `VN/*VN`, etc.) consulta [`AUDIT-MODULE-MATRIX.md`](AUDIT-MODULE-MATRIX.md). Documentación detallada por subsistema en [`doc/REFERENCE-Algebra.md`](doc/REFERENCE-Algebra.md), [`doc/REFERENCE-GroupTheory.md`](doc/REFERENCE-GroupTheory.md), [`doc/REFERENCE-Combinatorics.md`](doc/REFERENCE-Combinatorics.md) y [`doc/REFERENCE-VN.md`](doc/REFERENCE-VN.md).
+> **Nota (2026-06-08)**: la tabla §1 lista los módulos del núcleo histórico más las últimas adiciones. Para el inventario completo y al día (181 ficheros `.lean` totales bajo `AczelSetTheory/`), incluidos `Algebra/{Action,CosetAction,CorrespondenceTheorem,FirstIsomorphism,SecondIsomorphism,ThirdIsomorphism,Lattice,LinearSpace,Module,Monoid,NormalSubgroup,QuotientGroup,RingHom,Sylow,Zassenhaus,QuotientRing}`, `Integers/Canonical`, `Combinatorics/Counting`, 14 módulos adicionales en `VN/`, etc., consulta [`AUDIT-MODULE-MATRIX.md`](AUDIT-MODULE-MATRIX.md). Documentación detallada por subsistema en [`doc/REFERENCE-Algebra.md`](doc/REFERENCE-Algebra.md), [`doc/REFERENCE-GroupTheory.md`](doc/REFERENCE-GroupTheory.md), [`doc/REFERENCE-Combinatorics.md`](doc/REFERENCE-Combinatorics.md) y [`doc/REFERENCE-VN.md`](doc/REFERENCE-VN.md).
 
 ---
 
@@ -148,9 +148,11 @@ Below are the keys for reading and searching theorems.
 | 108 | `AczelSetTheory/Integers/Rationals/Density.lean` | `ℚ₀` | 🚧 Skeleton | Integers/Rationals, Integers/Rationals/AbsVal | Integers.lean |
 | 109 | `AczelSetTheory/Integers/ZModN.lean` | `HFAlgebra` | ✅ Complete | Algebra/{Ring,Field}, VN/{Arithmetic,IsNat,CardVN}, `Peano.PeanoNat.NumberTheory.{ModEq,Wilson}` | Integers.lean |
 | 110 | `AczelSetTheory/Topology/Basic.lean` | `HFTopology` | ✅ Complete | HFSets, Axioms/{Union,Intersection,Setminus,Subset,Singleton} | Topology/Interior, Topology/Neighborhoods, Topology/Subspace |
-| 111 | `AczelSetTheory/Topology/Interior.lean` | `HFTopology` | ⚠️ sorry | Topology/Basic, Axioms/{Separation,Intersection,Setminus} | — |
-| 112 | `AczelSetTheory/Topology/Neighborhoods.lean` | `HFTopology` | ⚠️ sorry | Topology/Basic, Axioms/{Separation,Powerset} | — |
-| 113 | `AczelSetTheory/Topology/Subspace.lean` | `HFTopology` | ⚠️ sorry | Topology/Basic, Axioms/{Separation,Powerset} | — |
+| 111 | `AczelSetTheory/Topology/Interior.lean` | `HFTopology` | ✅ Complete | Topology/Basic, Axioms/{Separation,Intersection,Setminus} | — |
+| 112 | `AczelSetTheory/Topology/Neighborhoods.lean` | `HFTopology` | ✅ Complete | Topology/Basic, Axioms/{Separation,Powerset} | — |
+| 113 | `AczelSetTheory/Topology/Subspace.lean` | `HFTopology` | ✅ Complete | Topology/Basic, Axioms/{Separation,Powerset} | — |
+| 114 | `AczelSetTheory/Integers/Canonical.lean` | `ℤ₀` | ✅ Complete | Integers/Basic, Integers/Order, `Peano.PeanoNat.{Sub,Order}` | Integers.lean |
+| 115 | `AczelSetTheory/Algebra/QuotientRing.lean` | `HFAlgebra` | ✅ Complete | Algebra/{Ring,QuotientGroup}, Axioms/{Separation,Decidable} | Integers/ZModN (futuro) |
 | — | `AczelSetTheory/Topology.lean` | — | ✅ Barrel | Topology/{Basic,Interior,Neighborhoods,Subspace} | AczelSetTheory.lean |
 | — | `AczelSetTheory/VN.lean` | — | ✅ Complete | VN/{Basic,Injective,IsNat,Arithmetic,FSet,PeanoAxioms,PeanoArith,PowVN,SubVN,DivVN,FactorialVN,CardVN,RankVN} | AczelSetTheory.lean |
 | — | `AczelSetTheory/PList.lean` | — | ✅ Complete | PList/{Basic,Lemmas,Omega0} | AczelSetTheory.lean |

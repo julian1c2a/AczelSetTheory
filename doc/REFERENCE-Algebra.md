@@ -1,6 +1,6 @@
 # Technical Reference — Algebra, Lattice & Structural Axioms
 
-**Last updated:** 2026-06-05 (M7 cerrado: `Algebra/Zassenhaus.lean` ✅ — Lema de la Mariposa; FASE A completa)
+**Last updated:** 2026-06-10 (M6B cerrado: `Algebra/HFMatrix.lean` ✅ — anillo de matrices n×n `HFMatrixRing`)
 **Parent:** [../REFERENCE.md](../REFERENCE.md)
 **Related:** [REFERENCE-HFSets.md](REFERENCE-HFSets.md) | [REFERENCE-Relations.md](REFERENCE-Relations.md) | [REFERENCE-VN.md](REFERENCE-VN.md)
 
@@ -51,6 +51,8 @@ foundation, decidability).
 | 96 | `AczelSetTheory/Algebra/LinearSpace.lean` | ✅ Complete |
 | 97 | `AczelSetTheory/Algebra/Sylow.lean` | ✅ Sylow I + II completos (§1–§40, §36-bis); 0 sorries (M6 cerrado 2026-06-04) |
 | 98 | `AczelSetTheory/Algebra/Zassenhaus.lean` | ✅ Lema de la Mariposa de Zassenhaus completo; 0 sorries (M7 cerrado 2026-06-05) |
+| 99 | `AczelSetTheory/Algebra/QuotientRing.lean` | ✅ Anillo cociente R/I genérico; 0 sorries (M5B cerrado 2026-06-06) |
+| 100 | `AczelSetTheory/Algebra/HFMatrix.lean` | ✅ Anillo de matrices n×n `HFMatrixRing`; 0 sorries (M6B cerrado 2026-06-10) |
 
 ---
 
@@ -2050,3 +2052,84 @@ def HFRing.quotient (rng : HFRing) (J : HFIdeal rng) : HFRing
 `HFAlgebra.HFIdeal.addQuot`, `HFAlgebra.HFIdeal.quotientMul`, `HFAlgebra.HFIdeal.mul_welldefined`,
 `HFAlgebra.HFIdeal.quotientMul_cosetOf`, `HFAlgebra.HFIdeal.quotientAdd_cosetOf`,
 `HFAlgebra.HFRing.quotient`
+
+---
+
+## 9. Algebra/HFMatrix.lean — Anillo de matrices n×n (M6B ✅, 2026-06-10)
+
+**Ruta:** AczelSetTheory/Algebra/HFMatrix.lean
+**Namespace:** `HFAlgebra`
+**Estado:** ✅ Completo, 0 sorries, 0 noncomputable, 0 warnings.
+
+Construcción del **anillo de matrices** `Mₙ(rng)` sobre un `HFRing` arbitrario.
+Una matriz n×n se representa como un elemento del producto cartesiano iterado
+`nPow rng.R (n²)` (una tupla de n² entradas en `rng.R`), con la entrada `(i,j)`
+ubicada en la posición lineal `i·n + j`.
+
+### 9.1 Suma finita en un anillo
+
+```lean
+def finSumRing (rng : HFRing) : ℕ₀ → (ℕ₀ → HFSet) → HFSet
+```
+
+- **Math**: `finSumRing rng n f = Σ_{k<n} f k`, suma de los primeros `n` términos en `rng`.
+- Lemas de soporte: `finSumRing_congr` (extensionalidad bajo `k < n`), `finSumRing_mem`
+  (cierre en `rng.R`), `finSumRing_add`, `finSumRing_swap` (intercambio de sumas dobles
+  `Σ_t Σ_s = Σ_s Σ_t`), `mul_finSumRing` (distributividad `a·Σ = Σ a·`), `finSumRing_mul`
+  (distributividad `(Σ)·a = Σ ·a`).
+
+### 9.2 Portador e indexado
+
+```lean
+def matrixCarrier (n : ℕ₀) (rng : HFRing) : HFSet := nPow rng.R (mul n n)
+```
+
+- **Math**: el portador es `rng.R^(n²)`. El acceso a la entrada lineal `k` se hace con el
+  helper privado `nthEntry k M`; la entrada matricial `(i,j)` es `nthEntry (i·n + j) M`.
+- Puente `FinList` ↔ tupla: `buildNPow` / `deconNPow` (round-trip `buildNPow_decon`,
+  `mem_buildNPow`) y `buildEntries` / `buildEntries_get` (construcción posicional desde
+  una función `f : ℕ₀ → HFSet`).
+
+### 9.3 Operaciones
+
+```lean
+def matAdd  (n : ℕ₀) (rng : HFRing) (M N : HFSet) : HFSet   -- (M+N)[i,j] = M[i,j]+N[i,j]
+def matNeg  (n : ℕ₀) (rng : HFRing) (M : HFSet)   : HFSet   -- (−M)[i,j]  = −M[i,j]
+def matZero (n : ℕ₀) (rng : HFRing)               : HFSet   -- todas las entradas = 0
+def matOne  (n : ℕ₀) (rng : HFRing)               : HFSet   -- identidad: δ_{ij}
+def matMul  (n : ℕ₀) (rng : HFRing) (M N : HFSet) : HFSet   -- (M·N)[i,j] = Σ_t M[i,t]·N[t,j]
+```
+
+- Fórmulas de entrada por operación: `nthEntry_matAdd`, `nthEntry_matNeg`, `nthEntry_matMul`
+  (y la variante `nthEntry_matMul'`). La multiplicación usa `finSumRing` sobre el índice
+  intermedio `t < n`.
+- Lemas de cierre: `matAdd_mem`, `matNeg_mem`, `matZero_mem`, `matOne_mem`, `matMul_mem`.
+
+### 9.4 El anillo de matrices
+
+```lean
+def HFMatrixRing (n : ℕ₀) (rng : HFRing) : HFRing
+```
+
+- **Math**: `Mₙ(rng)` es un anillo (unitario, no necesariamente conmutativo) con portador
+  `matrixCarrier n rng`, suma/negación/cero por entradas, uno la matriz identidad, y
+  producto fila-por-columna.
+- **Prueba**: los axiomas se reducen entrada a entrada vía `nPow_ext` + las fórmulas
+  `nthEntry_mat*`. La **asociatividad del producto** (`mat_mul_assoc`) es el punto técnico:
+  reescribe la suma doble del LHS, intercambia el orden con `finSumRing_swap`, aplica
+  `mul_assoc` punto a punto y cierra el RHS tras un `symm` (no se dispone de `conv_rhs`).
+
+### Notas técnicas
+
+- `conv_rhs`/`conv_lhs` NO existen (son macros de Mathlib): para reescribir el RHS de una
+  igualdad se usa `symm` y luego `rw`.
+- `rw [finSumRing_congr cb]` reescribe siempre la PRIMERA ocurrencia (el LHS de la meta).
+- `induction n generalizing start` con `{start}` implícito lo mantiene implícito en el IH;
+  se pasa con argumento nombrado `ih (start := σ start) ...`.
+
+**Exports públicos:**
+
+`HFAlgebra.finSumRing`, `HFAlgebra.finSumRing_congr`, `HFAlgebra.finSumRing_mem`,
+`HFAlgebra.mul_finSumRing`, `HFAlgebra.finSumRing_mul`, `HFAlgebra.matrixCarrier`,
+`HFAlgebra.matAdd`, `HFAlgebra.matNeg`, `HFAlgebra.matZero`, `HFAlgebra.matOne`,
+`HFAlgebra.matMul`, `HFAlgebra.HFMatrixRing`

@@ -13,8 +13,19 @@ License: MIT
 -- → ADR-000: la teoría nueva vive en Aczel nativo).
 --
 -- Público:
---   HFSet.pigeonhole                  : f función-clase A→B inyectiva → card A ≤ card B
---   HFSet.exists_collision_of_card_lt : card B < card A → ∃ x≠y en A con f x = f y
+--   §1  HFSet.pigeonhole                     : f inyectiva A→B → card A ≤ card B
+--   §2  HFSet.exists_collision_of_card_lt    : card B < card A → ∃ colisión en A
+--   §3  HFSet.eq_of_subset_of_card_eq        : A ⊆ B, card A = card B → A = B
+--       HFSet.surjective_of_injective_of_card_eq : inyectiva + card = → sobreyectiva
+--       HFSet.not_surjective_of_card_ne      : inyectiva + card ≠ → ¬sobreyectiva
+--   §4  HFSet.card_union_add_card_inter      : card(A∪B) + card(A∩B) = card A + card B
+--       HFSet.card_union                     : card(A∪B) = card A + card B − card(A∩B)
+--   §5  HFSet.card_sep_le                    : card(sep A P) ≤ card A
+--   §6  HFSet.card_union_three_add           : inclusión-exclusión para 3 conjuntos
+--
+-- Ver también (en otros módulos):
+--   Axioms/OrdinalNat: card_cartProd, card_nPow, card_inter_le, card_setminus_le
+--   Axioms/Cardinal:   card_powerset
 
 import AczelSetTheory.Axioms.CardImage
 import AczelSetTheory.Axioms.OrdinalNat
@@ -177,5 +188,53 @@ theorem card_union (A B : HFSet) :
           (Peano.Sub.add_k_sub_k _ _).symm
     _ = Peano.Sub.sub (add (card A) (card B)) (card (inter A B)) := by
           rw [add_comm (card (inter A B)) (card (union A B)), h]
+
+-- ─────────────────────────────────────────────────────────────────
+-- §5. Cota de cardinalidad para conjuntos filtrados
+-- ─────────────────────────────────────────────────────────────────
+
+/-- La separación `sep A P` tiene cardinal ≤ `card A`. -/
+theorem card_sep_le (A : HFSet) (P : HFSet → Prop) [DecidablePred P] :
+    card (sep A P) ≤ card A :=
+  card_le_of_subset (fun x hx => ((mem_sep A P x).mp hx).1)
+
+-- ─────────────────────────────────────────────────────────────────
+-- §6. Inclusión-exclusión para tres conjuntos
+-- ─────────────────────────────────────────────────────────────────
+
+/-- **Inclusión-exclusión para tres conjuntos** (forma aditiva, sin resta truncada):
+    `card(A∪B∪C) + card(A∩B) + card(A∩C) + card(B∩C)
+     = card A + card B + card C + card(A∩B∩C)`.
+
+    Estrategia: aplicar dos veces `card_union_add_card_inter` y la identidad
+    distribución `(A∪B)∩C = (A∩C)∪(B∩C)`. -/
+theorem card_union_three_add (A B C : HFSet) :
+    add (add (add (card (union (union A B) C))
+                  (card (inter A B)))
+             (card (inter A C)))
+        (card (inter B C))
+    = add (add (add (card A) (card B)) (card C))
+          (card (inter (inter A B) C)) := by
+  -- h1 : card((A∪B)∪C) + card((A∪B)∩C) = card(A∪B) + card C
+  have h1 := card_union_add_card_inter (union A B) C
+  -- h2 : card(A∪B) + card(A∩B) = card A + card B
+  have h2 := card_union_add_card_inter A B
+  -- Distribución: (A∪B)∩C = (A∩C)∪(B∩C)
+  have hdist : inter (union A B) C = union (inter A C) (inter B C) := by
+    rw [inter_comm (union A B) C, inter_union_distrib, inter_comm C A, inter_comm C B]
+  -- h3 : card((A∩C)∪(B∩C)) + card((A∩C)∩(B∩C)) = card(A∩C) + card(B∩C)
+  have h3 := card_union_add_card_inter (inter A C) (inter B C)
+  -- Identidad: (A∩C)∩(B∩C) = A∩B∩C
+  have hassoc : inter (inter A C) (inter B C) = inter (inter A B) C := by
+    apply extensionality; intro x
+    simp only [mem_inter]
+    constructor
+    · rintro ⟨⟨hxA, hxC⟩, hxB, _⟩; exact ⟨⟨hxA, hxB⟩, hxC⟩
+    · rintro ⟨⟨hxA, hxB⟩, hxC⟩; exact ⟨⟨hxA, hxC⟩, hxB, hxC⟩
+  -- Reescribir con las identidades
+  rw [hdist] at h1
+  rw [hassoc] at h3
+  -- Combinar: de h1, h2, h3 se sigue el resultado por omega₀
+  omega₀
 
 end HFSet
