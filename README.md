@@ -18,11 +18,11 @@ The Zermelo axioms (Extensionality, Empty Set, Pairs, Union, Separation, Interse
 
 Key properties of this set theory:
 
-- **Computable core**: all set definitions are decidable and executable (0 `noncomputable def`)
+- **Computable**: every *definition* is decidable and executable — **0 `noncomputable def`** across the whole library, including the hereditarily-finite choice function `HFSet.choose` (a plain `def`)
 - **No axiom of infinity**: natural numbers are constructed from sets (`vN : ℕ₀ → HFSet`)
 - **Well-founded recursion and induction** over sets (`∈` is well-founded)
 - **Axiom-free foundations**: the Zermelo axioms are derived theorems, not postulates
-- **Minimal classical footprint**: the foundational layer is constructive; some advanced results in the algebra layer (e.g. Sylow's theorems) reduce to the standard `{propext, Classical.choice, Quot.sound}` — verifiable per theorem with `#print axioms`
+- **Standard axiom footprint**: theorems reduce to `{propext, Classical.choice, Quot.sound}` — the same set as ordinary Lean/Mathlib developments. `Classical.choice` is used only for *propositional* reasoning (excluded middle via `byContradiction`/`em`) and enters structurally at the `CList.extEq` foundation (well-founded recursion); it is never used to make non-computable selections. Verifiable per theorem with `#print axioms`
 
 ### Derived Zermelo Axioms
 
