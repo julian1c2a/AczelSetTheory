@@ -4,7 +4,7 @@ Author: Julián Calderón Almendros
 License: MIT
 -/
 
--- AczelSetTheory/Integers/Rationals/IsCauchy.lean
+-- AczelSetTheory/Rationals/IsCauchy.lean
 -- Sucesiones de Cauchy diádicas sobre ℚ₀ (M3B).
 --
 -- API entregada:
@@ -19,13 +19,13 @@ License: MIT
 --   La condición simétrica evita llevar hipótesis de orden y es directamente
 --   compatible con absVal_sub_comm.
 --
--- Dependencies: AczelSetTheory.Integers.Rationals
---               AczelSetTheory.Integers.Rationals.AbsVal
+-- Dependencies: AczelSetTheory.Rationals.Basic
+--               AczelSetTheory.Rationals.AbsVal
 -- @axiom_system: ZF (sin elección)
 -- @importance: high
 
-import AczelSetTheory.Integers.Rationals
-import AczelSetTheory.Integers.Rationals.AbsVal
+import AczelSetTheory.Rationals.Basic
+import AczelSetTheory.Rationals.AbsVal
 import Peano.PeanoNat.Combinatorics.Pow
 
 namespace ℚ₀

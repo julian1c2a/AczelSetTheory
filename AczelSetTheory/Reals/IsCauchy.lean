@@ -20,12 +20,12 @@ License: MIT
 --   isCauchy_of_isCauchy₂ : IsCauchy₂ s → IsCauchy s
 --   isCauchy₂_of_isCauchy : IsCauchy s → IsCauchy₂ s
 --
--- Dependencies: AczelSetTheory.Integers.Rationals, AczelSetTheory.Integers.Rationals.AbsVal
+-- Dependencies: AczelSetTheory.Rationals.Basic, AczelSetTheory.Rationals.AbsVal
 -- @axiom_system: ZF (sin elección)
 -- @importance: high
 
-import AczelSetTheory.Integers.Rationals
-import AczelSetTheory.Integers.Rationals.AbsVal
+import AczelSetTheory.Rationals.Basic
+import AczelSetTheory.Rationals.AbsVal
 
 namespace ℝ₀
 

@@ -142,10 +142,10 @@ Below are the keys for reading and searching theorems.
 | 102 | `AczelSetTheory/Integers/PadicVal.lean` | `ℤ₀` | ✅ Complete | PList/Omega0, `Peano.PeanoNat.{Arith,Primes,WellFounded,Div}` | Integers/MobiusLiouville |
 | 103 | `AczelSetTheory/Integers/MobiusLiouville.lean` | `ℤ₀` | ✅ Complete | Integers/Basic, Integers/PadicVal | Integers.lean |
 | 104 | `AczelSetTheory/Integers/Bezout.lean` | `ℤ₀` | ✅ Complete | Integers/Basic, Integers/Arithmetic, Integers/Order, `Peano.PeanoNat.Arith` | (futuro) Integers/ZModN |
-| 105 | `AczelSetTheory/Integers/Rationals.lean` | `ℚ₀` | ✅ Complete | Integers/{Basic,Order,Functions,Arithmetic}, `Peano.PeanoNat.{Arith,Mul}` | Integers/Rationals/AbsVal, Integers/Rationals/Density, Integers.lean |
-| 106 | `AczelSetTheory/Integers/Rationals/AbsVal.lean` | `ℚ₀` | ✅ Complete | Integers/Rationals | Integers/Rationals/IsCauchy, Integers/Rationals/Density, Integers.lean |
-| 107 | `AczelSetTheory/Integers/Rationals/IsCauchy.lean` | `ℚ₀` | ✅ Complete | Integers/Rationals, Integers/Rationals/AbsVal, `Peano.PeanoNat.Combinatorics.Pow` | Integers.lean |
-| 108 | `AczelSetTheory/Integers/Rationals/Density.lean` | `ℚ₀` | 🚧 Skeleton | Integers/Rationals, Integers/Rationals/AbsVal | Integers.lean |
+| 105 | `AczelSetTheory/Rationals/Basic.lean` | `ℚ₀` | ✅ Complete | Integers/Order (ℤ₀), `Peano.{ℕ₁,PeanoNat.*}` | Rationals/AbsVal, Rationals/Density, Rationals.lean |
+| 106 | `AczelSetTheory/Rationals/AbsVal.lean` | `ℚ₀` | ✅ Complete | Rationals/Basic | Rationals/IsCauchy, Rationals/Density, Rationals.lean |
+| 107 | `AczelSetTheory/Rationals/IsCauchy.lean` | `ℚ₀` | ✅ Complete | Rationals/Basic, Rationals/AbsVal, `Peano.PeanoNat.Combinatorics.Pow` | Rationals.lean |
+| 108 | `AczelSetTheory/Rationals/Density.lean` | `ℚ₀` | 🚧 Skeleton | Rationals/Basic, Rationals/AbsVal | Rationals.lean |
 | 109 | `AczelSetTheory/Integers/ZModN.lean` | `HFAlgebra` | ✅ Complete | Algebra/{Ring,Field}, VN/{Arithmetic,IsNat,CardVN}, `Peano.PeanoNat.NumberTheory.{ModEq,Wilson}` | Integers.lean |
 | 110 | `AczelSetTheory/Topology/Basic.lean` | `HFTopology` | ✅ Complete | HFSets, Axioms/{Union,Intersection,Setminus,Subset,Singleton} | Topology/Interior, Topology/Neighborhoods, Topology/Subspace |
 | 111 | `AczelSetTheory/Topology/Interior.lean` | `HFTopology` | ✅ Complete | Topology/Basic, Axioms/{Separation,Intersection,Setminus} | — |
@@ -157,7 +157,8 @@ Below are the keys for reading and searching theorems.
 | — | `AczelSetTheory/Topology.lean` | — | ✅ Barrel | Topology/{Basic,Interior,Neighborhoods,Subspace} | AczelSetTheory.lean |
 | — | `AczelSetTheory/VN.lean` | — | ✅ Complete | VN/{Basic,Injective,IsNat,Arithmetic,FSet,PeanoAxioms,PeanoArith,PowVN,SubVN,DivVN,FactorialVN,CardVN,RankVN} | AczelSetTheory.lean |
 | — | `AczelSetTheory/PList.lean` | — | ✅ Complete | PList/{Basic,Lemmas,Omega0} | AczelSetTheory.lean |
-| — | `AczelSetTheory/Integers.lean` | — | ✅ Complete | Integers/{Basic,Order,Functions,Arithmetic,Bijection,PadicVal,MobiusLiouville,Canonical,Bezout,ZModN,Rationals,Rationals/AbsVal,Rationals/IsCauchy,Rationals/Density} | AczelSetTheory.lean |
+| — | `AczelSetTheory/Integers.lean` | — | ✅ Complete | Integers/{Basic,Order,Functions,Arithmetic,Bijection,PadicVal,MobiusLiouville,Canonical,Bezout,ZModN} | AczelSetTheory.lean |
+| — | `AczelSetTheory/Rationals.lean` | — | ✅ Barrel | Rationals/{Basic,AbsVal,IsCauchy,Density} | AczelSetTheory.lean |
 | — | `AczelSetTheory.lean` | — | ✅ Complete | PList, CList, HFSets, Operations/*, Axioms/*, Integers, Notation | Main |
 | — | `Main.lean` | — | ✅ Complete | CList.Basic | — |
 

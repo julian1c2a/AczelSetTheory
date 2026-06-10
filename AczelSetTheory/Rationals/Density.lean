@@ -4,7 +4,7 @@ Author: Julián Calderón Almendros
 License: MIT
 -/
 
--- AczelSetTheory/Integers/Rationals/Density.lean
+-- AczelSetTheory/Rationals/Density.lean
 -- Densidad de ℚ₀ en sí mismo (entre dos racionales hay un tercero).
 --
 -- ESTADO: esqueleto creado en FASE B / M2B (2026-06-05). Cuerpo a desarrollar.
@@ -15,12 +15,12 @@ License: MIT
 --   midpoint_lt     : a < b → midpoint a b < b
 --   exists_between  : a < b → ∃ c : ℚ₀, a < c ∧ c < b
 --
--- Dependencies: AczelSetTheory.Integers.Rationals, AczelSetTheory.Integers.Rationals.AbsVal
+-- Dependencies: AczelSetTheory.Rationals.Basic, AczelSetTheory.Rationals.AbsVal
 -- @axiom_system: ZF (sin elección)
 -- @importance: high
 
-import AczelSetTheory.Integers.Rationals
-import AczelSetTheory.Integers.Rationals.AbsVal
+import AczelSetTheory.Rationals.Basic
+import AczelSetTheory.Rationals.AbsVal
 
 namespace ℚ₀
 
