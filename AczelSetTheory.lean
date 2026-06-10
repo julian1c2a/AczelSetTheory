@@ -22,3 +22,7 @@ import AczelSetTheory.Integers
 import AczelSetTheory.Reals
 import AczelSetTheory.Topology
 import AczelSetTheory.Combinatorics
+
+-- Gate de pureza constructiva (ADR-018): falla el build si los símbolos
+-- vigilados regresan a depender de `Classical.choice`.
+import AczelSetTheory.Meta.AxiomCheck

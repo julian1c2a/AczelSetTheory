@@ -493,6 +493,49 @@ Se realiza un commit en peanolib (`0f5dd7b`) que hace públicos los cuatro símb
 
 ---
 
+## ADR-018: Pureza constructiva (cero `Classical`) + dependencia exclusiva de peanolib/ℕ₀
+
+**Date**: 2026-06-10
+**Status**: Accepted
+
+**Context**: El motivo fundacional del proyecto es formalizar la teoría de conjuntos de
+Aczel con **lógica intuicionista/constructiva pura** y aritmética propia (`ℕ₀` de peanolib).
+Una auditoría de axiomas (`#print axioms`) reveló que **prácticamente todo el desarrollo
+depende de `Classical.choice`**, incluso `HFSet.extensionality`. La raíz se localizó en
+`CList.evalOp` (motor de `mem`/`subset`/`extEq`): su `termination_by` usa una **medida
+ponderada `sizeOf·3 + opWeight`** con un paso recursivo (`.eq→.subset`) que no decrece el
+argumento estructural; eso introduce `Classical.choice`, que `HFSet = Quotient CList.Setoid`
+propaga a todo. (Verificado: `CList.lt`, con medida `sizeOf` pura, es limpio; peanolib es
+limpio — `add_comm → [propext]`, `le_total → sin axiomas`.)
+
+**Decision**:
+1. **Cero `Classical.*`** en todo AczelSetTheory. Footprint diana de axiomas:
+   `#print axioms ⊆ {propext, Quot.sound}` (ambos no-clásicos, compatibles con lógica
+   intuicionista; no se exige eliminarlos). Toda prueba que use `Classical.byContradiction`/
+   `em`/`propDecidable`/`choice`/`choose` se reconvierte a constructiva, **aunque no produzca
+   una `noncomputable def`**.
+2. **ℕ₀ (peanolib) siempre, nunca `Nat`** de Lean, salvo donde el kernel lo imponga
+   inevitablemente (`sizeOf`, literales internos, `omega`). La aritmética y el orden se toman
+   de peanolib (`Peano.Add`, `Peano.Order`), las medidas de terminación de `cSize : ℕ₀` y la
+   aritmética de metas de `omega₀`.
+3. **Dependencia matemática exclusiva de peanolib** para los naturales; `Nat` no es una
+   dependencia conceptual, solo un detalle técnico de kernel aislado y documentado.
+
+**Rationale**: El valor del proyecto descansa en ser teoría de conjuntos de Aczel
+constructiva/computable verificada; admitir lógica clásica o `Nat` de Lean como dependencia
+matemática traiciona la tesis fundacional. El arreglo de la raíz es viable y barato:
+separar `evalOp` en `mem`/`subset`/`eq` estructurales (con `eq A B := subset A B && subset B A`,
+no recursivo) es **axiom-free** (verificado en experimento standalone).
+
+**Consequences**:
+- Plan de ejecución en [`PLANNING-CONSTRUCTIVE.md`](PLANNING-CONSTRUCTIVE.md) (Fases 0–4).
+- Se añade un verificador `#assert_no_classical` (vía `Lean.collectAxioms`) como gate de build.
+- Refuerza y endurece el Principio 3 de PLANNING.md y complementa ADR-000.
+- Las excepciones técnicas de `Nat` inevitables se enumeran explícitamente en el plan.
+- Trabajo estimado: ~6–8 sesiones; mayor impacto en Fase 1 (raíz `evalOp`).
+
+---
+
 ## Template for new decisions
 
 ## ADR-NNN: [Title]

@@ -95,12 +95,11 @@ mutual
     | A, B, C, h1, h2 => by
         simp only [extEq_def, Bool.and_eq_true] at h1 h2 ⊢
         exact ⟨subset_trans A B C h1.1 h2.1, subset_trans C B A h2.2 h1.2⟩
-  termination_by A B C _ _ =>
-    Nat.succ (Nat.mul (Nat.add (Nat.add (sizeOf A) (sizeOf B)) (sizeOf C)) 2)
+  -- Medida lexicográfica (tamaño, fase): evita Classical.choice (ADR-018).
+  termination_by A B C _ _ => (Nat.add (Nat.add (sizeOf A) (sizeOf B)) (sizeOf C), 1)
   decreasing_by
     all_goals simp_wf
-    all_goals try simp [sizeOf]
-    all_goals try omega
+    all_goals omega
 
   theorem subset_trans :
       (A B C : CList) → subset A B = true → subset B C = true → subset A C = true
@@ -108,12 +107,10 @@ mutual
     | mk (.cons x xs), B, C, h1, h2 => by
         simp only [subset_cons, Bool.and_eq_true] at h1 ⊢
         exact ⟨mem_subset x B C h1.1 h2, subset_trans (mk xs) B C h1.2 h2⟩
-  termination_by A B C _ _ =>
-    Nat.mul (Nat.add (Nat.add (sizeOf A) (sizeOf B)) (sizeOf C)) 2
+  termination_by A B C _ _ => (Nat.add (Nat.add (sizeOf A) (sizeOf B)) (sizeOf C), 0)
   decreasing_by
     all_goals simp_wf
-    all_goals try simp [sizeOf]
-    all_goals try omega
+    all_goals omega
 
   theorem mem_subset :
       (x B C : CList) → mem x B = true → subset B C = true → mem x C = true
@@ -124,12 +121,10 @@ mutual
         cases h1 with
         | inl h1_eq  => exact mem_of_extEq x y C h1_eq h2.1
         | inr h1_mem => exact mem_subset x (mk ys) C h1_mem h2.2
-  termination_by x B C _ _ =>
-    Nat.mul (Nat.add (Nat.add (sizeOf x) (sizeOf B)) (sizeOf C)) 2
+  termination_by x B C _ _ => (Nat.add (Nat.add (sizeOf x) (sizeOf B)) (sizeOf C), 0)
   decreasing_by
     all_goals simp_wf
-    all_goals try simp [sizeOf]
-    all_goals try omega
+    all_goals omega
 
   theorem mem_of_extEq :
       (x y C : CList) → extEq x y = true → mem y C = true → mem x C = true
@@ -139,12 +134,10 @@ mutual
         cases h2 with
         | inl h2_eq  => exact Or.inl (extEq_trans x y z h1 h2_eq)
         | inr h2_mem => exact Or.inr (mem_of_extEq x y (mk zs) h1 h2_mem)
-  termination_by x y C _ _ =>
-    Nat.mul (Nat.add (Nat.add (sizeOf x) (sizeOf y)) (sizeOf C)) 2
+  termination_by x y C _ _ => (Nat.add (Nat.add (sizeOf x) (sizeOf y)) (sizeOf C), 0)
   decreasing_by
     all_goals simp_wf
-    all_goals try simp [sizeOf]
-    all_goals try omega
+    all_goals omega
 end
 
 theorem extEq_comm (A B : CList) : extEq A B = extEq B A := by

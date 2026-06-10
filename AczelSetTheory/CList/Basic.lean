@@ -86,12 +86,13 @@ def evalOp (op : CListOp) (A B : CList) : Bool :=
 
   | .eq, A, B =>
       evalOp .subset A B && evalOp .subset B A
-termination_by ((((sizeOf A + sizeOf B : Nat) * 3) + opWeight op) : Nat)
+-- Medida LEXICOGRÁFICA (estructural, fase): evita `Classical.choice` que sí
+-- introducía la medida aritmética ponderada `(sizeOf·3 + opWeight)` (ADR-018).
+termination_by ((sizeOf A + sizeOf B : Nat), opWeight op)
 decreasing_by
   all_goals simp_wf
-  all_goals try simp [sizeOf]
-  all_goals try simp_arith
-  all_goals try omega
+  all_goals try simp only [opWeight]
+  all_goals omega
 
 def mem    (x A : CList) : Bool := evalOp .mem x A
 def subset (A B : CList) : Bool := evalOp .subset A B
