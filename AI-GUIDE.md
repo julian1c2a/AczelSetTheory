@@ -10,6 +10,25 @@ Define el protocolo de documentación del proyecto, las convenciones de nomencla
 la política de bloqueo de archivos, el formato de código y la lista de verificación de cumplimiento.
 Léelo completamente antes de modificar cualquier archivo .lean o documentación.
 
+> ## 🚨 LECTURA OBLIGATORIA — `DECISIONS.md` (MANDATORIES del proyecto)
+>
+> **ANTES de escribir o modificar CUALQUIER `.lean`, es OBLIGATORIO leer
+> [`DECISIONS.md`](DECISIONS.md) y cumplir su sección «⚠️ MANDATORIES».**
+> Cada proyecto tiene sus propias reglas vinculantes (MANDATORIES) que NO son
+> deducibles del código ni de los estándares genéricos de Lean/Mathlib. En este
+> proyecto, las MANDATORIES incluyen, sin limitarse a:
+>
+> 1. **Lógica constructiva pura — CERO `Classical.*`** (ADR-018). Footprint diana
+>    `#print axioms ⊆ {propext, Quot.sound}`. Usar `Decidable.byContradiction`/
+>    `by_cases` sobre instancias `Decidable`, nunca `Classical.byContradiction`/`em`/
+>    `propDecidable`/`choice`/`choose`. El gate `Meta/AxiomCheck.lean` lo verifica.
+> 2. **`ℕ₀` (peanolib) siempre, nunca `Nat`** de Lean salvo kernel inevitable; medidas
+>    de terminación **lexicográficas**, nunca aritméticas ponderadas (introducen `Classical`).
+> 3. **Reutilizar los tipos públicos de peanolib** (`ℕ₁`, `ℕ₂`, …), NO redefinir
+>    subtipos privados que ya existen en Peano (ADR-019).
+>
+> El incumplimiento de una MANDATORY es un defecto de build, no una preferencia de estilo.
+
 Requisitos para el Sistema REFERENCE (Arquitectura en Árbol)
 
 (0.) Naturaleza de la documentación

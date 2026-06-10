@@ -1,6 +1,6 @@
 # Design Decisions — AczelSetTheory
 
-**Last updated:** 2026-06-08
+**Last updated:** 2026-06-10
 **Author**: Julián Calderón Almendros
 
 Architectural Decision Records (ADR) for this project.
@@ -8,6 +8,22 @@ Each entry records *what* was decided and *why*, for future reference.
 
 > ADRs marcados **[heredado de Peano]** fueron adoptados originalmente en el proyecto
 > predecesor y se aplican sin cambios a AczelSetTheory.
+
+---
+
+## ⚠️ MANDATORIES (reglas vinculantes — lectura obligatoria)
+
+Estas reglas son **vinculantes**, no preferencias de estilo. Su incumplimiento es un
+**defecto de build**. [`AI-GUIDE.md`](AI-GUIDE.md) redirige obligatoriamente aquí antes
+de tocar cualquier `.lean`. Cada regla enlaza a su ADR justificativo.
+
+| # | MANDATORY | ADR | Verificación |
+|---|---|---|---|
+| **M-1** | **Lógica constructiva pura: CERO `Classical.*`.** Prohibido `Classical.byContradiction`, `Classical.em`, `Classical.propDecidable`, `Classical.choice`, `Classical.choose`, `open Classical`. Usar `Decidable.byContradiction`, `by_cases` (sobre instancia `Decidable`), `decidable_of_iff`. Footprint diana `#print axioms ⊆ {propext, Quot.sound}`. | [ADR-018](#adr-018) | gate `Meta/AxiomCheck.lean` (`#assert_no_classical`) |
+| **M-2** | **`ℕ₀` (peanolib) siempre, nunca `Nat`** de Lean salvo kernel estrictamente inevitable (`sizeOf`, literales internos, `omega`). Aritmética/orden desde peanolib; metas con `omega₀`. | [ADR-018](#adr-018) | revisión + grep `\bNat\b` |
+| **M-3** | **Medidas de terminación lexicográficas `(Σ sizeOf, fase)`, NUNCA aritméticas ponderadas** (`sizeOf·k + peso`): estas últimas introducen `Classical.choice`. | [ADR-018](#adr-018) | gate + revisión de `termination_by` |
+| **M-4** | **Reutilizar los tipos públicos de peanolib** (`ℕ₁ = {n:ℕ₀ // n≠𝟘}`, `ℕ₂ = {n:ℕ₁ // n.val≠𝟙}`, …). **Prohibido redefinir subtipos privados que ya existen en Peano.** | [ADR-019](#adr-019) | revisión + grep `{.*: ℕ₀ //` |
+| **M-5** | **Dependencia matemática EXCLUSIVA de peanolib** para los naturales. `Nat` no es dependencia conceptual. Evitar módulos no-constructivos de peanolib (FSet/Perm/Sign/Wilson…) cuando contaminen el footprint. | [ADR-018](#adr-018) | revisión de imports |
 
 ---
 
@@ -533,6 +549,43 @@ no recursivo) es **axiom-free** (verificado en experimento standalone).
 - Refuerza y endurece el Principio 3 de PLANNING.md y complementa ADR-000.
 - Las excepciones técnicas de `Nat` inevitables se enumeran explícitamente en el plan.
 - Trabajo estimado: ~6–8 sesiones; mayor impacto en Fase 1 (raíz `evalOp`).
+
+---
+
+## ADR-019: Reutilizar los tipos públicos de peanolib (`ℕ₁`, `ℕ₂`, …) — no redefinir subtipos
+
+**Date**: 2026-06-10
+**Status**: Accepted (MANDATORY M-4)
+
+**Context**: En `Integers/Rationals.lean` se encontró `private abbrev PosNat₀ := {n : ℕ₀ // n ≠ 𝟘}`,
+que es **exactamente** `Peano.ℕ₁` (tipo público de peanolib). Redefinir subtipos comunes en
+matemáticas (positivos, ≥ 2, etc.) de forma privada y local:
+- duplica definiciones que ya existen y están probadas en peanolib;
+- impide reutilizar el aparato (lemas, instancias, notación `∣₁`, `gcd₁`, etc.);
+- fragmenta el proyecto y contradice ADR-000/M-5 (dependencia exclusiva de peanolib).
+
+Tipos públicos relevantes de peanolib (`Peano/PeanoNat.lean`):
+
+```lean
+def ℕ₁ : Type := {n : ℕ₀ // n ≠ ℕ₀.zero}              -- positivos (≠ 0)
+def ℕ₂ : Type := {n : ℕ₁ // n.val ≠ ℕ₀.succ ℕ₀.zero}  -- ≥ 2 (factores propios)
+```
+
+`ℕ₂` ya se usa en AczelSetTheory (`VN/DigitsVN.lean`: `base : ℕ₂`), confirmando que son
+importables y operativos.
+
+**Decision**: **Prohibido redefinir** subtipos de `ℕ₀`/`ℤ₀` que ya existan en peanolib.
+Usar `Peano.ℕ₁`, `Peano.ℕ₂` (y futuros tipos públicos) directamente. Si se necesita un
+subtipo nuevo no presente en peanolib, evaluarse primero si debe añadirse a peanolib
+(fundacional) en lugar de localmente.
+
+**Rationale**: Maximiza reutilización, coherencia y el principio «peanolib es la única
+fuente de los naturales y sus refinamientos». Reduce superficie de mantenimiento.
+
+**Consequences**:
+- `PosNat₀` se reemplaza por `Peano.ℕ₁` (ver plan de limpieza en `PLANNING.md` §Limpieza).
+- Revisión periódica con `grep "{.*: ℕ₀ //"` para detectar reincidencias.
+- Verificación incluida en MANDATORY M-4.
 
 ---
 

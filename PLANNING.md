@@ -36,6 +36,50 @@ Build: 241 jobs ✅, Lean v4.30.0. Próximo y último paso de FASE B: **M8B**.
 
 ---
 
+## 🧹 Iniciativa de Limpieza (2026-06-10) — reutilizar Peano + reorganizar números
+
+Dos frentes de limpieza estructural, gobernados por las **MANDATORIES** de
+[`DECISIONS.md`](DECISIONS.md) (M-4 reutilización de tipos; ADR-019) y por la directiva
+de pureza constructiva (M-1/M-2/M-3; ADR-018). Detalle táctico en
+[`NEXT_STEPS.md`](NEXT_STEPS.md) y [`PLANNING-CONSTRUCTIVE.md`](PLANNING-CONSTRUCTIVE.md).
+
+### L1 — Erradicar subtipos que duplican tipos públicos de peanolib (ADR-019)
+
+**Principio:** los refinamientos comunes de los naturales viven en peanolib y son públicos;
+no se redefinen localmente.
+
+| Tipo peanolib | Definición | Uso en el proyecto |
+|---|---|---|
+| `Peano.ℕ₁` | `{n : ℕ₀ // n ≠ 𝟘}` (positivos) | sustituye a `PosNat₀` en `Integers/Rationals.lean` |
+| `Peano.ℕ₂` | `{n : ℕ₁ // n.val ≠ 𝟙}` (≥ 2, factores propios) | ya usado en `VN/DigitsVN.lean` |
+
+**Revisión 2026-06-10:** la única duplicación detectada es `PosNat₀` (= `ℕ₁`). Procedimiento de
+limpieza para cada hallazgo: (1) `grep "{.*: ℕ₀ //"` y `"{.*: ℤ₀ //"`; (2) identificar el tipo
+peanolib equivalente; (3) sustituir y reusar su aparato (lemas, instancias, notación); (4) si no
+existe en peanolib y es fundacional, evaluar añadirlo allí, no localmente. Revisión recurrente
+en cada `repasa` para evitar reincidencias.
+
+### L2 — Reorganizar la jerarquía numérica: `/Rationals/` y `/Reals/` como pares de `/Integers/`
+
+Hoy `ℚ₀` cuelga de `Integers/Rationals*` (por dependencia: ℚ₀ se construye sobre ℤ₀), mientras
+`ℝ₀` ya es subsistema raíz (`Reals/`). Es una **asimetría**: conceptualmente ℚ₀ es un sistema
+numérico propio, par de ℤ₀ y ℝ₀.
+
+**Objetivo:** mover `Integers/Rationals.lean` y `Integers/Rationals/{AbsVal,Density,IsCauchy}.lean`
+a `AczelSetTheory/Rationals/` con barrel `Rationals.lean` (par de `Integers.lean`), actualizando
+imports y el barrel raíz. Coordinar con L1 (sustituir `PosNat₀`→`ℕ₁` en el mismo paso).
+Cadena de dependencias a respetar: `peanolib → … → Integers (ℤ₀) → Rationals (ℚ₀) → Reals (ℝ₀)`.
+
+**Coste estimado:** 1 sesión (mecánico pero transversal: ~5 ficheros + 2 barrels + REFERENCE).
+
+### L3 — Pureza constructiva (cross-ref)
+
+Frente gobernado por [`PLANNING-CONSTRUCTIVE.md`](PLANNING-CONSTRUCTIVE.md). Estado: Fase 0+1
+cerradas (cimiento limpio), Fase 3 parcial (6/8 ficheros). Pendiente inmediato: C-1 (WellOrder)
+y C-2 (sylow_first) en NEXT_STEPS.
+
+---
+
 ## ⚠️ Directiva maestra (2026-05-30): Peano congelado — teoría nueva en Aczel
 
 **Peano (`peanolib`) no desarrollará más teoría "hacia arriba".** Solo se admite trabajo

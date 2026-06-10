@@ -1,6 +1,31 @@
 # Next Steps
 
-**Last updated:** 2026-06-10 (M6B cerrado — matrices n×n sobre HFRing)
+**Last updated:** 2026-06-10 (Fase 3 constructiva parcial + MANDATORIES en DECISIONS.md)
+
+---
+
+## 🔴 INMEDIATO — Cierre de pureza constructiva (ADR-018, MANDATORY M-1)
+
+Ver plan completo en [`PLANNING-CONSTRUCTIVE.md`](PLANNING-CONSTRUCTIVE.md) §7. Quedan
+**2 obstáculos** que NO son conversión mecánica (requieren infraestructura de decidibilidad)
+para que `#print axioms ⊆ {propext, Quot.sound}` en todo el árbol:
+
+| ID | Tarea | Detalle |
+|----|-------|---------|
+| **C-1** | **`Axioms/WellOrder.lean` constructivo** | Añadir `[DecidablePred P]` a `wf_induction`/`wo_induction` (sin llamadores externos). **`no_infinite_descent`** usa `P x = ∀ n:ℕ₀, f n = x → ⊥` (indecidible): reformular vía **pigeonhole sobre `A` finito** (usar `Combinatorics/Counting.pigeonhole`, ya constructivo) en vez de la construcción clásica del contraejemplo minimal. |
+| **C-2** | **`Algebra/sylow_first` constructivo** | El `by_cases (∃ sub : HFSubgroup grp', …)` cae a `Classical.em`. Construir instancia `Decidable (∃ sub : HFSubgroup grp', P sub)` enumerando los subgrupos de un grupo finito como HFSet decidible (infraestructura nueva: conjunto de subgrupos). |
+
+Al cerrar C-1 y C-2: ampliar el gate `Meta/AxiomCheck.lean` con `wf_induction`, `sylow_first`,
+etc., y actualizar `AUDIT-MODULE-MATRIX.md` con columna `Classical.choice`.
+
+---
+
+## 🟠 INMEDIATO — Limpieza de tipos duplicados de Peano (ADR-019, MANDATORY M-4)
+
+| ID | Tarea | Detalle |
+|----|-------|---------|
+| **T-1** | **`PosNat₀` → `Peano.ℕ₁`** | En `Integers/Rationals.lean`, `private abbrev PosNat₀ := {n : ℕ₀ // n ≠ 𝟘}` es exactamente `ℕ₁`. Sustituir y reutilizar el aparato de peanolib. Coordinar con T-2. |
+| **T-2** | **Mover ℚ₀ a `/Rationals/` propio** | `Integers/Rationals*` → subdirectorio `AczelSetTheory/Rationals/` (par de `Integers/`), con barrel `Rationals.lean`. Actualizar imports y barrels. Ver `PLANNING.md` §Limpieza. |
 
 ---
 
