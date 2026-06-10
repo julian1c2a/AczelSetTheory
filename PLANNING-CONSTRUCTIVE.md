@@ -67,8 +67,34 @@ sobre `A`. Ninguna necesita `termination_by` ponderado.
 | **0** | Verificador `#assert_no_classical` (`Lean.collectAxioms`) | `AczelSetTheory/Meta/AxiomCheck.lean` | ✅ 2026-06-10 |
 | **1** | Saneo de la raíz: medidas de terminación **lexicográficas** en vez de aritméticas ponderadas | `evalOp`/`extEq`/`extensionality` y axiomas Zermelo limpios; `Classical.choice` deja de ser universal | ✅ 2026-06-10 |
 | **2** | Medidas de terminación a `cSize`/ℕ₀ + erradicar `Nat` evitable | 0 `Nat` salvo excepciones §5 | ⏳ |
-| **3** | Eliminar `Classical.*` en los 8 ficheros (orden por dificultad) | 0 `Classical.*` en fuente | ⏳ |
+| **3** | Eliminar `Classical.*` en los 8 ficheros (orden por dificultad) | 6/8 ficheros limpios + cadena McKay; 2 obstáculos (ver §7) | 🟡 2026-06-10 |
 | **4** | Cierre: ampliar gate a todo el árbol, comentario QuotientGroupVN, docs, AUDIT-MATRIX con columna `Classical.choice` | invariante constructivo activo | 🟡 parcial (gate en barrel raíz) |
+
+## 7. Estado Fase 3 (2026-06-10) y obstáculos restantes
+
+**Convertidos a constructivo** (`Classical.byContradiction`/`em` → `Decidable.byContradiction`/
+`by_cases` decidible; `decidable_of_iff` para existenciales acotados anidados):
+
+- ✅ `Axioms/Setminus.lean`, `Axioms/Function.lean`, `Topology/Interior.lean`
+- ✅ `Combinatorics/Counting.lean` (incl. instancia `decidable_of_iff` para `∃ x y ∈ A`)
+- ✅ `Integers/Bezout.lean`, `Integers/MobiusLiouville.lean`
+- ✅ `Algebra/Sylow.lean`: eliminado `import Peano.Prelim.Classical` vestigial + byContradictions
+  convertidos ⟹ **cadena McKay/Cauchy limpia** (`cauchy_minimal`, `succ_n_dvd_card_mckayFixedPoints`).
+
+**Obstáculos que requieren infraestructura de decidibilidad (no conversión mecánica):**
+
+1. **`Axioms/WellOrder.lean`** (`wf_induction`/`wo_induction`/`no_infinite_descent`): el predicado
+   `P : HFSet → Prop` es arbitrario y `sep A (fun z => ¬P z)` exige `DecidablePred`. Añadir
+   `[DecidablePred P]` arregla `wf_induction`/`wo_induction` (sin llamadores externos), pero
+   **`no_infinite_descent`** lo invoca con `P x = ∀ n:ℕ₀, f n = x → False` — cuantificador no
+   acotado sobre ℕ₀, **indecidible**. Requiere reformulación vía pigeonhole sobre `A` finito.
+2. **`Algebra/sylow_first`**: usa `by_cases (∃ sub : HFSubgroup grp', …)`, existencial sobre el
+   **tipo** `HFSubgroup` (no un HFSet acotado) sin instancia `Decidable` ⟹ `by_cases` cae a
+   `Classical.em`. Requiere `Decidable (∃ sub : HFSubgroup grp', P sub)` = enumerar subgrupos de
+   un grupo finito como HFSet decidible (infraestructura nueva).
+3. **Dependencia peanolib**: sus módulos no constructivos (`FSet`, `Perm`, `Sign`, `Counting`,
+   `Wilson`…) usan `Classical`. Cualquier teorema de AczelSetTheory que los use lo hereda.
+   Saneo fuera de este repo (trabajo en peanolib) o evitar esas APIs.
 
 > **Hallazgo clave de Fase 1 (revisa el diagnóstico):** la causa NO era la WF-recursion
 > ni `sizeOf` ni `Nat`, sino la **codificación aritmética ponderada** de la medida

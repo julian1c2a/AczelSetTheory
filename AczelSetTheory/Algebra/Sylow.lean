@@ -58,7 +58,6 @@ import AczelSetTheory.Combinatorics.Counting
 import Peano.PeanoNat.Combinatorics.Pow
 import Peano.PeanoNat.Arith
 import Peano.PeanoNat.Primes
-import Peano.Prelim.Classical
 import Peano.PeanoNat.WellFounded
 
 namespace HFAlgebra
@@ -1693,7 +1692,7 @@ theorem orbitOf_eq_or_disjoint (grp : HFGroup) (n : ℕ₀) (t s : HFSet)
   · refine Or.inl ?_
     -- Extracción clásica del testigo.
     have hex : ∃ x, x ∈ orbitOf grp n t ∧ x ∈ orbitOf grp n s :=
-      Classical.byContradiction (fun hne =>
+      Decidable.byContradiction (fun hne =>
         hdisj (fun x hx => hne ⟨x, hx⟩))
     obtain ⟨x, hxt, hxs⟩ := hex
     have h1 : orbitOf grp n x = orbitOf grp n t :=
@@ -2725,9 +2724,9 @@ theorem cauchy_minimal (grp : HFGroup) {n : ℕ₀} (hp : Peano.Arith.Prime (σ 
     le_trans _ (σ n) _ (prime_ge_two hp) hcard_ge
   -- Existe t ∈ F con t ≠ eTuple (si no, |F| ≤ 1 < 2, contradicción)
   have hexists_ne : ∃ t ∈ mckayFixedPoints grp (σ n), t ≠ eTuple grp (σ n) :=
-    Classical.byContradiction fun h_none => by
+    Decidable.byContradiction fun h_none => by
       have hall : ∀ t, t ∈ mckayFixedPoints grp (σ n) → t = eTuple grp (σ n) :=
-        fun t ht => Classical.byContradiction fun ht_ne => h_none ⟨t, ht, ht_ne⟩
+        fun t ht => Decidable.byContradiction fun ht_ne => h_none ⟨t, ht, ht_ne⟩
       have hF_sub : mckayFixedPoints grp (σ n) ⊆ HFSet.singleton (eTuple grp (σ n)) :=
         fun x hx => (HFSet.mem_singleton _ _).mpr (hall x hx)
       have hcard_sing : HFSet.card (HFSet.singleton (eTuple grp (σ n))) = 𝟙 := by
@@ -3032,7 +3031,7 @@ private theorem p_dvd_orbit_of_no_proper {grp : HFGroup} {p k : ℕ₀}
   -- Por h_no_proper: p^k ∤ |stab x|
   have h_stab_ndvd := h_no_proper ((HFGroupAction.conjugAction grp).stab hx) hstab_ne
   -- Por contradicción: si p ∤ |orb x| entonces Coprime(p^k, |orb x|) → p^k | |stab x|
-  apply Classical.byContradiction; intro h_orb_ndvd
+  apply Decidable.byContradiction; intro h_orb_ndvd
   apply h_stab_ndvd
   have h_cop : Coprime (p ^ k) (HFSet.card ((HFGroupAction.conjugAction grp).orb x)) := by
     unfold Coprime IsGCD

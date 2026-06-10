@@ -203,7 +203,7 @@ theorem HFTopSpace.isAdherencePt_iff_mem_closure (ts : HFTopSpace) {x A : HFSet}
     refine ⟨hxX, ?_⟩
     intro U hUτ hxU
     -- Si U ∩ A = ∅ entonces U ⊆ X\A, luego x ∈ int(X\A); contradice hni
-    apply Classical.byContradiction; intro hna
+    apply Decidable.byContradiction; intro hna
     have hUsub : U ⊆ HFSet.setminus ts.X A := by
       intro y hyU
       rw [HFSet.mem_setminus]

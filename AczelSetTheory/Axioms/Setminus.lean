@@ -60,7 +60,7 @@ theorem setminus_setminus_of_subset {A X : HFSet} (h : A ⊆ X) :
   rw [mem_setminus, mem_setminus]
   constructor
   · rintro ⟨hxX, hnot⟩
-    exact Classical.byContradiction (fun hna => hnot ⟨hxX, hna⟩)
+    exact Decidable.byContradiction (fun hna => hnot ⟨hxX, hna⟩)
   · intro hxA
     exact ⟨h x hxA, fun ⟨_, hna⟩ => hna hxA⟩
 

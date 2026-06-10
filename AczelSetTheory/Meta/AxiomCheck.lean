@@ -20,6 +20,11 @@ import Lean.Util.CollectAxioms
 import AczelSetTheory.CList.Basic
 import AczelSetTheory.HFSets
 import AczelSetTheory.Axioms.Setminus
+import AczelSetTheory.Axioms.Function
+import AczelSetTheory.Combinatorics.Counting
+import AczelSetTheory.Integers.Bezout
+import AczelSetTheory.Integers.MobiusLiouville
+import AczelSetTheory.Algebra.Sylow
 
 set_option autoImplicit false
 
@@ -57,8 +62,22 @@ end AczelSetTheory.Meta
 #assert_no_classical HFSet.not_mem_empty
 #assert_no_classical HFSet.mem_setminus
 
+-- Fase 3 (2026-06-10): conversión de `Classical.byContradiction`/`em` a
+-- `Decidable.byContradiction`/`by_cases` decidible en 6 ficheros + cadena McKay.
+#assert_no_classical HFSet.setminus_setminus_of_subset
+#assert_no_classical HFSet.snd_orderedPair_eq'
+#assert_no_classical HFSet.exists_collision_of_card_lt
+#assert_no_classical HFSet.eq_of_subset_of_card_eq
+#assert_no_classical HFSet.not_surjective_of_card_ne
+#assert_no_classical HFAlgebra.cauchy_minimal
+#assert_no_classical HFAlgebra.succ_n_dvd_card_mckayFixedPoints
+
 -- ─────────────────────────────────────────────────────────────────
--- PENDIENTES (Fase 3 — aún dependen de Classical vía byContradiction/em/
--- propDecidable): HFSet.wf_induction (WellOrder), Combinatorics.pigeonhole,
--- sylow_first, Bezout.*, MobiusLiouville.*, Topology.Interior.*, etc.
+-- PENDIENTES (Fase 3 — obstáculos que requieren infraestructura de
+-- decidibilidad, no conversión mecánica):
+--   • HFSet.wf_induction / wo_induction / no_infinite_descent (WellOrder):
+--     predicado `P : HFSet→Prop` arbitrario + cuantificador ∀ n:ℕ₀ indecidible.
+--   • HFAlgebra.sylow_first: `by_cases (∃ sub : HFSubgroup grp', …)` cae a
+--     `Classical.em` (no hay `Decidable` para ∃ sobre el TIPO HFSubgroup).
+--   • Heredado de peanolib: módulos no constructivos (FSet/Perm/Sign/…) si se usan.
 -- ─────────────────────────────────────────────────────────────────

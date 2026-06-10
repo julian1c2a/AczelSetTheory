@@ -133,7 +133,7 @@ private instance (n : ℕ₀) : Decidable (squarefree n) :=
           hknle (hsq.2 k hkp))
     | isFalse hnw =>
         isTrue ((squarefree_iff_bounded hn).mpr (fun p hle hp =>
-          Classical.byContradiction (fun h => hnw ⟨p, hle, hp, h⟩)))
+          Decidable.byContradiction (fun h => hnw ⟨p, hle, hp, h⟩)))
 
 /-- μ(n) = (-1)^Ω(n) si n es libre de cuadrados, 0 en otro caso. -/
 def mobius (n : ℕ₀) : ℤ₀ :=

@@ -94,7 +94,7 @@ theorem bezout_ofNat (a b : ℕ₀) :
       rw [ha', hb', mul_zero, hg', add_zero]
     · -- gcd ≠ 0 → le₀ (mul m b) (mul n a)
       have hle : le₀ (Peano.Mul.mul m b) (Peano.Mul.mul n a) :=
-        Classical.byContradiction (fun h_nle =>
+        Decidable.byContradiction (fun h_nle =>
           absurd (h.trans (sub_of_not_le h_nle)) hgcd)
       have key : Add.add (ofNat (Peano.Mul.mul n a)) (Neg.neg (ofNat (Peano.Mul.mul m b))) =
                  ofNat (gcd a b) := by
@@ -115,7 +115,7 @@ theorem bezout_ofNat (a b : ℕ₀) :
       have hg' : ofNat (gcd a b) = 0 := by rw [hgcd]; exact ofNat_zero
       rw [ha', hb', mul_zero, hg', add_zero]
     · have hle : le₀ (Peano.Mul.mul m a) (Peano.Mul.mul n b) :=
-        Classical.byContradiction (fun h_nle =>
+        Decidable.byContradiction (fun h_nle =>
           absurd (h.trans (sub_of_not_le h_nle)) hgcd)
       have key : Add.add (ofNat (Peano.Mul.mul n b)) (Neg.neg (ofNat (Peano.Mul.mul m a))) =
                  ofNat (gcd a b) := by

@@ -111,12 +111,10 @@ theorem snd_orderedPair_eq' (a b : HFSet) : snd ⟪a, b⟫ = b := by
   have hbu : b ∈ HFSet.sUnion ⟪a, b⟫ := by
     rw [mem_sUnion]
     exact ⟨pair a b, (mem_pair _ _ _).mpr (Or.inr rfl), (mem_pair b a b).mpr (Or.inr rfl)⟩
-  rcases Classical.em (∀ x : HFSet, x ∈ HFSet.sUnion ⟪a, b⟫ → x ∈ singleton a) with h | h
-  · haveI : Decidable (∀ x : HFSet, x ∈ HFSet.sUnion ⟪a, b⟫ → x ∈ singleton a) := .isTrue h
-    rw [if_pos h]
+  by_cases h : (∀ x : HFSet, x ∈ HFSet.sUnion ⟪a, b⟫ → x ∈ singleton a)
+  · rw [if_pos h]
     exact ((mem_singleton b a).mp (h b hbu)).symm
-  · haveI : Decidable (∀ x : HFSet, x ∈ HFSet.sUnion ⟪a, b⟫ → x ∈ singleton a) := .isFalse h
-    rw [if_neg h]
+  · rw [if_neg h]
     have anb : a ≠ b := by
       intro heq; subst heq; apply h; intro x hx
       rw [mem_sUnion] at hx

@@ -33,7 +33,7 @@ section PrivateDefs
 open Peano Peano.Axioms Peano.Add Peano.Mul Peano.Order
 
 -- Denominadores positivos (subconjunto de ℕ₀)
-private abbrev PosNat₀ := {n : ℕ₀ // n ≠ 𝟘}
+private abbrev PosNat₀ := {n : ℕ₀ // n ≠ 𝟘} -- Esto es exactamente ℕ₁ en Peano
 
 -- Denominador unidad: 1
 private def den1 : PosNat₀ := ⟨𝟙, succ_neq_zero 𝟘⟩

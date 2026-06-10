@@ -70,12 +70,18 @@ theorem exists_collision_of_card_lt {A B : HFSet} {f : HFSet → HFSet}
     (hf_into : ∀ x, x ∈ A → f x ∈ B)
     (hlt : lt₀ (card B) (card A)) :
     ∃ x y, x ∈ A ∧ y ∈ A ∧ x ≠ y ∧ f x = f y := by
-  apply Classical.byContradiction
+  -- La meta es decidible (existenciales acotados sobre A finito); damos la
+  -- instancia vía la forma acotada equivalente para evitar `Classical` (ADR-018).
+  haveI : Decidable (∃ x y, x ∈ A ∧ y ∈ A ∧ x ≠ y ∧ f x = f y) :=
+    decidable_of_iff (∃ x ∈ A, ∃ y ∈ A, x ≠ y ∧ f x = f y)
+      ⟨fun ⟨x, hx, y, hy, hne, hf⟩ => ⟨x, y, hx, hy, hne, hf⟩,
+       fun ⟨x, y, hx, hy, hne, hf⟩ => ⟨x, hx, y, hy, hne, hf⟩⟩
+  apply Decidable.byContradiction
   intro h
   -- ¬(∃ colisión) ⟹ f es inyectiva sobre A
   have hf_inj : ∀ x y, x ∈ A → y ∈ A → f x = f y → x = y := by
     intro x y hx hy hfxy
-    apply Classical.byContradiction
+    apply Decidable.byContradiction
     intro hxy
     exact h ⟨x, y, hx, hy, hxy, hfxy⟩
   -- pero entonces card A ≤ card B, contradiciendo card B < card A
@@ -89,17 +95,17 @@ theorem exists_collision_of_card_lt {A B : HFSet} {f : HFSet → HFSet}
     (conjuntos finitos). -/
 theorem eq_of_subset_of_card_eq {A B : HFSet} (hsub : A ⊆ B)
     (hcard : card A = card B) : A = B := by
-  apply Classical.byContradiction
+  apply Decidable.byContradiction
   intro hne
   -- A ⊆ B con A ≠ B ⟹ existe testigo b ∈ B \ A
   have hex : ∃ b, b ∈ B ∧ b ∉ A := by
-    apply Classical.byContradiction
+    apply Decidable.byContradiction
     intro hnex
     apply hne
     apply extensionality
     intro x
     exact ⟨fun hxA => hsub x hxA,
-           fun hxB => Classical.byContradiction (fun hxA => hnex ⟨x, hxB, hxA⟩)⟩
+           fun hxB => Decidable.byContradiction (fun hxA => hnex ⟨x, hxB, hxA⟩)⟩
   obtain ⟨b, hbB, hbA⟩ := hex
   have hlt := card_lt_of_ssubset hsub b hbB hbA
   rw [hcard] at hlt
@@ -131,11 +137,11 @@ theorem not_surjective_of_card_ne {A B : HFSet} {f : HFSet → HFSet}
     (hf_inj  : ∀ x y, x ∈ A → y ∈ A → f x = f y → x = y)
     (hne     : card A ≠ card B) :
     ∃ y, y ∈ B ∧ ¬ ∃ x ∈ A, y = f x := by
-  apply Classical.byContradiction
+  apply Decidable.byContradiction
   intro h
   have hsurj : ∀ y, y ∈ B → ∃ x ∈ A, y = f x := by
     intro y hy
-    apply Classical.byContradiction
+    apply Decidable.byContradiction
     intro hny
     exact h ⟨y, hy, hny⟩
   exact hne (card_eq_of_classBij hf_into hf_inj hsurj)
