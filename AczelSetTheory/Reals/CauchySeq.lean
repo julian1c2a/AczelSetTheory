@@ -8,6 +8,7 @@ License: MIT
 -- Base type for computable numbers: Cauchy sequences over ℚ₀.
 
 import AczelSetTheory.Rationals.IsCauchy
+import AczelSetTheory.Rationals.Inv
 
 namespace ℝ₀
 

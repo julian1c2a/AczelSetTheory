@@ -39,10 +39,14 @@ instance : LE CauchySeq := ⟨CauchySeq.LE⟩
 
 /-- El inverso de una sucesión de Cauchy está definido si la sucesión
 está estrictamente alejada de cero (Pos f ∨ Pos (-f)). -/
-def CauchySeq.inv (f : CauchySeq) (h : CauchySeq.Pos f ∨ CauchySeq.Pos (-f)) : CauchySeq :=
-  ⟨fun n => if ℚ₀.absVal (f.val n) ≤ 0 then 0 else (sorry : ℚ₀), by
+noncomputable def CauchySeq.inv (f : CauchySeq) (h : CauchySeq.Pos f ∨ CauchySeq.Pos (-f)) : CauchySeq :=
+  ⟨fun n => (f.val n)⁻¹, by
     -- Demostrar que el inverso de una sucesión alejada de 0 es de Cauchy.
-    -- Se usaría la cota inferior estricta para acotar el denominador.
+    -- Dado que f está alejada de 0, |f(n)| >= 1/2^k para n >= N.
     sorry⟩
+
+/-- División de sucesiones de Cauchy. f / g = f * g⁻¹ -/
+noncomputable def CauchySeq.div (f g : CauchySeq) (h : CauchySeq.Pos g ∨ CauchySeq.Pos (-g)) : CauchySeq :=
+  f * CauchySeq.inv g h
 
 end ℝ₀

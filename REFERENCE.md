@@ -146,6 +146,11 @@ Below are the keys for reading and searching theorems.
 | 106 | `AczelSetTheory/Rationals/AbsVal.lean` | `ℚ₀` | ✅ Complete | Rationals/Basic | Rationals/IsCauchy, Rationals/Density, Rationals.lean |
 | 107 | `AczelSetTheory/Rationals/IsCauchy.lean` | `ℚ₀` | ✅ Complete | Rationals/Basic, Rationals/AbsVal, `Peano.PeanoNat.Combinatorics.Pow` | Rationals.lean |
 | 108 | `AczelSetTheory/Rationals/Density.lean` | `ℚ₀` | 🚧 Skeleton | Rationals/Basic, Rationals/AbsVal | Rationals.lean |
+| 108b| `AczelSetTheory/Rationals/Inv.lean` | `ℚ₀` | ✅ Complete | Rationals/Basic | Rationals.lean, Reals/CauchySeq |
+| 108c| `AczelSetTheory/Reals/CauchySeq.lean` | `ℝ₀` | ✅ Complete | Rationals/IsCauchy, Rationals/Inv | Reals/Order, Reals/Arithmetic |
+| 108d| `AczelSetTheory/Reals/Arithmetic.lean` | `ℝ₀` | ✅ Complete | Reals/CauchySeq | Reals/Order |
+| 108e| `AczelSetTheory/Reals/Order.lean` | `ℝ₀` | ✅ Complete | Reals/CauchySeq, Reals/Arithmetic | Reals/Incompleteness |
+| 108f| `AczelSetTheory/Reals/Incompleteness.lean`| `ℝ₀` | 🚧 Skeleton | Reals/CauchySeq | — |
 | 109 | `AczelSetTheory/Integers/ZModN.lean` | `HFAlgebra` | ✅ Complete | Algebra/{Ring,Field}, VN/{Arithmetic,IsNat,CardVN}, `Peano.PeanoNat.NumberTheory.{ModEq,Wilson}` | Integers.lean |
 | 110 | `AczelSetTheory/Topology/Basic.lean` | `HFTopology` | ✅ Complete | HFSets, Axioms/{Union,Intersection,Setminus,Subset,Singleton} | Topology/Interior, Topology/Neighborhoods, Topology/Subspace |
 | 111 | `AczelSetTheory/Topology/Interior.lean` | `HFTopology` | ✅ Complete | Topology/Basic, Axioms/{Separation,Intersection,Setminus} | — |

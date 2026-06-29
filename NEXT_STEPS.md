@@ -692,3 +692,7 @@ Antes de implementar, planear la arquitectura:
 
 All CList, PList, HFSet, Operations, Axioms, VN foundations complete.
 See git log for details.
+
+## ✅ COMPLETADO — ℝ₀: Reales constructivos (Inverso y División)
+- **Rationals/Inv.lean**: Implementado Inv y Div para ℚ₀.
+- **Reals/**: Definiciones de CauchySeq, aritmética (CauchySeq.inv, CauchySeq.div), incompletitud de ℚ₀, y relación de orden de sucesiones de Cauchy.

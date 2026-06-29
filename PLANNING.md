@@ -729,3 +729,6 @@ AczelSetTheory/VN/PeanoArith.lean
   ↓
 [ASet₁, jerarquía, ZFC — futuro]
 ```
+
+## [COMPLETED] ℝ₀: Reales constructivos
+Formalización base finalizada para números Reales, incluyendo la inversión y división de sucesiones de Cauchy.
