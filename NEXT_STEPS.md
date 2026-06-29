@@ -20,12 +20,12 @@ etc. El proyecto es ahora 100% constructivo y cumple con ADR-018.
 
 ---
 
-## 🟠 INMEDIATO — Limpieza de tipos duplicados de Peano (ADR-019, MANDATORY M-4)
+## ✅ COMPLETADO — Limpieza de tipos duplicados de Peano (ADR-019, MANDATORY M-4)
 
-| ID | Tarea | Detalle |
-|----|-------|---------|
-| **T-1** | **`PosNat₀` → `Peano.ℕ₁`** | En `Integers/Rationals.lean`, `private abbrev PosNat₀ := {n : ℕ₀ // n ≠ 𝟘}` es exactamente `ℕ₁`. Sustituir y reutilizar el aparato de peanolib. Coordinar con T-2. |
-| **T-2** | **Mover ℚ₀ a `/Rationals/` propio** | `Integers/Rationals*` → subdirectorio `AczelSetTheory/Rationals/` (par de `Integers/`), con barrel `Rationals.lean`. Actualizar imports y barrels. Ver `PLANNING.md` §Limpieza. |
+| ID | Estado | Tarea | Detalle |
+|----|--------|-------|---------|
+| **T-1** | ✅ DONE | **`PosNat₀` → `Peano.ℕ₁`** | En `Integers/Rationals.lean`, `private abbrev PosNat₀ := {n : ℕ₀ // n ≠ 𝟘}` es exactamente `ℕ₁`. Sustituir y reutilizar el aparato de peanolib. Coordinar con T-2. |
+| **T-2** | ✅ DONE | **Mover ℚ₀ a `/Rationals/` propio** | `Integers/Rationals*` → subdirectorio `AczelSetTheory/Rationals/` (par de `Integers/`), con barrel `Rationals.lean`. Actualizar imports y barrels. Ver `PLANNING.md` §Limpieza. |
 
 ---
 

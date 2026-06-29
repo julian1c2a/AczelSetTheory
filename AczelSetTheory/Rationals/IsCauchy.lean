@@ -35,9 +35,19 @@ namespace ℚ₀
 -- ============================================================
 
 /-- `pow2 n = 1/2^n` en ℚ₀. Construido directamente como el racional con
-numerador 1 y denominador 2^n (en ℕ₀). -/
+numerador 1 y denominador 2^n. -/
+def pow2_den (n : ℕ₀) : ℕ₁ :=
+  ⟨Peano.Pow.pow (σ (σ 𝟘)) n, Peano.Pow.pow_ne_zero (by decide) n⟩
+
+-- pow2 n = 1 / 2^n
 def pow2 (n : ℕ₀) : ℚ₀ :=
-  ℚ₀.mk (ℤ₀.ofNat (σ 𝟘)) ⟨Peano.Pow.pow (σ (σ 𝟘)) n, Peano.Pow.pow_ne_zero (by decide) n⟩
+  ℚ₀.mk (ℤ₀.ofNat (σ 𝟘)) (pow2_den n)
+
+theorem pow2_nonneg (n : ℕ₀) : (0 : ℚ₀) ≤ pow2 n := by
+  sorry
+
+theorem pow2_succ_add (n : ℕ₀) : Add.add (pow2 (σ n)) (pow2 (σ n)) = pow2 n := by
+  sorry
 
 -- ============================================================
 -- Sección 2: Definiciones de Cauchy

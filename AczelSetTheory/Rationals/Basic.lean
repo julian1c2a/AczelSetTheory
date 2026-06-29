@@ -552,8 +552,8 @@ theorem neg_add (a b : ℚ₀) : Neg.neg (Add.add a b) = Add.add (Neg.neg a) (Ne
 -- Caracterización de la no negatividad: 0 ≤ q ⟺ 0 ≤ p.1 (numerador)
 -- ─────────────────────────────────────────────────────────────────────────────
 
-private theorem zero_le_iff_num_nonneg (p : ℤ₀ × ℕ₁) :
-    ((0 : ℚ₀) ≤ (mkQ p.1 p.2 : ℚ₀)) ↔ (0 : ℤ₀) ≤ p.1 := by
+theorem zero_le_iff_num_nonneg (p : ℤ₀ × ℕ₁) :
+    ((0 : ℚ₀) ≤ (mk p.1 p.2 : ℚ₀)) ↔ (0 : ℤ₀) ≤ p.1 := by
   show Mul.mul (0 : ℤ₀) (ℤ₀.ofNat p.2.val) ≤ Mul.mul p.1 (ℤ₀.ofNat den1.val) ↔ _
   rw [ℤ₀.zero_mul, den1, ℤ₀.ofNat_one, ℤ₀.mul_one]
 
