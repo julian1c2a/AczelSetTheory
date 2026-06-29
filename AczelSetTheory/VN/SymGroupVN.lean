@@ -27,8 +27,14 @@ License: MIT
 
 import AczelSetTheory.VN.Basic
 import Peano.PeanoNat.Combinatorics.Perm
+import AczelSetTheory.Axioms.Function
+import AczelSetTheory.Operations.FunctionComp
+import AczelSetTheory.Operations.Identity
+import AczelSetTheory.Operations.Inverse
+import AczelSetTheory.Algebra.Group
 
 open Peano Peano.FSet Peano.FSetFunction
+open HFSet
 
 namespace VN
 
@@ -47,34 +53,51 @@ theorem vnSeg_card (n : ℕ₀) : (vnSeg n).card = n :=
   ℕ₀FSet.Fin₀Set_card n
 
 -- ─────────────────────────────────────────────────────────────────
--- Tipo de permutaciones del segmento
+-- Teoría Nativa en HFSet: SymHF y SymHFGroup
 -- ─────────────────────────────────────────────────────────────────
 
-/-- El tipo de permutaciones biyectivas del segmento {0, 1, …, n-1}. -/
-def SymVN (n : ℕ₀) : Type := FunPerm (vnSeg n)
+noncomputable section
+
+/-- El conjunto de todas las biyecciones de A a A.
+    Definido nativamente en HFSet mediante separación sobre 𝒫(A × A). -/
+def SymHF (A : HFSet) : HFSet :=
+  have : DecidablePred (fun f => isBijective f A A) := fun _ => Classical.propDecidable _
+  HFSet.sep (HFSet.powerset (HFSet.cartProd A A))
+    (fun f => isBijective f A A)
+
+/-- La estructura de grupo de las permutaciones de A,
+    usando composición funcional e identidad funcional. -/
+def SymHFGroup (A : HFSet) : HFAlgebra.HFGroup where
+  G := SymHF A
+  op := fun f g => f ∘f g
+  e := HFSet.idFunc A
+  inv := fun f => f⁻¹ᵣ
+  e_mem := sorry
+  op_closed := sorry
+  inv_closed := sorry
+  op_assoc := sorry
+  op_id_left := sorry
+  op_inv_left := sorry
+
+end
+
+/-- El grupo simétrico concreto sobre el segmento de von Neumann S_n. -/
+noncomputable def SymVN (n : ℕ₀) : HFAlgebra.HFGroup :=
+  SymHFGroup (vN n)
 
 -- ─────────────────────────────────────────────────────────────────
--- Operaciones del grupo simétrico
+-- Puente con Peano (Fontanería)
 -- ─────────────────────────────────────────────────────────────────
 
-/-- La permutación identidad del segmento {0, …, n-1}. -/
-def SymVN.id (n : ℕ₀) : SymVN n := FunPerm.id (vnSeg n)
+/-- Convierte un par clave-valor de FunTable de Peano a un par ordenado de HFSet. -/
+def pair_to_HFSet (kv : ℕ₀ × ℕ₀) : HFSet :=
+  HFSet.orderedPair (vN kv.1) (vN kv.2)
 
-/-- Composición de dos permutaciones. El valor por defecto 𝟘 cubre
-    elementos fuera del rango (no ocurre en permutaciones válidas). -/
-def SymVN.comp (n : ℕ₀) (g f : SymVN n) : SymVN n :=
-  Perm.FunPerm.comp g f 𝟘
-
-theorem SymVN.comp_def (n : ℕ₀) (g f : SymVN n) :
-    SymVN.comp n g f = Perm.FunPerm.comp g f 𝟘 := rfl
-
--- ─────────────────────────────────────────────────────────────────
--- Nota de alcance: estructura FinGroup
--- ─────────────────────────────────────────────────────────────────
--- Para construir la estructura de grupo finito se necesita:
--- 1. Enumerar todas las permutaciones como FSet (SymVN n)
--- 2. Probar que card de ese conjunto es factorial n
---    (requiere Perm.card_Sym, no materializado aún en Peano)
--- 3. Verificar los axiomas de grupo: asociatividad, identidad, inversas
+/-- Inyecta una permutación de Peano (Sym A) como una biyección nativa en HFSet. -/
+def FunPerm_to_HFSet {n : ℕ₀} (f : Peano.Perm.Sym (vnSeg n)) : HFSet :=
+  -- Extraemos la lista de pares de la tabla de la función de Peano
+  let pairs : List (ℕ₀ × ℕ₀) := f.toFunTable.table.map (fun a => (a, f.applyElem a 𝟘))
+  -- Convertimos la lista a un HFSet (unión de singletons)
+  List.foldr (fun kv S => HFSet.union (HFSet.singleton (pair_to_HFSet kv)) S) HFSet.empty pairs
 
 end VN

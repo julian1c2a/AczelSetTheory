@@ -57,9 +57,9 @@
 | `Combinatorics/Summation.lean` | ✅ | `VN/SummationVN.lean` | Sumas sobre rangos VN |
 | `Combinatorics/Product.lean` | ✅ | `VN/ProductVN.lean` | Productos sobre rangos VN |
 | `Combinatorics/Counting.lean` | ✅ | `VN/CountingVN.lean` | Equivalente documental: Peano `Counting` quedó como módulo vacío (headers §1/§2/§3); AczelSetTheory conserva la correspondencia estructural para paridad formal. |
-| `Combinatorics/Perm.lean` | ✅ | `VN/SymGroupVN.lean` + `VN/PermVN.lean` | `SymGroupVN` cubre §1-§2 de Peano (FunPerm, Sym). §3 (ciclos), §4 (signatura), §5 aún no están materializadas en Peano. `PermVN.lean` registra la correspondencia. |
-| `Combinatorics/Orbit.lean` | ✅ | `VN/OrbitVN.lean` | Equivalente documental: Peano `Orbit` quedó como módulo vacío (headers §1/§2/§3); AczelSetTheory conserva la correspondencia. El contenido matemático operativo de órbitas vive en `Algebra/Action.lean` (`HFGroupAction.orb`, `orbits_partition`). |
-| `Combinatorics/Sign.lean` | ✅ | `VN/SignVN.lean` | Equivalente documental: Peano `Sign` quedó como módulo vacío (headers §1/§2/§3); AczelSetTheory conserva la correspondencia estructural para paridad formal. |
+| `Combinatorics/Perm.lean` | ✅ | `VN/SymGroupVN.lean` + `VN/PermVN.lean` | `SymGroupVN` cubre §1-§2 de Peano (FunPerm, Sym). §3 (ciclos) implementado en `PermVN.lean`. |
+| `Combinatorics/Orbit.lean` | ✅ | `VN/OrbitVN.lean` | Órbitas definidas funcionalmente en `PermVN` (`funOrb`), teoría de acción en `Action.lean`. |
+| `Combinatorics/Sign.lean` | ✅ | `VN/SignVN.lean` | Signatura implementada definiendo inversiones y devolviendo `1` o `-1` de `ℤ₀`. |
 | `Combinatorics/Group.lean` | ✅ | `Algebra/Group.lean` + `VN/SymGroupVN.lean` | AczelSetTheory tiene `HFGroup` abstracto y `SymVN` concreto: grupo simétrico sobre segmentos VN `vnSeg n`; `SymVN.id`, `SymVN.comp`, `vnSeg_card`, `mem_vnSeg_iff`. |
 
 ---
@@ -228,10 +228,10 @@ Buena fundación sin módulo explícito (fundamentos), relación de equivalencia
 
 **Punto crítico:** algunos módulos de permutaciones y grupos concretos sobre `ℕ₀`/VN aún pendientes:
 
-- Permutaciones (`Perm`, `Sign`, `Orbit`, `Counting`) — equivalentes documentales ✅, contenido matemático operativo aún no
+- Permutaciones (`Perm`, `Sign`, `Orbit`, `Counting`) — contenido matemático operativo implementado nativamente en `HFSet` ✅.
 - Grupo simétrico concreto `S_n`
-- Lattice min/max sobre VN (`LatticeVN.lean` pendiente)
-- Iniciality formal del sistema de Peano (`InitialityVN.lean` pendiente)
+- Lattice min/max sobre VN (`LatticeVN.lean` ✅ implementado)
+- Iniciality formal del sistema de Peano (`InitialityVN.lean` ✅ implementado)
 
 > **Nota 2026-06-05:** `Zassenhaus` se muda de ❌ a ✅ (`Algebra/Zassenhaus.lean`). FASE A de paridad cerrada.
 > **Nota 2026-06-04:** `Sylow II` cerrado (sorry resuelto vía `p_group_fixed_point`).

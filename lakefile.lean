@@ -3,8 +3,7 @@ open Lake DSL
 
 package "aczelsettheory"
 
-require peanolib from git
-  "https://github.com/julian1c2a/Peano" @ "master"
+require peanolib from "E:/dropbox/github/lean4/peano"
 
 lean_lib "AczelSetTheory"
 
