@@ -13,7 +13,7 @@ theorem setminusCList_extEq_left (a₁ a₂ b : CList) (ha : CList.extEq a₁ a�
   cases a₂ with | mk xs₂ =>
   have hP_resp : CList.P_respects (fun c => !(CList.mem c b)) := by
     intro x y heq
-    dsimp
+    change (!CList.mem x b) = (!CList.mem y b)
     cases h1 : CList.mem x b
     · cases h2 : CList.mem y b
       · rfl
@@ -31,7 +31,7 @@ theorem setminusCList_extEq_right (a b₁ b₂ : CList) (hb : CList.extEq b₁ b
   dsimp [setminusCList]
   have h_eq : (fun c => !(CList.mem c b₁)) = (fun c => !(CList.mem c b₂)) := by
     funext c
-    dsimp
+    change (!CList.mem c b₁) = (!CList.mem c b₂)
     have h1 : CList.mem c b₁ = true → CList.mem c b₂ = true := mem_resp_right c b₁ b₂ hb
     have hb_symm : CList.extEq b₂ b₁ = true := by
       rw [CList.extEq_comm]

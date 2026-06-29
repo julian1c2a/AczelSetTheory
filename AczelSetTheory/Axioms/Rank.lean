@@ -171,7 +171,7 @@ theorem mem_rank_lt : ∀ (a b : HFSet), a ∈ b → rank a < rank b := by
 -- WellFounded de ∈ en HFSet, vía Subrelation.wf
 -- ==================================================================
 
-instance mem_wf : WellFounded (· ∈ · : HFSet → HFSet → Prop) :=
+theorem mem_wf : WellFounded (· ∈ · : HFSet → HFSet → Prop) :=
   Subrelation.wf (fun {a b} h => mem_rank_lt a b h) (InvImage.wf rank well_founded_lt)
 
 end HFSet

@@ -15,7 +15,7 @@ theorem interCList_extEq_left
   cases a₂ with | mk xs₂ =>
   have hP_resp : CList.P_respects (fun c => CList.mem c b) := by
     intro x y heq
-    dsimp
+    change CList.mem x b = CList.mem y b
     cases h1 : CList.mem x b
     · cases h2 : CList.mem y b
       · rfl
@@ -35,7 +35,7 @@ theorem interCList_extEq_right
   dsimp [interCList]
   have h_eq : (fun c => CList.mem c b₁) = (fun c => CList.mem c b₂) := by
     funext c
-    dsimp
+    change CList.mem c b₁ = CList.mem c b₂
     have h1 : CList.mem c b₁ = true → CList.mem c b₂ = true := mem_resp_right c b₁ b₂ hb
     have hb_symm : CList.extEq b₂ b₁ = true := by
       rw [CList.extEq_comm]

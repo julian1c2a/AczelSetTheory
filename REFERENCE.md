@@ -154,6 +154,9 @@ Below are the keys for reading and searching theorems.
 | 114 | `AczelSetTheory/Integers/Canonical.lean` | `ℤ₀` | ✅ Complete | Integers/Basic, Integers/Order, `Peano.PeanoNat.{Sub,Order}` | Integers.lean |
 | 115 | `AczelSetTheory/Algebra/QuotientRing.lean` | `HFAlgebra` | ✅ Complete | Algebra/{Ring,QuotientGroup}, Axioms/{Separation,Decidable} | Integers/ZModN (futuro) |
 | 116 | `AczelSetTheory/Algebra/HFMatrix.lean` | `HFAlgebra` | ✅ Complete | Algebra/Ring, Axioms/{OrdinalNat,Cardinal}, HFList | Algebra.lean |
+| 117 | `AczelSetTheory/Operations/Order.lean` | `HFSet` | ✅ Complete | Axioms/Subset, Axioms/Relation | Axioms/Order |
+| 118 | `AczelSetTheory/Axioms/Order.lean` | `HFSet` | ✅ Complete | Operations/Order, Axioms/Adjunction | Axioms/WellOrder |
+| 119 | `AczelSetTheory/Axioms/WellOrder.lean` | `HFSet` | ✅ Complete | Operations/Order, Axioms/Separation, Axioms/Order, Axioms/Cardinal, Combinatorics/Counting | — |
 | — | `AczelSetTheory/Topology.lean` | — | ✅ Barrel | Topology/{Basic,Interior,Neighborhoods,Subspace} | AczelSetTheory.lean |
 | — | `AczelSetTheory/VN.lean` | — | ✅ Complete | VN/{Basic,Injective,IsNat,Arithmetic,FSet,PeanoAxioms,PeanoArith,PowVN,SubVN,DivVN,FactorialVN,CardVN,RankVN} | AczelSetTheory.lean |
 | — | `AczelSetTheory/PList.lean` | — | ✅ Complete | PList/{Basic,Lemmas,Omega0} | AczelSetTheory.lean |

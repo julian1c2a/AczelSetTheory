@@ -108,7 +108,7 @@ private theorem nodup_append (l₁ l₂ : PList CList)
     (h_cross : ∀ x, PList.Mem x l₁ → ∀ y, PList.Mem y l₂ → extEq x y = false) :
     Nodup (l₁ ++ l₂) := by
   induction l₁ with
-  | nil => simpa using h₂
+  | nil => exact h₂
   | cons x xs ih =>
     obtain ⟨hx_nd, hxs_nd⟩ := h₁
     simp only [PList.cons_append, Nodup]

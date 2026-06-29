@@ -16,6 +16,8 @@ License: MIT
 import AczelSetTheory.Operations.Order
 import AczelSetTheory.Axioms.Separation
 import AczelSetTheory.Axioms.Order
+import AczelSetTheory.Axioms.Cardinal
+import AczelSetTheory.Combinatorics.Counting
 
 namespace HFSet
 
@@ -107,14 +109,158 @@ theorem wo_induction {R A : HFSet} (hwo : isWellOrder R A)
 -- Descenso infinito es imposible en órdenes bien fundados
 -- ─────────────────────────────────────────────────────────────────
 
+open Peano
+
+private def vN_local : ℕ₀ → HFSet
+  | .zero => HFSet.empty
+  | .succ n => HFSet.insert (vN_local n) (vN_local n)
+
+private theorem card_vN_local : ∀ n, card (vN_local n) = n
+  | .zero => card_empty
+  | .succ n => by
+      change card (insert (vN_local n) (vN_local n)) = σ n
+      rw [card_insert _ _ (not_mem_self (vN_local n)), card_vN_local n]
+
+private theorem mem_vN_local : ∀ n x, x ∈ vN_local n → ∃ k, lt₀ k n ∧ x = vN_local k
+  | .zero, x, hx => False.elim (not_mem_empty x hx)
+  | .succ n, x, hx => by
+      have hx' : x ∈ insert (vN_local n) (vN_local n) := hx
+      rcases (mem_insert _ _ _).mp hx' with h_eq | hxn
+      · exact ⟨n, lt_succ_self n, h_eq⟩
+      · obtain ⟨k, hk, rfl⟩ := mem_vN_local n _ hxn
+        exact ⟨k, lt_of_lt_of_le hk (Peano.Order.le_succ_self n), rfl⟩
+
+private theorem vN_local_card_inj (n : ℕ₀) (x y : HFSet) (hx : x ∈ vN_local n) (hy : y ∈ vN_local n) :
+    card x = card y → x = y := by
+  intro hc
+  obtain ⟨kx, _, rfl⟩ := mem_vN_local n x hx
+  obtain ⟨ky, _, rfl⟩ := mem_vN_local n y hy
+  have h1 := card_vN_local kx
+  have h2 := card_vN_local ky
+  rw [h1, h2] at hc
+  rw [hc]
+
+private def f_img_interval (f : ℕ₀ → HFSet) (i : ℕ₀) : ℕ₀ → HFSet
+  | .zero => insert (f i) empty
+  | .succ d => insert (f (add i (σ d))) (f_img_interval f i d)
+
+private theorem f_i_mem_interval (f : ℕ₀ → HFSet) (i d : ℕ₀) : f i ∈ f_img_interval f i d := by
+  induction d with
+  | zero => exact (mem_insert _ _ _).mpr (Or.inl rfl)
+  | succ d ih => exact (mem_insert _ _ _).mpr (Or.inr ih)
+
+private theorem f_img_interval_subset {A : HFSet} (f : ℕ₀ → HFSet) (hf_mem : ∀ n, f n ∈ A) (i : ℕ₀) :
+    ∀ d, f_img_interval f i d ⊆ A
+  | .zero => by
+      intro x hx
+      change x ∈ insert (f i) empty at hx
+      rcases (mem_insert _ _ _).mp hx with rfl | hxe
+      · exact hf_mem i
+      · exact False.elim (not_mem_empty x hxe)
+  | .succ d => by
+      intro x hx
+      change x ∈ insert _ _ at hx
+      rcases (mem_insert _ _ _).mp hx with rfl | hxe
+      · exact hf_mem _
+      · exact f_img_interval_subset f hf_mem i d x hxe
+
+private theorem interval_has_pred {R : HFSet} (f : ℕ₀ → HFSet)
+    (hf_desc : ∀ n, ⟪f (σ n), f n⟫ ∈ R) (i : ℕ₀) :
+    ∀ d m, m ∈ f_img_interval f i d →
+      (∃ y ∈ f_img_interval f i d, ⟪y, m⟫ ∈ R) ∨ m = f (add i d)
+  | .zero => by
+      intro m hm
+      change m ∈ insert (f i) empty at hm
+      rcases (mem_insert _ _ _).mp hm with rfl | hxe
+      · exact Or.inr (by rw [add_zero])
+      · exact False.elim (not_mem_empty _ hxe)
+  | .succ d => by
+      intro m hm
+      change m ∈ insert (f (add i (σ d))) (f_img_interval f i d) at hm
+      rcases (mem_insert _ _ _).mp hm with rfl | hxe
+      · exact Or.inr rfl
+      · rcases interval_has_pred f hf_desc i d m hxe with ⟨y, hy, hyR⟩ | rfl
+        · exact Or.inl ⟨y, (mem_insert _ _ _).mpr (Or.inr hy), hyR⟩
+        · exact Or.inl ⟨f (add i (σ d)), (mem_insert _ _ _).mpr (Or.inl rfl), hf_desc _⟩
+
+private theorem f_succ_mem_interval (f : ℕ₀ → HFSet) (i d : ℕ₀) :
+    f (σ i) ∈ f_img_interval f i (σ d) := by
+  induction d with
+  | zero => exact (mem_insert _ _ _).mpr (Or.inl rfl)
+  | succ d ih =>
+      exact (mem_insert _ _ _).mpr (Or.inr ih)
+
+private theorem no_infinite_descent_cycle {R A : HFSet} (hwf : isStrictlyWellFounded R A)
+    {f : ℕ₀ → HFSet} (hf_mem : ∀ n, f n ∈ A) (hf_desc : ∀ n, ⟪f (σ n), f n⟫ ∈ R)
+    (i d : ℕ₀) (heq : f i = f (add i (σ d))) : False := by
+  let S := f_img_interval f i (σ d)
+  have hS_sub : S ⊆ A := f_img_interval_subset f hf_mem i (σ d)
+  have hS_ne : S ≠ empty := fun h => not_mem_empty (f i) (h ▸ f_i_mem_interval f i (σ d))
+  obtain ⟨m, hm_in_S, hm_min⟩ := hwf S hS_sub hS_ne
+  rcases interval_has_pred f hf_desc i (σ d) m hm_in_S with ⟨y, hy, hyR⟩ | rfl
+  · exact hm_min y hy hyR
+  · have hy : f (σ i) ∈ S := f_succ_mem_interval f i d
+    have hyR : ⟪f (σ i), f (add i (σ d))⟫ ∈ R := by
+      rw [← heq]
+      exact hf_desc i
+    exact hm_min (f (σ i)) hy hyR
+
+private theorem zero_add (a : ℕ₀) : add 𝟘 a = a := by
+  induction a with
+  | zero => rfl
+  | succ a ih =>
+      change σ (add 𝟘 a) = σ a
+      rw [ih]
+
+private theorem succ_add (a b : ℕ₀) : add (σ a) b = σ (add a b) := by
+  induction b with
+  | zero => rfl
+  | succ b ih =>
+      change σ (add (σ a) b) = σ (σ (add a b))
+      rw [ih]
+
+private theorem eq_add_of_lt0 (a b : ℕ₀) : lt₀ a b → ∃ d, b = add a (σ d) := by
+  induction a generalizing b with
+  | zero =>
+      cases b
+      · intro h; exact False.elim h
+      · case succ b' => intro _; exact ⟨b', by rw [zero_add]⟩
+  | succ a ih =>
+      cases b
+      · intro h; exact False.elim h
+      · case succ b' =>
+          intro h
+          obtain ⟨d, hd⟩ := ih b' h
+          exact ⟨d, by rw [hd, succ_add]⟩
+
 /-- No existe una cadena descendente infinita en una relación estrictamente
     bien fundada: si f : ℕ₀ → HFSet satisface ⟪f (n+1), f n⟫ ∈ R y f n ∈ A
     para todo n, se llega a contradicción. -/
 theorem no_infinite_descent {R A : HFSet} (hwf : isStrictlyWellFounded R A)
     {f : ℕ₀ → HFSet}
-    (hf_mem : ∀ n, f n ∈ A) (hf_desc : ∀ n, ⟪f (σ n), f n⟫ ∈ R) : False :=
-  wf_induction hwf (P := fun x => ∀ n, f n = x → False)
-    (fun _x _hx ih n hn => ih (f (σ n)) (hf_mem (σ n)) (hn ▸ hf_desc n) (σ n) rfl)
-    (f 𝟘) (hf_mem 𝟘) 𝟘 rfl
+    (hf_mem : ∀ n, f n ∈ A) (hf_desc : ∀ n, ⟪f (σ n), f n⟫ ∈ R) : False := by
+  -- Usaremos vN_local (σ (card A)) como conjunto de índices.
+  let Dom := vN_local (σ (card A))
+  have hcard_dom : card Dom = σ (card A) := card_vN_local _
+  have hlt : lt₀ (card A) (card Dom) := by
+    rw [hcard_dom]
+    exact lt_succ_self (card A)
+  let F : HFSet → HFSet := fun x => f (card x)
+  have hF_into : ∀ x ∈ Dom, F x ∈ A := fun x _ => hf_mem (card x)
+  obtain ⟨x, y, hx, hy, hne, hF⟩ := exists_collision_of_card_lt hF_into hlt
+  have hc_ne : card x ≠ card y := fun h => hne (vN_local_card_inj _ _ _ hx hy h)
+  change f (card x) = f (card y) at hF
+  rcases Peano.StrictOrder.trichotomy (card x) (card y) with hij_lt | heq | hji_lt
+  · obtain ⟨d, hd⟩ := eq_add_of_lt0 (card x) (card y) hij_lt
+    rw [hd] at hF
+    exact no_infinite_descent_cycle hwf hf_mem hf_desc (card x) d hF
+  · exact absurd heq hc_ne
+  · obtain ⟨d, hd⟩ := eq_add_of_lt0 (card y) (card x) hji_lt
+    rw [hd] at hF
+    exact no_infinite_descent_cycle hwf hf_mem hf_desc (card y) d hF.symm
+
+export AczelSetTheory.HFSet (
+  wf_induction minimum_in_nonempty wellOrder_minimum_unique wo_induction no_infinite_descent
+)
 
 end HFSet

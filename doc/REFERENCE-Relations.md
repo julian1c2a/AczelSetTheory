@@ -45,6 +45,9 @@ inverse, restriction, replacement, and cartesian products.
 | 74 | `AczelSetTheory/Axioms/CartProd.lean` | ✅ Complete |
 | 75 | `AczelSetTheory/Operations/NPow.lean` | ✅ Complete |
 | 76 | `AczelSetTheory/Axioms/NPow.lean` | ✅ Complete |
+| 117 | `AczelSetTheory/Operations/Order.lean` | ✅ Complete |
+| 118 | `AczelSetTheory/Axioms/Order.lean` | ✅ Complete |
+| 119 | `AczelSetTheory/Axioms/WellOrder.lean` | ✅ Complete |
 
 ---
 
@@ -337,6 +340,43 @@ def nPow (A : HFSet) : ℕ₀ → HFSet
 
 ---
 
+### 4.117 Operations/Order.lean — `namespace HFSet`
+
+#### 4.117.1 Order Properties
+
+Basic predicates for a relation `R` on a set `A`:
+- `isReflexive`, `isIrreflexive`
+- `isSymmetric`, `isAntisymmetric`
+- `isTransitive`
+- `isConnected`, `isTotal`, `isTrichotomous`
+
+Compound predicates:
+- `isPreorder`, `isEquivRel`, `isPartialOrder`
+- `isStrictOrder`, `isTotalOrder`, `isStrictTotalOrder`
+
+Element predicates:
+- `isMinimum`, `isMaximum`, `isMinimal`, `isMaximal`
+- `isLowerBound`, `isUpperBound`, `isInfimum`, `isSupremum`
+
+Well-foundedness:
+- `isWellFounded`: Every non-empty subset has a minimum.
+- `isStrictlyWellFounded`: Every non-empty subset has a minimal element.
+- `isWellOrder`: Total order and well-founded.
+
+---
+
+### 4.118 Axioms/Order.lean — `namespace HFSet`
+
+> No new definitions. Exports theorems only.
+
+---
+
+### 4.119 Axioms/WellOrder.lean — `namespace HFSet`
+
+> No new definitions. Exports theorems only.
+
+---
+
 ## 6. Theorems
 
 ### 6.18 Axioms/FunctionComp.lean — `namespace HFSet`
@@ -511,6 +551,31 @@ def nPow (A : HFSet) : ℕ₀ → HFSet
 | 1 | `mem_nPow_zero` | `(t A : HFSet) : t ∈ nPow A 𝟘 ↔ t = empty` |
 | 2 | `mem_nPow_succ` | `(t A : HFSet) (n : ℕ₀) : t ∈ nPow A (σ n) ↔ ∃ s ∈ nPow A n, ∃ a ∈ A, t = ⟪s, a⟫` |
 
+### 6.118 Axioms/Order.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `isPartialOrder_of_totalOrder` | `{R A : HFSet} (h : isTotalOrder R A) : isPartialOrder R A` |
+| 2 | `isConnected_of_isTotal` | `{R A : HFSet} (h : isTotal R A) : isConnected R A` |
+| 3 | `isAntisymmetric_of_strictOrder` | `{R A : HFSet} (hirr : isIrreflexive R A) (htr : isTransitive R A) : isAntisymmetric R A` |
+| 4 | `isPartialOrder_empty` | `(R : HFSet) : isPartialOrder R empty` |
+| 5 | `minimum_unique` | `{R A x y : HFSet} (hanti : isAntisymmetric R A) (hx : isMinimum R A x) (hy : isMinimum R A y) : x = y` |
+| 6 | `isMinimal_of_isMinimum` | `{R A x : HFSet} (hanti : isAntisymmetric R A) (hmin : isMinimum R A x) : isMinimal R A x` |
+| 7 | `isMinimum_of_isMinimal_total` | `{R A x : HFSet} (htot : isTotalOrder R A) (hmin : isMinimal R A x) : isMinimum R A x` |
+| 8 | `isPartialOrder_restrict` | `{R A B : HFSet} (h : isPartialOrder R A) (hB : B ⊆ A) : isPartialOrder R B` |
+| 9 | `isWellOrder_restrict` | `{R A B : HFSet} (hwo : isWellOrder R A) (hB : B ⊆ A) : isWellOrder R B` |
+| 10 | `isWellOrder_empty` | `(R : HFSet) : isWellOrder R empty` |
+
+### 6.119 Axioms/WellOrder.lean — `namespace HFSet`
+
+| # | Theorem | Lean signature |
+|---|---------|---------------|
+| 1 | `wf_induction` | `{R A : HFSet} (hwf : isStrictlyWellFounded R A) {P : HFSet → Prop} (step : ∀ x ∈ A, (∀ y ∈ A, ⟪y, x⟫ ∈ R → P y) → P x) : ∀ x ∈ A, P x` |
+| 2 | `minimum_in_nonempty` | `{R A S : HFSet} (hwo : isWellOrder R A) (hS : S ⊆ A) (hne : S ≠ empty) : ∃ m, isMinimum R S m` |
+| 3 | `wellOrder_minimum_unique` | `{R A S x y : HFSet} (hwo : isWellOrder R A) (hS : S ⊆ A) (hx : isMinimum R S x) (hy : isMinimum R S y) : x = y` |
+| 4 | `wo_induction` | `{R A : HFSet} (hwo : isWellOrder R A) {P : HFSet → Prop} (step : ∀ x ∈ A, (∀ y ∈ A, ⟪y, x⟫ ∈ R → y ≠ x → P y) → P x) : ∀ x ∈ A, P x` |
+| 5 | `no_infinite_descent` | `{R A : HFSet} (hwf : isStrictlyWellFounded R A) {f : ℕ₀ → HFSet} (hf_mem : ∀ n, f n ∈ A) (hf_desc : ∀ n, ⟪f (σ n), f n⟫ ∈ R) : False` |
+
 ---
 
 ### 6.54 Operations/CartProd.lean — `namespace HFSet`
@@ -637,3 +702,16 @@ def nPow (A : HFSet) : ℕ₀ → HFSet
 ### Axioms/NPow.lean
 
 `HFSet.mem_nPow_zero`, `HFSet.mem_nPow_succ`
+
+### Operations/Order.lean
+
+`HFSet.isReflexive`, `HFSet.isIrreflexive`, `HFSet.isSymmetric`, `HFSet.isAntisymmetric`, `HFSet.isTransitive`, `HFSet.isConnected`, `HFSet.isTotal`, `HFSet.isTrichotomous`, `HFSet.isPreorder`, `HFSet.isEquivRel`, `HFSet.isPartialOrder`, `HFSet.isStrictOrder`, `HFSet.isTotalOrder`, `HFSet.isStrictTotalOrder`, `HFSet.isMinimum`, `HFSet.isMaximum`, `HFSet.isMinimal`, `HFSet.isMaximal`, `HFSet.isLowerBound`, `HFSet.isUpperBound`, `HFSet.isInfimum`, `HFSet.isSupremum`, `HFSet.isWellFounded`, `HFSet.isStrictlyWellFounded`, `HFSet.isWellOrder`
+
+### Axioms/Order.lean
+
+`HFSet.isPartialOrder_of_totalOrder`, `HFSet.isPreorder_of_partialOrder`, `HFSet.isPreorder_of_totalOrder`, `HFSet.isStrictOrder_of_strictTotalOrder`, `HFSet.isConnected_of_isTotal`, `HFSet.isConnected_of_isTrichotomous`, `HFSet.isAntisymmetric_of_strictOrder`, `HFSet.isReflexive_empty`, `HFSet.isIrreflexive_empty`, `HFSet.isSymmetric_empty`, `HFSet.isAntisymmetric_empty`, `HFSet.isTransitive_empty`, `HFSet.isTotal_empty`, `HFSet.isTrichotomous_empty`, `HFSet.isPreorder_empty`, `HFSet.isPartialOrder_empty`, `HFSet.isTotalOrder_empty`, `HFSet.isStrictOrder_empty`, `HFSet.minimum_unique`, `HFSet.maximum_unique`, `HFSet.isMinimal_of_isMinimum`, `HFSet.isMaximal_of_isMaximum`, `HFSet.isMinimum_of_isMinimal_total`, `HFSet.isReflexive_restrict`, `HFSet.isIrreflexive_restrict`, `HFSet.isSymmetric_restrict`, `HFSet.isAntisymmetric_restrict`, `HFSet.isTransitive_restrict`, `HFSet.isTotal_restrict`, `HFSet.isTrichotomous_restrict`, `HFSet.isPreorder_restrict`, `HFSet.isPartialOrder_restrict`, `HFSet.isTotalOrder_restrict`, `HFSet.isStrictOrder_restrict`, `HFSet.isWellFounded_restrict`, `HFSet.isStrictlyWellFounded_restrict`, `HFSet.isWellOrder_restrict`, `HFSet.isWellFounded_empty`, `HFSet.isStrictlyWellFounded_empty`, `HFSet.isWellOrder_empty`, `HFSet.infimum_unique`, `HFSet.supremum_unique`
+
+### Axioms/WellOrder.lean
+
+`HFSet.wf_induction`, `HFSet.minimum_in_nonempty`, `HFSet.wellOrder_minimum_unique`, `HFSet.wo_induction`, `HFSet.no_infinite_descent`
+
