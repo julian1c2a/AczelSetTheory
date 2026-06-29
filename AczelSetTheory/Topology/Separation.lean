@@ -4,8 +4,6 @@ import AczelSetTheory.Axioms.Separation
 import AczelSetTheory.Axioms.Intersection
 import AczelSetTheory.Axioms.Setminus
 
-open Classical
-
 namespace HFTopology
 
 /-!

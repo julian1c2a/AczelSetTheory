@@ -7,8 +7,6 @@ import AczelSetTheory.Axioms.Function
 
 namespace HFSet
 
-open Classical
-
 -- ==================================================================
 -- Axioma de Elección para conjuntos hereditariamente finitos
 -- ==================================================================

@@ -27,8 +27,6 @@ License: MIT
 -- Notas técnicas:
 --   • El portador es `sub.cosets` (de `Algebra/CosetCount.lean`), evitando
 --     reconstruir el conjunto de cosetes.
---   • `cosetRep` usa `Classical.choose`, por lo que la operación cociente
---     es `noncomputable`.
 --   • La buena definición requiere normalidad (sub.isNormal).
 
 import AczelSetTheory.Algebra.QuotientGroup
