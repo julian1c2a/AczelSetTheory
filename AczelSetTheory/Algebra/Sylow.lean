@@ -3284,9 +3284,10 @@ theorem sylow_first (grp : HFGroup) (p k : ℕ₀)
   cases k' with
   | zero => exact sylow_first_zero grp' p'
   | succ m =>
-    by_cases h_proper :
-        ∃ sub : HFSubgroup grp', HFSet.card sub.H ≠ HFSet.card grp'.G ∧
-                                  p' ^ (σ m) ∣ HFSet.card sub.H
+    let P (H : HFSet) : Prop := HFSet.card H ≠ HFSet.card grp'.G ∧ p' ^ (σ m) ∣ HFSet.card H
+    haveI : DecidablePred P := inferInstance
+    haveI : Decidable (∃ sub : HFSubgroup grp', P sub.H) := inferInstance
+    by_cases h_proper : ∃ sub : HFSubgroup grp', P sub.H
     · -- Caso 2: ∃ M propio con p'^(σm) | |M|; aplicar HI a M
       obtain ⟨M, hM_ne, hM_dvd⟩ := h_proper
       have hM_lt : lt₀ (HFSet.card M.H) n := by

@@ -25,6 +25,7 @@ import AczelSetTheory.Combinatorics.Counting
 import AczelSetTheory.Integers.Bezout
 import AczelSetTheory.Integers.MobiusLiouville
 import AczelSetTheory.Algebra.Sylow
+import AczelSetTheory.Axioms.WellOrder
 
 set_option autoImplicit false
 
@@ -72,12 +73,13 @@ end AczelSetTheory.Meta
 #assert_no_classical HFAlgebra.cauchy_minimal
 #assert_no_classical HFAlgebra.succ_n_dvd_card_mckayFixedPoints
 
+-- Fase 4 (C1 y C2, 2026-06-29): cierre de los últimos obstáculos de decidibilidad.
+#assert_no_classical HFSet.wf_induction
+#assert_no_classical HFSet.wo_induction
+#assert_no_classical HFSet.no_infinite_descent
+#assert_no_classical HFAlgebra.sylow_first
+
 -- ─────────────────────────────────────────────────────────────────
--- PENDIENTES (Fase 3 — obstáculos que requieren infraestructura de
--- decidibilidad, no conversión mecánica):
---   • HFSet.wf_induction / wo_induction / no_infinite_descent (WellOrder):
---     predicado `P : HFSet→Prop` arbitrario + cuantificador ∀ n:ℕ₀ indecidible.
---   • HFAlgebra.sylow_first: `by_cases (∃ sub : HFSubgroup grp', …)` cae a
---     `Classical.em` (no hay `Decidable` para ∃ sobre el TIPO HFSubgroup).
+-- PENDIENTES (Fase 3):
 --   • Heredado de peanolib: módulos no constructivos (FSet/Perm/Sign/…) si se usan.
 -- ─────────────────────────────────────────────────────────────────

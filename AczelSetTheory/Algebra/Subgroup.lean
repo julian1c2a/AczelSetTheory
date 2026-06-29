@@ -25,6 +25,7 @@ import AczelSetTheory.Axioms.Decidable
 import AczelSetTheory.Axioms.OrdinalNat
 import AczelSetTheory.Axioms.Intersection
 import AczelSetTheory.Axioms.CardImage
+import AczelSetTheory.Axioms.Powerset
 
 namespace HFAlgebra
 
@@ -551,5 +552,62 @@ theorem rightCoset_eq_or_disjoint (sub : HFSubgroup grp) {a b : HFSet}
       exact False.elim (HFSet.not_mem_empty _ hx)
 
 end HFSubgroup
+
+-- ─────────────────────────────────────────────────────────────────
+-- Infraestructura de Decidibilidad (C-2)
+-- ─────────────────────────────────────────────────────────────────
+
+/-- Predicado booleano/decidible que determina si un conjunto H ⊆ G
+    cumple los axiomas de subgrupo. Útil para decidibilidad. -/
+def isSubgroupProp (grp : HFGroup) (H : HFSet) : Prop :=
+  (∀ x ∈ H, x ∈ grp.G) ∧
+  grp.e ∈ H ∧
+  (∀ x ∈ H, ∀ y ∈ H, grp.op x y ∈ H) ∧
+  (∀ x ∈ H, grp.inv x ∈ H)
+
+/-- Al ser `H` un HFSet (finito), las cuantificaciones acotadas
+    son decidibles. -/
+instance isSubgroupProp_decidable (grp : HFGroup) (H : HFSet) :
+    Decidable (isSubgroupProp grp H) :=
+  haveI _inst1 : Decidable (∀ x ∈ H, x ∈ grp.G) := inferInstance
+  haveI _inst2 : Decidable (grp.e ∈ H) := inferInstance
+  haveI _inst3 : Decidable (∀ x ∈ H, ∀ y ∈ H, grp.op x y ∈ H) := inferInstance
+  haveI _inst4 : Decidable (∀ x ∈ H, grp.inv x ∈ H) := inferInstance
+  instDecidableAnd
+
+/-- Equivalencia entre existir un subgrupo y existir un subconjunto
+    que cumpla las propiedades. -/
+theorem exists_subgroup_iff_powerset (grp : HFGroup) (P : HFSet → Prop) :
+    (∃ sub : HFSubgroup grp, P sub.H) ↔
+    (∃ H ∈ HFSet.powerset grp.G, isSubgroupProp grp H ∧ P H) := by
+  constructor
+  · intro ⟨sub, hP⟩
+    refine ⟨sub.H, ?_, ?_, hP⟩
+    · rw [HFSet.mem_powerset]
+      intro x hx
+      exact sub.H_sub hx
+    · exact ⟨fun _ hx => sub.H_sub hx, sub.e_mem, fun _ hx _ hy => sub.op_closed hx hy, fun _ hx => sub.inv_closed hx⟩
+  · intro ⟨H, hpow, hsub, hP⟩
+    have hsubset : ∀ x ∈ H, x ∈ grp.G := by
+      intro x hx
+      rw [HFSet.mem_powerset] at hpow
+      exact hpow x hx
+    let sub : HFSubgroup grp := {
+      H := H
+      H_sub := fun {x} hx => hsubset x hx
+      e_mem := hsub.2.1
+      op_closed := fun {a b} ha hb => hsub.2.2.1 _ ha _ hb
+      inv_closed := fun {a} ha => hsub.2.2.2 _ ha
+    }
+    exact ⟨sub, hP⟩
+
+/-- Instancia que hace decidibles las cuantificaciones existenciales
+    acotadas sobre el tipo de subgrupos `HFSubgroup grp`. -/
+instance existsSubgroup_decidable (grp : HFGroup) (P : HFSet → Prop) [DecidablePred P] :
+    Decidable (∃ sub : HFSubgroup grp, P sub.H) :=
+  decidable_of_iff (∃ H ∈ HFSet.powerset grp.G, isSubgroupProp grp H ∧ P H)
+    (exists_subgroup_iff_powerset grp P).symm
+
+export HFAlgebra (isSubgroupProp exists_subgroup_iff_powerset)
 
 end HFAlgebra

@@ -6,7 +6,31 @@ All notable changes to this project are documented here.
 
 ---
 
-## [2026-06-07] — M5B: cuerpo ℤ/pℤ + conmutatividad de ℤ/nℤ
+## [2026-06-29] — Cierre de pureza constructiva (C-1 y C-2)
+
+### Added
+
+- **`AczelSetTheory/Algebra/Subgroup.lean`**:
+  - `isSubgroupProp` e `isSubgroupProp_decidable` (predicado booleano sobre subconjuntos para determinar si son subgrupos).
+  - `exists_subgroup_iff_powerset` y `existsSubgroup_decidable` (instancia de decidibilidad para la existencia de subgrupos que cumplan un predicado sobre un grupo).
+
+### Changed
+
+- **`AczelSetTheory/Axioms/WellOrder.lean`**:
+  - `no_infinite_descent` reescrito usando `Combinatorics/Counting.pigeonhole` para evitar inducción y el uso encubierto de indecidibilidad, logrando pureza constructiva (Mito C-1).
+  - Añadido `[DecidablePred P]` a `wf_induction` y `wo_induction`.
+  - Reemplazo de `Classical.byContradiction` por `Decidable.byContradiction` en teoremas de inducción.
+- **`AczelSetTheory/Algebra/Sylow.lean`**:
+  - `sylow_first` usa la instancia `existsSubgroup_decidable` en su `by_cases`, eliminando el uso de `Classical.em` (Mito C-2).
+- **`AczelSetTheory/Meta/AxiomCheck.lean`**:
+  - Habilitados asserts de verificación estricta para `wf_induction`, `no_infinite_descent` y `sylow_first` confirmando su pureza (`#print axioms` limpio de `Classical.choice`).
+
+### Build
+
+- ✅ `lake build AczelSetTheory.Meta.AxiomCheck` pasa exitosamente.
+- El repositorio completo cumple estricta y cabalmente con **ADR-018** (cero `Classical.*`).
+
+---
 
 ### Added
 

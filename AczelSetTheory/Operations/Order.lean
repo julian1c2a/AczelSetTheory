@@ -154,12 +154,12 @@ def isStrictlyWellFounded (R A : HFSet) : Prop :=
 def isWellOrder (R A : HFSet) : Prop :=
   isTotalOrder R A ∧ isWellFounded R A
 
-export AczelSetTheory.HFSet (
+end HFSet
+
+export HFSet (
   isReflexive isIrreflexive isSymmetric isAntisymmetric isTransitive isConnected isTotal isTrichotomous
   isPreorder isEquivRel isPartialOrder isStrictOrder isTotalOrder isStrictTotalOrder
   isMinimum isMaximum isMinimal isMaximal
   isLowerBound isUpperBound isInfimum isSupremum
   isWellFounded isStrictlyWellFounded isWellOrder
 )
-
-end HFSet

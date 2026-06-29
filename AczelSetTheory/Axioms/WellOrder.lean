@@ -29,14 +29,13 @@ namespace HFSet
     cada x ∈ A satisface P siempre que todos sus R-predecesores en A lo satisfagan,
     entonces todos los elementos de A satisfacen P. -/
 theorem wf_induction {R A : HFSet} (hwf : isStrictlyWellFounded R A)
-    {P : HFSet → Prop}
+    {P : HFSet → Prop} [DecidablePred P]
     (step : ∀ x ∈ A, (∀ y ∈ A, ⟪y, x⟫ ∈ R → P y) → P x) :
     ∀ x ∈ A, P x := by
   intro x hx
-  apply Classical.byContradiction
+  apply Decidable.byContradiction
   intro hnp
   -- Sea S = {z ∈ A | ¬P z}, no vacío porque x ∈ S.
-  haveI : DecidablePred (fun z => ¬P z) := fun z => Classical.propDecidable _
   let S := sep A (fun z => ¬P z)
   have hS_sub : S ⊆ A := fun z hz => (mem_sep A _ z |>.mp hz).1
   have hS_ne : S ≠ empty := by
@@ -49,7 +48,7 @@ theorem wf_induction {R A : HFSet} (hwf : isStrictlyWellFounded R A)
   apply hnp_m
   apply step m hm_in_A
   intro y hy hym
-  apply Classical.byContradiction
+  apply Decidable.byContradiction
   intro hnp_y
   have hy_in_S : y ∈ S := mem_sep A _ y |>.mpr ⟨hy, hnp_y⟩
   exact absurd hym (hm_no_pred y hy_in_S)
@@ -76,13 +75,12 @@ theorem wellOrder_minimum_unique {R A S x y : HFSet}
     todos los y ∈ A con ⟪y, x⟫ ∈ R y y ≠ x lo satisfagan, entonces
     todos los elementos de A satisfacen P. -/
 theorem wo_induction {R A : HFSet} (hwo : isWellOrder R A)
-    {P : HFSet → Prop}
+    {P : HFSet → Prop} [DecidablePred P]
     (step : ∀ x ∈ A, (∀ y ∈ A, ⟪y, x⟫ ∈ R → y ≠ x → P y) → P x) :
     ∀ x ∈ A, P x := by
   intro x hx
-  apply Classical.byContradiction
+  apply Decidable.byContradiction
   intro hnp
-  haveI : DecidablePred (fun z => ¬P z) := fun z => Classical.propDecidable _
   let S := sep A (fun z => ¬P z)
   have hS_sub : S ⊆ A := fun z hz => (mem_sep A _ z |>.mp hz).1
   have hS_ne : S ≠ empty := by
@@ -95,7 +93,7 @@ theorem wo_induction {R A : HFSet} (hwo : isWellOrder R A)
   apply hnp_m
   apply step m hm_in_A
   intro y hy hym hne
-  apply Classical.byContradiction
+  apply Decidable.byContradiction
   intro hnp_y
   have hy_in_S : y ∈ S := mem_sep A _ y |>.mpr ⟨hy, hnp_y⟩
   -- m es mínimo de S: ⟪m, y⟫ ∈ R para todo y ∈ S.
@@ -259,8 +257,8 @@ theorem no_infinite_descent {R A : HFSet} (hwf : isStrictlyWellFounded R A)
     rw [hd] at hF
     exact no_infinite_descent_cycle hwf hf_mem hf_desc (card y) d hF.symm
 
-export AczelSetTheory.HFSet (
+end HFSet
+
+export HFSet (
   wf_induction minimum_in_nonempty wellOrder_minimum_unique wo_induction no_infinite_descent
 )
-
-end HFSet

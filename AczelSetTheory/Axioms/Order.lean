@@ -244,7 +244,9 @@ theorem supremum_unique {R A b c : HFSet}
     (hb : isSupremum R A b) (hc : isSupremum R A c) : b = c :=
   hanti b hb_mem c hc_mem (hb.2 c hc.1) (hc.2 b hb.1)
 
-export AczelSetTheory.HFSet (
+end HFSet
+
+export HFSet (
   isPartialOrder_of_totalOrder isPreorder_of_partialOrder isPreorder_of_totalOrder isStrictOrder_of_strictTotalOrder
   isConnected_of_isTotal isConnected_of_isTrichotomous
   isAntisymmetric_of_strictOrder
@@ -259,5 +261,3 @@ export AczelSetTheory.HFSet (
   isWellFounded_empty isStrictlyWellFounded_empty isWellOrder_empty
   infimum_unique supremum_unique
 )
-
-end HFSet

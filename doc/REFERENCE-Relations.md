@@ -570,10 +570,10 @@ Well-foundedness:
 
 | # | Theorem | Lean signature |
 |---|---------|---------------|
-| 1 | `wf_induction` | `{R A : HFSet} (hwf : isStrictlyWellFounded R A) {P : HFSet → Prop} (step : ∀ x ∈ A, (∀ y ∈ A, ⟪y, x⟫ ∈ R → P y) → P x) : ∀ x ∈ A, P x` |
+| 1 | `wf_induction` | `{R A : HFSet} (hwf : isStrictlyWellFounded R A) {P : HFSet → Prop} [DecidablePred P] (step : ∀ x ∈ A, (∀ y ∈ A, ⟪y, x⟫ ∈ R → P y) → P x) : ∀ x ∈ A, P x` |
 | 2 | `minimum_in_nonempty` | `{R A S : HFSet} (hwo : isWellOrder R A) (hS : S ⊆ A) (hne : S ≠ empty) : ∃ m, isMinimum R S m` |
 | 3 | `wellOrder_minimum_unique` | `{R A S x y : HFSet} (hwo : isWellOrder R A) (hS : S ⊆ A) (hx : isMinimum R S x) (hy : isMinimum R S y) : x = y` |
-| 4 | `wo_induction` | `{R A : HFSet} (hwo : isWellOrder R A) {P : HFSet → Prop} (step : ∀ x ∈ A, (∀ y ∈ A, ⟪y, x⟫ ∈ R → y ≠ x → P y) → P x) : ∀ x ∈ A, P x` |
+| 4 | `wo_induction` | `{R A : HFSet} (hwo : isWellOrder R A) {P : HFSet → Prop} [DecidablePred P] (step : ∀ x ∈ A, (∀ y ∈ A, ⟪y, x⟫ ∈ R → y ≠ x → P y) → P x) : ∀ x ∈ A, P x` |
 | 5 | `no_infinite_descent` | `{R A : HFSet} (hwf : isStrictlyWellFounded R A) {f : ℕ₀ → HFSet} (hf_mem : ∀ n, f n ∈ A) (hf_desc : ∀ n, ⟪f (σ n), f n⟫ ∈ R) : False` |
 
 ---

@@ -573,6 +573,37 @@ def HFSubgroup.cosetEq (sub : HFSubgroup grp) (a b : HFSet) : Prop :=
 
 - **Math**: a ~_H b iff b·a⁻¹ ∈ H — relación de equivalencia de cosetes.
 
+#### 4.88.6 `HFAlgebra.isSubgroupProp`
+
+```lean
+def isSubgroupProp (grp : HFGroup) (H : HFSet) : Prop
+```
+- **Math**: Predicado booleano/decidible que determina si un conjunto H ⊆ G cumple los axiomas de subgrupo.
+
+#### 4.88.7 `HFAlgebra.isSubgroupProp_decidable`
+
+```lean
+instance isSubgroupProp_decidable (grp : HFGroup) (H : HFSet) : Decidable (isSubgroupProp grp H)
+```
+- **Math**: Al ser `H` un HFSet (finito), las cuantificaciones acotadas son decidibles.
+
+#### 4.88.8 `HFAlgebra.exists_subgroup_iff_powerset`
+
+```lean
+theorem exists_subgroup_iff_powerset (grp : HFGroup) (P : HFSet → Prop) :
+    (∃ sub : HFSubgroup grp, P sub.H) ↔
+    (∃ H ∈ HFSet.powerset grp.G, isSubgroupProp grp H ∧ P H)
+```
+- **Math**: Equivalencia entre existir un subgrupo y existir un subconjunto que cumpla las propiedades.
+
+#### 4.88.9 `HFAlgebra.existsSubgroup_decidable`
+
+```lean
+instance existsSubgroup_decidable (grp : HFGroup) (P : HFSet → Prop) [DecidablePred P] :
+    Decidable (∃ sub : HFSubgroup grp, P sub.H)
+```
+- **Math**: Instancia que hace decidibles las cuantificaciones existenciales acotadas sobre el tipo de subgrupos `HFSubgroup grp`.
+
 ---
 
 ### 4.89 Algebra/GroupHom.lean — `namespace HFAlgebra`
