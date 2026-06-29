@@ -40,7 +40,7 @@ def isSurjective
       :=
   ∀ b, b ∈ B → ∃ a, ⟪a, b⟫ ∈ f
 
-/-- f es biyectiva de A en B. -/
+/-- f es biyectiva sobre A y B si es una función con dominio A, sobreyectiva sobre B e inyectiva. -/
 def isBijective
   (f A B : HFSet) :
     Prop

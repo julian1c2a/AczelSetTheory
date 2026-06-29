@@ -8,20 +8,10 @@ License: MIT
 --
 -- Signatura de permutaciones sobre el embedding de Von Neumann.
 --
--- Estado: ⚠️ Módulo huérfano de paridad — no se materializará por transporte.
---   Por ADR-000 (DECISIONS.md, 2026-05-30): Peano queda congelado para teoría
---   "hacia arriba" y la teoría nueva NO se transporta vía VN. La signatura de
---   permutaciones (sgn σ ∈ {+1,−1}, homomorfismo Sₙ → ℤ/2) se construirá, cuando
---   se aborde, de forma NATIVA en `AczelSetTheory/Combinatorics/` (sobre SymGroup
---   nativo), no aquí.
---   Este archivo se conserva solo como marcador histórico de la fase de paridad
---   Peano↔Aczel (bootstrapping). Candidato a retirar.
---
--- Contenido:
---   (vacío — marcador histórico, ver Combinatorics/ para la teoría nativa)
 
 import AczelSetTheory.VN.SymGroupVN
 import Peano.PeanoNat.Combinatorics.Sign
+import AczelSetTheory.Integers.Basic
 
 set_option autoImplicit false
 
@@ -29,20 +19,26 @@ namespace AczelSetTheory
   namespace VN
     namespace Sign
 
-      /-!
-      # § 1. Definición
-      !-/
-      -- ...
+      noncomputable section
+      open Classical
 
-      /-!
-      # § 2. Propiedades
-      !-/
-      -- ...
+      /-- Inversiones de una permutación `f` sobre `vN n`.
+          Son los pares ordenados `(x, y)` donde `x ∈ y` (`x < y`) pero `f(y) ∈ f(x)` (`f(y) < f(x)`). -/
+      def inversions (n : ℕ₀) (f : HFSet) : HFSet :=
+        have : DecidablePred (fun (p : HFSet) => ∃ x ∈ VN.vN n, ∃ y ∈ VN.vN n,
+          p = HFSet.orderedPair x y ∧ x ∈ y ∧ (HFSet.apply f y) ∈ (HFSet.apply f x)) := fun _ => propDecidable _
+        HFSet.sep (HFSet.cartProd (VN.vN n) (VN.vN n))
+          (fun (p : HFSet) => ∃ x ∈ VN.vN n, ∃ y ∈ VN.vN n,
+            p = HFSet.orderedPair x y ∧ x ∈ y ∧ (HFSet.apply f y) ∈ (HFSet.apply f x))
 
-      /-!
-      # § 3. Aplicaciones
-      !-/
-      -- ...
+      /-- La signatura devuelve `1` si el número de inversiones es par, y `-1` si es impar. -/
+      def sign (n : ℕ₀) (f : HFSet) : ℤ₀ :=
+        let invs := inversions n f
+        let c := HFSet.card invs
+        have is_even : Prop := ∃ k : ℕ₀, c = Peano.Add.add k k
+        if is_even then (1 : ℤ₀) else ℤ₀.negOne
+
+      end
 
     end Sign
   end VN

@@ -41,6 +41,32 @@ namespace AczelSetTheory
       El contenido sustantivo vive en `AczelSetTheory.VN.SymGroupVN`.
       !-/
 
+      noncomputable section
+      open Classical
+
+      /-- Órbita de un elemento `x` bajo una función `f` sobre el conjunto `A`.
+          Se define como la intersección de todos los subconjuntos de `A`
+          que contienen a `x` y son cerrados bajo `f`. -/
+      def funOrb (f A x : HFSet) : HFSet :=
+        have : DecidablePred (fun (S : HFSet) => x ∈ S ∧ ∀ y ∈ S, (HFSet.apply f y) ∈ S) := fun _ => propDecidable _
+        let validS := HFSet.sep (HFSet.powerset A)
+          (fun (S : HFSet) => x ∈ S ∧ ∀ y ∈ S, (HFSet.apply f y) ∈ S)
+        HFSet.sInter validS
+
+      /-- El soporte de una permutación: elementos no fijos. -/
+      def funSupport (f A : HFSet) : HFSet :=
+        have : DecidablePred (fun (y : HFSet) => HFSet.apply f y ≠ y) := fun _ => propDecidable _
+        HFSet.sep A (fun (y : HFSet) => HFSet.apply f y ≠ y)
+
+      /-- Una permutación `f` sobre `A` es un ciclo si su soporte no es vacío
+          y para cualquier elemento `x` en su soporte, la órbita de `x`
+          cubre exactamente todo el soporte. -/
+      def isCycle (f A : HFSet) : Prop :=
+        let supp := funSupport f A
+        supp ≠ HFSet.empty ∧ ∀ x ∈ supp, funOrb f A x = supp
+
+      end
+
     end Perm
   end VN
 end AczelSetTheory
