@@ -43,7 +43,7 @@ private theorem mul_ne_zero₀ {n m : ℕ₀} (hn : n ≠ 𝟘) (hm : m ≠ 𝟘
   intro h
   exact ((mul_eq_zero n m).mp h).elim hn hm
 
-private def mulDen (b d : ℕ₁) : ℕ₁ :=
+def mulDen (b d : ℕ₁) : ℕ₁ :=
   ⟨mul b.val d.val, mul_ne_zero₀ b.property d.property⟩
 
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -189,6 +189,14 @@ instance instMul : Mul ℚ₀ where
 
 instance instSub : Sub ℚ₀ where
   sub a b := a + (-b)
+
+theorem mk_eq_iff (a c : ℤ₀) (b d : ℕ₁) :
+    mk a b = mk c d ↔ Mul.mul a (ℤ₀.ofNat d.val) = Mul.mul c (ℤ₀.ofNat b.val) :=
+  ⟨fun h => Quotient.exact h, fun h => Quotient.sound h⟩
+
+theorem add_mk (a c : ℤ₀) (b d : ℕ₁) :
+    Add.add (mk a b) (mk c d) = mk (Add.add (Mul.mul a (ℤ₀.ofNat d.val)) (Mul.mul c (ℤ₀.ofNat b.val))) (mulDen b d) :=
+  rfl
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Embedding desde ℤ₀

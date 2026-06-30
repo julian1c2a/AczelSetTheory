@@ -40,13 +40,27 @@ def pow2_den (n : ℕ₀) : ℕ₁ :=
   ⟨Peano.Pow.pow (σ (σ 𝟘)) n, Peano.Pow.pow_ne_zero (by decide) n⟩
 
 -- pow2 n = 1 / 2^n
+theorem pow2_den_succ (n : ℕ₀) : (pow2_den (σ n)).val = Peano.Mul.mul (pow2_den n).val (σ (σ 𝟘)) := rfl
+
 def pow2 (n : ℕ₀) : ℚ₀ :=
   ℚ₀.mk (ℤ₀.ofNat (σ 𝟘)) (pow2_den n)
 
 theorem pow2_nonneg (n : ℕ₀) : (0 : ℚ₀) ≤ pow2 n := by
-  sorry
+  show Mul.mul (0:ℤ₀) (ℤ₀.ofNat (pow2_den n).val) ≤ Mul.mul (ℤ₀.ofNat (σ 𝟘)) (ℤ₀.ofNat 𝟙)
+  rw [ℤ₀.zero_mul]
+  have h1 : Mul.mul (ℤ₀.ofNat (σ 𝟘)) (ℤ₀.ofNat 𝟙) = ℤ₀.ofNat (σ 𝟘) := by
+    rw [← ℤ₀.ofNat_mul]
+    have h1_1 : Peano.Mul.mul (σ 𝟘) 𝟙 = σ 𝟘 := Peano.Mul.mul_one _
+    rw [h1_1]
+  rw [h1]
+  exact ℤ₀.zero_le_ofNat _
 
 theorem pow2_succ_add (n : ℕ₀) : Add.add (pow2 (σ n)) (pow2 (σ n)) = pow2 n := by
+  dsimp [pow2]
+  rw [ℚ₀.add_mk]
+  rw [ℚ₀.mk_eq_iff]
+  -- Algebraic equality in ℤ₀: (1*2^(n+1) + 1*2^(n+1)) * 2^n = 1 * (2^(n+1) * 2^(n+1))
+  -- Needs manual rewriting since we don't have a `ring` tactic for ℤ₀.
   sorry
 
 -- ============================================================
