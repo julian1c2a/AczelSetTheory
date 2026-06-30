@@ -97,6 +97,25 @@ theorem abs_neg (z : ℤ₀) : abs (-z) = abs z := by
       exact hnz (zero_le_neg_of_le_zero ((le_total z 0).resolve_right hz))
 
 -- ─────────────────────────────────────────────────────────────────────────────
+-- abs_eq_zero_iff
+
+theorem abs_eq_zero_iff {z : ℤ₀} : abs z = 0 ↔ z = 0 := by
+  constructor
+  · intro h
+    unfold abs at h
+    by_cases h0 : (0 : ℤ₀) ≤ z
+    · rw [if_pos h0] at h; exact h
+    · rw [if_neg h0] at h
+      have h_neg : Neg.neg (Neg.neg z) = Neg.neg 0 := by rw [h]
+      rw [neg_neg, neg_zero] at h_neg
+      exact h_neg
+  · intro h
+    rw [h]
+    unfold abs
+    have h0 : (0 : ℤ₀) ≤ 0 := le_refl 0
+    rw [if_pos h0]
+
+-- ─────────────────────────────────────────────────────────────────────────────
 -- toNat
 -- ─────────────────────────────────────────────────────────────────────────────
 
