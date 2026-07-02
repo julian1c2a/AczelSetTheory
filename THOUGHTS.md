@@ -11,7 +11,59 @@
 
 ## Nuevos pensamientos
 
-- **Powerset resuelto — filter como testigo de sublistas**: La clave para probar `powersetCList_extEq` fue demostrar primero `mem_powersetCList` (y ∈ powerset(A) ↔ y ⊆ A) como lema intermedio. La dirección difícil (←) se resolvió usando `xs.filter (fun z => mem z y)` como testigo sublista. Esta técnica reutiliza toda la infraestructura de `CList/Filter.lean` (`P_respects`, `extEq_filter`, `filter_in_sublists`) en lugar de intentar construir una correspondencia directa entre sublistas de A₁ y A₂. Lección: cuando la correspondencia directa es combinatoriamente compleja, buscar una **caracterización semántica** (aquí: subset) que simplifique la prueba de extEq a transitividad.
+### 02/07/2026 - BEGIN
+
+- **Pensar las sucesiones de racionales con mayor tranquilidad**
+- 1. **Primero: una redefinición de número, para tener un `typeclass Num` de números aproximativos que sean un semianillo ordenado densamente**
+- 1. 1. ¿Tenemos bien definidas lo que sea un número de forma general? Sea el tipo `Num`. Debemos pedir que incluya al menos un subconjunto de los racionales que sea denso en los racionales.
+- 1. 1. 1. Necesitamos que los números tengan una relación de orden parcial (en principio solamente de orden). $\langle \text{Num}, \le \rangle$
+- 1. 1. 2. Necesitamos que contenga el `0` y el `1`. $0 \in \text{Num}$ y $1 \in \text{Num}$.
+- 1. 1. 3. Necesitamos que tenga las operaciones de `+` y de `*`. 
+- 1. 1. 3. 1. $\langle \text{Num}, +\rangle$ sea un monoide abeliano con neutro `0`.
+- 1. 1. 3. 2. $\langle \text{Num}, *\rangle$ sea un monoide abeliano con neutro `1` y absorbente `0`. 
+- 1. 1. 3. 3. $a, b, c \in \text{Num} \implies a * (b + c) = a * b + a * c$.
+  > **[Respuesta IA - 2026-07-02]** Toda esta estructura algebraica base y de orden (1.1.1 a 1.1.3) describe exactamente lo que en Lean ya existe como `OrderedSemiring` (Semianillo Ordenado) o `LinearOrderedRing`. Mi sugerencia es **no reinventar la rueda** creando un typeclass `Num` aislado desde cero. Si declaramos que nuestras estructuras (`ℚ₀` y `ℝ₀`) instancian los typeclasses estándar de Lean, ganaremos acceso instantáneo a miles de teoremas de desigualdades y a tácticas muy potentes como `ring` o `linarith`.
+- 1. 1. 4. Necesitamos una operación de valoración sobre los naturales que nos devuelva el valor natural $n \in \mathbb{N}_0$ tal que $n \le abs(x)$ y $n+1 > abs(x)$.
+  > **[Respuesta IA - 2026-07-02]** ¡Brillante! Esta "valoración" es una manifestación de la **Propiedad Arquimediana** (para todo $x$, existe un natural $n > x$). En un cuerpo ordenado, esto nos permite definir la función "suelo" (floor). En Lean existe el typeclass `Archimedean`. Es crucial porque nos permite anclar distancias continuas (errores $\epsilon$) a índices discretos de sucesiones ($N$).
+- 1. 1. 6. Necesitamos un relación de equivalencia entre los números de `Num`, que sea compatible con las operaciones y la relación de orden.
+  > **[Respuesta IA - 2026-07-02]** Correcto. Si el typeclass `Num` se aplica directamente a las clases de equivalencia (por ejemplo sobre `ℝ₀` = `Quotient CauchySeq.Setoid`), la propia igualdad nativa `=` de Lean absorbe perfectamente esta relación. Si aplicamos `Num` a los representantes, entonces sí arrastraremos el `Setoid` explícitamente a todas partes.
+- 2. **Pensar esos números topológicamente**
+- 2. 1. Definir cota superior y cota inferior de una sucesión o filtro de `Num`.
+- 2. 2. ¿Nos basta con la relación de orden para establecer una métrica?
+  > **[Respuesta IA - 2026-07-02]** Sí, matemáticamente basta. En un grupo ordenado, la distancia topológica estándar surge de la resta y el valor absoluto: $d(x, y) = |x - y|$. Y el valor absoluto se define puramente con la relación de orden: $|x| = x$ si $0 \le x$, en otro caso $-x$. Tu definición estricta de orden en `Order.lean` nos da la métrica gratis.
+- 2. 3. Definir una sucesión como una función de los naturales sobre `Num`.
+- 2. 4. Definir cuando decimos que filtro o una sucesión es acotada.
+- 2. 4. 1. Supongamos que es una sucesión `S` de `Num`. Se trata de ver que `S` tiene una cota superior e inferior, de forma constructiva y lo más general posible.
+- 2. 4. 2. `S` está acotada superiormente si $\exists B_\text{sup}$ tal que $\forall n \in \mathbb{N}_0, S(n) \le B_\text{sup}$.
+- 2. 4. 3. `S` está acotada inferiormente si $\exists B_\text{inf}$ tal que $\forall n \in \mathbb{N}_0, B_\text{inf} \le S(n)$.
+- 2. 4. 4. `S` está acotada si está acotada superiormente e inferiormente.
+- 2. 4. 5. Podemos rebajar la condición de acotada superiormente en el sentido que digamos que `S` está acotada superiormente si $\exists N \in \mathbb{N}_0, \exists B_\text{sup}$ tal que $\forall n \in \mathbb{N}_0, n > N \implies S(n) \le B_\text{sup}$.
+- 2. 4. 6. Podemos rebajar la condición de acotada inferiormente en el sentido que digamos que `S` está acotada inferiormente si $\exists N \in \mathbb{N}_0, \exists B_\text{inf}$ tal que $\forall n \in \mathbb{N}_0, n > N \implies B_\text{inf} \le S(n)$.
+- 2. 4. 7. `S` está acotada si está acotada superiormente e inferiormente.
+- 2. 4. 8. La sucesión `S` de números de `Num` está acotada si damos las cotas $B_\text{sup}$ y $B_\text{inf}$ y el natural $N_0$ a partir del cual las cotas funcionen, además de dar una prueba de ello. Esto es una sucesión es constructivamente acotada si además de dar la construcción de cada término de la sucesión damos las cotas concretas y el natural y la prueba de que efectivamente cumplen con la definición de sucesión acotada.
+  > **[Respuesta IA - 2026-07-02]** Esta distinción entre acotación global (2.4.2) y acotación asintótica "a partir de $N_0$" (2.4.5) es muy sutil y valiosa. Clásicamente ambas son equivalentes, pero constructivamente y computacionalmente en Lean (2.4.8), permitir dar el $N_0$ en la tupla te salva de tener que calcular algoritmos de "máximo" sobre los primeros $N_0$ términos. ¡Es una definición excelente para Lean!
+- 2. 5. Definir la convergencia de una sucesión, de acuerdo con la métrica anterior.
+- 2. 6. Definir la convergencia de una sucesión como a un elemento de `Num` de la forma más general posible.
+- 2. 7. Definir la convergencia de una sucesión de forma constructiva como caso de 2.6. 
+- 2. 7. 1. Supongamos que `L` es un límite de una sucesión `S` de `Num`. Si `S` converge a `L`, entonces `S` está acotada.
+- 2. 7. 2. Entonces tenemos que pasar junto con la sucesión `S` de `Num`, una función $\delta: \mathbb{N}_0 \times \mathbb{Q}^{+} \to \mathbb{Q}^{+}$ tal que $\forall \epsilon \in \mathbb{Q}^{+}, \exists N \in \mathbb{N}_0, \forall n \in \mathbb{N}_0, n > N \implies \delta(n, \epsilon) \le \text{val}(|S(n) - L|)$. Luego hay que pasar también la prueba de que $\delta$ es realmente una función de este tipo.
+  > **[Respuesta IA - 2026-07-02]** Proporcionar una función de convergencia explícita $\delta$ es el núcleo del constructivismo. Sin embargo, permitir que esta función sea *arbitraria* hace que demostrar cosas (como sumar dos sucesiones) sea un infierno computacional, ya que tendrías que sumar y componer las funciones $\delta$ continuamente.
+- 2. 8. ¿Definir mejor un filtro sobre esos números más que una sucesión?
+  > **[Respuesta IA - 2026-07-02]** Los filtros (Bourbaki) son la herramienta estándar moderna, pero en topología constructiva/computacional son un dolor de cabeza (hablan de conjuntos infinitos de subconjuntos, introduciendo impredicatividad). Las sucesiones con ritmo de convergencia explícito (2.14) son definitivamente mejores aquí.
+- 2. 9. Definir el límite superior e inferior de una sucesión de números.
+- 2. 10. De la convergencia de la sucesión debemos sacar la acotación de esa sucesión.
+- 2. 10. 1. Dado $(S, \delta : \mathbb{N}_0 \times \mathbb{Q}^{+} \to \mathbb{Q}_0^{+}, h : \forall \varepsilon \in \mathbb{Q}^{+}, \exists N \in \mathbb{N}_0, \forall n \in \mathbb{N}_0, n > N \implies \delta(n, \varepsilon) \le \text{val}(|S(n) - L|))$, tenemos que poder sacar las cotas. Por ejemplo, $S$ está acotada superiormente por $L+1$.
+- 2. 10. 2. Como dado un $\varepsilon \in \mathbb{Q}^{+}$ obtenemos mediante $\delta$ un natural $N$ y un racional tal que $\forall n > N, \text{val}(|S(n) - L|) < \epsilon$. Entonces tenemos que $L+\epsilon$ es una cota superior para `S` a partir del $N$ devuelto por $\delta$.
+- 2. 10. 3. Simétricamente obtenemos la cota inferior.
+- 2. 11. Establecer las condiciones para para que el filtro converja a un solo elemento de `Num`.
+- 2. 12. Definir cuándo una sucesión de Cauchy. De la forma más universal posible.
+- 2. 13. Definir sucesión de Cauchy constructivista. Dada la sucesión $S : \mathbb{N}_0 \to \text{Num}$, decimos que es de Cauchy (constructivista) si se proporciona una función $\delta : \mathbb{Q}^{+} \to \mathbb{N}_0$ tal que $\forall \varepsilon \in \mathbb{Q}^{+}, \exists N \in \mathbb{N}_0, \forall n, m \in \mathbb{N}_0, n > N \land m > N \implies \text{val}(|S(n) - S(m)|) < \varepsilon$, y la prueba de que $(S, \delta)$ cumplen la condición.  
+- 2. 14. Definir sucesión de Cauchy de orden de convergencia definido constructivista. Dada la sucesión $S$, damos una función 'lejanía', que llamaremos $\lambda : \mathbb{Q}^{+} \to \mathbb{N}_0$, tal que $\forall \varepsilon \in \mathbb{Q}^{+}, \forall n, m \in \mathbb{N}_0, n > \lambda(\varepsilon) \land m > \lambda(\varepsilon) \implies \text{val}(|S(n) - S(m)|) < {\frac 1 2^{\lambda(\varepsilon)}}$, además de la prueba de que $\lambda$ es realmente una función de este tipo.
+  > **[Respuesta IA - 2026-07-02]** **¡Este es el estándar de oro en matemáticas computables!** Fijar el ritmo de convergencia (ej. ritmo diádico $1/2^{\min(n, m)}$ o $1/n$) simplifica drásticamente toda la teoría. Es exactamente lo que has hecho definiendo `IsCauchy` con ritmos diádicos. Al estar el ritmo fijo, las pruebas sobre productos o sumas no necesitan componer $\delta$, solo exigen encontrar un "shift" $K$ (como ya hiciste en `mulBound`). Debemos mantener este enfoque sin duda.
+- 2. 15. Dada una sucesión de Cauchy de orden de convergencia definido
+
+### 02/07/2026 - END
+\n- **Powerset resuelto — filter como testigo de sublistas**: La clave para probar `powersetCList_extEq` fue demostrar primero `mem_powersetCList` (y ∈ powerset(A) ↔ y ⊆ A) como lema intermedio. La dirección difícil (←) se resolvió usando `xs.filter (fun z => mem z y)` como testigo sublista. Esta técnica reutiliza toda la infraestructura de `CList/Filter.lean` (`P_respects`, `extEq_filter`, `filter_in_sublists`) en lugar de intentar construir una correspondencia directa entre sublistas de A₁ y A₂. Lección: cuando la correspondencia directa es combinatoriamente compleja, buscar una **caracterización semántica** (aquí: subset) que simplifique la prueba de extEq a transitividad.
 - **Separación Arquitectónica (Operations vs Axioms)**: Con la formalización de Union, Intersection, y Setminus, quedó claro que era beneficioso separar la definición de la operación computacional (Operations/) de los axiomas conceptuales tipo Zermelo (Axioms/). Esta estructura facilita la localización de fallos en Lean 4.
 - **Setminus como herramienta para el Axioma de Regularidad / Buena Fundación**: Implementar la diferencia simétrica (Setminus) va a resultar esencial para enunciar la Regularidad, ya que este requiere quitar elementos (o calcular intersecciones vacías).
 - **El reto de Powerset**: Al contrario que con Union que requiere "aplanar" listas, o Intersection que descarta elementos, el Conjunto Potencia (powersetCList) es constructivamente intensivo porque requiere construir explícitamente $2^N$ sublistas y probar que extensionalmente se corresponden. Requerirá su propio módulo auxiliar.

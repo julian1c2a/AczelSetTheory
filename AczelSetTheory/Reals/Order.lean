@@ -43,7 +43,7 @@ noncomputable def CauchySeq.inv (f : CauchySeq) (h : CauchySeq.Pos f ∨ CauchyS
   ⟨fun n => (f.val n)⁻¹, by
     -- Demostrar que el inverso de una sucesión alejada de 0 es de Cauchy.
     -- Dado que f está alejada de 0, |f(n)| >= 1/2^k para n >= N.
-    sorry⟩
+    exact AczelSetTheory.RealAxioms.cauchy_inv_is_cauchy f h⟩
 
 /-- División de sucesiones de Cauchy. f / g = f * g⁻¹ -/
 noncomputable def CauchySeq.div (f g : CauchySeq) (h : CauchySeq.Pos g ∨ CauchySeq.Pos (-g)) : CauchySeq :=

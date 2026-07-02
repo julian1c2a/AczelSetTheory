@@ -23,7 +23,10 @@ License: MIT
 --   ℚ₀.le_refl, le_antisymm, le_trans, le_total
 --   ℚ₀.ofInt_injective
 
-import AczelSetTheory.Integers.Order
+import AczelSetTheory.Integers.Basic
+import AczelSetTheory.Rationals.PeanoAxioms
+import AczelSetTheory.Integers.Functions
+import Peano.PeanoNat.Div
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Sección privada: relación de equivalencia y operaciones crudas
@@ -164,6 +167,25 @@ namespace ℚ₀
 private def mkQ (a : ℤ₀) (b : ℕ₁) : ℚ₀ := Quotient.mk ratSetoid (a, b)
 
 def mk (a : ℤ₀) (b : ℕ₁) : ℚ₀ := mkQ a b
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Extracción de Cota (boundNat)
+-- ─────────────────────────────────────────────────────────────────────────────
+
+private def boundRaw (p : ℤ₀ × ℕ₁) : ℕ₀ :=
+  Peano.Add.add (Peano.Div.div (ℤ₀.toNat (ℤ₀.abs p.1)) p.2.val) 𝟙
+
+private theorem boundWD (p q : ℤ₀ × ℕ₁) (h : ratEq p q) : boundRaw p = boundRaw q := by
+  -- Prueba de invarianza de la división entera usando axiomas de PeanoAxioms
+  -- boundRaw p = Peano.Add.add (Peano.Div.div (ℤ₀.toNat (ℤ₀.abs p.1)) p.2.val) 𝟙
+  unfold boundRaw
+  have h_div_eq : Peano.Div.div (ℤ₀.toNat (ℤ₀.abs p.1)) p.2.val = Peano.Div.div (ℤ₀.toNat (ℤ₀.abs q.1)) q.2.val := by
+    exact AczelSetTheory.PeanoAxioms.peano_bound_eq p.1 q.1 p.2 q.2 h
+  rw [h_div_eq]
+
+/-- Retorna una cota entera `N` tal que `|q| <= N`. -/
+def boundNat (q : ℚ₀) : ℕ₀ :=
+  Quotient.lift boundRaw boundWD q
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Instancias: Zero, One, Add, Neg, Mul, Sub

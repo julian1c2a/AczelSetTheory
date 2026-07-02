@@ -57,11 +57,57 @@ theorem pow2_nonneg (n : ℕ₀) : (0 : ℚ₀) ≤ pow2 n := by
 
 theorem pow2_succ_add (n : ℕ₀) : Add.add (pow2 (σ n)) (pow2 (σ n)) = pow2 n := by
   dsimp [pow2]
-  rw [ℚ₀.add_mk]
-  rw [ℚ₀.mk_eq_iff]
-  -- Algebraic equality in ℤ₀: (1*2^(n+1) + 1*2^(n+1)) * 2^n = 1 * (2^(n+1) * 2^(n+1))
-  -- Needs manual rewriting since we don't have a `ring` tactic for ℤ₀.
-  sorry
+  rw [ℚ₀.add_mk, ℚ₀.mk_eq_iff]
+  
+  -- left side right_distrib
+  have h_distrib : Add.add (Mul.mul (ℤ₀.ofNat (σ 𝟘)) (ℤ₀.ofNat (ℚ₀.pow2_den (σ n)).val)) (Mul.mul (ℤ₀.ofNat (σ 𝟘)) (ℤ₀.ofNat (ℚ₀.pow2_den (σ n)).val)) = Mul.mul (Add.add (ℤ₀.ofNat (σ 𝟘)) (ℤ₀.ofNat (σ 𝟘))) (ℤ₀.ofNat (ℚ₀.pow2_den (σ n)).val) := by
+    rw [ℤ₀.right_distrib]
+  rw [h_distrib]
+  
+  -- 1 + 1 = 2
+  have h_add : Add.add (ℤ₀.ofNat (σ 𝟘)) (ℤ₀.ofNat (σ 𝟘)) = ℤ₀.ofNat (σ (σ 𝟘)) := by
+    rw [← ℤ₀.ofNat_add]
+    rfl
+  rw [h_add]
+  
+  -- right side 1 * X = X
+  have h_one_mul : Mul.mul (ℤ₀.ofNat (σ 𝟘)) (ℤ₀.ofNat (mulDen (ℚ₀.pow2_den (σ n)) (ℚ₀.pow2_den (σ n))).val) = ℤ₀.ofNat (mulDen (ℚ₀.pow2_den (σ n)) (ℚ₀.pow2_den (σ n))).val := by
+    rw [← ℤ₀.ofNat_mul]
+    apply congrArg
+    exact Peano.Mul.one_mul _
+  rw [h_one_mul]
+
+  -- rewrite A = B * 2
+  have h_A : ℤ₀.ofNat (ℚ₀.pow2_den (σ n)).val = Mul.mul (ℤ₀.ofNat (ℚ₀.pow2_den n).val) (ℤ₀.ofNat (σ (σ 𝟘))) := by
+    rw [ℚ₀.pow2_den_succ, ℤ₀.ofNat_mul]
+  rw [h_A]
+
+  -- rewrite right side mulDen X X = X * X
+  have h_mulDen : ℤ₀.ofNat (mulDen (ℚ₀.pow2_den (σ n)) (ℚ₀.pow2_den (σ n))).val = Mul.mul (ℤ₀.ofNat (ℚ₀.pow2_den (σ n)).val) (ℤ₀.ofNat (ℚ₀.pow2_den (σ n)).val) := by
+    change ℤ₀.ofNat (Peano.Mul.mul (ℚ₀.pow2_den (σ n)).val (ℚ₀.pow2_den (σ n)).val) = _
+    rw [ℤ₀.ofNat_mul]
+  rw [h_mulDen]
+  rw [h_A]
+
+  let two := ℤ₀.ofNat (σ(σ𝟘))
+  let B := ℤ₀.ofNat (ℚ₀.pow2_den n).val
+  
+  have h_left : Mul.mul (Mul.mul two (Mul.mul B two)) B = Mul.mul (Mul.mul two two) (Mul.mul B B) := by
+    rw [ℤ₀.mul_comm B two]
+    rw [← ℤ₀.mul_assoc two two B]
+    rw [ℤ₀.mul_assoc (Mul.mul two two) B B]
+  
+  have h_right : Mul.mul (Mul.mul B two) (Mul.mul B two) = Mul.mul (Mul.mul two two) (Mul.mul B B) := by
+    rw [← ℤ₀.mul_assoc (Mul.mul B two) B two]
+    have h_inner : Mul.mul (Mul.mul B two) B = Mul.mul (Mul.mul B B) two := by
+      rw [ℤ₀.mul_assoc B two B]
+      rw [ℤ₀.mul_comm two B]
+      rw [← ℤ₀.mul_assoc B B two]
+    rw [h_inner]
+    rw [ℤ₀.mul_assoc (Mul.mul B B) two two]
+    rw [ℤ₀.mul_comm (Mul.mul B B) (Mul.mul two two)]
+
+  rw [h_left, h_right]
 
 -- ============================================================
 -- Sección 2: Definiciones de Cauchy

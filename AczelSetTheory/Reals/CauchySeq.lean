@@ -41,9 +41,46 @@ theorem CauchySeq.Equiv_symm {f g : CauchySeq} (h : CauchySeq.Equiv f g) : Cauch
   rw [hsym]
   exact hN m hm
 
--- Para la transitividad f ∼ g ∧ g ∼ h → f ∼ h, necesitaríamos que
--- 1/2^(k+1) + 1/2^(k+1) = 1/2^k, pero esto requerirá teoría adicional sobre pow2.
 theorem CauchySeq.Equiv_trans {f g h : CauchySeq} (h1 : CauchySeq.Equiv f g) (h2 : CauchySeq.Equiv g h) : CauchySeq.Equiv f h := by
-  sorry
+  intro k
+  rcases h1 (σ k) with ⟨N1, hN1⟩
+  rcases h2 (σ k) with ⟨N2, hN2⟩
+  exists Peano.Lattice.max N1 N2
+  intro m hm
+  have hN1_le : le₀ N1 m := Peano.Order.le_trans N1 (Peano.Lattice.max N1 N2) m (Peano.Lattice.le_max_left N1 N2) hm
+  have hN2_le : le₀ N2 m := Peano.Order.le_trans N2 (Peano.Lattice.max N1 N2) m (Peano.Lattice.le_max_right N1 N2) hm
+  have h_bound1 := hN1 m hN1_le
+  have h_bound2 := hN2 m hN2_le
+  
+  let a : ℚ₀ := f.val m
+  let b : ℚ₀ := g.val m
+  let c : ℚ₀ := h.val m
+  
+  have h_bound1_let : (Add.add a (-b)).absVal ≤ ℚ₀.pow2 (σ k) := h_bound1
+  have h_bound2_let : (Add.add b (-c)).absVal ≤ ℚ₀.pow2 (σ k) := h_bound2
+  
+  have h_eq : Add.add a (-c) = Add.add (Add.add a (-b)) (Add.add b (-c)) := by
+    calc
+      Add.add a (-c) = Add.add a (Add.add 0 (-c)) := by rw [ℚ₀.zero_add (-c)]
+      _ = Add.add a (Add.add (Add.add (-b) b) (-c)) := by rw [ℚ₀.neg_add_self b]
+      _ = Add.add a (Add.add (-b) (Add.add b (-c))) := by rw [ℚ₀.add_assoc (-b) b (-c)]
+      _ = Add.add (Add.add a (-b)) (Add.add b (-c)) := by rw [ℚ₀.add_assoc a (-b) (Add.add b (-c))]
+
+  have h_tri : (Add.add a (-c)).absVal ≤ Add.add (Add.add a (-b)).absVal (Add.add b (-c)).absVal := by
+    rw [h_eq]
+    exact ℚ₀.absVal_add_le (Add.add a (-b)) (Add.add b (-c))
+    
+  have h_add_le : Add.add (Add.add a (-b)).absVal (Add.add b (-c)).absVal ≤ Add.add (ℚ₀.pow2 (σ k)) (ℚ₀.pow2 (σ k)) := by
+    have ha : Add.add (Add.add a (-b)).absVal (Add.add b (-c)).absVal ≤ Add.add (ℚ₀.pow2 (σ k)) (Add.add b (-c)).absVal := 
+      ℚ₀.add_le_add_right h_bound1_let (Add.add b (-c)).absVal
+    have hb : Add.add (ℚ₀.pow2 (σ k)) (Add.add b (-c)).absVal ≤ Add.add (ℚ₀.pow2 (σ k)) (ℚ₀.pow2 (σ k)) := 
+      ℚ₀.add_le_add_left h_bound2_let (ℚ₀.pow2 (σ k))
+    exact ℚ₀.le_trans ha hb
+
+  have h_trans := ℚ₀.le_trans h_tri h_add_le
+  have h_pow_add := ℚ₀.pow2_succ_add k
+  
+  rw [h_pow_add] at h_trans
+  exact h_trans
 
 end ℝ₀
