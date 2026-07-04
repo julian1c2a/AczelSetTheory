@@ -1,4 +1,4 @@
-﻿# Thoughts — AczelSetTheory
+# Thoughts — AczelSetTheory
 
 **Last updated:** 2026-05-21
 **Author**: Julián Calderón Almendros
@@ -29,8 +29,8 @@
   > **[Respuesta IA - 2026-07-02]** Correcto. Si el typeclass `Num` se aplica directamente a las clases de equivalencia (por ejemplo sobre `ℝ₀` = `Quotient CauchySeq.Setoid`), la propia igualdad nativa `=` de Lean absorbe perfectamente esta relación. Si aplicamos `Num` a los representantes, entonces sí arrastraremos el `Setoid` explícitamente a todas partes.
 - 2. **Pensar esos números topológicamente**
 - 2. 1. Definir cota superior y cota inferior de una sucesión o filtro de `Num`.
-- 2. 2. ¿Nos basta con la relación de orden para establecer una métrica?
-  > **[Respuesta IA - 2026-07-02]** Sí, matemáticamente basta. En un grupo ordenado, la distancia topológica estándar surge de la resta y el valor absoluto: $d(x, y) = |x - y|$. Y el valor absoluto se define puramente con la relación de orden: $|x| = x$ si $0 \le x$, en otro caso $-x$. Tu definición estricta de orden en `Order.lean` nos da la métrica gratis.
+- 2. 2. ¿Nos basta con la relación de orden para establecer una métrica? Falta la resta, que se puede definir a partir de la suma o del predecesor, si incluimos a los naturales en Num.
+  > **[Respuesta IA - 2026-07-02]** Sí, matemáticamente basta, pero asumiendo que ya poseemos la resta. Como bien dices, si partimos desde cero, la resta es fundamental. En un grupo ordenado, la distancia topológica estándar surge de la resta y el valor absoluto: $d(x, y) = |x - y|$. Y el valor absoluto se define puramente con la relación de orden: $|x| = x$ si $0 \le x$, en otro caso $-x$. Tu definición estricta de orden en `Order.lean` junto con la resta nos da la métrica gratis.
 - 2. 3. Definir una sucesión como una función de los naturales sobre `Num`.
 - 2. 4. Definir cuando decimos que filtro o una sucesión es acotada.
 - 2. 4. 1. Supongamos que es una sucesión `S` de `Num`. Se trata de ver que `S` tiene una cota superior e inferior, de forma constructiva y lo más general posible.
