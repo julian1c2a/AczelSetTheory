@@ -14,3 +14,4 @@ import AczelSetTheory.Rationals.AbsVal
 import AczelSetTheory.Rationals.IsCauchy
 import AczelSetTheory.Rationals.Density
 import AczelSetTheory.Rationals.CauchySeqAlgebra
+import AczelSetTheory.Rationals.Roots
