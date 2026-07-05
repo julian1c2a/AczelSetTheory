@@ -149,7 +149,7 @@ end ℚ₀
 
 namespace ℚ₀
 
-private theorem le_absVal (q : ℚ₀) : q ≤ absVal q := by
+theorem le_absVal (q : ℚ₀) : q ≤ absVal q := by
   by_cases h : (0 : ℚ₀) ≤ q
   · rw [absVal_of_nonneg h]; exact le_refl q
   · have hle : q ≤ 0 := (le_total 0 q).resolve_left h
@@ -157,6 +157,12 @@ private theorem le_absVal (q : ℚ₀) : q ≤ absVal q := by
     have h0nq : (0 : ℚ₀) ≤ -q := by
       have := neg_le_neg hle; rwa [neg_zero] at this
     exact le_trans hle h0nq
+
+theorem neg_le_absVal (q : ℚ₀) : Neg.neg q ≤ ℚ₀.absVal q := by
+  have h1 : Neg.neg q ≤ ℚ₀.absVal (Neg.neg q) := ℚ₀.le_absVal (Neg.neg q)
+  have h2 : ℚ₀.absVal (Neg.neg q) = ℚ₀.absVal q := ℚ₀.absVal_neg q
+  rw [h2] at h1
+  exact h1
 
 theorem absVal_add_le (a b : ℚ₀) :
     absVal (a + b) ≤ absVal a + absVal b := by
@@ -202,7 +208,76 @@ theorem absVal_mul_sub_mul (a b c d : ℚ₀) :
   rw [h_mul1, h_mul2] at h_tri
   exact h_tri
 
+theorem le_div_add_one_mul (a b : ℕ₀) (hb : b ≠ 𝟘) : le₀ a (mul (add (div a b) 𝟙) b) := by
+  have heq : a = add (mul (div a b) b) (mod a b) := divMod_spec a b hb
+  have hlt : lt₀ (mod a b) b := mod_lt a b hb
+  have h_add : lt₀ (add (mul (div a b) b) (mod a b)) (add (mul (div a b) b) b) :=
+    (add_lt_add_left_iff (mul (div a b) b) (mod a b) b).mpr hlt
+  rw [←heq] at h_add
+  have hrw : add (mul (div a b) b) b = mul (add (div a b) 𝟙) b := by
+    have h1 : mul (add (div a b) 𝟙) b = add (mul (div a b) b) (mul 𝟙 b) := Peano.Mul.add_mul (div a b) 𝟙 b
+    have h2 : mul 𝟙 b = b := Peano.Mul.one_mul b
+    rw [h2] at h1
+    exact h1.symm
+  rw [hrw] at h_add
+  exact lt_imp_le _ _ h_add
+
+theorem le_abs_self (z : ℤ₀) : z ≤ ℤ₀.abs z := by
+  by_cases h : 0 ≤ z
+  · unfold ℤ₀.abs
+    rw [if_pos h]
+    exact ℤ₀.le_refl z
+  · have hz0 : z ≤ 0 := by
+      cases ℤ₀.le_total 0 z with
+      | inl h1 => exact absurd h1 h
+      | inr h2 => exact h2
+    have h0abs : 0 ≤ ℤ₀.abs z := ℤ₀.abs_nonneg z
+    exact ℤ₀.le_trans hz0 h0abs
+
+theorem neg_le_abs_self (z : ℤ₀) : -z ≤ ℤ₀.abs z := by
+  have h := le_abs_self (-z)
+  have h2 : ℤ₀.abs (-z) = ℤ₀.abs z := ℤ₀.abs_neg z
+  rw [h2] at h
+  exact h
+
 theorem le_boundNat (q : ℚ₀) : absVal q ≤ ofNat₀ (boundNat q) := by
-  sorry
+  refine Quotient.inductionOn q (fun p => ?_)
+  -- absVal q <= N means q <= N and -q <= N
+  -- Wait, since absVal q is either q or -q, if we prove both mk p.1 p.2 <= N and mk (-p.1) p.2 <= N
+  -- it will be greater than absVal q.
+  have h_bound : ℤ₀.abs p.1 ≤ ℤ₀.ofNat (add (div (ℤ₀.toNat (ℤ₀.abs p.1)) p.2.val) 𝟙) * ℤ₀.ofNat p.2.val := by
+    -- ℤ₀.abs p.1 = ofNat (toNat (abs p.1))
+    have h_nat_le := le_div_add_one_mul (ℤ₀.toNat (ℤ₀.abs p.1)) p.2.val p.2.property
+    calc ℤ₀.abs p.1 = ℤ₀.ofNat (ℤ₀.toNat (ℤ₀.abs p.1)) := ℤ₀.nonneg_eq_ofNat (ℤ₀.abs_nonneg p.1)
+         _ ≤ ℤ₀.ofNat (mul (add (div (ℤ₀.toNat (ℤ₀.abs p.1)) p.2.val) 𝟙) p.2.val) := ℤ₀.le_ofNat_iff.mpr h_nat_le
+         _ = ℤ₀.ofNat (add (div (ℤ₀.toNat (ℤ₀.abs p.1)) p.2.val) 𝟙) * ℤ₀.ofNat p.2.val := ℤ₀.ofNat_mul (add (div (ℤ₀.toNat (ℤ₀.abs p.1)) p.2.val) 𝟙) p.2.val
+  
+  -- We want absVal (mk p.1 p.2) <= mk (ofNat (...)) den1
+  -- By cases on 0 <= q
+  let den1 : ℕ₁ := ⟨𝟙, Peano.Axioms.succ_neq_zero 𝟘⟩
+  by_cases h : (0 : ℚ₀) ≤ (mk p.1 p.2 : ℚ₀)
+  · change absVal (mk p.1 p.2 : ℚ₀) ≤ _
+    rw [absVal_of_nonneg h]
+    -- we want mk p.1 p.2 <= mk (ofNat (...)) den1
+    have h_den : den1.val = 𝟙 := rfl
+    show Mul.mul p.1 (ℤ₀.ofNat den1.val) ≤ Mul.mul (ℤ₀.ofNat (add (div (ℤ₀.toNat (ℤ₀.abs p.1)) p.2.val) 𝟙)) (ℤ₀.ofNat p.2.val)
+    rw [h_den, ℤ₀.ofNat_one, ℤ₀.mul_one]
+    have hp_le_abs : p.1 ≤ ℤ₀.abs p.1 := le_abs_self p.1
+    exact ℤ₀.le_trans hp_le_abs h_bound
+  · have hl : (mk p.1 p.2 : ℚ₀) ≤ 0 := by
+      cases le_total 0 (mk p.1 p.2 : ℚ₀) with
+      | inl h1 => exact absurd h1 h
+      | inr h2 => exact h2
+    change absVal (mk p.1 p.2 : ℚ₀) ≤ _
+    rw [absVal_of_nonpos hl]
+    -- we want -mk p.1 p.2 <= mk (ofNat (...)) den1
+    -- -mk p.1 p.2 = mk (-p.1) p.2
+    have hneg : - (mk p.1 p.2 : ℚ₀) = mk (-p.1) p.2 := rfl
+    rw [hneg]
+    have h_den : den1.val = 𝟙 := rfl
+    show Mul.mul (-p.1) (ℤ₀.ofNat den1.val) ≤ Mul.mul (ℤ₀.ofNat (add (div (ℤ₀.toNat (ℤ₀.abs p.1)) p.2.val) 𝟙)) (ℤ₀.ofNat p.2.val)
+    rw [h_den, ℤ₀.ofNat_one, ℤ₀.mul_one]
+    have hp_neg_le_abs : -p.1 ≤ ℤ₀.abs p.1 := neg_le_abs_self p.1
+    exact ℤ₀.le_trans hp_neg_le_abs h_bound
 
 end ℚ₀

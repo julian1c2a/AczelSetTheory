@@ -127,6 +127,113 @@ instance : Inv ℚ₀ := ⟨inv⟩
 
 instance : Div ℚ₀ := ⟨fun a b => a * b⁻¹⟩
 
+theorem inv_mk (a : ℤ₀) (b : ℕ₁) :
+    (mk a b)⁻¹ = mk (invRaw (a, b)).1 (invRaw (a, b)).2 := rfl
+
+theorem mul_inv_cancel {q : ℚ₀} (h : q ≠ 0) : q * q⁻¹ = 1 := by
+  revert h
+  refine Quotient.inductionOn q (fun p hp => ?_)
+  change mk p.1 p.2 * (mk p.1 p.2)⁻¹ = 1
+  have ha : p.1 ≠ 0 := by
+    intro ha_zero
+    apply hp
+    exact mk_eq_zero_iff.mpr ha_zero
+  have h_mk : mk p.1 p.2 * (mk p.1 p.2)⁻¹ = mk (p.1 * (invRaw p).1) (mulDen p.2 (invRaw p).2) := rfl
+  rw [h_mk]
+  unfold invRaw
+  rw [if_neg ha]
+  by_cases hpos : 0 ≤ p.1
+  · rw [if_pos hpos]
+    rw [one_def, mk_eq_iff]
+    -- Goal: p.1 * p.2.val * 1 = 1 * (p.2.val * invDen p.1)
+    have h_den1 : ℤ₀.ofNat den1.val = 1 := rfl
+    rw [h_den1, ℤ₀.mul_one, ℤ₀.one_mul]
+    have h_mulDen : ℤ₀.ofNat (mulDen p.2 (invDen p.1)).val = ℤ₀.ofNat p.2.val * ℤ₀.ofNat (invDen p.1).val := ℤ₀.ofNat_mul p.2.val (invDen p.1).val
+    rw [h_mulDen]
+    have h_invDen : ℤ₀.ofNat (invDen p.1).val = p.1 := by
+      rw [ofNat_invDen_val_eq_abs ha, abs_of_pos hpos]
+    rw [h_invDen]
+    exact ℤ₀.mul_comm p.1 (ℤ₀.ofNat p.2.val)
+  · rw [if_neg hpos]
+    rw [one_def, mk_eq_iff]
+    have h_den1 : ℤ₀.ofNat den1.val = 1 := rfl
+    rw [h_den1, ℤ₀.mul_one, ℤ₀.one_mul]
+    have h_mulDen : ℤ₀.ofNat (mulDen p.2 (invDen p.1)).val = ℤ₀.ofNat p.2.val * ℤ₀.ofNat (invDen p.1).val := ℤ₀.ofNat_mul p.2.val (invDen p.1).val
+    rw [h_mulDen]
+    have h_invDen : ℤ₀.ofNat (invDen p.1).val = -p.1 := by
+      rw [ofNat_invDen_val_eq_abs ha, abs_of_neg hpos]
+    rw [h_invDen]
+    -- p.1 * -ℤ₀.ofNat p.2.val = ℤ₀.ofNat p.2.val * -p.1
+    have h1 : p.1 * (-ℤ₀.ofNat p.2.val) = Neg.neg (p.1 * ℤ₀.ofNat p.2.val) := ℤ₀.mul_neg p.1 (ℤ₀.ofNat p.2.val)
+    have h2 : ℤ₀.ofNat p.2.val * -p.1 = Neg.neg (ℤ₀.ofNat p.2.val * p.1) := ℤ₀.mul_neg (ℤ₀.ofNat p.2.val) p.1
+    have h3 : p.1 * ℤ₀.ofNat p.2.val = ℤ₀.ofNat p.2.val * p.1 := ℤ₀.mul_comm p.1 (ℤ₀.ofNat p.2.val)
+    -- We need to prove: p.1 * (-ℤ₀.ofNat p.2.val, invDen p.1).fst = ℤ₀.ofNat p.2.val * -p.1
+    -- Actually, we can just use `change` and then `rw`.
+    change p.1 * (-ℤ₀.ofNat p.2.val) = ℤ₀.ofNat p.2.val * -p.1
+    rw [h1, h2, h3]
+
+theorem inv_mul_cancel {q : ℚ₀} (h : q ≠ 0) : q⁻¹ * q = 1 := by
+  rw [mul_comm, mul_inv_cancel h]
+
+theorem inv_unique {x y : ℚ₀} (hx : x ≠ 0) (h : x * y = 1) : y = x⁻¹ := by
+  have h1 : x⁻¹ * (x * y) = x⁻¹ * 1 := congrArg (fun z => x⁻¹ * z) h
+  rw [← ℚ₀.mul_assoc, inv_mul_cancel hx, one_mul, mul_one] at h1
+  exact h1
+
+theorem one_ne_zero : (1 : ℚ₀) ≠ 0 := by
+  intro h
+  have h1 : ℚ₀.mk (ℤ₀.ofNat 𝟙) den1 = ℚ₀.mk (ℤ₀.ofNat 𝟘) den1 := h
+  have h2 := ℚ₀.mk_eq_zero_iff.mp h1
+  have h3 : 𝟙 = 𝟘 := ℤ₀.ofNat_injective h2
+  cases h3
+
+theorem inv_mul_inv (x y : ℚ₀) (hx : x ≠ 0) (hy : y ≠ 0) : (x * y)⁻¹ = x⁻¹ * y⁻¹ := by
+  have h1 : (x * y) * (x⁻¹ * y⁻¹) = 1 := calc
+    (x * y) * (x⁻¹ * y⁻¹) = x * (y * (x⁻¹ * y⁻¹)) := ℚ₀.mul_assoc _ _ _
+    _ = x * (y * (y⁻¹ * x⁻¹)) := by rw [mul_comm x⁻¹ y⁻¹]
+    _ = x * ((y * y⁻¹) * x⁻¹) := by rw [← ℚ₀.mul_assoc y y⁻¹ x⁻¹]
+    _ = x * (1 * x⁻¹) := by rw [mul_inv_cancel hy]
+    _ = x * x⁻¹ := by rw [one_mul]
+    _ = 1 := mul_inv_cancel hx
+  have h_xy_ne_0 : x * y ≠ 0 := by
+    intro h
+    have h2 : (x * y) * (x⁻¹ * y⁻¹) = 0 := by rw [h, zero_mul]
+    rw [h1] at h2
+    exact one_ne_zero h2
+  exact (inv_unique h_xy_ne_0 h1).symm
+
+theorem inv_sub_inv_eq (x y : ℚ₀) (hx : x ≠ 0) (hy : y ≠ 0) :
+    x⁻¹ - y⁻¹ = (y - x) * (x * y)⁻¹ := by
+  have h1 : (x⁻¹ - y⁻¹) * (x * y) = y - x := by
+    calc
+      (x⁻¹ - y⁻¹) * (x * y) = Add.add (x⁻¹) (-y⁻¹) * (x * y) := rfl
+      _ = Add.add (x⁻¹ * (x * y)) ((-y⁻¹) * (x * y)) := by rw [ℚ₀.right_distrib]
+      _ = Add.add ((x⁻¹ * x) * y) ((-y⁻¹) * (x * y)) := by rw [← ℚ₀.mul_assoc]
+      _ = Add.add (1 * y) ((-y⁻¹) * (x * y)) := by rw [inv_mul_cancel hx]
+      _ = Add.add y ((-y⁻¹) * (x * y)) := by rw [one_mul]
+      _ = Add.add y (- (y⁻¹ * (x * y))) := by rw [ℚ₀.neg_mul]
+      _ = Add.add y (- (y⁻¹ * (y * x))) := by rw [mul_comm x y]
+      _ = Add.add y (- ((y⁻¹ * y) * x)) := by rw [← ℚ₀.mul_assoc]
+      _ = Add.add y (- (1 * x)) := by rw [inv_mul_cancel hy]
+      _ = Add.add y (- x) := by rw [one_mul]
+      _ = y - x := rfl
+  have h_xy_ne_0 : x * y ≠ 0 := by
+    intro h
+    have h_one : (x * y) * (x⁻¹ * y⁻¹) = 1 := calc
+      (x * y) * (x⁻¹ * y⁻¹) = x * (y * (x⁻¹ * y⁻¹)) := ℚ₀.mul_assoc _ _ _
+      _ = x * (y * (y⁻¹ * x⁻¹)) := by rw [mul_comm x⁻¹ y⁻¹]
+      _ = x * ((y * y⁻¹) * x⁻¹) := by rw [← ℚ₀.mul_assoc y y⁻¹ x⁻¹]
+      _ = x * (1 * x⁻¹) := by rw [mul_inv_cancel hy]
+      _ = x * x⁻¹ := by rw [one_mul]
+      _ = 1 := mul_inv_cancel hx
+    have h2 : (x * y) * (x⁻¹ * y⁻¹) = 0 := by rw [h, zero_mul]
+    rw [h_one] at h2
+    exact one_ne_zero h2
+  have h2 : ((x⁻¹ - y⁻¹) * (x * y)) * (x * y)⁻¹ = (y - x) * (x * y)⁻¹ := congrArg (fun z => z * (x * y)⁻¹) h1
+  rw [ℚ₀.mul_assoc, mul_inv_cancel h_xy_ne_0, mul_one] at h2
+  exact h2
+
 end
+
 
 end ℚ₀

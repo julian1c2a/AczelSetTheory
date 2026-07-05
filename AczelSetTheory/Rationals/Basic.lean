@@ -215,6 +215,16 @@ theorem mk_eq_iff (a c : ℤ₀) (b d : ℕ₁) :
     mk a b = mk c d ↔ Mul.mul a (ℤ₀.ofNat d.val) = Mul.mul c (ℤ₀.ofNat b.val) :=
   ⟨fun h => Quotient.exact h, fun h => Quotient.sound h⟩
 
+theorem zero_def : (0 : ℚ₀) = mk 0 den1 := rfl
+theorem one_def : (1 : ℚ₀) = mk 1 den1 := rfl
+
+theorem mk_eq_zero_iff {a : ℤ₀} {b : ℕ₁} : mk a b = 0 ↔ a = 0 := by
+  have h_zero : (0 : ℚ₀) = mk 0 den1 := rfl
+  rw [h_zero, mk_eq_iff]
+  -- a * 1 = 0 * b
+  have h_den : ℤ₀.ofNat den1.val = 1 := rfl
+  rw [h_den, ℤ₀.mul_one, ℤ₀.zero_mul]
+
 theorem add_mk (a c : ℤ₀) (b d : ℕ₁) :
     Add.add (mk a b) (mk c d) = mk (Add.add (Mul.mul a (ℤ₀.ofNat d.val)) (Mul.mul c (ℤ₀.ofNat b.val))) (mulDen b d) :=
   rfl
@@ -457,6 +467,19 @@ instance instLT : LT ℚ₀ where
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Propiedades del orden
 -- ─────────────────────────────────────────────────────────────────────────────
+
+theorem ofNat₀_le_ofNat₀ {n m : ℕ₀} (h : Peano.Order.le₀ n m) : ofNat₀ n ≤ ofNat₀ m := by
+  rw [ofNat₀_eq_mk, ofNat₀_eq_mk, mk_le_mk]
+  have h1 : Mul.mul (ℤ₀.ofNat n) (ℤ₀.ofNat den1.val) = ℤ₀.ofNat n := by
+    change Mul.mul (ℤ₀.ofNat n) (ℤ₀.ofNat 𝟙) = ℤ₀.ofNat n
+    rw [←ℤ₀.ofNat_mul]
+    exact congrArg ℤ₀.ofNat (Peano.Mul.mul_one n)
+  have h2 : Mul.mul (ℤ₀.ofNat m) (ℤ₀.ofNat den1.val) = ℤ₀.ofNat m := by
+    change Mul.mul (ℤ₀.ofNat m) (ℤ₀.ofNat 𝟙) = ℤ₀.ofNat m
+    rw [←ℤ₀.ofNat_mul]
+    exact congrArg ℤ₀.ofNat (Peano.Mul.mul_one m)
+  rw [h1, h2]
+  exact ℤ₀.le_ofNat_iff.mpr h
 
 theorem le_refl (a : ℚ₀) : a ≤ a := by
   refine Quotient.inductionOn a (fun p => ?_)

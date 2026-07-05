@@ -258,7 +258,36 @@ theorem cauchy_mul_is_cauchy (f g : CauchySeq) (K : ℕ₀) (hK : CauchySeq.mulB
     Add.add (Mul.mul f.boundVal (Mul.mul (ℚ₀.pow2 (Peano.Lattice.min n m)) (ℚ₀.pow2 K))) (Mul.mul g.boundVal (Mul.mul (ℚ₀.pow2 (Peano.Lattice.min n m)) (ℚ₀.pow2 K))) := by
     exact ℚ₀.add_le_add h_part1 h_part2
     
-  sorry
+  let M := ℚ₀.pow2 (Peano.Lattice.min n m)
+  let P := ℚ₀.pow2 K
+  have hrw1 : Add.add (Mul.mul f.boundVal (Mul.mul M P)) (Mul.mul g.boundVal (Mul.mul M P)) = 
+    Mul.mul (Add.add f.boundVal g.boundVal) (Mul.mul M P) := by
+    exact Eq.symm (ℚ₀.right_distrib f.boundVal g.boundVal (Mul.mul M P))
+  rw [hrw1] at h_parts_add
+  
+  have hrw2 : Mul.mul (Add.add f.boundVal g.boundVal) (Mul.mul M P) = Mul.mul (Mul.mul (Add.add f.boundVal g.boundVal) P) M := by
+    have h_comm : Mul.mul M P = Mul.mul P M := ℚ₀.mul_comm M P
+    rw [h_comm]
+    exact Eq.symm (ℚ₀.mul_assoc (Add.add f.boundVal g.boundVal) P M)
+  rw [hrw2] at h_parts_add
+  
+  have h_bound_add : Add.add f.boundVal g.boundVal ≤ ℚ₀.ofNat₀ K := by
+    have h1 : Add.add f.boundVal g.boundVal ≤ ℚ₀.absVal (Add.add f.boundVal g.boundVal) := ℚ₀.le_absVal (Add.add f.boundVal g.boundVal)
+    have h2 : ℚ₀.absVal (Add.add f.boundVal g.boundVal) ≤ ℚ₀.ofNat₀ (CauchySeq.mulBound f g) := ℚ₀.le_boundNat (Add.add f.boundVal g.boundVal)
+    have h3 : ℚ₀.ofNat₀ (CauchySeq.mulBound f g) ≤ ℚ₀.ofNat₀ K := ℚ₀.ofNat₀_le_ofNat₀ hK
+    exact ℚ₀.le_trans h1 (ℚ₀.le_trans h2 h3)
+    
+  have h_mul_P : Mul.mul (Add.add f.boundVal g.boundVal) P ≤ ℚ₀.ofNat₀ 𝟙 := by
+    have h1 : Mul.mul (Add.add f.boundVal g.boundVal) P ≤ Mul.mul (ℚ₀.ofNat₀ K) P := ℚ₀.mul_le_mul_right_of_nonneg h_bound_add (ℚ₀.pow2_nonneg K)
+    have h2 : Mul.mul (ℚ₀.ofNat₀ K) P ≤ ℚ₀.ofNat₀ 𝟙 := ℚ₀.pow2_bound K
+    exact ℚ₀.le_trans h1 h2
+    
+  have h_mul_M : Mul.mul (Mul.mul (Add.add f.boundVal g.boundVal) P) M ≤ Mul.mul (ℚ₀.ofNat₀ 𝟙) M := 
+    ℚ₀.mul_le_mul_right_of_nonneg h_mul_P (ℚ₀.pow2_nonneg (Peano.Lattice.min n m))
+  have h_one_M : Mul.mul (ℚ₀.ofNat₀ 𝟙) M = M := ℚ₀.one_mul M
+  rw [h_one_M] at h_mul_M
+  
+  exact ℚ₀.le_trans h_triangle (ℚ₀.le_trans h_parts_add h_mul_M)
 
 /-- Multiplicación de sucesiones de Cauchy. -/
 def CauchySeq.mul (f g : CauchySeq) : CauchySeq :=
@@ -312,9 +341,62 @@ K = N + 2k. -/
 def CauchySeq.invBound (f : CauchySeq) (h : CauchySeq.ApartZero f) : ℕ₀ :=
   Peano.Add.add (h.N f) (Peano.Add.add (h.k f) (h.k f))
 
+theorem ApartZero_absVal_bound (f : CauchySeq) (h : CauchySeq.ApartZero f) (m : ℕ₀)
+    (hm : Peano.Order.le₀ (CauchySeq.ApartZero.N f h) m) :
+    ℚ₀.pow2 (CauchySeq.ApartZero.k f h) ≤ ℚ₀.absVal (f.val m) := by
+  cases h with
+  | inl p =>
+    have h_pos : ℚ₀.pow2 p.k ≤ f.val m := p.proof m hm
+    have h_le_abs : f.val m ≤ ℚ₀.absVal (f.val m) := ℚ₀.le_absVal (f.val m)
+    exact ℚ₀.le_trans h_pos h_le_abs
+  | inr p =>
+    have h_pos : ℚ₀.pow2 p.k ≤ (-f).val m := p.proof m hm
+    have h_le_abs : Neg.neg (f.val m) ≤ ℚ₀.absVal (f.val m) := ℚ₀.neg_le_absVal (f.val m)
+    exact ℚ₀.le_trans h_pos h_le_abs
+
+theorem mul_ne_zero {x y : ℚ₀} (hx : x ≠ 0) (hy : y ≠ 0) : x * y ≠ 0 := by
+  intro h
+  have h1 : x⁻¹ * (x * y) = x⁻¹ * 0 := congrArg (fun z => x⁻¹ * z) h
+  rw [ℚ₀.mul_zero] at h1
+  rw [← ℚ₀.mul_assoc] at h1
+  rw [inv_mul_cancel hx] at h1
+  rw [ℚ₀.one_mul] at h1
+  exact hy h1
+
+theorem absVal_ne_zero {x : ℚ₀} (hx : x ≠ 0) : ℚ₀.absVal x ≠ 0 := by
+  intro h
+  exact hx ((ℚ₀.absVal_zero_iff x).mp h)
+
+theorem absVal_one : ℚ₀.absVal 1 = 1 := by
+  have h1 : ℚ₀.absVal (1 * 1) = ℚ₀.absVal 1 * ℚ₀.absVal 1 := ℚ₀.absVal_mul 1 1
+  rw [ℚ₀.mul_one] at h1
+  have h2 : ℚ₀.absVal 1 ≠ 0 := absVal_ne_zero one_ne_zero
+  have h3 : (ℚ₀.absVal 1)⁻¹ * ℚ₀.absVal 1 = (ℚ₀.absVal 1)⁻¹ * (ℚ₀.absVal 1 * ℚ₀.absVal 1) := congrArg (fun z => (ℚ₀.absVal 1)⁻¹ * z) h1
+  rw [← ℚ₀.mul_assoc] at h3
+  rw [inv_mul_cancel h2] at h3
+  rw [ℚ₀.one_mul] at h3
+  exact h3.symm
+
+theorem absVal_inv (x : ℚ₀) (hx : x ≠ 0) : ℚ₀.absVal (x⁻¹) = (ℚ₀.absVal x)⁻¹ := by
+  have h1 : x * x⁻¹ = 1 := mul_inv_cancel hx
+  have h2 : ℚ₀.absVal (x * x⁻¹) = ℚ₀.absVal 1 := congrArg ℚ₀.absVal h1
+  rw [ℚ₀.absVal_mul] at h2
+  rw [absVal_one] at h2
+  have hx_abs_ne_zero : ℚ₀.absVal x ≠ 0 := absVal_ne_zero hx
+  exact inv_unique hx_abs_ne_zero h2
+
 theorem absVal_inv_sub_inv (x y : ℚ₀) (hx : x ≠ 0) (hy : y ≠ 0) :
-    ℚ₀.absVal (x⁻¹ - y⁻¹) = Mul.mul (ℚ₀.absVal (y - x)) (Mul.mul (ℚ₀.absVal x) (ℚ₀.absVal y))⁻¹ := by
-  sorry
+    ℚ₀.absVal (x⁻¹ - y⁻¹) = ℚ₀.absVal (y - x) * (ℚ₀.absVal x * ℚ₀.absVal y)⁻¹ := by
+  rw [inv_sub_inv_eq x y hx hy]
+  rw [ℚ₀.absVal_mul]
+  have h_xy_ne_0 : x * y ≠ 0 := mul_ne_zero hx hy
+  rw [absVal_inv _ h_xy_ne_0]
+  rw [ℚ₀.absVal_mul]
+
+theorem inv_bound_lemma (x y d p : ℚ₀) (hx : 0 ≤ x) (hy : 0 ≤ y) (hd : 0 ≤ d) (hp : 0 ≤ p)
+    (h_pow2 : p * p ≤ x * y)
+    (h_diff : d ≤ p * p * p) :
+    d * (x * y)⁻¹ ≤ p := by sorry
 
 theorem cauchy_inv_is_cauchy (f : CauchySeq) (h : CauchySeq.ApartZero f) :
     ℚ₀.IsCauchy (fun n => (f.val (Peano.Add.add n (CauchySeq.invBound f h)))⁻¹) := by
@@ -323,19 +405,60 @@ theorem cauchy_inv_is_cauchy (f : CauchySeq) (h : CauchySeq.ApartZero f) :
   let fnK := f.val (Peano.Add.add n K)
   let fmK := f.val (Peano.Add.add m K)
   
-  -- The distance |1/fnK - 1/fmK| is equal to |fmK - fnK| / (|fnK| * |fmK|)
-  have h_eq : ℚ₀.absVal (fnK⁻¹ - fmK⁻¹) = Mul.mul (ℚ₀.absVal (fmK - fnK)) (Mul.mul (ℚ₀.absVal fnK) (ℚ₀.absVal fmK))⁻¹ := by
-    -- Requires f(n+K) ≠ 0 and f(m+K) ≠ 0 which is guaranteed by ApartZero.
-    sorry
+  have h_N_le_K : Peano.Order.le₀ (CauchySeq.ApartZero.N f h) K := by
+    dsimp [K, CauchySeq.invBound]
+    exact Peano.Add.le_self_add (CauchySeq.ApartZero.N f h) (Peano.Add.add (CauchySeq.ApartZero.k f h) (CauchySeq.ApartZero.k f h))
     
-  -- f is Cauchy, so |fmK - fnK| ≤ 1/2^{min(n+K, m+K)} = 1/2^{min(n, m)} * 1/2^K
+  have h_K_le_nK : Peano.Order.le₀ K (Peano.Add.add n K) := 
+    Peano.Add.le_self_add_l K n
+
+  have h_N_le_nK : Peano.Order.le₀ (CauchySeq.ApartZero.N f h) (Peano.Add.add n K) := 
+    Peano.Order.le_trans (CauchySeq.ApartZero.N f h) K (Peano.Add.add n K) h_N_le_K h_K_le_nK
+    
+  have h_pow2_le_abs_fnK : ℚ₀.pow2 (CauchySeq.ApartZero.k f h) ≤ ℚ₀.absVal fnK := 
+    ApartZero_absVal_bound f h (Peano.Add.add n K) h_N_le_nK
+
+  have hfnK_ne_0 : fnK ≠ 0 := by
+    intro h_eq_0
+    rw [h_eq_0, absVal_zero] at h_pow2_le_abs_fnK
+    have h_pow2_def : ℚ₀.pow2 (CauchySeq.ApartZero.k f h) = ℚ₀.mk (ℤ₀.ofNat (σ 𝟘)) (ℚ₀.pow2_den (CauchySeq.ApartZero.k f h)) := rfl
+    have h_zero_def : (0 : ℚ₀) = ℚ₀.mk (ℤ₀.ofNat 𝟘) den1 := rfl
+    rw [h_pow2_def, h_zero_def, ℚ₀.mk_le_mk] at h_pow2_le_abs_fnK
+    have h_den : ℤ₀.ofNat den1.val = 1 := ℤ₀.ofNat_one
+    have hz : ℤ₀.ofNat 𝟘 = 0 := rfl
+    rw [h_den, ℤ₀.mul_one, hz, ℤ₀.zero_mul] at h_pow2_le_abs_fnK
+    rw [← hz, ℤ₀.le_ofNat_iff] at h_pow2_le_abs_fnK
+    exact Peano.Order.le_1_0_then_false h_pow2_le_abs_fnK
+
+  have h_K_le_mK : Peano.Order.le₀ K (Peano.Add.add m K) := 
+    Peano.Add.le_self_add_l K m
+
+  have h_N_le_mK : Peano.Order.le₀ (CauchySeq.ApartZero.N f h) (Peano.Add.add m K) := 
+    Peano.Order.le_trans (CauchySeq.ApartZero.N f h) K (Peano.Add.add m K) h_N_le_K h_K_le_mK
+
+  have h_pow2_le_abs_fmK : ℚ₀.pow2 (CauchySeq.ApartZero.k f h) ≤ ℚ₀.absVal fmK := 
+    ApartZero_absVal_bound f h (Peano.Add.add m K) h_N_le_mK
+
+  have hfmK_ne_0 : fmK ≠ 0 := by
+    intro h_eq_0
+    rw [h_eq_0, absVal_zero] at h_pow2_le_abs_fmK
+    have h_pow2_def : ℚ₀.pow2 (CauchySeq.ApartZero.k f h) = ℚ₀.mk (ℤ₀.ofNat (σ 𝟘)) (ℚ₀.pow2_den (CauchySeq.ApartZero.k f h)) := rfl
+    have h_zero_def : (0 : ℚ₀) = ℚ₀.mk (ℤ₀.ofNat 𝟘) den1 := rfl
+    rw [h_pow2_def, h_zero_def, ℚ₀.mk_le_mk] at h_pow2_le_abs_fmK
+    have h_den : ℤ₀.ofNat den1.val = 1 := ℤ₀.ofNat_one
+    have hz : ℤ₀.ofNat 𝟘 = 0 := rfl
+    rw [h_den, ℤ₀.mul_one, hz, ℤ₀.zero_mul] at h_pow2_le_abs_fmK
+    rw [← hz, ℤ₀.le_ofNat_iff] at h_pow2_le_abs_fmK
+    exact Peano.Order.le_1_0_then_false h_pow2_le_abs_fmK
+
+  have h_eq : ℚ₀.absVal (fnK⁻¹ - fmK⁻¹) = Mul.mul (ℚ₀.absVal (fmK - fnK)) (Mul.mul (ℚ₀.absVal fnK) (ℚ₀.absVal fmK))⁻¹ := by
+    have h_sub : ℚ₀.absVal (fnK⁻¹ - fmK⁻¹) = ℚ₀.absVal (fmK - fnK) * (ℚ₀.absVal fnK * ℚ₀.absVal fmK)⁻¹ := 
+      absVal_inv_sub_inv fnK fmK hfnK_ne_0 hfmK_ne_0
+    exact h_sub
+    
   have h_f_cauchy := f.property (Peano.Add.add n K) (Peano.Add.add m K)
   
-  -- |fnK| ≥ 1/2^k and |fmK| ≥ 1/2^k, so (|fnK| * |fmK|)⁻¹ ≤ (1/2^k * 1/2^k)⁻¹ = 2^{2k}
-  have h_bound : (Mul.mul (ℚ₀.absVal fnK) (ℚ₀.absVal fmK))⁻¹ ≤ ℚ₀.ofNat₀ (CauchySeq.invBound f h) := by
-    sorry
-    
-  -- Combining the above bounds gives exactly |1/fnK - 1/fmK| ≤ 1/2^{min(n, m)}
+  -- Combining bounds
   sorry
 
 /-- El inverso de una sucesión de Cauchy está definido si la sucesión
