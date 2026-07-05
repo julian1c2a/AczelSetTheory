@@ -24,7 +24,6 @@ License: MIT
 --   ℚ₀.ofInt_injective
 
 import AczelSetTheory.Integers.Basic
-import AczelSetTheory.Rationals.PeanoAxioms
 import AczelSetTheory.Integers.Functions
 import Peano.PeanoNat.Div
 
@@ -39,7 +38,7 @@ open Peano Peano.Axioms Peano.Add Peano.Mul Peano.Order
 -- Denominadores positivos = `ℕ₁` de peanolib (= {n : ℕ₀ // n ≠ 𝟘}); no se redefine (ADR-019).
 
 -- Denominador unidad: 1
-private def den1 : ℕ₁ := ⟨𝟙, succ_neq_zero 𝟘⟩
+def den1 : ℕ₁ := ⟨𝟙, succ_neq_zero 𝟘⟩
 
 -- Producto de denominadores positivos
 private theorem mul_ne_zero₀ {n m : ℕ₀} (hn : n ≠ 𝟘) (hm : m ≠ 𝟘) : mul n m ≠ 𝟘 := by
@@ -180,7 +179,7 @@ private theorem boundWD (p q : ℤ₀ × ℕ₁) (h : ratEq p q) : boundRaw p = 
   -- boundRaw p = Peano.Add.add (Peano.Div.div (ℤ₀.toNat (ℤ₀.abs p.1)) p.2.val) 𝟙
   unfold boundRaw
   have h_div_eq : Peano.Div.div (ℤ₀.toNat (ℤ₀.abs p.1)) p.2.val = Peano.Div.div (ℤ₀.toNat (ℤ₀.abs q.1)) q.2.val := by
-    exact AczelSetTheory.PeanoAxioms.peano_bound_eq p.1 q.1 p.2 q.2 h
+    exact ℤ₀.peano_bound_eq p.1 q.1 p.2 q.2 h
   rw [h_div_eq]
 
 /-- Retorna una cota entera `N` tal que `|q| <= N`. -/
@@ -220,6 +219,10 @@ theorem add_mk (a c : ℤ₀) (b d : ℕ₁) :
     Add.add (mk a b) (mk c d) = mk (Add.add (Mul.mul a (ℤ₀.ofNat d.val)) (Mul.mul c (ℤ₀.ofNat b.val))) (mulDen b d) :=
   rfl
 
+theorem mul_mk (a c : ℤ₀) (b d : ℕ₁) :
+    Mul.mul (mk a b) (mk c d) = mk (Mul.mul a c) (mulDen b d) :=
+  rfl
+
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Embedding desde ℤ₀
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -227,6 +230,9 @@ theorem add_mk (a c : ℤ₀) (b d : ℕ₁) :
 def ofInt (z : ℤ₀) : ℚ₀ := mkQ z den1
 
 def ofNat₀ (n : ℕ₀) : ℚ₀ := ofInt (ℤ₀.ofNat n)
+
+theorem ofNat₀_eq_mk (n : ℕ₀) : ofNat₀ n = mk (ℤ₀.ofNat n) den1 :=
+  rfl
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Leyes de anillo conmutativo
@@ -440,6 +446,10 @@ instance instLE : LE ℚ₀ where
   le a b := Quotient.liftOn₂ a b
     (fun p q => Mul.mul p.1 (ℤ₀.ofNat q.2.val) ≤ Mul.mul q.1 (ℤ₀.ofNat p.2.val))
     (fun p₁ q₁ p₂ q₂ h1 h2 => propext (leWD p₁ p₂ q₁ q₂ h1 h2))
+
+theorem mk_le_mk (a c : ℤ₀) (b d : ℕ₁) :
+    (mk a b ≤ mk c d) ↔ Mul.mul a (ℤ₀.ofNat d.val) ≤ Mul.mul c (ℤ₀.ofNat b.val) :=
+  Iff.rfl
 
 instance instLT : LT ℚ₀ where
   lt a b := a ≤ b ∧ ¬b ≤ a
@@ -667,5 +677,47 @@ theorem add_le_add_left {a b : ℚ₀} (h : a ≤ b) (c : ℚ₀) :
 theorem add_le_add_right {a b : ℚ₀} (h : a ≤ b) (c : ℚ₀) :
     Add.add a c ≤ Add.add b c := by
   rw [add_comm a c, add_comm b c]; exact add_le_add_left h c
+
+theorem add_le_add {a b c d : ℚ₀} (h1 : a ≤ b) (h2 : c ≤ d) : Add.add a c ≤ Add.add b d :=
+  le_trans (add_le_add_right h1 c) (add_le_add_left h2 b)
+
+theorem mul_le_mul_right_of_nonneg {a b c : ℚ₀} (h1 : a ≤ b) (h2 : 0 ≤ c) : Mul.mul a c ≤ Mul.mul b c := by
+  revert h1 h2
+  refine Quotient.inductionOn₃ a b c (fun p q r h1 h2 => ?_)
+  change Mul.mul p.1 (ℤ₀.ofNat q.2.val) ≤ Mul.mul q.1 (ℤ₀.ofNat p.2.val) at h1
+  have hr : (0 : ℤ₀) ≤ r.1 := (zero_le_iff_num_nonneg r).mp h2
+  show Mul.mul (Mul.mul p.1 r.1) (ℤ₀.ofNat (Peano.Mul.mul q.2.val r.2.val)) ≤ 
+       Mul.mul (Mul.mul q.1 r.1) (ℤ₀.ofNat (Peano.Mul.mul p.2.val r.2.val))
+  rw [ℤ₀.ofNat_mul, ℤ₀.ofNat_mul]
+  
+  -- We want to show (p.1 * r.1) * (q.2 * r.2) ≤ (q.1 * r.1) * (p.2 * r.2)
+  -- Reorder to (p.1 * q.2) * (r.1 * r.2) ≤ (q.1 * p.2) * (r.1 * r.2)
+  have h_reorder1 : Mul.mul (Mul.mul p.1 r.1) (Mul.mul (ℤ₀.ofNat q.2.val) (ℤ₀.ofNat r.2.val)) = 
+                    Mul.mul (Mul.mul p.1 (ℤ₀.ofNat q.2.val)) (Mul.mul r.1 (ℤ₀.ofNat r.2.val)) := by
+    rw [mul_swap_inner p.1 r.1 (ℤ₀.ofNat q.2.val) (ℤ₀.ofNat r.2.val)]
+    
+  have h_reorder2 : Mul.mul (Mul.mul q.1 r.1) (Mul.mul (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat r.2.val)) = 
+                    Mul.mul (Mul.mul q.1 (ℤ₀.ofNat p.2.val)) (Mul.mul r.1 (ℤ₀.ofNat r.2.val)) := by
+    rw [mul_swap_inner q.1 r.1 (ℤ₀.ofNat p.2.val) (ℤ₀.ofNat r.2.val)]
+    
+  rw [h_reorder1, h_reorder2]
+  
+  have hr_nonneg : (0 : ℤ₀) ≤ Mul.mul r.1 (ℤ₀.ofNat r.2.val) := by
+    apply ℤ₀.mul_nonneg hr
+    exact ℤ₀.zero_le_ofNat _
+    
+  exact ℤ₀.mul_le_mul_right_of_nonneg h1 hr_nonneg
+
+theorem mul_le_mul_left_of_nonneg {a b c : ℚ₀} (h1 : a ≤ b) (h2 : 0 ≤ c) : Mul.mul c a ≤ Mul.mul c b := by
+  have ha : Mul.mul c a = Mul.mul a c := mul_comm c a
+  have hb : Mul.mul c b = Mul.mul b c := mul_comm c b
+  rw [ha, hb]
+  exact mul_le_mul_right_of_nonneg h1 h2
+
+theorem mul_le_mul {a b c d : ℚ₀} (h1 : a ≤ b) (h2 : c ≤ d) (h3 : 0 ≤ a) (h4 : 0 ≤ c) : Mul.mul a c ≤ Mul.mul b d := by
+  have h_left : Mul.mul a c ≤ Mul.mul b c := mul_le_mul_right_of_nonneg h1 h4
+  have h_b_nonneg : 0 ≤ b := le_trans h3 h1
+  have h_right : Mul.mul b c ≤ Mul.mul b d := mul_le_mul_left_of_nonneg h2 h_b_nonneg
+  exact le_trans h_left h_right
 
 end ℚ₀

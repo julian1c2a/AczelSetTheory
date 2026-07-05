@@ -3,7 +3,7 @@ open Lake DSL
 
 package "aczelsettheory"
 
-require peanolib from "E:/dropbox/github/lean4/peano"
+require peanolib from "E:/dropbox/github/lean4/Peano.worktrees/arith-expansion"
 
 lean_lib "AczelSetTheory"
 

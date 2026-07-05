@@ -6,7 +6,7 @@
    "name": "peanolib",
    "manifestFile": "lake-manifest.json",
    "inherited": false,
-   "dir": "E:/dropbox/github/lean4/peano",
+   "dir": "E:/dropbox/github/lean4/Peano.worktrees/arith-expansion",
    "configFile": "lakefile.lean"}],
  "name": "aczelsettheory",
  "lakeDir": ".lake",

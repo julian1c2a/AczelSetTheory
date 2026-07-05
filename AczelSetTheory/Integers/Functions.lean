@@ -21,10 +21,11 @@ License: MIT
 --          powZ_zero, powZ_succ, powZ_one
 
 import AczelSetTheory.Integers.Order
+import Peano.PeanoNat.Div
 
 namespace ℤ₀
 
-open Peano Peano.Add Peano.Sub Peano.Mul Peano.Order
+open Peano Peano.Axioms Peano.StrictOrder Peano.Add Peano.Sub Peano.Mul Peano.Div Peano.Order
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Lemas privados auxiliares
@@ -167,5 +168,84 @@ theorem powZ_succ (z : ℤ₀) (n : ℕ₀) : powZ z (σ n) = Mul.mul (powZ z n)
 
 theorem powZ_one (z : ℤ₀) : powZ z 𝟙 = z := by
   rw [show (𝟙 : ℕ₀) = σ 𝟘 from rfl, powZ_succ, powZ_zero, one_mul]
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Lemas para Racionales (Rationals)
+-- ─────────────────────────────────────────────────────────────────────────────
+
+theorem eq_ofNat_toNat_abs_or_neg (a : ℤ₀) :
+  a = ofNat (toNat (abs a)) ∨ a = Neg.neg (ofNat (toNat (abs a))) := by
+  have habs : abs a = ofNat (toNat (abs a)) := nonneg_eq_ofNat (abs_nonneg a)
+  by_cases h : (0 : ℤ₀) ≤ a
+  · have haa : abs a = a := by unfold abs; rw [if_pos h]
+    exact Or.inl (haa.symm.trans habs)
+  · have haa : abs a = -a := by unfold abs; rw [if_neg h]
+    have hkey : -a = ofNat (toNat (abs a)) := haa.symm.trans habs
+    have hkey2 : a = - (ofNat (toNat (abs a))) := by
+      calc a = - (-a) := (neg_neg a).symm
+           _ = - (ofNat (toNat (abs a))) := by rw [hkey]
+    exact Or.inr hkey2
+
+theorem ofNat_eq_neg_ofNat_implies_zero (A C : ℕ₀) (h : ofNat A = - ofNat C) : A = 𝟘 ∧ C = 𝟘 := by
+  have h_add : Add.add (ofNat A) (ofNat C) = 0 := by
+    rw [h, neg_add_self]
+  rw [← ofNat_add] at h_add
+  have h_add2 : add A C = 𝟘 := ofNat_injective h_add
+  cases A with
+  | zero => 
+    rw [Peano.Add.zero_add] at h_add2
+    exact ⟨rfl, h_add2⟩
+  | succ a' => 
+    exfalso
+    rw [succ_add] at h_add2
+    exact succ_neq_zero (add a' C) h_add2
+
+theorem peano_bound_eq (a c : ℤ₀) (b d : ℕ₁)
+    (h : Mul.mul a (ℤ₀.ofNat d.val) = Mul.mul c (ℤ₀.ofNat b.val)) :
+    div (ℤ₀.toNat (ℤ₀.abs a)) b.val = div (ℤ₀.toNat (ℤ₀.abs c)) d.val := by
+  have ha := eq_ofNat_toNat_abs_or_neg a
+  have hc := eq_ofNat_toNat_abs_or_neg c
+  cases ha with
+  | inl ha_pos =>
+    cases hc with
+    | inl hc_pos =>
+      rw [ha_pos, hc_pos] at h
+      rw [← ofNat_mul, ← ofNat_mul] at h
+      have h_nat : mul (toNat (abs a)) d.val = mul (toNat (abs c)) b.val := ofNat_injective h
+      exact div_eq_of_mul_eq (toNat (abs a)) b.val (toNat (abs c)) d.val b.property d.property h_nat
+    | inr hc_neg =>
+      rw [ha_pos, hc_neg] at h
+      rw [← ofNat_mul, neg_mul, ← ofNat_mul] at h
+      have h_zero := ofNat_eq_neg_ofNat_implies_zero (mul (toNat (abs a)) d.val) (mul (toNat (abs c)) b.val) h
+      have hAd : mul (toNat (abs a)) d.val = 𝟘 := h_zero.1
+      have hA : toNat (abs a) = 𝟘 := (mul_eq_zero (toNat (abs a)) d.val).mp hAd |>.resolve_right d.property
+      have hCb : mul (toNat (abs c)) b.val = 𝟘 := h_zero.2
+      have hC : toNat (abs c) = 𝟘 := (mul_eq_zero (toNat (abs c)) b.val).mp hCb |>.resolve_right b.property
+      rw [hA, hC]
+      have h_zero_mul : mul 𝟘 d.val = mul 𝟘 b.val := by rw [Peano.Mul.zero_mul, Peano.Mul.zero_mul]
+      exact div_eq_of_mul_eq 𝟘 b.val 𝟘 d.val b.property d.property h_zero_mul
+  | inr ha_neg =>
+    cases hc with
+    | inl hc_pos =>
+      rw [ha_neg, hc_pos] at h
+      rw [neg_mul, ← ofNat_mul, ← ofNat_mul] at h
+      have h_symm : ofNat (mul (toNat (abs c)) b.val) = - ofNat (mul (toNat (abs a)) d.val) := h.symm
+      have h_zero := ofNat_eq_neg_ofNat_implies_zero (mul (toNat (abs c)) b.val) (mul (toNat (abs a)) d.val) h_symm
+      have hCb : mul (toNat (abs c)) b.val = 𝟘 := h_zero.1
+      have hC : toNat (abs c) = 𝟘 := (mul_eq_zero (toNat (abs c)) b.val).mp hCb |>.resolve_right b.property
+      have hAd : mul (toNat (abs a)) d.val = 𝟘 := h_zero.2
+      have hA : toNat (abs a) = 𝟘 := (mul_eq_zero (toNat (abs a)) d.val).mp hAd |>.resolve_right d.property
+      rw [hA, hC]
+      have h_zero_mul : mul 𝟘 d.val = mul 𝟘 b.val := by rw [Peano.Mul.zero_mul, Peano.Mul.zero_mul]
+      exact div_eq_of_mul_eq 𝟘 b.val 𝟘 d.val b.property d.property h_zero_mul
+    | inr hc_neg =>
+      rw [ha_neg, hc_neg] at h
+      rw [neg_mul, ← ofNat_mul, neg_mul, ← ofNat_mul] at h
+      have h_pos : ofNat (mul (toNat (abs a)) d.val) = ofNat (mul (toNat (abs c)) b.val) := by
+        calc ofNat (mul (toNat (abs a)) d.val) = - (- ofNat (mul (toNat (abs a)) d.val)) := (neg_neg _).symm
+             _ = - (- ofNat (mul (toNat (abs c)) b.val)) := by rw [h]
+             _ = ofNat (mul (toNat (abs c)) b.val) := neg_neg _
+      have h_nat : mul (toNat (abs a)) d.val = mul (toNat (abs c)) b.val := ofNat_injective h_pos
+      exact div_eq_of_mul_eq (toNat (abs a)) b.val (toNat (abs c)) d.val b.property d.property h_nat
 
 end ℤ₀

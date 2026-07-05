@@ -109,6 +109,32 @@ theorem pow2_succ_add (n : ℕ₀) : Add.add (pow2 (σ n)) (pow2 (σ n)) = pow2 
 
   rw [h_left, h_right]
 
+theorem pow2_add (n m : ℕ₀) : pow2 (Peano.Add.add n m) = Mul.mul (pow2 n) (pow2 m) := by
+  dsimp [pow2]
+  rw [ℚ₀.mul_mk, ℚ₀.mk_eq_iff]
+  have h_one : ℤ₀.ofNat (σ 𝟘) = 1 := ℤ₀.ofNat_one
+  rw [h_one]
+  rw [ℤ₀.one_mul, ℤ₀.one_mul, ℤ₀.one_mul]
+  apply congrArg ℤ₀.ofNat
+  exact Eq.symm (Peano.Pow.pow_add_eq_mul_pow (σ (σ 𝟘)) n m)
+
+theorem pow2_bound (K : ℕ₀) : Mul.mul (ofNat₀ K) (pow2 K) ≤ ofNat₀ 𝟙 := by
+  rw [ofNat₀_eq_mk K, ofNat₀_eq_mk 𝟙]
+  dsimp [pow2]
+  rw [ℚ₀.mul_mk, ℚ₀.mk_le_mk]
+  have h_one : ℤ₀.ofNat (σ 𝟘) = 1 := ℤ₀.ofNat_one
+  rw [h_one]
+  have h_den1 : ℤ₀.ofNat den1.val = 1 := ℤ₀.ofNat_one
+  rw [h_den1]
+  rw [ℤ₀.mul_one, ℤ₀.mul_one, ℤ₀.ofNat_one, ℤ₀.one_mul]
+  rw [ℤ₀.le_ofNat_iff]
+  have h_den1_val : den1.val = 𝟙 := rfl
+  have h_mul_den : (mulDen den1 (pow2_den K)).val = Peano.Mul.mul den1.val (pow2_den K).val := rfl
+  rw [h_mul_den, h_den1_val]
+  have h_one_mul : Peano.Mul.mul 𝟙 (pow2_den K).val = (pow2_den K).val := Peano.Mul.one_mul (pow2_den K).val
+  rw [h_one_mul]
+  exact Peano.Pow.n_le_two_pow_n K
+
 -- ============================================================
 -- Sección 2: Definiciones de Cauchy
 -- ============================================================

@@ -8,7 +8,5 @@ License: MIT
 -- Barrel para el subsistema ℝ₀ (números reales como Cauchy de ℚ₀).
 -- Auto-mantenido en sincronía con AczelSetTheory/Reals/.
 
-import AczelSetTheory.Reals.CauchySeq
-import AczelSetTheory.Reals.Arithmetic
-import AczelSetTheory.Reals.Order
+import AczelSetTheory.Rationals.CauchySeqAlgebra
 import AczelSetTheory.Reals.Incompleteness

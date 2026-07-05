@@ -7,7 +7,7 @@ License: MIT
 -- AczelSetTheory/Reals/Incompleteness.lean
 -- Demostración de que ℚ₀ es incompleto (existe una sucesión de Cauchy sin límite en ℚ₀).
 
-import AczelSetTheory.Reals.CauchySeq
+import AczelSetTheory.Rationals.CauchySeqAlgebra
 
 namespace ℝ₀
 
@@ -49,7 +49,7 @@ theorem sqrt2Seq_isCauchy : ℚ₀.IsCauchy sqrt2Seq := by
   sorry
 
 /-- La sucesión que aproxima a √2 como elemento de CauchySeq. -/
-def sqrt2CauchySeq : CauchySeq := ⟨sqrt2Seq, sqrt2Seq_isCauchy⟩
+def sqrt2CauchySeq : ℚ₀.CauchySeq := ⟨sqrt2Seq, sqrt2Seq_isCauchy⟩
 
 -- ============================================================
 -- Irracionalidad y Falta de Límite

@@ -303,7 +303,22 @@ theorem nonneg_eq_ofNat {a : ℤ₀} (h : 0 ≤ a) : a = ofNat a.repr.1 := by
   · -- a.repr.1 = 𝟘, luego h' fuerza a.repr.2 = 𝟘
     have h2 : a.repr.2 = 𝟘 := by omega₀
     exact Prod.ext rfl h2
-  · exact Prod.ext rfl ha
+  · -- a.repr.2 = 𝟘
+    exact Prod.ext rfl ha
+
+theorem mul_le_mul_right_of_nonneg {a b c : ℤ₀} (h1 : a ≤ b) (h2 : 0 ≤ c) : Mul.mul a c ≤ Mul.mul b c := by
+  have hc : c = ofNat c.repr.1 := nonneg_eq_ofNat h2
+  rw [hc]
+  by_cases h0 : c.repr.1 = 𝟘
+  · rw [h0]
+    have hz : ofNat 𝟘 = 0 := rfl
+    rw [hz, mul_zero, mul_zero]
+    exact le_refl 0
+  · exact (mul_le_mul_right_ofNat_pos h0 a b).mp h1
+
+theorem mul_le_mul_left_of_nonneg {a b c : ℤ₀} (h1 : a ≤ b) (h2 : 0 ≤ c) : Mul.mul c a ≤ Mul.mul c b := by
+  rw [mul_comm c a, mul_comm c b]
+  exact mul_le_mul_right_of_nonneg h1 h2
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- No negatividad del producto

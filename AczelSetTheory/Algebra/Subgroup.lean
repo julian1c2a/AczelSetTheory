@@ -608,6 +608,6 @@ instance existsSubgroup_decidable (grp : HFGroup) (P : HFSet → Prop) [Decidabl
   decidable_of_iff (∃ H ∈ HFSet.powerset grp.G, isSubgroupProp grp H ∧ P H)
     (exists_subgroup_iff_powerset grp P).symm
 
-export HFAlgebra (isSubgroupProp exists_subgroup_iff_powerset)
-
 end HFAlgebra
+
+export HFAlgebra (isSubgroupProp exists_subgroup_iff_powerset)

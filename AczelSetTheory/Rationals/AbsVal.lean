@@ -176,4 +176,33 @@ theorem absVal_add_le (a b : ℚ₀) :
     exact le_trans (hstep ▸ le_refl _)
       (le_trans (add_le_add_right h1 _) (add_le_add_left h2 _))
 
+
+theorem absVal_mul_sub_mul (a b c d : ℚ₀) :
+    absVal (a * b - c * d) ≤ Add.add (absVal a * absVal (b - d)) (absVal d * absVal (a - c)) := by
+  have h_eq : a * b - c * d = Add.add (a * (b - d)) (d * (a - c)) := by
+    calc
+      a * b - c * d = Add.add (a * b) (Neg.neg (c * d)) := rfl
+      _ = Add.add (Add.add (a * b) 0) (Neg.neg (c * d)) := by rw [add_zero]
+      _ = Add.add (Add.add (a * b) (Add.add (Neg.neg (a * d)) (a * d))) (Neg.neg (c * d)) := by rw [neg_add_self (a * d)]
+      _ = Add.add (Add.add (Add.add (a * b) (Neg.neg (a * d))) (a * d)) (Neg.neg (c * d)) := by rw [add_assoc (a * b) (Neg.neg (a * d)) (a * d)]
+      _ = Add.add (Add.add (a * b) (Neg.neg (a * d))) (Add.add (a * d) (Neg.neg (c * d))) := by rw [add_assoc (Add.add (a * b) (Neg.neg (a * d))) (a * d) (Neg.neg (c * d))]
+      _ = Add.add (Add.add (a * b) (a * (Neg.neg d))) (Add.add (a * d) (Neg.neg (c * d))) := by rw [mul_neg a d]
+      _ = Add.add (a * Add.add b (Neg.neg d)) (Add.add (a * d) (Neg.neg (c * d))) := by rw [← left_distrib a b (Neg.neg d)]
+      _ = Add.add (a * (b - d)) (Add.add (a * d) (Neg.neg (c * d))) := rfl
+      _ = Add.add (a * (b - d)) (Add.add (d * a) (Neg.neg (c * d))) := by rw [mul_comm a d]
+      _ = Add.add (a * (b - d)) (Add.add (d * a) (Neg.neg (d * c))) := by rw [mul_comm c d]
+      _ = Add.add (a * (b - d)) (Add.add (d * a) (d * (Neg.neg c))) := by rw [mul_neg d c]
+      _ = Add.add (a * (b - d)) (d * Add.add a (Neg.neg c)) := by rw [← left_distrib d a (Neg.neg c)]
+      _ = Add.add (a * (b - d)) (d * (a - c)) := rfl
+
+  rw [h_eq]
+  have h_tri := absVal_add_le (a * (b - d)) (d * (a - c))
+  have h_mul1 : absVal (a * (b - d)) = absVal a * absVal (b - d) := absVal_mul a (b - d)
+  have h_mul2 : absVal (d * (a - c)) = absVal d * absVal (a - c) := absVal_mul d (a - c)
+  rw [h_mul1, h_mul2] at h_tri
+  exact h_tri
+
+theorem le_boundNat (q : ℚ₀) : absVal q ≤ ofNat₀ (boundNat q) := by
+  sorry
+
 end ℚ₀
