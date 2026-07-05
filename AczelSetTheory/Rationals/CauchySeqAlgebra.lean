@@ -393,10 +393,28 @@ theorem absVal_inv_sub_inv (x y : ℚ₀) (hx : x ≠ 0) (hy : y ≠ 0) :
   rw [absVal_inv _ h_xy_ne_0]
   rw [ℚ₀.absVal_mul]
 
-theorem inv_bound_lemma (x y d p : ℚ₀) (hx : 0 ≤ x) (hy : 0 ≤ y) (hd : 0 ≤ d) (hp : 0 ≤ p)
-    (h_pow2 : p * p ≤ x * y)
-    (h_diff : d ≤ p * p * p) :
-    d * (x * y)⁻¹ ≤ p := by sorry
+theorem inv_nonneg {x : ℚ₀} (hx : 0 ≤ x) (h_ne : x ≠ 0) : 0 ≤ x⁻¹ := by
+  sorry
+
+theorem inv_bound_lemma (x y d p Z : ℚ₀) (hx : 0 ≤ x) (hy : 0 ≤ y) (hd : 0 ≤ d) (hp : 0 ≤ p)
+    (hZ_pos : 0 ≤ Z) (hZ_nz : Z ≠ 0)
+    (h_Z_le : Z ≤ x * y)
+    (h_diff : d ≤ p * Z) :
+    d * (x * y)⁻¹ ≤ p := by 
+  have h_xy_nonneg : 0 ≤ x * y := mul_nonneg hx hy
+  have h_xy_nz : x * y ≠ 0 := by
+    intro h_eq_0
+    rw [h_eq_0] at h_Z_le
+    have h_Z_eq_0 : Z = 0 := ℚ₀.le_antisymm h_Z_le hZ_pos
+    exact hZ_nz h_Z_eq_0
+  have h_xy_inv_nonneg : 0 ≤ (x * y)⁻¹ := inv_nonneg h_xy_nonneg h_xy_nz
+  have h_pZ_le_pxy : p * Z ≤ p * (x * y) := mul_le_mul_left_of_nonneg h_Z_le hp
+  have h_d_le_pxy : d ≤ p * (x * y) := ℚ₀.le_trans h_diff h_pZ_le_pxy
+  have h_mul_inv : d * (x * y)⁻¹ ≤ (p * (x * y)) * (x * y)⁻¹ := mul_le_mul_right_of_nonneg h_d_le_pxy h_xy_inv_nonneg
+  have h_assoc : (p * (x * y)) * (x * y)⁻¹ = p * ((x * y) * (x * y)⁻¹) := by rw [ℚ₀.mul_assoc]
+  have h_cancel : (x * y) * (x * y)⁻¹ = 1 := mul_inv_cancel h_xy_nz
+  rw [h_assoc, h_cancel, ℚ₀.mul_one] at h_mul_inv
+  exact h_mul_inv
 
 theorem cauchy_inv_is_cauchy (f : CauchySeq) (h : CauchySeq.ApartZero f) :
     ℚ₀.IsCauchy (fun n => (f.val (Peano.Add.add n (CauchySeq.invBound f h)))⁻¹) := by

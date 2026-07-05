@@ -21,3 +21,21 @@ Para lo anterior solo tenemos que suponer $n \in \mathbb{N}_2$ y $p \in \mathbb{
 El único problema del anterior razonamiento es que es de tipo existencial y en este proyecto queremos una prueba que no use $\neg \neg P \implies P$ ni $P \lor \neg P$.
 
 ---
+
+Vamos a desarrollar un algoritmo que nos de una sucesión de racionales que tienda a $\sqrt[n]{m}$, aunque por ahora no hemos demostrado que exista semejante cosa. La función inversa a esto sí que la tenemos en $\mathbb{N}$, $f_n(m) := m^n$. $f_n^\prime (m) = n \cdot m^{n-1}$, dónde $n \gt 1$.
+
+El algoritmo que usaremos es (aparte de tomar una semilla inicial), el siguiente (Newton-Raphson):
+
+$$ x_{k+1} := \frac{1}{n} \left( (n-1) x_k + \frac{m}{x_k^{n-1}} \right) $$
+
+¿Cómo podríamos interpretarlo en términos de sucesiones? Tenemos: 
+
+$$\nu_{\text{NR}} : \mathbb{N}_0 \to \mathbb{Q}_0 := k \mapsto \frac{1}{k} \left( (k-1) \nu_{\text{NR}}_k + \frac{m}{\nu_{\text{NR}}_k^{n-1}} \right)$$
+
+y nos falta aún hallar el término $\nu_{\text{NR}}(0)$. Podríamos primero tomar una cota superior, $\nu_{\text{NR}}(0) := m$ por ejemplo. Con $\nu_{\text{NR}}(0) := m$ tenemos por ejemplo:
+
+$$|\nu_{\text{NR}}(k) - \sqrt[n]{m}| \le |\nu_{\text{NR}}(k-1) - \sqrt[n]{m}|^n$$
+
+Ahora nos falta dar una función $\nu : \mathbb{Q}_{>0} \to \mathbb{N}_0$ tal que: $\forall \varepsilon \in \mathbb{Q}_{>0}, \forall k,l \in \mathbb{N}_0, k,l > \nu(\varepsilon) \implies |\nu_{\text{NR}}(k) - \nu_{\text{NR}}(l)| < \varepsilon$
+
+---
