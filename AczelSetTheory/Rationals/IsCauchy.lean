@@ -118,6 +118,32 @@ theorem pow2_add (n m : ℕ₀) : pow2 (Peano.Add.add n m) = Mul.mul (pow2 n) (p
   apply congrArg ℤ₀.ofNat
   exact Eq.symm (Peano.Pow.pow_add_eq_mul_pow (σ (σ 𝟘)) n m)
 
+theorem pow2_le_one (k : ℕ₀) : pow2 k ≤ ofNat₀ 𝟙 := by
+  have h_pow2_def : pow2 k = ℚ₀.mk (ℤ₀.ofNat (σ 𝟘)) (pow2_den k) := rfl
+  have h_one_def : ofNat₀ 𝟙 = ℚ₀.mk (ℤ₀.ofNat (σ 𝟘)) den1 := rfl
+  rw [h_pow2_def, h_one_def, ℚ₀.mk_le_mk]
+  have h_den1 : ℤ₀.ofNat den1.val = 1 := rfl
+  have h_num : ℤ₀.ofNat (σ 𝟘) = 1 := rfl
+  rw [h_num, h_den1, ℤ₀.mul_one, ℤ₀.one_mul]
+  have h_den_pos : 1 ≤ ℤ₀.ofNat (pow2_den k).val := by
+    change ℤ₀.ofNat 𝟙 ≤ ℤ₀.ofNat (pow2_den k).val
+    rw [ℤ₀.le_ofNat_iff]
+    have h_ne_0 := (pow2_den k).property
+    match h_val : (pow2_den k).val with
+    | 𝟘 => rw [h_val] at h_ne_0; exact False.elim (h_ne_0 rfl)
+    | σ y =>
+      change Peano.Order.le₀ 𝟙 (σ y)
+      exact Peano.Order.succ_le_succ_if (Peano.Order.zero_le y)
+  exact h_den_pos
+theorem pow2_ne_zero (k : ℕ₀) : ℚ₀.pow2 k ≠ 0 := by
+  intro h
+  have h_pow2_def : ℚ₀.pow2 k = ℚ₀.mk (ℤ₀.ofNat (σ 𝟘)) (ℚ₀.pow2_den k) := rfl
+  have h_zero_def : (0 : ℚ₀) = ℚ₀.mk (ℤ₀.ofNat 𝟘) den1 := rfl
+  rw [h_pow2_def, h_zero_def] at h
+  have hz := ℚ₀.mk_eq_zero_iff.mp h
+  have hz_inj := ℤ₀.ofNat_injective hz
+  exact Peano.Axioms.succ_neq_zero 𝟘 hz_inj
+
 theorem pow2_bound (K : ℕ₀) : Mul.mul (ofNat₀ K) (pow2 K) ≤ ofNat₀ 𝟙 := by
   rw [ofNat₀_eq_mk K, ofNat₀_eq_mk 𝟙]
   dsimp [pow2]

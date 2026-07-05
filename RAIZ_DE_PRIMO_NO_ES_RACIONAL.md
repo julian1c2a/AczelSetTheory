@@ -36,6 +36,6 @@ y nos falta aún hallar el término $\nu_{\text{NR}}(0)$. Podríamos primero tom
 
 $$|\nu_{\text{NR}}(k) - \sqrt[n]{m}| \le |\nu_{\text{NR}}(k-1) - \sqrt[n]{m}|^n$$
 
-Ahora nos falta dar una función $\nu : \mathbb{Q}_{>0} \to \mathbb{N}_0$ tal que: $\forall \varepsilon \in \mathbb{Q}_{>0}, \forall k,l \in \mathbb{N}_0, k,l > \nu(\varepsilon) \implies |\nu_{\text{NR}}(k) - \nu_{\text{NR}}(l)| < \varepsilon$
+Ahora nos falta dar una función $\nu : \mathbb{Q}_{>0} \to \mathbb{N}_0$ tal que: $\forall \varepsilon \in \mathbb{Q}_{>0}, \forall k,l \in \mathbb{N}_0, k l > \nu(\varepsilon) , l > \nu(\varepsilon) \implies |\nu_{\text{NR}}(k) - \nu_{\text{NR}}(l)| < \varepsilon$
 
 ---

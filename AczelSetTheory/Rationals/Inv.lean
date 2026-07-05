@@ -233,6 +233,32 @@ theorem inv_sub_inv_eq (x y : ℚ₀) (hx : x ≠ 0) (hy : y ≠ 0) :
   rw [ℚ₀.mul_assoc, mul_inv_cancel h_xy_ne_0, mul_one] at h2
   exact h2
 
+theorem inv_nonneg {x : ℚ₀} (hx : 0 ≤ x) (h_ne : x ≠ 0) : 0 ≤ x⁻¹ := by
+  revert hx h_ne
+  refine Quotient.inductionOn x (fun p hx h_ne => ?_)
+  change 0 ≤ (mk p.1 p.2)⁻¹
+  rw [inv_mk]
+  have ha : p.1 ≠ 0 := by
+    intro ha_zero
+    apply h_ne
+    exact mk_eq_zero_iff.mpr ha_zero
+  unfold invRaw
+  rw [if_neg ha]
+  have hpos : 0 ≤ p.1 := by
+    change 0 ≤ mk p.1 p.2 at hx
+    have h_zero : (0 : ℚ₀) = mk 0 den1 := rfl
+    rw [h_zero, mk_le_mk] at hx
+    have h_den : ℤ₀.ofNat den1.val = 1 := rfl
+    rw [h_den, ℤ₀.mul_one, ℤ₀.zero_mul] at hx
+    exact hx
+  rw [if_pos hpos]
+  change 0 ≤ mk (ℤ₀.ofNat p.2.val) (invDen p.1)
+  have h_zero : (0 : ℚ₀) = mk 0 den1 := rfl
+  rw [h_zero, mk_le_mk]
+  have h_den : ℤ₀.ofNat den1.val = 1 := rfl
+  rw [h_den, ℤ₀.mul_one, ℤ₀.zero_mul]
+  exact ℤ₀.zero_le_ofNat _
+
 end
 
 

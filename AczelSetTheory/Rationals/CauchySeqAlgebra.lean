@@ -393,9 +393,6 @@ theorem absVal_inv_sub_inv (x y : ℚ₀) (hx : x ≠ 0) (hy : y ≠ 0) :
   rw [absVal_inv _ h_xy_ne_0]
   rw [ℚ₀.absVal_mul]
 
-theorem inv_nonneg {x : ℚ₀} (hx : 0 ≤ x) (h_ne : x ≠ 0) : 0 ≤ x⁻¹ := by
-  sorry
-
 theorem inv_bound_lemma (x y d p Z : ℚ₀) (hx : 0 ≤ x) (hy : 0 ≤ y) (hd : 0 ≤ d) (hp : 0 ≤ p)
     (hZ_pos : 0 ≤ Z) (hZ_nz : Z ≠ 0)
     (h_Z_le : Z ≤ x * y)
@@ -474,10 +471,57 @@ theorem cauchy_inv_is_cauchy (f : CauchySeq) (h : CauchySeq.ApartZero f) :
       absVal_inv_sub_inv fnK fmK hfnK_ne_0 hfmK_ne_0
     exact h_sub
     
-  have h_f_cauchy := f.property (Peano.Add.add n K) (Peano.Add.add m K)
+  have h_f_cauchy := f.property (Peano.Add.add m K) (Peano.Add.add n K)
   
-  -- Combining bounds
-  sorry
+  let x := ℚ₀.absVal fnK
+  let y := ℚ₀.absVal fmK
+  let d := ℚ₀.absVal (fmK - fnK)
+  let p := ℚ₀.pow2 (Peano.Lattice.min n m)
+  let k := CauchySeq.ApartZero.k f h
+  let Z := ℚ₀.pow2 (Peano.Add.add k k)
+  
+  have hx : 0 ≤ x := ℚ₀.absVal_nonneg fnK
+  have hy : 0 ≤ y := ℚ₀.absVal_nonneg fmK
+  have hd : 0 ≤ d := ℚ₀.absVal_nonneg (fmK - fnK)
+  have hp : 0 ≤ p := ℚ₀.pow2_nonneg (Peano.Lattice.min n m)
+  have hZ_pos : 0 ≤ Z := ℚ₀.pow2_nonneg (Peano.Add.add k k)
+  
+  have hZ_nz : Z ≠ 0 := by
+    intro hz
+    have h_k_ne : ℚ₀.pow2 k ≠ 0 := pow2_ne_zero k
+    have h_add_pow2 : Z = Mul.mul (ℚ₀.pow2 k) (ℚ₀.pow2 k) := ℚ₀.pow2_add k k
+    rw [h_add_pow2] at hz
+    exact mul_ne_zero h_k_ne h_k_ne hz
+
+  have h_Z_le : Z ≤ Mul.mul x y := by
+    have h_add_pow2 : Z = Mul.mul (ℚ₀.pow2 k) (ℚ₀.pow2 k) := ℚ₀.pow2_add k k
+    rw [h_add_pow2]
+    exact ℚ₀.mul_le_mul h_pow2_le_abs_fnK h_pow2_le_abs_fmK (ℚ₀.pow2_nonneg k) (ℚ₀.pow2_nonneg k)
+
+  have h_diff : d ≤ Mul.mul p Z := by
+    have h_pow2_add : ℚ₀.pow2 (Peano.Add.add (Peano.Lattice.min n m) K) = Mul.mul p (ℚ₀.pow2 K) := ℚ₀.pow2_add _ _
+    have h_min_add : Peano.Lattice.min (Peano.Add.add m K) (Peano.Add.add n K) = Peano.Add.add (Peano.Lattice.min m n) K := 
+      Peano.Arith.min_add_add_right m n K
+    have h_min_comm : Peano.Lattice.min m n = Peano.Lattice.min n m := Peano.Lattice.min_comm m n
+    have h_d_le_pow2K : d ≤ ℚ₀.pow2 (Peano.Lattice.min (Peano.Add.add m K) (Peano.Add.add n K)) := h_f_cauchy
+    rw [h_min_add, h_min_comm, h_pow2_add] at h_d_le_pow2K
+    have h_K_def : K = Peano.Add.add (CauchySeq.ApartZero.N f h) (Peano.Add.add k k) := rfl
+    have h_pow2_K : ℚ₀.pow2 K = Mul.mul (ℚ₀.pow2 (CauchySeq.ApartZero.N f h)) Z := by
+      rw [h_K_def]
+      exact ℚ₀.pow2_add _ _
+    have h_pow2_N_le_1 : ℚ₀.pow2 (CauchySeq.ApartZero.N f h) ≤ ℚ₀.ofNat₀ 𝟙 := ℚ₀.pow2_le_one _
+    have h_pow2_K_le_Z : ℚ₀.pow2 K ≤ Z := by
+      rw [h_pow2_K]
+      have h1 : Mul.mul (ℚ₀.pow2 (CauchySeq.ApartZero.N f h)) Z ≤ Mul.mul (ℚ₀.ofNat₀ 𝟙) Z := ℚ₀.mul_le_mul_right_of_nonneg h_pow2_N_le_1 hZ_pos
+      have h2 : Mul.mul (ℚ₀.ofNat₀ 𝟙) Z = Z := ℚ₀.one_mul Z
+      rw [h2] at h1
+      exact h1
+    have h_p_pow2_K_le_pZ : Mul.mul p (ℚ₀.pow2 K) ≤ Mul.mul p Z := ℚ₀.mul_le_mul_left_of_nonneg h_pow2_K_le_Z hp
+    exact ℚ₀.le_trans h_d_le_pow2K h_p_pow2_K_le_pZ
+
+  have h_bound := inv_bound_lemma x y d p Z hx hy hd hp hZ_pos hZ_nz h_Z_le h_diff
+  rw [h_eq]
+  exact h_bound
 
 /-- El inverso de una sucesión de Cauchy está definido si la sucesión
 está estrictamente alejada de cero (ApartZero f). -/
