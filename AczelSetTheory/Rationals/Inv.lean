@@ -20,15 +20,11 @@ private theorem absNat_ne_zero {z : ℤ₀} (h : z ≠ 0) : absNat z ≠ 𝟘 :=
   have h_z_zero : z = 0 := ℤ₀.abs_eq_zero_iff.mp h_abs_zero
   exact h h_z_zero
 
-noncomputable section
-
-open Classical
-
-private noncomputable def invDen (z : ℤ₀) : ℕ₁ :=
+private def invDen (z : ℤ₀) : ℕ₁ :=
   if h : z = 0 then ⟨𝟙, succ_neq_zero 𝟘⟩
   else ⟨absNat z, absNat_ne_zero h⟩
 
-private noncomputable def invRaw (p : ℤ₀ × ℕ₁) : ℤ₀ × ℕ₁ :=
+private def invRaw (p : ℤ₀ × ℕ₁) : ℤ₀ × ℕ₁ :=
   if p.1 = 0 then (0, ⟨𝟙, succ_neq_zero 𝟘⟩)
   else if 0 ≤ p.1 then (ℤ₀.ofNat p.2.val, invDen p.1)
   else (- ℤ₀.ofNat p.2.val, invDen p.1)

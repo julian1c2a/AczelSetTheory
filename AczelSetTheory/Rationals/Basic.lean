@@ -582,8 +582,15 @@ theorem neg_le_neg {a b : ℚ₀} (h : a ≤ b) : Neg.neg b ≤ Neg.neg a := by
       exact ℤ₀.neg_le_neg h
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- Decidibilidad del orden
+-- Decidibilidad del orden y de la igualdad
 -- ─────────────────────────────────────────────────────────────────────────────
+
+instance instDecidableEq (a b : ℚ₀) : Decidable (a = b) := by
+  refine Quotient.recOnSubsingleton₂ a b (fun p q => ?_)
+  have hd : Decidable (ratEq p q) := by
+    show Decidable (Mul.mul p.1 (ℤ₀.ofNat q.2.val) = Mul.mul q.1 (ℤ₀.ofNat p.2.val))
+    exact ℤ₀.instDecidableEq _ _
+  exact decidable_of_iff (ratEq p q) ⟨fun h => Quotient.sound h, fun h => Quotient.exact h⟩
 
 instance instDecidableLE (a b : ℚ₀) : Decidable (a ≤ b) := by
   refine Quotient.recOnSubsingleton₂ a b (fun p q => ?_)

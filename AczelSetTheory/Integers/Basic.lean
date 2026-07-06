@@ -502,4 +502,14 @@ theorem repr_mul_ofNat_intEq (a : ℤ₀) (k : ℕ₀) :
   simp only [Peano.Mul.add_mul] at h2k
   omega₀
 
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Decidibilidad de la Igualdad
+-- ─────────────────────────────────────────────────────────────────────────────
+
+instance instDecidableEq (a b : ℤ₀) : Decidable (a = b) :=
+  if h : a.repr = b.repr then
+    isTrue (repr_inj h)
+  else
+    isFalse (fun heq => h (congrArg repr heq))
+
 end ℤ₀

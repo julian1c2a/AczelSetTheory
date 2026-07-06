@@ -22,7 +22,7 @@ Aproximación por el método de Newton-Raphson.
 Para calcular la raíz n-ésima de m, se itera:
 x_{k+1} = (1 / n) * ((n - 1) * x_k + m / (x_k ^ (n - 1)))
 -/
-noncomputable def newton_raphson_step (m : ℕ₀) (n : Peano.ℕ₂) (x : ℚ₀) : ℚ₀ :=
+def newton_raphson_step (m : ℕ₀) (n : Peano.ℕ₂) (x : ℚ₀) : ℚ₀ :=
   -- Si m = 0 o m = 1, la sucesión es constante y vale m (evitamos divisiones por cero u otras indefiniciones)
   if m = 𝟘 ∨ m = 𝟙 then
     ofNat₀ m
@@ -40,7 +40,7 @@ noncomputable def newton_raphson_step (m : ℕ₀) (n : Peano.ℕ₂) (x : ℚ�
 Sucesión de aproximaciones de Newton-Raphson para la raíz n-ésima de m.
 Comienza con la semilla x_0 = m.
 -/
-noncomputable def newton_raphson_seq (m : ℕ₀) (n : Peano.ℕ₂) : ℕ₀ → ℚ₀
+def newton_raphson_seq (m : ℕ₀) (n : Peano.ℕ₂) : ℕ₀ → ℚ₀
   | 𝟘 => ofNat₀ m
   | σ k => newton_raphson_step m n (newton_raphson_seq m n k)
 
