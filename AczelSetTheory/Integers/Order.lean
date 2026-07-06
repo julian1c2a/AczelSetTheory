@@ -39,14 +39,14 @@ instance : LT ℤ₀ where
 -- omega₀ requires @LE.le ℕ₀ (not le₀) so helpers expose ≤ notation.
 -- ─────────────────────────────────────────────────────────────────────────────
 
-private theorem le_iff (a b : ℤ₀) :
+theorem le_iff (a b : ℤ₀) :
     a ≤ b ↔ (add a.repr.1 b.repr.2 : ℕ₀) ≤ add a.repr.2 b.repr.1 :=
   Iff.rfl
 
-private theorem le_iff_mp {a b : ℤ₀} (h : a ≤ b) :
+theorem le_iff_mp {a b : ℤ₀} (h : a ≤ b) :
     (add a.repr.1 b.repr.2 : ℕ₀) ≤ add a.repr.2 b.repr.1 := h
 
-private theorem le_iff_mpr {a b : ℤ₀}
+theorem le_iff_mpr {a b : ℤ₀}
     (h : (add a.repr.1 b.repr.2 : ℕ₀) ≤ add a.repr.2 b.repr.1) : a ≤ b := h
 
 -- ─────────────────────────────────────────────────────────────────────────────
