@@ -111,4 +111,20 @@ theorem rational_not_root (a : ℤ₀) (b : ℕ₁) (m : ℤ₀) (n : ℕ₀)
   rw [h_powZ_b] at heq
   exact h_irr_spec heq
 
+def pow_bound (x y : ℚ₀) : ℕ₀ → ℚ₀
+  | 𝟘 => 0
+  | σ k => Add.add (Mul.mul x (pow_bound x y k)) (pow y k)
+
+theorem pow_sub_eq (x y : ℚ₀) (n : ℕ₀) : 
+  pow x n = Add.add (pow y n) (Mul.mul (Sub.sub x y) (pow_bound x y n)) := sorry
+
+theorem pow_bound_mono (x1 x2 y : ℚ₀) (h : x1 ≤ x2) (n : ℕ₀) : 
+  pow_bound x1 y n ≤ pow_bound x2 y n := sorry
+
+theorem newton_seq_apart_lt (q r : ℚ₀) (n : ℕ₂) (h : pow r n.val < q) :
+  ∃ δ > (0:ℚ₀), ∀ k, δ ≤ Sub.sub (newton_raphson_seq q n k) r := sorry
+
+theorem newton_seq_apart_gt (q r : ℚ₀) (n : ℕ₂) (h : q < pow r n.val) :
+  ∃ N : ℕ₀, ∃ δ > (0:ℚ₀), ∀ k, N ≤ k → δ ≤ Sub.sub r (newton_raphson_seq q n k) := sorry
+
 end ℚ₀
