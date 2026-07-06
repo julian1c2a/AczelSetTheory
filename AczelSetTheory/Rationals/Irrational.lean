@@ -223,10 +223,126 @@ theorem pow_bound_mono (x1 x2 y : ℚ₀) (hx1 : 0 ≤ x1) (hy : 0 ≤ y) (h : x
     have step3 : Mul.mul x1 (pow_bound x1 y k) ≤ Mul.mul x2 (pow_bound x2 y k) := le_trans step1 step2
     exact add_le_add_right step3 (pow y k)
 
-theorem newton_seq_apart_lt (q r : ℚ₀) (n : ℕ₂) (h : pow r n.val < q) :
-  ∃ δ > (0:ℚ₀), ∀ k, δ ≤ Sub.sub (newton_raphson_seq q n k) r := sorry
+theorem pow_bound_pos_succ (x y : ℚ₀) (hx : 0 < x) (hy : 0 ≤ y) (k : ℕ₀) : 0 < pow_bound x y (σ k) := by
+  induction k with
+  | zero =>
+    change 0 < pow_bound x y 1
+    have h1 : pow_bound x y 1 = Add.add (Mul.mul x 0) 1 := rfl
+    rw [h1]
+    have hm : Mul.mul x 0 = 0 := mul_zero x
+    rw [hm, zero_add]
+    exact zero_lt_one
+  | succ k' ih =>
+    have h_step : pow_bound x y (σ (σ k')) = Add.add (Mul.mul x (pow_bound x y (σ k'))) (pow y (σ k')) := rfl
+    rw [h_step]
+    have h1 : 0 < Mul.mul x (pow_bound x y (σ k')) := mul_pos_pub hx ih
+    have h2 : 0 ≤ pow y (σ k') := pow_nonneg y hy _
+    rw [add_comm]
+    exact add_pos_of_nonneg_of_pos h2 h1
 
-theorem newton_seq_apart_gt (q r : ℚ₀) (n : ℕ₂) (h : q < pow r n.val) :
-  ∃ N : ℕ₀, ∃ δ > (0:ℚ₀), ∀ k, N ≤ k → δ ≤ Sub.sub r (newton_raphson_seq q n k) := sorry
+theorem pow_bound_pos (x y : ℚ₀) (hx : 0 < x) (hy : 0 ≤ y) (n : ℕ₀) (hn : n ≠ 0) : 0 < pow_bound x y n := by
+  cases n with
+  | zero => exact False.elim (hn rfl)
+  | succ k => exact pow_bound_pos_succ x y hx hy k
+
+theorem sub_pos_of_lt {a b : ℚ₀} (h : b < a) : 0 < Sub.sub a b := by
+  have h_le : 0 ≤ Sub.sub a b := by
+    have h1 : Add.add b (Neg.neg b) ≤ Add.add a (Neg.neg b) := add_le_add_right h.1 (Neg.neg b)
+    have h2 : Add.add b (Neg.neg b) = 0 := add_neg_self b
+    rw [h2] at h1
+    exact h1
+  have h_not_le : ¬(Sub.sub a b ≤ 0) := by
+    intro hc
+    have hc_eq : Sub.sub a b = 0 := le_antisymm hc h_le
+    have hc3 : Add.add (Sub.sub a b) b = Add.add 0 b := congrArg (fun z => Add.add z b) hc_eq
+    have ha : Add.add (Sub.sub a b) b = a := by
+      have hd : Sub.sub a b = Add.add a (Neg.neg b) := rfl
+      rw [hd, add_assoc, neg_add_self, add_zero]
+    rw [zero_add] at hc3
+    rw [ha] at hc3
+    have h_a_le_b : a ≤ b := by rw [hc3]; exact le_refl b
+    exact h.2 h_a_le_b
+  exact ⟨h_le, h_not_le⟩
+
+theorem sub_nonneg_of_mul_nonneg (A B c : ℚ₀) (hB : 0 ≤ B) (hc : 0 < c) (h_mul : c ≤ Mul.mul A B) : 0 ≤ A := by
+  cases le_total 0 A with
+  | inl h_pos => exact h_pos
+  | inr h_neg =>
+    have h1 : Mul.mul A B ≤ Mul.mul 0 B := mul_le_mul_right_of_nonneg h_neg hB
+    have hm : Mul.mul 0 B = 0 := zero_mul B
+    rw [hm] at h1
+    have h2 : c ≤ 0 := le_trans h_mul h1
+    exact False.elim (hc.2 h2)
+
+theorem newton_seq_apart_lt (q r : ℚ₀) (n : ℕ₂) (hq : 0 < q) (hr : 0 ≤ r) (h : pow r n.val.val < q) :
+  ∃ N : ℕ₀, ∃ δ > (0:ℚ₀), ∀ k, Peano.Order.le₀ N k → δ ≤ Sub.sub (newton_raphson_seq q n k) r := by
+  exists 1
+  let c := Sub.sub q (pow r n.val.val)
+  have hc : 0 < c := sub_pos_of_lt h
+  let x1 := newton_raphson_seq q n 1
+  have hx1 : 0 < x1 := newton_seq_pos q n hq 1
+  let M := pow_bound x1 r n.val.val
+  have hM_pos : 0 < M := pow_bound_pos x1 r hx1 hr n.val.val n.val.property
+  let delta := Mul.mul c (inv M)
+  have h_delta_pos : 0 < delta := mul_pos_pub hc (inv_pos hM_pos)
+  exists delta
+  exists h_delta_pos
+  intro k hk
+  cases k with
+  | zero =>
+    cases hk with
+    | inl h_lt =>
+      cases h_lt
+    | inr h_eq =>
+      cases h_eq
+  | succ k' =>
+    let x_k := newton_raphson_seq q n (σ k')
+    have h_q_le_xk_n : q ≤ pow x_k n.val.val := newton_seq_pow_ge q n hq k'
+    have h_sub_le : c ≤ Sub.sub (pow x_k n.val.val) (pow r n.val.val) := add_le_add_right h_q_le_xk_n _
+    have h_pow_sub_eq : pow x_k n.val.val = Add.add (pow r n.val.val) (Mul.mul (Sub.sub x_k r) (pow_bound x_k r n.val.val)) := pow_sub_eq x_k r n.val.val
+    have h_sub_eq : Sub.sub (pow x_k n.val.val) (pow r n.val.val) = Mul.mul (Sub.sub x_k r) (pow_bound x_k r n.val.val) := by
+      have hd1 : Sub.sub (pow x_k n.val.val) (pow r n.val.val) = Add.add (pow x_k n.val.val) (Neg.neg (pow r n.val.val)) := rfl
+      rw [hd1, h_pow_sub_eq]
+      rw [add_assoc, add_comm (Mul.mul _ _) _, ←add_assoc, add_neg_self, zero_add]
+    rw [h_sub_eq] at h_sub_le
+    have h_x_le_x1 : x_k ≤ x1 := newton_seq_le_x1 q n hq k'
+    have hxk_pos : 0 < x_k := newton_seq_pos q n hq (σ k')
+    have h_B_le_M : pow_bound x_k r n.val.val ≤ M := pow_bound_mono x_k x1 r (le_of_lt hxk_pos) hr h_x_le_x1 n.val.val
+    have hB_pos : 0 < pow_bound x_k r n.val.val := pow_bound_pos x_k r hxk_pos hr n.val.val n.val.property
+    have h_diff_nonneg : 0 ≤ Sub.sub x_k r := sub_nonneg_of_mul_nonneg _ _ c hB_pos.1 hc h_sub_le
+    have h_B_mul : Mul.mul (Sub.sub x_k r) (pow_bound x_k r n.val.val) ≤ Mul.mul (Sub.sub x_k r) M := mul_le_mul_left_of_nonneg h_B_le_M h_diff_nonneg
+    have h_c_le_diff_M : c ≤ Mul.mul (Sub.sub x_k r) M := le_trans h_sub_le h_B_mul
+    have h_mul_inv : Mul.mul c (inv M) ≤ Mul.mul (Mul.mul (Sub.sub x_k r) M) (inv M) := mul_le_mul_right_of_nonneg h_c_le_diff_M (inv_pos hM_pos).1
+    have h_assoc : Mul.mul (Mul.mul (Sub.sub x_k r) M) (inv M) = Mul.mul (Sub.sub x_k r) (Mul.mul M (inv M)) := mul_assoc _ _ _
+    have hM_ne_zero : M ≠ 0 := by 
+      intro hM_eq
+      have hM_le : M ≤ 0 := by rw [hM_eq]; exact le_refl 0
+      exact hM_pos.2 hM_le
+    have h_M_inv : Mul.mul M (inv M) = 1 := mul_inv_cancel hM_ne_zero
+    have h_mul_one : Mul.mul (Sub.sub x_k r) 1 = Sub.sub x_k r := mul_one _
+    rw [h_assoc, h_M_inv, h_mul_one] at h_mul_inv
+    exact h_mul_inv
+
+theorem newton_seq_anti (q : ℚ₀) (n : ℕ₂) (hq : 0 < q) (N k : ℕ₀) (h : Peano.Order.le₀ N k) :
+  newton_raphson_seq q n k ≤ newton_raphson_seq q n N := sorry
+
+theorem newton_seq_eventually_lt (q r : ℚ₀) (n : ℕ₂) (hq : 0 < q) (h : q < pow r n.val.val) :
+  ∃ N : ℕ₀, newton_raphson_seq q n N < r := sorry
+
+theorem newton_seq_apart_gt (q r : ℚ₀) (n : ℕ₂) (hq : 0 < q) (hr : 0 ≤ r) (h : q < pow r n.val.val) :
+  ∃ N : ℕ₀, ∃ δ > (0:ℚ₀), ∀ k, Peano.Order.le₀ N k → δ ≤ Sub.sub r (newton_raphson_seq q n k) := by
+  have h_exists_N : ∃ N : ℕ₀, newton_raphson_seq q n N < r := newton_seq_eventually_lt q r n hq h
+  cases h_exists_N with
+  | intro N h_xN_lt_r =>
+    let x_N := newton_raphson_seq q n N
+    have h_delta_pos : 0 < Sub.sub r x_N := sub_pos_of_lt h_xN_lt_r
+    exists N
+    exists (Sub.sub r x_N)
+    exists h_delta_pos
+    intro k hk
+    have h_anti : newton_raphson_seq q n k ≤ x_N := newton_seq_anti q n hq N k hk
+    have h_neg : Neg.neg x_N ≤ Neg.neg (newton_raphson_seq q n k) := neg_le_neg h_anti
+    have h_sub : Add.add r (Neg.neg x_N) ≤ Add.add r (Neg.neg (newton_raphson_seq q n k)) := add_le_add_left h_neg r
+    exact h_sub
 
 end ℚ₀

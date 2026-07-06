@@ -624,4 +624,12 @@ theorem newton_seq_monotone (q : ℚ₀) (n : Peano.ℕ₂) (hq : 0 < q) (k : �
     rw [h_left, h_right] at h_final_mul
     exact h_final_mul
 
+theorem newton_seq_le_x1 (q : ℚ₀) (n : ℕ₂) (hq : 0 < q) (k : ℕ₀) :
+  newton_raphson_seq q n (σ k) ≤ newton_raphson_seq q n 1 := by
+  induction k with
+  | zero => exact le_refl _
+  | succ k' ih =>
+    have h_mono := newton_seq_monotone q n hq k'
+    exact le_trans h_mono ih
+
 end ℚ₀
