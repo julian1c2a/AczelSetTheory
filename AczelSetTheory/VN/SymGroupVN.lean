@@ -28,6 +28,7 @@ License: MIT
 import AczelSetTheory.VN.Basic
 import Peano.PeanoNat.Combinatorics.Perm
 import AczelSetTheory.Axioms.Function
+import AczelSetTheory.Axioms.DecidableFunction
 import AczelSetTheory.Operations.FunctionComp
 import AczelSetTheory.Operations.Identity
 import AczelSetTheory.Operations.Inverse
@@ -56,18 +57,14 @@ theorem vnSeg_card (n : ℕ₀) : (vnSeg n).card = n :=
 -- Teoría Nativa en HFSet: SymHF y SymHFGroup
 -- ─────────────────────────────────────────────────────────────────
 
-noncomputable section
-
 /-- El conjunto de todas las biyecciones de A a A.
     Definido nativamente en HFSet mediante separación sobre 𝒫(A × A). -/
 def SymHF (A : HFSet) : HFSet :=
-  have : DecidablePred (fun f => isBijective f A A) := fun _ => Classical.propDecidable _
   HFSet.sep (HFSet.powerset (HFSet.cartProd A A))
     (fun f => isBijective f A A)
 
 theorem mem_SymHF_iff (A f : HFSet) :
   f ∈ SymHF A ↔ f ⊆ HFSet.cartProd A A ∧ isBijective f A A := by
-  have : DecidablePred (fun f => isBijective f A A) := fun _ => Classical.propDecidable _
   rw [SymHF, HFSet.mem_sep, HFSet.mem_powerset]
   rfl
 
@@ -144,10 +141,8 @@ def SymHFGroup (A : HFSet) : HFAlgebra.HFGroup where
     rw [mem_SymHF_iff] at hf
     exact relInv_funComp_idFunc hf.2
 
-end
-
 /-- El grupo simétrico concreto sobre el segmento de von Neumann S_n. -/
-noncomputable def SymVN (n : ℕ₀) : HFAlgebra.HFGroup :=
+def SymVN (n : ℕ₀) : HFAlgebra.HFGroup :=
   SymHFGroup (vN n)
 
 -- ─────────────────────────────────────────────────────────────────
