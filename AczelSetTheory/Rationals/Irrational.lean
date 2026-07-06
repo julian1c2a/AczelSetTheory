@@ -180,8 +180,48 @@ theorem pow_sub_eq (x y : ℚ₀) (n : ℕ₀) :
       exact Eq.trans step3 step4
     exact h_final
 
-theorem pow_bound_mono (x1 x2 y : ℚ₀) (h : x1 ≤ x2) (n : ℕ₀) : 
-  pow_bound x1 y n ≤ pow_bound x2 y n := sorry
+theorem pow_nonneg (y : ℚ₀) (hy : 0 ≤ y) (n : ℕ₀) : 0 ≤ pow y n := by
+  induction n with
+  | zero =>
+    have h : pow y 𝟘 = 1 := rfl
+    rw [h]
+    exact ofNat₀_nonneg 1
+  | succ k ih =>
+    have h : pow y (σ k) = Mul.mul y (pow y k) := rfl
+    rw [h]
+    exact mul_nonneg hy ih
+
+theorem pow_bound_nonneg (x y : ℚ₀) (hx : 0 ≤ x) (hy : 0 ≤ y) (n : ℕ₀) : 0 ≤ pow_bound x y n := by
+  induction n with
+  | zero =>
+    have h : pow_bound x y 𝟘 = 0 := rfl
+    rw [h]
+    exact le_refl 0
+  | succ k ih =>
+    have h : pow_bound x y (σ k) = Add.add (Mul.mul x (pow_bound x y k)) (pow y k) := rfl
+    rw [h]
+    have h1 : 0 ≤ Mul.mul x (pow_bound x y k) := mul_nonneg hx ih
+    have h2 : 0 ≤ pow y k := pow_nonneg y hy k
+    exact add_nonneg h1 h2
+
+theorem pow_bound_mono (x1 x2 y : ℚ₀) (hx1 : 0 ≤ x1) (hy : 0 ≤ y) (h : x1 ≤ x2) (n : ℕ₀) : 
+  pow_bound x1 y n ≤ pow_bound x2 y n := by
+  induction n with
+  | zero =>
+    have h1 : pow_bound x1 y 𝟘 = 0 := rfl
+    have h2 : pow_bound x2 y 𝟘 = 0 := rfl
+    rw [h1, h2]
+    exact le_refl 0
+  | succ k ih =>
+    have hb1 : pow_bound x1 y (σ k) = Add.add (Mul.mul x1 (pow_bound x1 y k)) (pow y k) := rfl
+    have hb2 : pow_bound x2 y (σ k) = Add.add (Mul.mul x2 (pow_bound x2 y k)) (pow y k) := rfl
+    rw [hb1, hb2]
+    have h_nonneg_B1 : 0 ≤ pow_bound x1 y k := pow_bound_nonneg x1 y hx1 hy k
+    have step1 : Mul.mul x1 (pow_bound x1 y k) ≤ Mul.mul x2 (pow_bound x1 y k) := mul_le_mul_right_of_nonneg h h_nonneg_B1
+    have hx2_nonneg : 0 ≤ x2 := le_trans hx1 h
+    have step2 : Mul.mul x2 (pow_bound x1 y k) ≤ Mul.mul x2 (pow_bound x2 y k) := mul_le_mul_left_of_nonneg ih hx2_nonneg
+    have step3 : Mul.mul x1 (pow_bound x1 y k) ≤ Mul.mul x2 (pow_bound x2 y k) := le_trans step1 step2
+    exact add_le_add_right step3 (pow y k)
 
 theorem newton_seq_apart_lt (q r : ℚ₀) (n : ℕ₂) (h : pow r n.val < q) :
   ∃ δ > (0:ℚ₀), ∀ k, δ ≤ Sub.sub (newton_raphson_seq q n k) r := sorry
