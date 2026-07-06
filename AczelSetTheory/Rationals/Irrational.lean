@@ -115,8 +115,70 @@ def pow_bound (x y : ℚ₀) : ℕ₀ → ℚ₀
   | 𝟘 => 0
   | σ k => Add.add (Mul.mul x (pow_bound x y k)) (pow y k)
 
+theorem add_sub_cancel' (x y : ℚ₀) : Add.add y (Sub.sub x y) = x := by
+  change Add.add y (Add.add x (Neg.neg y)) = x
+  rw [add_comm x (Neg.neg y)]
+  rw [← add_assoc]
+  rw [add_comm y (Neg.neg y)]
+  rw [neg_add_self y]
+  rw [zero_add]
+
+theorem mul_assoc_mul (a b c : ℚ₀) : Mul.mul (Mul.mul a b) c = Mul.mul a (Mul.mul b c) := mul_assoc a b c
+theorem mul_comm_mul (a b : ℚ₀) : Mul.mul a b = Mul.mul b a := mul_comm a b
+theorem add_assoc_add (a b c : ℚ₀) : Add.add (Add.add a b) c = Add.add a (Add.add b c) := add_assoc a b c
+theorem add_comm_add (a b : ℚ₀) : Add.add a b = Add.add b a := add_comm a b
+
 theorem pow_sub_eq (x y : ℚ₀) (n : ℕ₀) : 
-  pow x n = Add.add (pow y n) (Mul.mul (Sub.sub x y) (pow_bound x y n)) := sorry
+  pow x n = Add.add (pow y n) (Mul.mul (Sub.sub x y) (pow_bound x y n)) := by
+  induction n with
+  | zero =>
+    have h1 : pow x 𝟘 = 1 := rfl
+    have h2 : pow y 𝟘 = 1 := rfl
+    have h3 : pow_bound x y 𝟘 = 0 := rfl
+    rw [h1, h2, h3]
+    have h_mul : Mul.mul (Sub.sub x y) 0 = 0 := mul_zero _
+    rw [h_mul]
+    exact (add_zero _).symm
+  | succ k ih =>
+    have h_pow_x : pow x (σ k) = Mul.mul x (pow x k) := rfl
+    rw [h_pow_x]
+    rw [ih]
+    have hd1 : Mul.mul x (Add.add (pow y k) (Mul.mul (Sub.sub x y) (pow_bound x y k))) = Add.add (Mul.mul x (pow y k)) (Mul.mul x (Mul.mul (Sub.sub x y) (pow_bound x y k))) := left_distrib x _ _
+    rw [hd1]
+    have h_bound : pow_bound x y (σ k) = Add.add (Mul.mul x (pow_bound x y k)) (pow y k) := rfl
+    rw [h_bound]
+    have hd2 : Mul.mul (Sub.sub x y) (Add.add (Mul.mul x (pow_bound x y k)) (pow y k)) = Add.add (Mul.mul (Sub.sub x y) (Mul.mul x (pow_bound x y k))) (Mul.mul (Sub.sub x y) (pow y k)) := left_distrib (Sub.sub x y) _ _
+    rw [hd2]
+    have h_pow_y : pow y (σ k) = Mul.mul y (pow y k) := rfl
+    rw [h_pow_y]
+    have h1 : Mul.mul (Sub.sub x y) (Mul.mul x (pow_bound x y k)) = Mul.mul x (Mul.mul (Sub.sub x y) (pow_bound x y k)) := by
+      rw [← mul_assoc_mul, mul_comm_mul (Sub.sub x y) x, mul_assoc_mul]
+    rw [h1]
+    have h2 : Add.add (Mul.mul y (pow y k)) (Add.add (Mul.mul (Sub.sub x y) (Mul.mul x (pow_bound x y k))) (Mul.mul (Sub.sub x y) (pow y k))) = 
+              Add.add (Add.add (Mul.mul y (pow y k)) (Mul.mul (Sub.sub x y) (pow y k))) (Mul.mul (Sub.sub x y) (Mul.mul x (pow_bound x y k))) := by
+      have step1 := (add_assoc_add (Mul.mul y (pow y k)) (Mul.mul (Sub.sub x y) (Mul.mul x (pow_bound x y k))) (Mul.mul (Sub.sub x y) (pow y k))).symm
+      have step2 := congrArg (fun a => Add.add a (Mul.mul (Sub.sub x y) (pow y k))) (add_comm_add (Mul.mul y (pow y k)) (Mul.mul (Sub.sub x y) (Mul.mul x (pow_bound x y k))))
+      have step3 := add_assoc_add (Mul.mul (Sub.sub x y) (Mul.mul x (pow_bound x y k))) (Mul.mul y (pow y k)) (Mul.mul (Sub.sub x y) (pow y k))
+      have step4 := add_comm_add (Mul.mul (Sub.sub x y) (Mul.mul x (pow_bound x y k))) (Add.add (Mul.mul y (pow y k)) (Mul.mul (Sub.sub x y) (pow y k)))
+      exact Eq.trans step1 (Eq.trans step2 (Eq.trans step3 step4))
+    have h3 : Add.add (Mul.mul y (pow y k)) (Mul.mul (Sub.sub x y) (pow y k)) = Mul.mul x (pow y k) := by
+      have hd3 : Mul.mul (Add.add y (Sub.sub x y)) (pow y k) = Add.add (Mul.mul y (pow y k)) (Mul.mul (Sub.sub x y) (pow y k)) := right_distrib y (Sub.sub x y) (pow y k)
+      have hd3_symm := hd3.symm
+      have hsub := add_sub_cancel' x y
+      have hd3_sub := congrArg (fun a => Mul.mul a (pow y k)) hsub
+      exact Eq.trans hd3_symm hd3_sub
+    have h_final : Add.add (Mul.mul x (pow y k)) (Mul.mul x (Mul.mul (Sub.sub x y) (pow_bound x y k))) = 
+                   Add.add (Mul.mul y (pow y k)) (Add.add (Mul.mul x (Mul.mul (Sub.sub x y) (pow_bound x y k))) (Mul.mul (Sub.sub x y) (pow y k))) := by
+      have step1 := congrArg (fun a => Add.add a (Mul.mul x (Mul.mul (Sub.sub x y) (pow_bound x y k)))) h3.symm
+      have step2 := congrArg (fun a => Add.add (Add.add (Mul.mul y (pow y k)) (Mul.mul (Sub.sub x y) (pow y k))) a) h1.symm
+      have step3 := Eq.trans step1 step2
+      have step4_1 := add_assoc_add (Mul.mul y (pow y k)) (Mul.mul (Sub.sub x y) (pow y k)) (Mul.mul (Sub.sub x y) (Mul.mul x (pow_bound x y k)))
+      have step4_2 := congrArg (fun a => Add.add (Mul.mul y (pow y k)) a) (add_comm_add (Mul.mul (Sub.sub x y) (pow y k)) (Mul.mul (Sub.sub x y) (Mul.mul x (pow_bound x y k))))
+      have step4_3 := Eq.trans step4_1 step4_2
+      have step4_4 := congrArg (fun a => Add.add (Mul.mul y (pow y k)) (Add.add a (Mul.mul (Sub.sub x y) (pow y k)))) h1
+      have step4 := Eq.trans step4_3 step4_4
+      exact Eq.trans step3 step4
+    exact h_final
 
 theorem pow_bound_mono (x1 x2 y : ℚ₀) (h : x1 ≤ x2) (n : ℕ₀) : 
   pow_bound x1 y n ≤ pow_bound x2 y n := sorry
