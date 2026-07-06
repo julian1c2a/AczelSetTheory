@@ -265,9 +265,181 @@ theorem newton_seq_pos (q : ℚ₀) (n : Peano.ℕ₂) (hq : 0 < q) (k : ℕ₀)
       have h_inv_n_pos : 0 < inv (ofNat₀ n.val.val) := inv_pos (ofNat₀_pos n.val.property)
       exact mul_pos_pub h_inv_n_pos h_sum_pos
 
+theorem le_of_add_le_add_right {a b c : ℚ₀} (h : Add.add a c ≤ Add.add b c) : a ≤ b := by
+  have h1 : Add.add (Add.add a c) (Neg.neg c) ≤ Add.add (Add.add b c) (Neg.neg c) := add_le_add_right h (Neg.neg c)
+  have ha : Add.add (Add.add a c) (Neg.neg c) = a := by rw [add_assoc, add_neg_self, add_zero]
+  have hb : Add.add (Add.add b c) (Neg.neg c) = b := by rw [add_assoc, add_neg_self, add_zero]
+  rw [ha, hb] at h1
+  exact h1
+
+theorem le_add_right (a b : ℚ₀) (hb : 0 ≤ b) : a ≤ Add.add a b := by
+  have h1 : Add.add a 0 ≤ Add.add a b := add_le_add_left hb a
+  rw [add_zero] at h1
+  exact h1
+
+theorem le_add_left (a b : ℚ₀) (ha : 0 ≤ a) : b ≤ Add.add a b := by
+  have h1 : Add.add 0 b ≤ Add.add a b := add_le_add_right ha b
+  rw [zero_add] at h1
+  exact h1
+
+theorem le_of_lt {a b : ℚ₀} (h : a < b) : a ≤ b := h.1
+
+theorem le_w_sq_add_one {w : ℚ₀} (hw : 0 ≤ w) : w ≤ Add.add (Mul.mul w w) 1 := by
+  cases le_total 1 w with
+  | inl h1 =>
+    have h2 : Mul.mul w 1 ≤ Mul.mul w w := mul_le_mul_left_of_nonneg h1 hw
+    have hm : Mul.mul w 1 = w := mul_one w
+    rw [hm] at h2
+    have h3 : Mul.mul w w ≤ Add.add (Mul.mul w w) 1 := le_add_right _ _ (le_of_lt zero_lt_one)
+    exact le_trans h2 h3
+  | inr h2 =>
+    have hsq : 0 ≤ Mul.mul w w := mul_nonneg hw hw
+    have h3 : 1 ≤ Add.add (Mul.mul w w) 1 := le_add_left _ _ hsq
+    exact le_trans h2 h3
+
+theorem bernoulli_ineq_alt2 (w : ℚ₀) (hw : 0 ≤ w) (n : ℕ₀) :
+  Add.add (1:ℚ₀) (Mul.mul (ofNat₀ n) w) ≤ Add.add (pow w n) (ofNat₀ n) := by
+  let x := Add.add w (Neg.neg (1:ℚ₀))
+  have h_w_eq : Add.add (1:ℚ₀) x = w := by
+    have hc : Add.add (1:ℚ₀) x = Add.add (1:ℚ₀) (Add.add w (Neg.neg (1:ℚ₀))) := rfl
+    have hc2 : Add.add (1:ℚ₀) (Add.add w (Neg.neg (1:ℚ₀))) = Add.add (Add.add (1:ℚ₀) w) (Neg.neg (1:ℚ₀)) := (add_assoc _ _ _).symm
+    have hc3 : Add.add (1:ℚ₀) w = Add.add w (1:ℚ₀) := add_comm _ _
+    have hc4 : Add.add (Add.add w (1:ℚ₀)) (Neg.neg (1:ℚ₀)) = Add.add w (Add.add (1:ℚ₀) (Neg.neg (1:ℚ₀))) := add_assoc _ _ _
+    have hc5 : Add.add (1:ℚ₀) (Neg.neg (1:ℚ₀)) = (0:ℚ₀) := add_neg_self _
+    have hc6 : Add.add w (0:ℚ₀) = w := add_zero _
+    rw [hc, hc2, hc3, hc4, hc5, hc6]
+  
+  have hx_cond : (0:ℚ₀) ≤ Add.add (1:ℚ₀) x := by
+    rw [h_w_eq]
+    exact hw
+    
+  have h_bern := bernoulli_ineq x hx_cond n
+  
+  have h_nx : Mul.mul (ofNat₀ n) x = Add.add (Mul.mul (ofNat₀ n) w) (Neg.neg (ofNat₀ n)) := by
+    have d : Mul.mul (ofNat₀ n) x = Add.add (Mul.mul (ofNat₀ n) w) (Mul.mul (ofNat₀ n) (Neg.neg (1:ℚ₀))) := left_distrib _ _ _
+    have mn : Mul.mul (ofNat₀ n) (Neg.neg (1:ℚ₀)) = Neg.neg (Mul.mul (ofNat₀ n) (1:ℚ₀)) := mul_neg _ _
+    have mo : Mul.mul (ofNat₀ n) (1:ℚ₀) = ofNat₀ n := mul_one _
+    rw [d, mn, mo]
+    
+  have h_lhs : Add.add (1:ℚ₀) (Mul.mul (ofNat₀ n) x) = Add.add (Add.add (1:ℚ₀) (Mul.mul (ofNat₀ n) w)) (Neg.neg (ofNat₀ n)) := by
+    rw [h_nx, ← add_assoc]
+    
+  rw [h_w_eq, h_lhs] at h_bern
+  
+  have h_add_n := add_le_add_right h_bern (ofNat₀ n)
+  
+  have h_cancel : Add.add (Add.add (Add.add (1:ℚ₀) (Mul.mul (ofNat₀ n) w)) (Neg.neg (ofNat₀ n))) (ofNat₀ n) = Add.add (1:ℚ₀) (Mul.mul (ofNat₀ n) w) := by
+    have hc1 : Add.add (Add.add (Add.add (1:ℚ₀) (Mul.mul (ofNat₀ n) w)) (Neg.neg (ofNat₀ n))) (ofNat₀ n) = Add.add (Add.add (1:ℚ₀) (Mul.mul (ofNat₀ n) w)) (Add.add (Neg.neg (ofNat₀ n)) (ofNat₀ n)) := add_assoc _ _ _
+    have hc2 : Add.add (Neg.neg (ofNat₀ n)) (ofNat₀ n) = (0:ℚ₀) := neg_add_self _
+    have hc3 : Add.add (Add.add (1:ℚ₀) (Mul.mul (ofNat₀ n) w)) (0:ℚ₀) = Add.add (1:ℚ₀) (Mul.mul (ofNat₀ n) w) := add_zero _
+    rw [hc1, hc2, hc3]
+    
+  rw [h_cancel] at h_add_n
+  exact h_add_n
+
+theorem pow_one (n : ℕ₀) : pow (1:ℚ₀) n = (1:ℚ₀) := by
+  induction n with
+  | zero => rfl
+  | succ k ih =>
+    have h1 : pow (1:ℚ₀) (σ k) = Mul.mul (1:ℚ₀) (pow (1:ℚ₀) k) := rfl
+    have hm : Mul.mul (1:ℚ₀) (1:ℚ₀) = (1:ℚ₀) := one_mul _
+    rw [h1, ih, hm]
+
+theorem pow_ne_zero_of_pos {x : ℚ₀} (hx : 0 < x) (n : ℕ₀) : pow x n ≠ 0 := by
+  have hp : 0 < pow x n := pow_pos n hx
+  intro h
+  rw [h] at hp
+  exact hp.2 (le_refl 0)
+
+theorem pow_mul_distrib (a b : ℚ₀) (n : ℕ₀) : pow (Mul.mul a b) n = Mul.mul (pow a n) (pow b n) := by
+  induction n with
+  | zero => rfl
+  | succ k ih =>
+    have h1 : pow (Mul.mul a b) (σ k) = Mul.mul (Mul.mul a b) (pow (Mul.mul a b) k) := rfl
+    have h2 : pow a (σ k) = Mul.mul a (pow a k) := rfl
+    have h3 : pow b (σ k) = Mul.mul b (pow b k) := rfl
+    rw [h1, ih, h2, h3]
+    have hc1 : Mul.mul (Mul.mul a b) (Mul.mul (pow a k) (pow b k)) = Mul.mul a (Mul.mul b (Mul.mul (pow a k) (pow b k))) := mul_assoc _ _ _
+    have hc2 : Mul.mul b (Mul.mul (pow a k) (pow b k)) = Mul.mul (pow a k) (Mul.mul b (pow b k)) := by
+      have hc2_1 : Mul.mul b (Mul.mul (pow a k) (pow b k)) = Mul.mul (Mul.mul b (pow a k)) (pow b k) := (mul_assoc _ _ _).symm
+      have hc2_2 : Mul.mul b (pow a k) = Mul.mul (pow a k) b := mul_comm _ _
+      have hc2_3 : Mul.mul (Mul.mul (pow a k) b) (pow b k) = Mul.mul (pow a k) (Mul.mul b (pow b k)) := mul_assoc _ _ _
+      rw [hc2_1, hc2_2, hc2_3]
+    have hc3 : Mul.mul a (Mul.mul (pow a k) (Mul.mul b (pow b k))) = Mul.mul (Mul.mul a (pow a k)) (Mul.mul b (pow b k)) := (mul_assoc _ _ _).symm
+    rw [hc1, hc2, hc3]
+
+theorem pow_inv (b : ℚ₀) (hb : 0 < b) (n : ℕ₀) : pow (inv b) n = inv (pow b n) := by
+  have h_mul : Mul.mul (pow b n) (pow (inv b) n) = (1:ℚ₀) := by
+    have hd : Mul.mul (pow b n) (pow (inv b) n) = pow (Mul.mul b (inv b)) n := (pow_mul_distrib b (inv b) n).symm
+    have hb_ne : b ≠ 0 := by
+      intro hc; rw [hc] at hb; exact hb.2 (le_refl 0)
+    have hi : Mul.mul b (inv b) = (1:ℚ₀) := mul_inv_cancel hb_ne
+    have ho : pow (1:ℚ₀) n = (1:ℚ₀) := pow_one n
+    rw [hd, hi, ho]
+  
+  have hb_pow_ne_zero : pow b n ≠ 0 := pow_ne_zero_of_pos hb n
+  exact inv_unique hb_pow_ne_zero h_mul
+
 theorem newton_seq_pow_ge (q : ℚ₀) (n : Peano.ℕ₂) (hq : 0 < q) (k : ℕ₀) :
   q ≤ pow (newton_raphson_seq q n (σ k)) n.val.val := by
-  sorry
+  let x_k := newton_raphson_seq q n k
+  have hx_k_pos : 0 < x_k := newton_seq_pos q n hq k
+  let x_next := newton_raphson_seq q n (σ k)
+  
+  -- Si q = 1, es trivial
+  by_cases hq_one : q = (1:ℚ₀)
+  · sorry
+  
+  -- Si q ≠ 1, usamos la expansión algebraica
+  · let n_val := n.val.val
+    let n_min_1 := Peano.Sub.sub n_val 𝟙
+    
+    have hn_eq : n_val = σ n_min_1 := sorry
+      
+    let w := Mul.mul x_next (inv x_k)
+    
+    have hx_ne : x_k ≠ 0 := by
+      intro hc; rw [hc] at hx_k_pos; exact hx_k_pos.2 (le_refl 0)
+      
+    have hx_next_pos : 0 < x_next := newton_seq_pos q n hq (σ k)
+    have hw_nonneg : 0 ≤ w := mul_nonneg (le_of_lt hx_next_pos) (inv_nonneg (le_of_lt hx_k_pos) hx_ne)
+      
+    have h_bern := bernoulli_ineq_alt2 w hw_nonneg n_val
+    
+    have h_xnext : Mul.mul (ofNat₀ n_val) x_next = Add.add (Mul.mul (ofNat₀ n_min_1) x_k) (Mul.mul q (inv (pow x_k n_min_1))) := sorry
+      
+    have h_nw : Mul.mul (ofNat₀ n_val) w = Add.add (ofNat₀ n_min_1) (Mul.mul q (inv (pow x_k n_val))) := sorry
+      
+    have h_one_add_nw : Add.add (1:ℚ₀) (Mul.mul (ofNat₀ n_val) w) = Add.add (ofNat₀ n_val) (Mul.mul q (inv (pow x_k n_val))) := sorry
+      
+    rw [h_one_add_nw] at h_bern
+    have h_comm : Add.add (ofNat₀ n_val) (Mul.mul q (inv (pow x_k n_val))) = Add.add (Mul.mul q (inv (pow x_k n_val))) (ofNat₀ n_val) := add_comm _ _
+    rw [h_comm] at h_bern
+    
+    have h_le := le_of_add_le_add_right h_bern
+    
+    have h_wn : pow w n_val = Mul.mul (pow x_next n_val) (inv (pow x_k n_val)) := by
+      have h_pow_w : pow w n_val = pow (Mul.mul x_next (inv x_k)) n_val := rfl
+      rw [h_pow_w, pow_mul_distrib, pow_inv _ hx_k_pos]
+      
+    rw [h_wn] at h_le
+    
+    have h_mul_xn := mul_le_mul_right_of_nonneg h_le (le_of_lt (pow_pos n_val hx_k_pos))
+    
+    have h_cancel1 : Mul.mul (Mul.mul q (inv (pow x_k n_val))) (pow x_k n_val) = q := by
+      have h_assoc : Mul.mul (Mul.mul q (inv (pow x_k n_val))) (pow x_k n_val) = Mul.mul q (Mul.mul (inv (pow x_k n_val)) (pow x_k n_val)) := mul_assoc _ _ _
+      have h_inv : Mul.mul (inv (pow x_k n_val)) (pow x_k n_val) = (1:ℚ₀) := inv_mul_cancel (pow_ne_zero_of_pos hx_k_pos n_val)
+      have hm1 : Mul.mul q (1:ℚ₀) = q := mul_one _
+      rw [h_assoc, h_inv, hm1]
+      
+    have h_cancel2 : Mul.mul (Mul.mul (pow x_next n_val) (inv (pow x_k n_val))) (pow x_k n_val) = pow x_next n_val := by
+      have h_assoc : Mul.mul (Mul.mul (pow x_next n_val) (inv (pow x_k n_val))) (pow x_k n_val) = Mul.mul (pow x_next n_val) (Mul.mul (inv (pow x_k n_val)) (pow x_k n_val)) := mul_assoc _ _ _
+      have h_inv : Mul.mul (inv (pow x_k n_val)) (pow x_k n_val) = (1:ℚ₀) := inv_mul_cancel (pow_ne_zero_of_pos hx_k_pos n_val)
+      have hm2 : Mul.mul (pow x_next n_val) (1:ℚ₀) = pow x_next n_val := mul_one _
+      rw [h_assoc, h_inv, hm2]
+      
+    rw [h_cancel1, h_cancel2] at h_mul_xn
+    exact h_mul_xn
 
 theorem newton_seq_monotone (q : ℚ₀) (n : Peano.ℕ₂) (hq : 0 < q) (k : ℕ₀) :
   newton_raphson_seq q n (σ (σ k)) ≤ newton_raphson_seq q n (σ k) := by
