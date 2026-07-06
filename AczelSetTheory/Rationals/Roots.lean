@@ -265,4 +265,12 @@ theorem newton_seq_pos (q : ℚ₀) (n : Peano.ℕ₂) (hq : 0 < q) (k : ℕ₀)
       have h_inv_n_pos : 0 < inv (ofNat₀ n.val.val) := inv_pos (ofNat₀_pos n.val.property)
       exact mul_pos_pub h_inv_n_pos h_sum_pos
 
+theorem newton_seq_pow_ge (q : ℚ₀) (n : Peano.ℕ₂) (hq : 0 < q) (k : ℕ₀) :
+  q ≤ pow (newton_raphson_seq q n (σ k)) n.val.val := by
+  sorry
+
+theorem newton_seq_monotone (q : ℚ₀) (n : Peano.ℕ₂) (hq : 0 < q) (k : ℕ₀) :
+  newton_raphson_seq q n (σ (σ k)) ≤ newton_raphson_seq q n (σ k) := by
+  sorry
+
 end ℚ₀
