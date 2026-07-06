@@ -323,24 +323,46 @@ theorem newton_seq_apart_lt (q r : ℚ₀) (n : ℕ₂) (hq : 0 < q) (hr : 0 ≤
     rw [h_assoc, h_M_inv, h_mul_one] at h_mul_inv
     exact h_mul_inv
 
-theorem newton_seq_anti (q : ℚ₀) (n : ℕ₂) (hq : 0 < q) (N k : ℕ₀) (h : Peano.Order.le₀ N k) :
-  newton_raphson_seq q n k ≤ newton_raphson_seq q n N := sorry
+theorem newton_seq_succ_le (q : ℚ₀) (n : ℕ₂) (hq : 0 < q) (k : ℕ₀) (h1 : Peano.Order.le₀ 1 k) :
+  newton_raphson_seq q n (σ k) ≤ newton_raphson_seq q n k := by
+  cases k with
+  | zero => exact False.elim (Peano.Order.le_1_0_then_false h1)
+  | succ k' => exact newton_seq_monotone q n hq k'
+
+theorem newton_seq_anti (q : ℚ₀) (n : ℕ₂) (hq : 0 < q) (N k : ℕ₀) (h1 : Peano.Order.le₀ 1 N) (hk : Peano.Order.le₀ N k) :
+  newton_raphson_seq q n k ≤ newton_raphson_seq q n N := by
+  induction k with
+  | zero =>
+    have hN : N = 0 := Peano.Order.le_zero_eq_wp hk
+    rw [hN] at h1
+    exact False.elim (Peano.Order.le_1_0_then_false h1)
+  | succ k' ih =>
+    have h_or : Peano.Order.le₀ N k' ∨ N = σ k' := Peano.Order.le_succ_then_le_or_eq_wp hk
+    cases h_or with
+    | inl h_le =>
+      have h_ih : newton_raphson_seq q n k' ≤ newton_raphson_seq q n N := ih h_le
+      have h_k_ge_1 : Peano.Order.le₀ 1 k' := Peano.Order.le_trans 1 N k' h1 h_le
+      have h_step : newton_raphson_seq q n (σ k') ≤ newton_raphson_seq q n k' := newton_seq_succ_le q n hq k' h_k_ge_1
+      exact le_trans h_step h_ih
+    | inr h_eq =>
+      rw [h_eq]
+      exact le_refl _
 
 theorem newton_seq_eventually_lt (q r : ℚ₀) (n : ℕ₂) (hq : 0 < q) (h : q < pow r n.val.val) :
-  ∃ N : ℕ₀, newton_raphson_seq q n N < r := sorry
+  ∃ N : ℕ₀, And (Peano.Order.le₀ 1 N) (newton_raphson_seq q n N < r) := sorry
 
 theorem newton_seq_apart_gt (q r : ℚ₀) (n : ℕ₂) (hq : 0 < q) (hr : 0 ≤ r) (h : q < pow r n.val.val) :
   ∃ N : ℕ₀, ∃ δ > (0:ℚ₀), ∀ k, Peano.Order.le₀ N k → δ ≤ Sub.sub r (newton_raphson_seq q n k) := by
-  have h_exists_N : ∃ N : ℕ₀, newton_raphson_seq q n N < r := newton_seq_eventually_lt q r n hq h
+  have h_exists_N : ∃ N : ℕ₀, And (Peano.Order.le₀ 1 N) (newton_raphson_seq q n N < r) := newton_seq_eventually_lt q r n hq h
   cases h_exists_N with
   | intro N h_xN_lt_r =>
     let x_N := newton_raphson_seq q n N
-    have h_delta_pos : 0 < Sub.sub r x_N := sub_pos_of_lt h_xN_lt_r
+    have h_delta_pos : 0 < Sub.sub r x_N := sub_pos_of_lt h_xN_lt_r.2
     exists N
     exists (Sub.sub r x_N)
     exists h_delta_pos
     intro k hk
-    have h_anti : newton_raphson_seq q n k ≤ x_N := newton_seq_anti q n hq N k hk
+    have h_anti : newton_raphson_seq q n k ≤ x_N := newton_seq_anti q n hq N k h_xN_lt_r.1 hk
     have h_neg : Neg.neg x_N ≤ Neg.neg (newton_raphson_seq q n k) := neg_le_neg h_anti
     have h_sub : Add.add r (Neg.neg x_N) ≤ Add.add r (Neg.neg (newton_raphson_seq q n k)) := add_le_add_left h_neg r
     exact h_sub

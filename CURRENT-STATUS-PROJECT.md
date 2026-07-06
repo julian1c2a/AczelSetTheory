@@ -35,93 +35,93 @@
 
 ### PList/ (4 modules)
 
-| Module | Status |
-|--------|--------|
-| PList/Basic.lean | ✅ |
-| PList/Fin0.lean | ✅ |
-| PList/Lemmas.lean | ✅ |
-| PList/Omega0.lean | ✅ |
+| Module            | Status |
+| -------------------| --------|
+| PList/Basic.lean  | ✅      |
+| PList/Fin0.lean   | ✅      |
+| PList/Lemmas.lean | ✅      |
+| PList/Omega0.lean | ✅      |
 
 ### Top-level (4 modules)
 
-| Module | Status |
-|--------|--------|
-| HFSets.lean | ✅ |
-| HFList.lean | ✅ |
-| HFListOps.lean | ✅ |
-| Notation.lean | ✅ |
+| Module         | Status |
+| ----------------| --------|
+| HFSets.lean    | ✅      |
+| HFList.lean    | ✅      |
+| HFListOps.lean | ✅      |
+| Notation.lean  | ✅      |
 
 ### Operations/ (21 modules)
 
-| Module | Status |
-|--------|--------|
-| Operations/Union.lean | ✅ |
-| Operations/Intersection.lean | ✅ |
-| Operations/Setminus.lean | ✅ |
-| Operations/Separation.lean | ✅ |
-| Operations/Pair.lean | ✅ |
-| Operations/Powerset.lean | ✅ |
-| Operations/SymDiff.lean | ✅ |
-| Operations/OrderedPair.lean | ✅ |
-| Operations/Relation.lean | ✅ |
-| Operations/Function.lean | ✅ |
-| Operations/Inverse.lean | ✅ |
-| Operations/Restriction.lean | ✅ |
-| Operations/Composition.lean | ✅ |
-| Operations/Replacement.lean | ✅ |
-| Operations/Cardinal.lean | ✅ |
-| Operations/FunctionComp.lean | ✅ |
-| Operations/Identity.lean | ✅ |
-| Operations/Product.lean | ✅ |
-| Operations/CartProd.lean | ✅ |
-| Operations/NPow.lean | ✅ |
-| Operations/Order.lean | ✅ |
+| Module                       | Status |
+| ------------------------------| --------|
+| Operations/Union.lean        | ✅      |
+| Operations/Intersection.lean | ✅      |
+| Operations/Setminus.lean     | ✅      |
+| Operations/Separation.lean   | ✅      |
+| Operations/Pair.lean         | ✅      |
+| Operations/Powerset.lean     | ✅      |
+| Operations/SymDiff.lean      | ✅      |
+| Operations/OrderedPair.lean  | ✅      |
+| Operations/Relation.lean     | ✅      |
+| Operations/Function.lean     | ✅      |
+| Operations/Inverse.lean      | ✅      |
+| Operations/Restriction.lean  | ✅      |
+| Operations/Composition.lean  | ✅      |
+| Operations/Replacement.lean  | ✅      |
+| Operations/Cardinal.lean     | ✅      |
+| Operations/FunctionComp.lean | ✅      |
+| Operations/Identity.lean     | ✅      |
+| Operations/Product.lean      | ✅      |
+| Operations/CartProd.lean     | ✅      |
+| Operations/NPow.lean         | ✅      |
+| Operations/Order.lean        | ✅      |
 
 ### Axioms/ (41 modules)
 
-| Module | Status |
-|--------|--------|
-| Axioms/Union.lean | ✅ |
-| Axioms/Intersection.lean | ✅ |
-| Axioms/Setminus.lean | ✅ |
-| Axioms/Separation.lean | ✅ |
-| Axioms/Pair.lean | ✅ |
-| Axioms/Powerset.lean | ✅ |
-| Axioms/Singleton.lean | ✅ |
-| Axioms/SymDiff.lean | ✅ |
-| Axioms/OrderedPair.lean | ✅ |
-| Axioms/Foundation.lean | ✅ |
-| Axioms/Decidable.lean | ✅ (`mem_decidable`, `instDecidableEqHFSet`, `instDecidableEmpty`) |
-| Axioms/Subset.lean | ✅ |
-| Axioms/Lattice.lean | ✅ |
-| Axioms/BooleanAlgebra.lean | ✅ |
-| Axioms/BooleanRing.lean | ✅ |
-| Axioms/Succ.lean | ✅ |
-| Axioms/VonNeumann.lean | ✅ |
-| Axioms/Choice.lean | ✅ |
-| Axioms/Cardinal.lean | ✅ |
-| Axioms/Relation.lean | ✅ |
-| Axioms/Function.lean | ✅ |
-| Axioms/Bijection.lean | ✅ |
-| Axioms/Inverse.lean | ✅ |
-| Axioms/Composition.lean | ✅ |
-| Axioms/Restriction.lean | ✅ |
-| Axioms/Replacement.lean | ✅ |
-| Axioms/FunctionComp.lean | ✅ |
-| Axioms/Identity.lean | ✅ |
-| Axioms/Product.lean | ✅ |
-| Axioms/Image.lean | ✅ |
-| Axioms/Adjunction.lean | ✅ |
-| Axioms/Induction.lean | ✅ |
-| Axioms/CartProd.lean | ✅ |
-| Axioms/Ordinal.lean | ✅ |
-| Axioms/OrdinalNat.lean | ✅ |
-| Axioms/Fintype.lean | ✅ |
-| Axioms/NPow.lean | ✅ |
-| Axioms/Rank.lean | ✅ (`rank`, `rank_empty`, `rank_insert`, `mem_rank_lt`, `instance mem_wf`) |
-| Axioms/Order.lean | ✅ |
-| Axioms/WellOrder.lean | ✅ |
-| Axioms/LinearOrder.lean | ✅ |
+| Module                     | Status                                                                    |
+| ----------------------------| ---------------------------------------------------------------------------|
+| Axioms/Union.lean          | ✅                                                                         |
+| Axioms/Intersection.lean   | ✅                                                                         |
+| Axioms/Setminus.lean       | ✅                                                                         |
+| Axioms/Separation.lean     | ✅                                                                         |
+| Axioms/Pair.lean           | ✅                                                                         |
+| Axioms/Powerset.lean       | ✅                                                                         |
+| Axioms/Singleton.lean      | ✅                                                                         |
+| Axioms/SymDiff.lean        | ✅                                                                         |
+| Axioms/OrderedPair.lean    | ✅                                                                         |
+| Axioms/Foundation.lean     | ✅                                                                         |
+| Axioms/Decidable.lean      | ✅ (`mem_decidable`, `instDecidableEqHFSet`, `instDecidableEmpty`)         |
+| Axioms/Subset.lean         | ✅                                                                         |
+| Axioms/Lattice.lean        | ✅                                                                         |
+| Axioms/BooleanAlgebra.lean | ✅                                                                         |
+| Axioms/BooleanRing.lean    | ✅                                                                         |
+| Axioms/Succ.lean           | ✅                                                                         |
+| Axioms/VonNeumann.lean     | ✅                                                                         |
+| Axioms/Choice.lean         | ✅                                                                         |
+| Axioms/Cardinal.lean       | ✅                                                                         |
+| Axioms/Relation.lean       | ✅                                                                         |
+| Axioms/Function.lean       | ✅                                                                         |
+| Axioms/Bijection.lean      | ✅                                                                         |
+| Axioms/Inverse.lean        | ✅                                                                         |
+| Axioms/Composition.lean    | ✅                                                                         |
+| Axioms/Restriction.lean    | ✅                                                                         |
+| Axioms/Replacement.lean    | ✅                                                                         |
+| Axioms/FunctionComp.lean   | ✅                                                                         |
+| Axioms/Identity.lean       | ✅                                                                         |
+| Axioms/Product.lean        | ✅                                                                         |
+| Axioms/Image.lean          | ✅                                                                         |
+| Axioms/Adjunction.lean     | ✅                                                                         |
+| Axioms/Induction.lean      | ✅                                                                         |
+| Axioms/CartProd.lean       | ✅                                                                         |
+| Axioms/Ordinal.lean        | ✅                                                                         |
+| Axioms/OrdinalNat.lean     | ✅                                                                         |
+| Axioms/Fintype.lean        | ✅                                                                         |
+| Axioms/NPow.lean           | ✅                                                                         |
+| Axioms/Rank.lean           | ✅ (`rank`, `rank_empty`, `rank_insert`, `mem_rank_lt`, `instance mem_wf`) |
+| Axioms/Order.lean          | ✅                                                                         |
+| Axioms/WellOrder.lean      | ✅                                                                         |
+| Axioms/LinearOrder.lean    | ✅                                                                         |
 
 ### VN/ (49 modules)
 
