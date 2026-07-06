@@ -525,11 +525,11 @@ theorem cauchy_inv_is_cauchy (f : CauchySeq) (h : CauchySeq.ApartZero f) :
 
 /-- El inverso de una sucesión de Cauchy está definido si la sucesión
 está estrictamente alejada de cero (ApartZero f). -/
-noncomputable def CauchySeq.inv (f : CauchySeq) (h : CauchySeq.ApartZero f) : CauchySeq :=
+def CauchySeq.inv (f : CauchySeq) (h : CauchySeq.ApartZero f) : CauchySeq :=
   ⟨fun n => (f.val (Peano.Add.add n (CauchySeq.invBound f h)))⁻¹, cauchy_inv_is_cauchy f h⟩
 
 /-- División de sucesiones de Cauchy. f / g = f * g⁻¹ -/
-noncomputable def CauchySeq.div (f g : CauchySeq) (h : CauchySeq.ApartZero g) : CauchySeq :=
+def CauchySeq.div (f g : CauchySeq) (h : CauchySeq.ApartZero g) : CauchySeq :=
   f * CauchySeq.inv g h
 
 end ℚ₀

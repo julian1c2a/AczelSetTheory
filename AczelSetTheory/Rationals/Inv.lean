@@ -255,7 +255,4 @@ theorem inv_nonneg {x : ℚ₀} (hx : 0 ≤ x) (h_ne : x ≠ 0) : 0 ≤ x⁻¹ :
   rw [h_den, ℤ₀.mul_one, ℤ₀.zero_mul]
   exact ℤ₀.zero_le_ofNat _
 
-end
-
-
 end ℚ₀
