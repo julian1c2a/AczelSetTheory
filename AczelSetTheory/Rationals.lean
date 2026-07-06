@@ -16,4 +16,5 @@ import AczelSetTheory.Rationals.Density
 import AczelSetTheory.Rationals.CauchySeqAlgebra
 import AczelSetTheory.Rationals.Canonical
 import AczelSetTheory.Rationals.Convergence
+import AczelSetTheory.Rationals.Bisection
 import AczelSetTheory.Rationals.Roots
