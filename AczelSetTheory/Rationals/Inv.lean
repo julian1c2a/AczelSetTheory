@@ -255,4 +255,25 @@ theorem inv_nonneg {x : ℚ₀} (hx : 0 ≤ x) (h_ne : x ≠ 0) : 0 ≤ x⁻¹ :
   rw [h_den, ℤ₀.mul_one, ℤ₀.zero_mul]
   exact ℤ₀.zero_le_ofNat _
 
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Orden e inversa: si 1 ≤ q entonces q⁻¹ ≤ 1
+-- ─────────────────────────────────────────────────────────────────────────────
+
+private theorem zero_le_one_inv : (0 : ℚ₀) ≤ 1 := by
+  have h0 : (0 : ℚ₀) = mk 0 den1 := rfl
+  have h1 : (1 : ℚ₀) = mk 1 den1 := rfl
+  rw [h0, h1, mk_le_mk]
+  have hd : ℤ₀.ofNat den1.val = (1 : ℤ₀) := rfl
+  rw [hd, ℤ₀.mul_one, ℤ₀.mul_one]
+  exact ℤ₀.zero_le_ofNat 𝟙
+
+/-- Si `1 ≤ q` entonces `q⁻¹ ≤ 1`. -/
+theorem inv_le_one {q : ℚ₀} (hq : 1 ≤ q) : q⁻¹ ≤ 1 := by
+  have hq0 : q ≠ 0 := fun h => one_ne_zero (le_antisymm (h ▸ hq) zero_le_one_inv)
+  have hqnn : 0 ≤ q := le_trans zero_le_one_inv hq
+  have hinn : 0 ≤ q⁻¹ := inv_nonneg hqnn hq0
+  have h1 : q⁻¹ * 1 ≤ q⁻¹ * q := mul_le_mul_left_of_nonneg hq hinn
+  rw [mul_one, inv_mul_cancel hq0] at h1
+  exact h1
+
 end ℚ₀
