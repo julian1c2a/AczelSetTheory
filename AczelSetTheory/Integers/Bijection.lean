@@ -25,7 +25,7 @@ open Peano Peano.Add Peano.Sub Peano.Mul
 -- ─────────────────────────────────────────────────────────────────────────────
 
 /-- Todo entero z es igual a repr.1 − repr.2 (interpretado en ℤ₀). -/
-private theorem ofNat_sub_repr (z : ℤ₀) :
+theorem ofNat_sub_repr (z : ℤ₀) :
     Add.add (ofNat z.repr.1) (Neg.neg (ofNat z.repr.2)) = z := by
   apply repr_inj
   -- Componentes del representante de −(ofNat z.repr.2)

@@ -1,22 +1,14 @@
 # Next Steps
 
-**Last updated:** 2026-06-29 (Fase 3 constructiva completa + MANDATORIES en DECISIONS.md)
+**Last updated:** 2026-07-07 (Inicio de FASE C + Documentación M8B cerrada)
 
 ---
 
-## 🔴 INMEDIATO — Cierre de pureza constructiva (ADR-018, MANDATORY M-1)
+## 🔴 INMEDIATO — FASE C: Análisis Real y Topología Avanzada
 
-Ver plan completo en [`PLANNING-CONSTRUCTIVE.md`](PLANNING-CONSTRUCTIVE.md) §7. Quedan
-**0 obstáculos** que NO son conversión mecánica (requieren infraestructura de decidibilidad)
-para que `#print axioms ⊆ {propext, Quot.sound}` en todo el árbol (¡COMPLETADO!):
-
-| ID | Estado | Tarea | Detalle |
-|----|--------|-------|---------|
-| **C-1** | ✅ DONE | **`Axioms/WellOrder.lean` constructivo** | Añadir `[DecidablePred P]` a `wf_induction`/`wo_induction` (sin llamadores externos). **`no_infinite_descent`** usa `P x = ∀ n:ℕ₀, f n = x → ⊥` (indecidible): reformular vía **pigeonhole sobre `A` finito** (usar `Combinatorics/Counting.pigeonhole`, ya constructivo) en vez de la construcción clásica del contraejemplo minimal. |
-| **C-2** | ✅ DONE | **`Algebra/sylow_first` constructivo** | El `by_cases (∃ sub : HFSubgroup grp', …)` cae a `Classical.em`. Construir instancia `Decidable (∃ sub : HFSubgroup grp', P sub)` enumerando los subgrupos de un grupo finito como HFSet decidible (infraestructura nueva: conjunto de subgrupos). |
-
-Ambos cerrados: el gate `Meta/AxiomCheck.lean` se ha actualizado con `wf_induction`, `sylow_first`,
-etc. El proyecto es ahora 100% constructivo y cumple con ADR-018.
+Con la FASE B y los Racionales (`ℚ₀`) completados y documentados, el foco pasa a `ℝ₀`:
+1. **Completar las sucesiones reales (`Reals/Incompleteness.lean`)**: Cerrar los *sorrys* pendientes.
+2. **Propiedades topológicas de ℝ₀**: Explorar conexidad, compacidad y convergencia real utilizando las bases establecidas en `AczelSetTheory/Topology/`.
 
 ---
 
@@ -26,6 +18,13 @@ etc. El proyecto es ahora 100% constructivo y cumple con ADR-018.
 |----|--------|-------|---------|
 | **T-1** | ✅ DONE | **`PosNat₀` → `Peano.ℕ₁`** | En `Integers/Rationals.lean`, `private abbrev PosNat₀ := {n : ℕ₀ // n ≠ 𝟘}` es exactamente `ℕ₁`. Sustituir y reutilizar el aparato de peanolib. Coordinar con T-2. |
 | **T-2** | ✅ DONE | **Mover ℚ₀ a `/Rationals/` propio** | `Integers/Rationals*` → subdirectorio `AczelSetTheory/Rationals/` (par de `Integers/`), con barrel `Rationals.lean`. Actualizar imports y barrels. Ver `PLANNING.md` §Limpieza. |
+
+---
+
+### ✅ L2 — Reorganizar la jerarquía numérica: `/Rationals/` y `/Reals/` como pares de `/Integers/`
+
+**ESTADO: ✅ COMPLETADO (2026-07-07)**
+Hoy `ℚ₀` es un subsistema raíz (`AczelSetTheory/Rationals/`) con su propio barrel `Rationals.lean` (par de `Integers.lean` y `Reals.lean`), completando la asimetría histórica. Toda la dependencia fluye limpiamente: `peanolib → … → Integers (ℤ₀) → Rationals (ℚ₀) → Reals (ℝ₀)`.
 
 ---
 

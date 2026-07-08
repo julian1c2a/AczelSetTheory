@@ -20,3 +20,4 @@ import AczelSetTheory.Rationals.Bisection
 import AczelSetTheory.Rationals.Roots
 import AczelSetTheory.Rationals.PowOrder
 import AczelSetTheory.Rationals.RationalLog
+import AczelSetTheory.Rationals.HFRat

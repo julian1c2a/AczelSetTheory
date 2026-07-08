@@ -52,7 +52,7 @@ private theorem mul_div_swap {A d g : ℕ₀} (hgA : g ∣ A) (hgd : g ∣ d) (h
     _ = mul (A / g) d := by rw [hd]
 
 /-- Un entero se descompone como signo · magnitud: `z = sign z · ofNat |z|`. -/
-private theorem self_eq_sign_mul_toNat_abs (z : ℤ₀) :
+theorem self_eq_sign_mul_toNat_abs (z : ℤ₀) :
     z = Mul.mul (ℤ₀.sign z) (ℤ₀.ofNat (ℤ₀.toNat (ℤ₀.abs z))) := by
   have hAbsEq : ℤ₀.ofNat (ℤ₀.toNat (ℤ₀.abs z)) = ℤ₀.abs z :=
     (ℤ₀.nonneg_eq_ofNat (ℤ₀.abs_nonneg z)).symm

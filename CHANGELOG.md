@@ -6,6 +6,28 @@ All notable changes to this project are documented here.
 
 ---
 
+## [2026-07-07] — Fusión de mejorias y Cierre de FASE B
+
+### Added
+- **Teoría analítica de Racionales (`AczelSetTheory/Rationals/`)**: Integración completa de la rama `mejorias` con 10 submódulos nuevos que dotan a `ℚ₀` de un soporte de análisis real incipiente:
+  - `Bisection.lean`: Método de bisección con intervalos anidados y decaimiento exponencial.
+  - `Convergence.lean`: Definiciones de sucesiones acotadas, convergentes y límites.
+  - `RationalLog.lean`: Expansión en serie para logaritmos (artanh).
+  - `Roots.lean`: Extracción de raíces y convergencia.
+  - `Canonical.lean`: Representación canónica de `ℚ₀` (reducción de fracciones vía GCD).
+  - `PowOrder.lean`: Propiedades de exponentes y orden.
+  - `Archimedean.lean` e `Irrational.lean` (convergencia a irracionales y aproximaciones).
+
+### Changed
+- **Arquitectura de Racionales**: `ℚ₀` se ha separado completamente de `Integers/` a su propia carpeta de primer nivel `AczelSetTheory/Rationals/` (completando la iniciativa L2 de limpieza de dependencias).
+- **Documentación del Proyecto**: Renovación profunda del sistema de referencia (`REFERENCE.md` y `doc/REFERENCE-Rationals.md`) para proyectar exhaustivamente la nueva rama y cerrar formalmente el milestone documental **M8B**.
+- **Cierre de Fase B**: Con la integración de los racionales completos y la documentación, la FASE B (Consolidación) queda oficialmente cerrada, abriendo la puerta a la FASE C (Análisis Real / Topología).
+
+### Removed
+- Limpieza total del repositorio: Eliminación de 27 archivos espurios (scripts de prueba y archivos `*scratch*.lean`) que contaminaban la raíz y subcarpetas, dejando un árbol limpio. Eliminación del directorio `/scratch`. Reducción neta de *sorrys* fantasmas en los reportes de build.
+
+---
+
 ## [2026-06-29] — Cierre de pureza constructiva (C-1 y C-2)
 
 ### Added

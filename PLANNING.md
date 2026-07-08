@@ -13,9 +13,7 @@
 > referencia de sus módulos en `doc/REFERENCE-{Arithmetic,Combinatorics,Foundation,
 > GroupTheory,ListsAndSets,NumberTheory,Prelim}.md`.
 
----
-
-## ✅ Check-in (2026-06-10) — FASE B casi cerrada (8/9 milestones)
+## ✅ Check-in (2026-07-07) — FASE B CERRADA (9/9 milestones)
 
 Detalle completo en [`PLANNING-FASE-B.md`](PLANNING-FASE-B.md). Estado de los 9 milestones:
 
@@ -29,10 +27,10 @@ Detalle completo en [`PLANNING-FASE-B.md`](PLANNING-FASE-B.md). Estado de los 9 
 | M5B (ℤ/nℤ + ℤ/pℤ) | ✅ CERRADO commits bf96be7/28e78bb | `Integers/ZModN.lean` (ADR-016) |
 | M6B (matrices Mₙ sobre HFRing) | ✅ CERRADO 2026-06-10 | `Algebra/HFMatrix.lean` |
 | M7B (Combinatorics nativa) | ✅ CERRADO 2026-06-08 | `Combinatorics/Counting.lean` |
-| **M8B (cierre doc + RFC FASE C)** | ⏳ **PENDIENTE** | único restante |
+| **M8B (cierre doc + RFC FASE C)** | ✅ CERRADO 2026-07-07 | Actualización de REFERENCIA y `Rationals/` |
 
 Invariante 0/0/0/0 mantenido (0 sorry / 0 noncomputable / 0 axiomas privados / 0 warnings).
-Build: 241 jobs ✅, Lean v4.30.0. Próximo y último paso de FASE B: **M8B**.
+Build: 251 jobs ✅, Lean v4.30.0. **FASE B CERRADA**. Inicia FASE C (Análisis Real).
 
 ---
 

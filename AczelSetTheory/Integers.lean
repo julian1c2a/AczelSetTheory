@@ -8,3 +8,4 @@ import AczelSetTheory.Integers.MobiusLiouville
 import AczelSetTheory.Integers.Canonical
 import AczelSetTheory.Integers.Bezout
 import AczelSetTheory.Integers.ZModN
+import AczelSetTheory.Integers.HFInt

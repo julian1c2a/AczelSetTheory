@@ -144,9 +144,18 @@ Below are the keys for reading and searching theorems.
 | 104 | `AczelSetTheory/Integers/Bezout.lean` | `ℤ₀` | ✅ Complete | Integers/Basic, Integers/Arithmetic, Integers/Order, `Peano.PeanoNat.Arith` | (futuro) Integers/ZModN |
 | 105 | `AczelSetTheory/Rationals/Basic.lean` | `ℚ₀` | ✅ Complete | Integers/Order (ℤ₀), `Peano.{ℕ₁,PeanoNat.*}` | Rationals/AbsVal, Rationals/Density, Rationals.lean |
 | 106 | `AczelSetTheory/Rationals/AbsVal.lean` | `ℚ₀` | ✅ Complete | Rationals/Basic | Rationals/IsCauchy, Rationals/Density, Rationals.lean |
-| 107 | `AczelSetTheory/Rationals/IsCauchy.lean` | `ℚ₀` | ✅ Complete | Rationals/Basic, Rationals/AbsVal, `Peano.PeanoNat.Combinatorics.Pow` | Rationals.lean |
+| 107 | `AczelSetTheory/Rationals/IsCauchy.lean` | `ℚ₀` | ✅ Complete | Rationals/Basic, Rationals/AbsVal, `Peano.PeanoNat.Combinatorics.Pow` | Rationals/Convergence |
 | 108 | `AczelSetTheory/Rationals/Density.lean` | `ℚ₀` | 🚧 Skeleton | Rationals/Basic, Rationals/AbsVal | Rationals.lean |
-| 108b| `AczelSetTheory/Rationals/Inv.lean` | `ℚ₀` | ✅ Complete | Rationals/Basic | Rationals.lean, Reals/CauchySeq |
+| 108b| `AczelSetTheory/Rationals/Inv.lean` | `ℚ₀` | ✅ Complete | Rationals/Basic | Rationals/CauchySeqAlgebra |
+| 108c| `AczelSetTheory/Rationals/Convergence.lean` | `ℚ₀` | ✅ Complete | Rationals/IsCauchy | Rationals/Bisection, Rationals/RationalLog |
+| 108d| `AczelSetTheory/Rationals/Bisection.lean` | `ℚ₀` | ✅ Complete | Rationals/Convergence | Rationals/Roots, Rationals/Archimedean |
+| 108e| `AczelSetTheory/Rationals/Canonical.lean` | `ℚ₀` | ✅ Complete | Rationals/Basic, `Peano.PeanoNat.Arith` | Rationals.lean |
+| 108f| `AczelSetTheory/Rationals/PowOrder.lean` | `ℚ₀` | ✅ Complete | Rationals/Basic, `Peano.PeanoNat.Combinatorics.Pow` | Rationals/IsCauchy |
+| 108g| `AczelSetTheory/Rationals/RationalLog.lean` | `ℚ₀` | ✅ Complete | Rationals/Convergence | Rationals.lean |
+| 108h| `AczelSetTheory/Rationals/Roots.lean` | `ℚ₀` | ✅ Complete | Rationals/Bisection | Rationals.lean |
+| 108i| `AczelSetTheory/Rationals/CauchySeqAlgebra.lean` | `ℚ₀` | ✅ Complete | Rationals/IsCauchy, Rationals/Inv | Rationals.lean |
+| 108j| `AczelSetTheory/Rationals/Archimedean.lean` | `ℚ₀` | 🚧 Progress | Rationals/Bisection | Rationals/Irrational |
+| 108k| `AczelSetTheory/Rationals/Irrational.lean` | `ℚ₀` | 🚧 Progress | Rationals/Archimedean | Rationals.lean |
 | 108c| `AczelSetTheory/Reals/CauchySeq.lean` | `ℝ₀` | ✅ Complete | Rationals/IsCauchy, Rationals/Inv | Reals/Order, Reals/Arithmetic |
 | 108d| `AczelSetTheory/Reals/Arithmetic.lean` | `ℝ₀` | ✅ Complete | Reals/CauchySeq | Reals/Order |
 | 108e| `AczelSetTheory/Reals/Order.lean` | `ℝ₀` | ✅ Complete | Reals/CauchySeq, Reals/Arithmetic | Reals/Incompleteness |

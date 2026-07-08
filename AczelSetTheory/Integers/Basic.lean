@@ -68,9 +68,9 @@ def ℤ₀ := Quotient intSetoid
 
 namespace ℤ₀
 
-private abbrev mk (p : ℕ₀ × ℕ₀) : ℤ₀ := Quotient.mk intSetoid p
+abbrev mk (p : ℕ₀ × ℕ₀) : ℤ₀ := Quotient.mk intSetoid p
 
-private theorem mk_eq_iff {p q : ℕ₀ × ℕ₀} : mk p = mk q ↔ intEq p q := by
+theorem mk_eq_iff {p q : ℕ₀ × ℕ₀} : mk p = mk q ↔ intEq p q := by
   constructor
   · intro h; exact Quotient.exact h
   · intro h; exact Quotient.sound h
@@ -82,7 +82,7 @@ private theorem mk_eq_iff {p q : ℕ₀ × ℕ₀} : mk p = mk q ↔ intEq p q :
 -- Uses `p.2 ≤ p.1` (LE typeclass) so that omega₀ can process it via ψ_le_iff.
 -- The `DecidableRel (@LE.le ℕ₀ _)` instance from Peano.PeanoNat.Decidable
 -- provides the required `Decidable (p.2 ≤ p.1)`.
-private def normalize (p : ℕ₀ × ℕ₀) : ℕ₀ × ℕ₀ :=
+def normalize (p : ℕ₀ × ℕ₀) : ℕ₀ × ℕ₀ :=
   if p.2 ≤ p.1 then (sub p.1 p.2, 𝟘) else (𝟘, sub p.2 p.1)
 
 private theorem normalize_eq_of_equiv {p q : ℕ₀ × ℕ₀} (h : intEq p q) :
@@ -126,8 +126,8 @@ def ofNat (n : ℕ₀) : ℤ₀ := mk (n, 𝟘)
 -- Operaciones internas (Peano.Add y Peano.Mul en scope aquí)
 -- ─────────────────────────────────────────────────────────────────────────────
 
-private def addRaw (p q : ℕ₀ × ℕ₀) : ℕ₀ × ℕ₀ := (add p.1 q.1, add p.2 q.2)
-private def negRaw (p : ℕ₀ × ℕ₀)   : ℕ₀ × ℕ₀ := (p.2, p.1)
+def addRaw (p q : ℕ₀ × ℕ₀) : ℕ₀ × ℕ₀ := (add p.1 q.1, add p.2 q.2)
+def negRaw (p : ℕ₀ × ℕ₀)   : ℕ₀ × ℕ₀ := (p.2, p.1)
 private def mulRaw (p q : ℕ₀ × ℕ₀) : ℕ₀ × ℕ₀ :=
   (add (mul p.1 q.1) (mul p.2 q.2), add (mul p.1 q.2) (mul p.2 q.1))
 
@@ -196,7 +196,7 @@ theorem mul_mk (p q : ℕ₀ × ℕ₀) : HMul.hMul (mk p) (mk q) = mk (mulRaw p
 -- Helpers para módulos hijo
 -- ─────────────────────────────────────────────────────────────────────────────
 
-private theorem normalize_intEq (p : ℕ₀ × ℕ₀) :
+theorem normalize_intEq (p : ℕ₀ × ℕ₀) :
     add (normalize p).1 p.2 = add (normalize p).2 p.1 := by
   unfold normalize
   by_cases h : p.2 ≤ p.1
@@ -206,11 +206,11 @@ private theorem normalize_intEq (p : ℕ₀ × ℕ₀) :
     have h' := lt_imp_le p.1 p.2 (nle_then_gt p.2 p.1 h)
     have := sub_k_add_k p.2 p.1 h'; omega₀
 
-private theorem normalize_is_intEq (p : ℕ₀ × ℕ₀) : intEq (normalize p) p :=
+theorem normalize_is_intEq (p : ℕ₀ × ℕ₀) : intEq (normalize p) p :=
   normalize_intEq p
 
 -- For all of the following, `repr (mk p) = normalize p` holds definitionally.
-private theorem repr_mk (p : ℕ₀ × ℕ₀) : repr (mk p) = normalize p := rfl
+theorem repr_mk (p : ℕ₀ × ℕ₀) : repr (mk p) = normalize p := rfl
 
 theorem mk_repr (a : ℤ₀) : mk a.repr = a := by
   rcases Quotient.exists_rep a with ⟨p, rfl⟩

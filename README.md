@@ -5,8 +5,8 @@
 **Author**: Julián Calderón Almendros
 **License**: MIT
 **Lean version**: v4.30.0
-**Build status**: ✅ 0 `sorry` — 0 `noncomputable` — 0 errors, 0 warnings — 182 `.lean` files (~28 800 LOC), build 241 jobs
-**Roadmap**: FASE A (paridad Peano) ✅ completa · FASE B (consolidación) 8/9 milestones cerrados (solo resta M8B: cierre documental)
+**Build status**: ✅ 0 `sorry` — 0 `noncomputable` — 0 errors, 0 warnings — 196 `.lean` files (~33 000 LOC), build 251 jobs
+**Roadmap**: FASE A (paridad Peano) ✅ completa · FASE B (consolidación) ✅ completa · FASE C (análisis real) 🚧 en curso
 
 ---
 
@@ -84,9 +84,12 @@ AczelSetTheory/
     Field, Module, LinearSpace, Lattice, Action, CosetAction, QuotientGroup,
     FirstIsomorphism, SecondIsomorphism, ThirdIsomorphism, CorrespondenceTheorem,
     Sylow, Zassenhaus, QuotientRing, HFMatrix
-  Integers/          — Integer type ℤ₀ + ℚ₀ (9 sub-modules + Rationals/)
+  Integers/          — Integer type ℤ₀ (10 sub-modules)
     Basic, Order, Functions, Arithmetic, Bijection, PadicVal, MobiusLiouville,
-    Canonical, Bezout, ZModN, Rationals/{AbsVal, Density, IsCauchy}
+    Canonical, Bezout, ZModN
+  Rationals/         — Rational type ℚ₀ and analytic theory (14 sub-modules)
+    Basic, AbsVal, Density, IsCauchy, Inv, Bisection, Canonical, Convergence,
+    PowOrder, RationalLog, Roots, CauchySeqAlgebra, Archimedean, Irrational
   Combinatorics/     — Native finite combinatorics in HFSet (1 sub-module)
     Counting  — pigeonhole, inclusion–exclusion (2 and 3 sets), card lemmas
   Topology/          — Topological spaces over HFSet (5 sub-modules)
