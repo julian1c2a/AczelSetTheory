@@ -104,10 +104,18 @@ Canonical
 ## Módulo: `AczelSetTheory/Rationals/Archimedean.lean`
 **Descripción:** Propiedad arquimediana explícita para ℚ₀.
 
+**Teoremas Principales:**
+- `theorem archimedean (x y : ℚ₀) : 0 < x → ∃ N : ℕ₀, y < Mul.mul (ofNat₀ N) x`
+
 ---
 
 ## Módulo: `AczelSetTheory/Rationals/Irrational.lean`
 **Descripción:** Construcción formal de irracionales aproximados mediante sucesiones racionales sin límite exacto en ℚ₀ (ej: convergencia por Newton-Raphson a $\sqrt{2}$).
+
+**Teoremas Principales:**
+- `theorem newton_seq_eventually_lt (q r : ℚ₀) (n : ℕ₂) (hq : 0 < q) (hr : 0 ≤ r) (h : q < pow r n.val.val) : ∃ N : ℕ₀, And (Peano.Order.le₀ 1 N) (newton_raphson_seq q n N < r)`
+- `theorem newton_seq_apart_gt (q r : ℚ₀) (n : ℕ₂) (hq : 0 < q) (hr : 0 ≤ r) (h : q < pow r n.val.val) : ∃ N : ℕ₀, ∃ δ > (0:ℚ₀), ∀ k, Peano.Order.le₀ N k → δ ≤ Sub.sub r (newton_raphson_seq q n k)`
+- `theorem newton_seq_apart_lt (q r : ℚ₀) (n : ℕ₂) (hq : 0 < q) (h : pow r n.val.val < q) : ∃ N : ℕ₀, ∃ δ > (0:ℚ₀), ∀ k, Peano.Order.le₀ N k → δ ≤ Sub.sub (newton_raphson_seq q n k) r`
 
 ---
 
