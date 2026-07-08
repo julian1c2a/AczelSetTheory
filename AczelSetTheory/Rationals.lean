@@ -21,3 +21,5 @@ import AczelSetTheory.Rationals.Roots
 import AczelSetTheory.Rationals.PowOrder
 import AczelSetTheory.Rationals.RationalLog
 import AczelSetTheory.Rationals.HFRat
+import AczelSetTheory.Rationals.HFRatOps
+import AczelSetTheory.Rationals.HFRatCauchy

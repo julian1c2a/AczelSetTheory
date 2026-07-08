@@ -7,8 +7,11 @@ License: MIT
 -- AczelSetTheory/Rationals/CauchySeqAlgebra.lean
 -- Álgebra general de sucesiones de Cauchy en ℚ₀.
 
+import AczelSetTheory.Rationals.Basic
+import AczelSetTheory.Rationals.AbsVal
 import AczelSetTheory.Rationals.IsCauchy
 import AczelSetTheory.Rationals.Inv
+import AczelSetTheory.Rationals.MinAdd
 import Peano.PeanoNat.Arith
 
 namespace ℚ₀
