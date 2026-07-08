@@ -5,6 +5,7 @@ License: MIT
 -/
 
 import AczelSetTheory.Rationals.Roots
+import AczelSetTheory.Rationals.Archimedean
 import AczelSetTheory.Integers.Functions
 import AczelSetTheory.Integers.Order
 import Peano.PeanoNat.Combinatorics.Pow
@@ -349,14 +350,45 @@ theorem newton_seq_anti (q : ℚ₀) (n : ℕ₂) (hq : 0 < q) (N k : ℕ₀) (h
       exact le_refl _
 
 -- Helper lemma: If x_k >= r, then the Newton step decreases by at least a constant delta.
-lemma newton_seq_step_bound (q r : ℚ₀) (n : ℕ₂) (hq : 0 < q) (hr : 0 ≤ r) (h : q < pow r n.val.val) :
+theorem newton_seq_step_bound (q r : ℚ₀) (n : ℕ₂) (hq : 0 < q) (hr : 0 ≤ r) (h : q < pow r n.val.val) :
   ∃ delta > (0:ℚ₀), ∀ k : ℕ₀, Peano.Order.le₀ 1 k → r ≤ newton_raphson_seq q n k →
   Add.add (newton_raphson_seq q n (σ k)) delta ≤ newton_raphson_seq q n k := sorry
 
 -- Helper lemma: Telescoping sum of the lower bound.
-lemma newton_seq_telescope (f : ℕ₀ → ℚ₀) (delta : ℚ₀) (h_delta : 0 < delta) 
+theorem newton_seq_telescope (f : ℕ₀ → ℚ₀) (delta : ℚ₀) (h_delta : 0 < delta) 
   (h_step : ∀ k : ℕ₀, Peano.Order.le₀ 1 k → Add.add (f (σ k)) delta ≤ f k) :
-  ∀ k : ℕ₀, Add.add (f (σ k)) (Mul.mul (ofNat₀ k) delta) ≤ f 1 := sorry
+  ∀ k : ℕ₀, Add.add (f (σ k)) (Mul.mul (ofNat₀ k) delta) ≤ f 1 := by
+  intro k
+  induction k with
+  | zero =>
+    have h_0 : ofNat₀ 𝟘 = 0 := rfl
+    have h_mul_zero : Mul.mul (0:ℚ₀) delta = 0 := zero_mul delta
+    have h_add_zero : Add.add (f (σ 𝟘)) 0 = f (σ 𝟘) := add_zero _
+    rw [h_0, h_mul_zero, h_add_zero]
+    exact le_refl _
+  | succ k' ih =>
+    have h1 : Peano.Order.le₀ 1 (σ k') := Peano.Order.le_1_succ _
+    have h_step' := h_step (σ k') h1
+    have h_sigma : ofNat₀ (σ k') = Add.add (ofNat₀ k') 1 := by
+      have hh : ofNat₀ (σ k') = ofNat₀ (Peano.Add.add k' 𝟙) := rfl
+      rw [hh, ofNat₀_add]
+      rfl
+    rw [h_sigma]
+    have h_dist : Mul.mul (Add.add (ofNat₀ k') 1) delta = Add.add (Mul.mul (ofNat₀ k') delta) (Mul.mul 1 delta) := right_distrib _ _ _
+    rw [h_dist]
+    have h_one : Mul.mul (1:ℚ₀) delta = delta := one_mul delta
+    rw [h_one]
+    have h_assoc : Add.add (f (σ (σ k'))) (Add.add (Mul.mul (ofNat₀ k') delta) delta) = Add.add (Add.add (f (σ (σ k'))) delta) (Mul.mul (ofNat₀ k') delta) := by
+      have h1 : Add.add (f (σ (σ k'))) (Add.add (Mul.mul (ofNat₀ k') delta) delta) = Add.add (Add.add (f (σ (σ k'))) (Mul.mul (ofNat₀ k') delta)) delta := (ℚ₀.add_assoc _ _ _).symm
+      rw [h1]
+      have h3 : Add.add (Add.add (f (σ (σ k'))) (Mul.mul (ofNat₀ k') delta)) delta = Add.add (f (σ (σ k'))) (Add.add (Mul.mul (ofNat₀ k') delta) delta) := ℚ₀.add_assoc _ _ _
+      have h4 : Add.add (Mul.mul (ofNat₀ k') delta) delta = Add.add delta (Mul.mul (ofNat₀ k') delta) := add_comm _ _
+      rw [h3, h4]
+      exact (ℚ₀.add_assoc _ _ _).symm
+    rw [h_assoc]
+    have h_le1 : Add.add (Add.add (f (σ (σ k'))) delta) (Mul.mul (ofNat₀ k') delta) ≤ Add.add (f (σ k')) (Mul.mul (ofNat₀ k') delta) := by
+      exact add_le_add_right h_step' _
+    exact le_trans h_le1 ih
 
 theorem newton_seq_eventually_lt (q r : ℚ₀) (n : ℕ₂) (hq : 0 < q) (hr : 0 ≤ r) (h : q < pow r n.val.val) :
   ∃ N : ℕ₀, And (Peano.Order.le₀ 1 N) (newton_raphson_seq q n N < r) := by
@@ -367,7 +399,7 @@ theorem newton_seq_eventually_lt (q r : ℚ₀) (n : ℕ₂) (hq : 0 < q) (hr : 
     by_cases hr_le : r ≤ newton_raphson_seq q n N
     · exact hr_le
     · have h_lt : newton_raphson_seq q n N < r := by
-        exact ⟨(le_total _ _).resolve_right hr_le, hr_le⟩
+        exact ⟨(ℚ₀.le_total _ _).resolve_right hr_le, hr_le⟩
       have h_ex : ∃ N : ℕ₀, And (Peano.Order.le₀ 1 N) (newton_raphson_seq q n N < r) := ⟨N, hN, h_lt⟩
       exact False.elim (h_false h_ex)
       
@@ -386,7 +418,19 @@ theorem newton_seq_eventually_lt (q r : ℚ₀) (n : ℕ₂) (hq : 0 < q) (hr : 
   
   have h_tele_M := h_tele M
   -- Combining h_tele_M and hM leads to x_{M+1} < 0, but we know x_{M+1} > 0.
-  sorry
+  have h_tele_M := h_tele M
+  have h_xM_pos : 0 ≤ newton_raphson_seq q n (σ M) := by
+    have h1 : Peano.Order.le₀ 1 (σ M) := Peano.Order.le_1_succ _
+    exact le_trans hr (h_all (σ M) h1)
+  
+  have h_M_delta_le : Mul.mul (ofNat₀ M) delta ≤ Add.add (newton_raphson_seq q n (σ M)) (Mul.mul (ofNat₀ M) delta) := by
+    have hz : Add.add 0 (Mul.mul (ofNat₀ M) delta) ≤ Add.add (newton_raphson_seq q n (σ M)) (Mul.mul (ofNat₀ M) delta) := add_le_add_right h_xM_pos _
+    rw [ℚ₀.zero_add] at hz
+    exact hz
+
+  have h_M_delta_le_x1 : Mul.mul (ofNat₀ M) delta ≤ newton_raphson_seq q n 1 := le_trans h_M_delta_le h_tele_M
+  
+  exact hM.2 h_M_delta_le_x1
 
 theorem newton_seq_apart_gt (q r : ℚ₀) (n : ℕ₂) (hq : 0 < q) (hr : 0 ≤ r) (h : q < pow r n.val.val) :
   ∃ N : ℕ₀, ∃ δ > (0:ℚ₀), ∀ k, Peano.Order.le₀ N k → δ ≤ Sub.sub r (newton_raphson_seq q n k) := by
