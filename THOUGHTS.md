@@ -1872,3 +1872,7 @@ Por tanto, asumimos esta limitación en el FRENTE 4. Se dejan estos 4 sorrys como
 ### Siguiente paso
 - Iniciar **FRENTE 1: Análisis Real Constructivo** (definición de métricas, completitud algorítmica).
 
+
+---
+## PUNTO DE REANUDACIÓN (2026-07-08)
+Se ha creado el archivo NEXT-STEPS.md en la raíz del proyecto para documentar el punto exacto de reanudación para la siguiente sesión (Inicio del **FRENTE 1: Análisis Real Constructivo**).
