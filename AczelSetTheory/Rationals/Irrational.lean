@@ -348,12 +348,49 @@ theorem newton_seq_anti (q : ℚ₀) (n : ℕ₂) (hq : 0 < q) (N k : ℕ₀) (h
       rw [h_eq]
       exact le_refl _
 
-theorem newton_seq_eventually_lt (q r : ℚ₀) (n : ℕ₂) (hq : 0 < q) (h : q < pow r n.val.val) :
-  ∃ N : ℕ₀, And (Peano.Order.le₀ 1 N) (newton_raphson_seq q n N < r) := sorry
+-- Helper lemma: If x_k >= r, then the Newton step decreases by at least a constant delta.
+lemma newton_seq_step_bound (q r : ℚ₀) (n : ℕ₂) (hq : 0 < q) (hr : 0 ≤ r) (h : q < pow r n.val.val) :
+  ∃ delta > (0:ℚ₀), ∀ k : ℕ₀, Peano.Order.le₀ 1 k → r ≤ newton_raphson_seq q n k →
+  Add.add (newton_raphson_seq q n (σ k)) delta ≤ newton_raphson_seq q n k := sorry
+
+-- Helper lemma: Telescoping sum of the lower bound.
+lemma newton_seq_telescope (f : ℕ₀ → ℚ₀) (delta : ℚ₀) (h_delta : 0 < delta) 
+  (h_step : ∀ k : ℕ₀, Peano.Order.le₀ 1 k → Add.add (f (σ k)) delta ≤ f k) :
+  ∀ k : ℕ₀, Add.add (f (σ k)) (Mul.mul (ofNat₀ k) delta) ≤ f 1 := sorry
+
+theorem newton_seq_eventually_lt (q r : ℚ₀) (n : ℕ₂) (hq : 0 < q) (hr : 0 ≤ r) (h : q < pow r n.val.val) :
+  ∃ N : ℕ₀, And (Peano.Order.le₀ 1 N) (newton_raphson_seq q n N < r) := by
+  apply Classical.byContradiction
+  intro h_false
+  have h_all : ∀ N : ℕ₀, Peano.Order.le₀ 1 N → r ≤ newton_raphson_seq q n N := by
+    intro N hN
+    by_cases hr_le : r ≤ newton_raphson_seq q n N
+    · exact hr_le
+    · have h_lt : newton_raphson_seq q n N < r := by
+        exact ⟨(le_total _ _).resolve_right hr_le, hr_le⟩
+      have h_ex : ∃ N : ℕ₀, And (Peano.Order.le₀ 1 N) (newton_raphson_seq q n N < r) := ⟨N, hN, h_lt⟩
+      exact False.elim (h_false h_ex)
+      
+  have h_bound := newton_seq_step_bound q r n hq hr h
+  rcases h_bound with ⟨delta, h_delta_pos, h_step⟩
+  
+  have h_step_applied : ∀ k : ℕ₀, Peano.Order.le₀ 1 k → Add.add (newton_raphson_seq q n (σ k)) delta ≤ newton_raphson_seq q n k := by
+    intro k hk
+    exact h_step k hk (h_all k hk)
+    
+  have h_tele := newton_seq_telescope (newton_raphson_seq q n) delta h_delta_pos h_step_applied
+  
+  -- By Archimedean property, there exists M such that x_1 < M * delta
+  have h_arch := archimedean delta (newton_raphson_seq q n 1) h_delta_pos
+  rcases h_arch with ⟨M, hM⟩
+  
+  have h_tele_M := h_tele M
+  -- Combining h_tele_M and hM leads to x_{M+1} < 0, but we know x_{M+1} > 0.
+  sorry
 
 theorem newton_seq_apart_gt (q r : ℚ₀) (n : ℕ₂) (hq : 0 < q) (hr : 0 ≤ r) (h : q < pow r n.val.val) :
   ∃ N : ℕ₀, ∃ δ > (0:ℚ₀), ∀ k, Peano.Order.le₀ N k → δ ≤ Sub.sub r (newton_raphson_seq q n k) := by
-  have h_exists_N : ∃ N : ℕ₀, And (Peano.Order.le₀ 1 N) (newton_raphson_seq q n N < r) := newton_seq_eventually_lt q r n hq h
+  have h_exists_N : ∃ N : ℕ₀, And (Peano.Order.le₀ 1 N) (newton_raphson_seq q n N < r) := newton_seq_eventually_lt q r n hq hr h
   cases h_exists_N with
   | intro N h_xN_lt_r =>
     let x_N := newton_raphson_seq q n N

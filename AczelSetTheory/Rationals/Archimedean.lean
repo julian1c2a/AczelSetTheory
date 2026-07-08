@@ -167,4 +167,24 @@ theorem archimedean_int (p1 q1 : ℤ₀) (p2 q2 : ℕ₀) (hx : ¬ p1 ≤ 0) (hq
 theorem archimedean (x y : ℚ₀) : 0 < x → ∃ N : ℕ₀, y < Mul.mul (ofNat₀ N) x := by
   revert x y
   refine Quotient.ind₂ (fun p q hx => ?_)
-  sorry
+  have h_zero : (0 : ℚ₀) = mk 0 den1 := rfl
+  have hx2 : ¬ mk p.1 p.2 ≤ mk 0 den1 := hx.2
+  rw [mk_le_mk] at hx2
+  have hd1 : ℤ₀.ofNat den1.val = 1 := rfl
+  rw [hd1, ℤ₀.mul_one, ℤ₀.zero_mul] at hx2
+  have hq2_ne : q.2.val ≠ 𝟘 := q.2.property
+  have h_arch := archimedean_int p.1 q.1 p.2.val q.2.val hx2 hq2_ne
+  rcases h_arch with ⟨N, hN⟩
+  refine ⟨N, ?_⟩
+  have h_y_lt : ¬ Mul.mul (ofNat₀ N) (mk p.1 p.2) ≤ mk q.1 q.2 := by
+    rw [ofNat₀_eq_mk]
+    have h_mul_mk : Mul.mul (mk (ℤ₀.ofNat N) den1) (mk p.1 p.2) = mk (Mul.mul (ℤ₀.ofNat N) p.1) (mulDen den1 p.2) := by
+      rfl
+    rw [h_mul_mk, mk_le_mk]
+    have h_mulDen : ℤ₀.ofNat (mulDen den1 p.2).val = ℤ₀.ofNat p.2.val := by
+      change ℤ₀.ofNat (mul 𝟙 p.2.val) = ℤ₀.ofNat p.2.val
+      rw [Peano.Mul.one_mul]
+    rw [h_mulDen]
+    rw [ℤ₀.mul_assoc]
+    exact hN
+  exact ⟨(ℚ₀.le_total _ _).resolve_right h_y_lt, h_y_lt⟩
