@@ -44,7 +44,7 @@
 ##### FRENTE 3 : CRITERIOS DE CONVERGENCIA Y CRITERIOS DE EQUIVALENCIA ENTRE SUCESIONES DE CAUCHY (HASTA EXPANDIR LAS SERIES CONVERGENTES Y LAS DE CAUCHY HASTA SU MAYOR GENERALIDAD UNA VEZ DADAS LOS TÉRMINOS Y CON ÉPSILONS CUALQUIERA, DÁNDO SOLO SU FUNCIÓN $\nu_n : \mathbb{Q}_0^{\gt 0} \to \mathbb{N}_0$)))$ MÁS LA PRUEBA DE QUE REALMENTE FUNCIONAN.
   > **[Respuesta Antigravity]**: Es el paso necesario. Evolucionar del épsilon diádico (`1/2^n`) a una función de módulo de convergencia arbitrario `nu(ε)` nos dará compatibilidad plena con el análisis real constructivo canónico (estilo Bishop).
 
-##### FRENTE 4 : ESTUDIO DE LA POSIBILIDAD DE DAR UNA DEFINICIÓN DE TIPOS NUEVOS PARA ENTEROS Y RACIONALES.
+##### FRENTE 4 : ESTUDIO DE LA POSIBILIDAD DE DAR UNA DEFINICIÓN DE TIPOS NUEVOS PARA ENTEROS Y RACIONALES. [COMENZADO - TRABAJO GRUESO TERMINADO]
 
 - 1º : Actualmente tenemos $\mathbb{Z}_0$ como las clases de equivalencia de las parejas de naturales $(n,m)$ con la relación $(a,b) \sim (c,d) \iff a+d=b+c$.
 - 2º : Quiero agregar un tipo nuevo que defina un entero canónico privilegiado: 

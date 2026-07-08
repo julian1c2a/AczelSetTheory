@@ -108,3 +108,24 @@ Canonical
 
 ## Módulo: `AczelSetTheory/Rationals/Irrational.lean`
 **Descripción:** Construcción formal de irracionales aproximados mediante sucesiones racionales sin límite exacto en ℚ₀ (ej: convergencia por Newton-Raphson a $\sqrt{2}$).
+
+---
+
+## Módulo: `AczelSetTheory/Rationals/HFRat.lean`
+**Descripción:** Tipo racional estructurado `HFRat` que expone un racional exento de constructores internos dependientes de setoides a nivel visual, empleando pares coprimos (`ℚ₀'`).
+
+---
+
+## Módulo: `AczelSetTheory/Rationals/HFRatOps.lean`
+**Descripción:** Operaciones algebraicas (`inv`, `div`, `absVal`, `pow`, `ofInt`, `ofNat₀`) sobre `HFRat`, elevadas explícitamente desde `ℚ₀`.
+
+---
+
+## Módulo: `AczelSetTheory/Rationals/HFRatCauchy.lean`
+**Descripción:** Sucesiones de Cauchy para `HFRat` e inter-operabilidad con las sucesiones de Cauchy en `ℚ₀`. Exporta `HFRat.CauchySeq` y `HFRat.IsCauchy`.
+
+---
+
+## Módulo: `AczelSetTheory/Rationals/MinAdd.lean`
+**Descripción:** Lemas auxiliares de suma y mínimo (`min_add_add_right`, `min_add_add_left`), posibilitando compilación correcta de operaciones algebraicas límite.
+

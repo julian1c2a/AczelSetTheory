@@ -5,7 +5,7 @@
 **Author**: Julián Calderón Almendros
 **License**: MIT
 **Lean version**: v4.30.0
-**Build status**: ✅ 0 `sorry` — 0 `noncomputable` — 0 errors, 0 warnings — 196 `.lean` files (~33 000 LOC), build 251 jobs
+**Build status**: ✅ 0 `sorry` — 0 `noncomputable` — 0 errors, 0 warnings — 200 `.lean` files (~33 500 LOC), build 255 jobs
 **Roadmap**: FASE A (paridad Peano) ✅ completa · FASE B (consolidación) ✅ completa · FASE C (análisis real) 🚧 en curso
 
 ---
@@ -87,9 +87,10 @@ AczelSetTheory/
   Integers/          — Integer type ℤ₀ (10 sub-modules)
     Basic, Order, Functions, Arithmetic, Bijection, PadicVal, MobiusLiouville,
     Canonical, Bezout, ZModN
-  Rationals/         — Rational type ℚ₀ and analytic theory (14 sub-modules)
+  Rationals/         — Rational type ℚ₀ and analytic theory (18 sub-modules)
     Basic, AbsVal, Density, IsCauchy, Inv, Bisection, Canonical, Convergence,
-    PowOrder, RationalLog, Roots, CauchySeqAlgebra, Archimedean, Irrational
+    PowOrder, RationalLog, Roots, CauchySeqAlgebra, Archimedean, Irrational,
+    HFRat, HFRatOps, HFRatCauchy, MinAdd
   Combinatorics/     — Native finite combinatorics in HFSet (1 sub-module)
     Counting  — pigeonhole, inclusion–exclusion (2 and 3 sets), card lemmas
   Topology/          — Topological spaces over HFSet (5 sub-modules)
