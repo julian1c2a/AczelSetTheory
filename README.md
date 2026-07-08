@@ -5,7 +5,7 @@
 **Author**: Julián Calderón Almendros
 **License**: MIT
 **Lean version**: v4.30.0
-**Build status**: ✅ 0 `sorry` — 0 `noncomputable` — 0 errors, 0 warnings — 200 `.lean` files (~33 500 LOC), build 255 jobs
+**Build status**: ✅ 10 `sorry` — 0 `noncomputable` — 0 errors, 0 warnings — 200 `.lean` files (~33 500 LOC), build 255 jobs
 **Roadmap**: FASE A (paridad Peano) ✅ completa · FASE B (consolidación) ✅ completa · FASE C (análisis real) 🚧 en curso
 
 ---
