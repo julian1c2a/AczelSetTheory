@@ -337,7 +337,7 @@ theorem bernoulli_ineq_alt2 (w : ℚ₀) (hw : 0 ≤ w) (n : ℕ₀) :
   rw [h_cancel] at h_add_n
   exact h_add_n
 
-theorem pow_one (n : ℕ₀) : pow (1:ℚ₀) n = (1:ℚ₀) := by
+theorem one_pow (n : ℕ₀) : pow (1:ℚ₀) n = (1:ℚ₀) := by
   induction n with
   | zero => rfl
   | succ k ih =>
@@ -374,7 +374,7 @@ theorem pow_inv (b : ℚ₀) (hb : 0 < b) (n : ℕ₀) : pow (inv b) n = inv (po
     have hb_ne : b ≠ 0 := by
       intro hc; rw [hc] at hb; exact hb.2 (le_refl 0)
     have hi : Mul.mul b (inv b) = (1:ℚ₀) := mul_inv_cancel hb_ne
-    have ho : pow (1:ℚ₀) n = (1:ℚ₀) := pow_one n
+    have ho : pow (1:ℚ₀) n = (1:ℚ₀) := one_pow n
     rw [hd, hi, ho]
   
   have hb_pow_ne_zero : pow b n ≠ 0 := pow_ne_zero_of_pos hb n
@@ -391,7 +391,7 @@ theorem newton_seq_pow_ge (q : ℚ₀) (n : Peano.ℕ₂) (hq : 0 < q) (k : ℕ�
   · have h_step : newton_raphson_seq q n (σ k) = newton_raphson_step q n x_k := rfl
     have h_or : q = (0:ℚ₀) ∨ q = (1:ℚ₀) := Or.inr hq_one
     have h_if : newton_raphson_step q n x_k = q := if_pos h_or
-    rw [h_step, h_if, hq_one, pow_one]
+    rw [h_step, h_if, hq_one, one_pow]
     exact le_refl (1:ℚ₀)
   
   -- Si q ≠ 1, usamos la expansión algebraica

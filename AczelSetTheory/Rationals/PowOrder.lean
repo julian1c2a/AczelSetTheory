@@ -40,10 +40,6 @@ theorem pow_one (x : ℚ₀) : pow x 𝟙 = x := by
   show x * pow x 𝟘 = x
   rw [pow_zero, mul_one]
 
-theorem one_pow (n : ℕ₀) : pow (1 : ℚ₀) n = 1 := by
-  induction n with
-  | zero => rfl
-  | succ k ih => rw [pow_succ, ih, mul_one]
 
 theorem pow_add (x : ℚ₀) (m n : ℕ₀) :
     pow x (Peano.Add.add m n) = pow x m * pow x n := by

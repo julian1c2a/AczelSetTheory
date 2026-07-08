@@ -124,13 +124,15 @@ Peano tenía `NumberSets.lean` con la definición de `ℤ_P` como pares. AczelSe
 
 | Módulo AczelSetTheory | Contenido | Estado |
 |---|---|---|
-| `Integers/Basic.lean` | Tipo `HFInt` = pares VN, representante canónico, `toInt`, `toNat` | ✅ |
-| `Integers/Arithmetic.lean` | `+`, `-`, `*`, propiedades algebraicas sobre `HFInt` | ✅ |
-| `Integers/Order.lean` | Orden `≤` sobre `HFInt` | ✅ |
-| `Integers/Bijection.lean` | Biyección `HFInt ↔ ℤ` (vía isomorfismo con Lean `Int`) | ✅ |
-| `Integers/Functions.lean` | Funciones de conversión y auxiliares | ✅ |
+| `Integers/Basic.lean` | Tipo `ℤ₀` base como clases de equivalencia de pares | ✅ |
+| `Integers/Arithmetic.lean` | `+`, `-`, `*`, división, gcd, lcm sobre `ℤ₀` | ✅ |
+| `Integers/Order.lean` | Orden `≤` sobre `ℤ₀` | ✅ |
+| `Integers/Bijection.lean` | Biyección `ℤ₀ ↔ ℤ` (vía isomorfismo con Lean `Int`) | ✅ |
+| `Integers/Functions.lean` | Funciones de conversión, `abs`, `sign` | ✅ |
 | `Integers/MobiusLiouville.lean` | Función de Möbius `μ(n)` y función de Liouville `λ(n)` | ✅ 🆕 |
 | `Integers/PadicVal.lean` | Valuación p-ádica `v_p(n)` | ✅ 🆕 |
+| `Integers/HFInt.lean` | Wrapper `HFInt` con representante canónico | ✅ 🆕 |
+| `Integers/HFIntOps.lean` | Operaciones elevadas y comodidades `HFInt` | ✅ 🆕 |
 
 ---
 

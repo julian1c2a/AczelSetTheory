@@ -84,9 +84,9 @@ AczelSetTheory/
     Field, Module, LinearSpace, Lattice, Action, CosetAction, QuotientGroup,
     FirstIsomorphism, SecondIsomorphism, ThirdIsomorphism, CorrespondenceTheorem,
     Sylow, Zassenhaus, QuotientRing, HFMatrix
-  Integers/          — Integer type ℤ₀ (10 sub-modules)
+  Integers/          — Integer type ℤ₀ (12 sub-modules)
     Basic, Order, Functions, Arithmetic, Bijection, PadicVal, MobiusLiouville,
-    Canonical, Bezout, ZModN
+    Canonical, Bezout, ZModN, HFInt, HFIntOps
   Rationals/         — Rational type ℚ₀ and analytic theory (18 sub-modules)
     Basic, AbsVal, Density, IsCauchy, Inv, Bisection, Canonical, Convergence,
     PowOrder, RationalLog, Roots, CauchySeqAlgebra, Archimedean, Irrational,
