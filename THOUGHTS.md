@@ -1848,3 +1848,27 @@ DECISIÃ“N: Portar el esquema de `namespace`s que se puede observar en Peano a to
 Al implementar `bezoutCoeffs` (funciÃ³n computable del algoritmo extendido de Euclides en `Bezout.lean`), la prueba de correctness `bezoutCoeffs_spec` requerÃ­a el lema `gcd_step (a b : â„•â‚€) (hb : b â‰  ðŸ˜) : gcd a b = gcd b (a % b)`, que estaba declarado `private` en `peanolib/Peano/PeanoNat/Arith.lean` y por tanto inaccesible desde AczelSetTheory.
 
 **RESUELTO (2026-06-06):** Se quitÃ³ `private` de `gcd_step` en `Arith.lean` y se aÃ±adiÃ³ al bloque `export` de `Peano.lean`. Build de peanolib: 66 jobs, 0 errores. Commit `084dea7` en master local de peanolib. Push pendiente de autenticaciÃ³n GitHub (hacer `git push origin master` desde el terminal con credenciales).
+
+---
+
+## PROYECTA: FRENTE 4 (Racionales Completos, Incompletitud)
+> Fecha: 2026-07-08
+
+### Estado del Frente
+- Se formalizó la secuencia de Newton en Irrational.lean ($\sqrt[n]{q}$).
+- Se demostró que la secuencia se mantiene alejada (bounded away) de cualquier aproximación racional que no sea raíz exacta (
+ewton_seq_apart_lt, 
+ewton_seq_apart_gt).
+- Se construyó la sucesión para $\sqrt{2}$ en Incompleteness.lean.
+- Quedan 4 sorrys residuales: 1 de contención (
+ewton_seq_step_bound) en Irrational.lean, y 3 referidos a la irracionalidad algebraica profunda de $\sqrt{2}$ (sqrt2_irrational, Cauchy bounds) en Incompleteness.lean.
+
+### Deuda Técnica Acordada
+Para probar la irracionalidad de $\sqrt{2}$ (es decir, ^2 \neq 2q^2$) en Incompleteness.lean, el proyecto Peano carece actualmente de:
+1. padicVal_mul o padicVal_pow (para usar paridad de la valuación p-ádica).
+2. Un principio de descenso infinito aplicable a fracciones directamente.
+Por tanto, asumimos esta limitación en el FRENTE 4. Se dejan estos 4 sorrys como "deuda técnica de fundamentos numéricos", y consideramos el objetivo *arquitectónico* del FRENTE 4 como **completado**. El marco axiomático de HFRat está solidificado.
+
+### Siguiente paso
+- Iniciar **FRENTE 1: Análisis Real Constructivo** (definición de métricas, completitud algorítmica).
+

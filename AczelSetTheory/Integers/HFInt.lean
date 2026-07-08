@@ -255,4 +255,6 @@ instance : Coe Pos HFInt where coe := Subtype.val
 instance : Coe Neg HFInt where coe := Subtype.val
 instance : Coe NonNeg HFInt where coe := Subtype.val
 
+instance : Coe Peano.ℕ₀ HFInt where coe := ofNat
+
 end HFInt

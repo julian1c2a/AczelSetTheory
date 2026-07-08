@@ -23,3 +23,5 @@ import AczelSetTheory.Rationals.RationalLog
 import AczelSetTheory.Rationals.HFRat
 import AczelSetTheory.Rationals.HFRatOps
 import AczelSetTheory.Rationals.HFRatCauchy
+import AczelSetTheory.Rationals.Archimedean
+import AczelSetTheory.Rationals.Irrational
