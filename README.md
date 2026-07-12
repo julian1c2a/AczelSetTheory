@@ -4,8 +4,8 @@
 
 **Author**: Julián Calderón Almendros
 **License**: MIT
-**Lean version**: v4.30.0
-**Build status**: ✅ 4 `sorry` — 0 `noncomputable` — 0 errors, 0 warnings — 200 `.lean` files (~33 500 LOC), build 255 jobs
+**Lean version**: v4.31.0
+**Build status**: ✅ 14 `sorry` (todos en `Rationals/`·`Reals/`, ver [CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md)) — 0 `noncomputable` — 0 errors, 0 warnings — 204 `.lean` files (~34 250 LOC), build 266 jobs
 **Roadmap**: FASE A (paridad Peano) ✅ completa · FASE B (consolidación) ✅ completa · FASE C (análisis real) 🚧 en curso
 
 ---
@@ -22,7 +22,7 @@ Key properties of this set theory:
 - **No axiom of infinity**: natural numbers are constructed from sets (`vN : ℕ₀ → HFSet`)
 - **Well-founded recursion and induction** over sets (`∈` is well-founded)
 - **Axiom-free foundations**: the Zermelo axioms are derived theorems, not postulates
-- **Standard axiom footprint**: theorems reduce to `{propext, Classical.choice, Quot.sound}` — the same set as ordinary Lean/Mathlib developments. `Classical.choice` is used only for *propositional* reasoning (excluded middle via `byContradiction`/`em`) and enters structurally at the `CList.extEq` foundation (well-founded recursion); it is never used to make non-computable selections. Verifiable per theorem with `#print axioms`
+- **Constructive axiom footprint — cero `Classical`**: this is a *foundational, non-negotiable* project mandate (`DECISIONS.md` MANDATORY M-1, ADR-018), not a stylistic preference. Target footprint: `#print axioms ⊆ {propext, Quot.sound}` — **no** `Classical.choice`, unlike ordinary Lean/Mathlib developments. `Classical.byContradiction`/`em`/`propDecidable`/`choice`/`choose` are all forbidden and must be reconverted to constructive proofs (`Decidable.byContradiction`, `by_cases` over a genuine `Decidable` instance, bounded/decidable search) even when this does not by itself produce a `noncomputable def`. Enforced mechanically per-theorem by `#assert_no_classical` in [`AczelSetTheory/Meta/AxiomCheck.lean`](AczelSetTheory/Meta/AxiomCheck.lean), imported in the root barrel — a regression fails `lake build`. As of 2026-07-12 the coverage of this gate is partial (grows with each closed sorry); see [CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md) and [INFORME-AUDITORIA-2026-07-12.md](INFORME-AUDITORIA-2026-07-12.md) for the last verified state and the one violation found and fixed that session
 
 ### Derived Zermelo Axioms
 
@@ -87,10 +87,13 @@ AczelSetTheory/
   Integers/          — Integer type ℤ₀ (12 sub-modules)
     Basic, Order, Functions, Arithmetic, Bijection, PadicVal, MobiusLiouville,
     Canonical, Bezout, ZModN, HFInt, HFIntOps
-  Rationals/         — Rational type ℚ₀ and analytic theory (18 sub-modules)
+  Rationals/         — Rational type ℚ₀ and analytic theory (21 sub-modules)
     Basic, AbsVal, Density, IsCauchy, Inv, Bisection, Canonical, Convergence,
     PowOrder, RationalLog, Roots, CauchySeqAlgebra, Archimedean, Irrational,
-    HFRat, HFRatOps, HFRatCauchy, MinAdd
+    HFRat, HFRatOps, HFRatCauchy, HFRatCauchyAlgebra, MinAdd, Series, Polynomial
+    (Series/Polynomial 🚧 in progress — see CURRENT-STATUS-PROJECT.md)
+  Reals/             — Incompleteness of HFRat, first steps towards HFReal (1 sub-module)
+    Incompleteness  — 🚧 in progress; HFReal (quotient of Cauchy sequences) not built yet
   Combinatorics/     — Native finite combinatorics in HFSet (1 sub-module)
     Counting  — pigeonhole, inclusion–exclusion (2 and 3 sets), card lemmas
   Topology/          — Topological spaces over HFSet (5 sub-modules)
@@ -139,7 +142,7 @@ CList  ──normalize──▶  CList (canonical form)
 lake build AczelSetTheory
 ```
 
-Requires Lean v4.30.0 (see `lean-toolchain`).
+Requires Lean v4.31.0 (see `lean-toolchain`).
 
 ### Running
 
@@ -155,9 +158,10 @@ lake build Main && lake env lean --run Main.lean
 - [CHANGELOG.md](CHANGELOG.md) — Change history
 - [CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md) — Project status overview
 - [DEPENDENCIES.md](DEPENDENCIES.md) — Module dependency diagram (initial-phase scope; use `lake graph` for the full graph)
-- [NEXT_STEPS.md](NEXT_STEPS.md) — Development roadmap (tactical)
+- [NEXT-STEPS.md](NEXT-STEPS.md) — Development roadmap (tactical)
 - [PLANNING.md](PLANNING.md) / [PLANNING-FASE-B.md](PLANNING-FASE-B.md) — Long-term roadmap and FASE B milestone tracking
-- [AUDIT-MODULE-MATRIX.md](AUDIT-MODULE-MATRIX.md) — Per-module audit (LOC, sorry/axiom/noncomputable counts)
+- [AUDIT-MODULE-MATRIX.md](AUDIT-MODULE-MATRIX.md) — Per-module audit (LOC, sorry/axiom/noncomputable counts; stale since 2026-06-10)
+- [INFORME-AUDITORIA-2026-07-12.md](INFORME-AUDITORIA-2026-07-12.md) — Latest cross-project audit (state vs. documentation, governance comparison with sibling Lean 4 projects)
 
 ### Documentación heredada de Peano
 
