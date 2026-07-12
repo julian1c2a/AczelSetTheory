@@ -30,7 +30,7 @@ import AczelSetTheory.VN.CardVN
 import Peano.PeanoNat.Foundation.PeanoSystem
 import Peano.PeanoNat.Foundation.Initiality
 
-open Peano Peano.Foundation
+open Peano Peano.PeanoSystem Peano.Initiality
 
 namespace VN
 
