@@ -390,47 +390,95 @@ theorem newton_seq_telescope (f : ℕ₀ → ℚ₀) (delta : ℚ₀) (h_delta :
       exact add_le_add_right h_step' _
     exact le_trans h_le1 ih
 
+/-- Búsqueda constructiva acotada: hasta el índice `σ K`, o bien ya hay un testigo
+`N` con `seq N < r`, o bien `r` sigue siendo una cota inferior en `σ K` y la suma
+telescópica de los descensos por `h_step` está acotada por `seq 1`. Sustituye al uso
+de `Classical.byContradiction` de la versión anterior: la disyunción se decide en
+cada paso vía la instancia `Decidable` de `≤` en `ℚ₀` (`ℚ₀.le_total` + `resolve_right`),
+sin asumir el medio excluido no constructivo. -/
+private theorem newton_bounded_search (q r : ℚ₀) (n : ℕ₂)
+    (delta : ℚ₀) (_h_delta_pos : 0 < delta)
+    (h_step : ∀ k : ℕ₀, Peano.Order.le₀ 1 k → r ≤ newton_raphson_seq q n k →
+      Add.add (newton_raphson_seq q n (σ k)) delta ≤ newton_raphson_seq q n k) :
+    ∀ K : ℕ₀,
+      (∃ N : ℕ₀, Peano.Order.le₀ 1 N ∧ newton_raphson_seq q n N < r) ∨
+      (r ≤ newton_raphson_seq q n (σ K) ∧
+        Add.add (newton_raphson_seq q n (σ K)) (Mul.mul (ofNat₀ K) delta) ≤ newton_raphson_seq q n 1) := by
+  intro K
+  induction K with
+  | zero =>
+    by_cases hr_le : r ≤ newton_raphson_seq q n 1
+    · refine Or.inr ⟨hr_le, ?_⟩
+      have h0 : ofNat₀ (𝟘 : ℕ₀) = (0:ℚ₀) := rfl
+      have hmz : Mul.mul (0:ℚ₀) delta = 0 := zero_mul delta
+      have haz : Add.add (newton_raphson_seq q n (σ 𝟘)) (0:ℚ₀) = newton_raphson_seq q n (σ 𝟘) := add_zero _
+      rw [h0, hmz, haz]
+      exact le_refl _
+    · have hlt : newton_raphson_seq q n 1 < r := ⟨(ℚ₀.le_total _ _).resolve_right hr_le, hr_le⟩
+      exact Or.inl ⟨1, Peano.Order.le_refl 1, hlt⟩
+  | succ K' ih =>
+    rcases ih with ⟨N, hN1, hNlt⟩ | ⟨hle_K', htele_K'⟩
+    · exact Or.inl ⟨N, hN1, hNlt⟩
+    · by_cases hr_le2 : r ≤ newton_raphson_seq q n (σ (σ K'))
+      · refine Or.inr ⟨hr_le2, ?_⟩
+        have h_sigma : ofNat₀ (σ K') = Add.add (ofNat₀ K') 1 := by
+          have hh : ofNat₀ (σ K') = ofNat₀ (Peano.Add.add K' 𝟙) := rfl
+          rw [hh, ofNat₀_add]
+          rfl
+        rw [h_sigma]
+        have h_dist : Mul.mul (Add.add (ofNat₀ K') 1) delta
+            = Add.add (Mul.mul (ofNat₀ K') delta) (Mul.mul 1 delta) := right_distrib _ _ _
+        rw [h_dist]
+        have h_one : Mul.mul (1:ℚ₀) delta = delta := one_mul delta
+        rw [h_one]
+        have h_step' := h_step (σ K') (Peano.Order.le_1_succ _) hle_K'
+        have h_assoc :
+            Add.add (newton_raphson_seq q n (σ (σ K'))) (Add.add (Mul.mul (ofNat₀ K') delta) delta)
+              = Add.add (Add.add (newton_raphson_seq q n (σ (σ K'))) delta) (Mul.mul (ofNat₀ K') delta) := by
+          have h1 : Add.add (newton_raphson_seq q n (σ (σ K'))) (Add.add (Mul.mul (ofNat₀ K') delta) delta)
+              = Add.add (Add.add (newton_raphson_seq q n (σ (σ K'))) (Mul.mul (ofNat₀ K') delta)) delta :=
+            (ℚ₀.add_assoc _ _ _).symm
+          rw [h1]
+          have h3 : Add.add (Add.add (newton_raphson_seq q n (σ (σ K'))) (Mul.mul (ofNat₀ K') delta)) delta
+              = Add.add (newton_raphson_seq q n (σ (σ K'))) (Add.add (Mul.mul (ofNat₀ K') delta) delta) :=
+            ℚ₀.add_assoc _ _ _
+          have h4 : Add.add (Mul.mul (ofNat₀ K') delta) delta = Add.add delta (Mul.mul (ofNat₀ K') delta) :=
+            add_comm _ _
+          rw [h3, h4]
+          exact (ℚ₀.add_assoc _ _ _).symm
+        rw [h_assoc]
+        have h_le1 :
+            Add.add (Add.add (newton_raphson_seq q n (σ (σ K'))) delta) (Mul.mul (ofNat₀ K') delta)
+              ≤ Add.add (newton_raphson_seq q n (σ K')) (Mul.mul (ofNat₀ K') delta) :=
+          add_le_add_right h_step' _
+        exact le_trans h_le1 htele_K'
+      · have hlt2 : newton_raphson_seq q n (σ (σ K')) < r :=
+          ⟨(ℚ₀.le_total _ _).resolve_right hr_le2, hr_le2⟩
+        exact Or.inl ⟨σ (σ K'), Peano.Order.le_1_succ _, hlt2⟩
+
 theorem newton_seq_eventually_lt (q r : ℚ₀) (n : ℕ₂) (hq : 0 < q) (hr : 0 ≤ r) (h : q < pow r n.val.val) :
   ∃ N : ℕ₀, And (Peano.Order.le₀ 1 N) (newton_raphson_seq q n N < r) := by
-  apply Classical.byContradiction
-  intro h_false
-  have h_all : ∀ N : ℕ₀, Peano.Order.le₀ 1 N → r ≤ newton_raphson_seq q n N := by
-    intro N hN
-    by_cases hr_le : r ≤ newton_raphson_seq q n N
-    · exact hr_le
-    · have h_lt : newton_raphson_seq q n N < r := by
-        exact ⟨(ℚ₀.le_total _ _).resolve_right hr_le, hr_le⟩
-      have h_ex : ∃ N : ℕ₀, And (Peano.Order.le₀ 1 N) (newton_raphson_seq q n N < r) := ⟨N, hN, h_lt⟩
-      exact False.elim (h_false h_ex)
-      
   have h_bound := newton_seq_step_bound q r n hq hr h
   rcases h_bound with ⟨delta, h_delta_pos, h_step⟩
-  
-  have h_step_applied : ∀ k : ℕ₀, Peano.Order.le₀ 1 k → Add.add (newton_raphson_seq q n (σ k)) delta ≤ newton_raphson_seq q n k := by
-    intro k hk
-    exact h_step k hk (h_all k hk)
-    
-  have h_tele := newton_seq_telescope (newton_raphson_seq q n) delta h_delta_pos h_step_applied
-  
+
   -- By Archimedean property, there exists M such that x_1 < M * delta
   have h_arch := archimedean delta (newton_raphson_seq q n 1) h_delta_pos
   rcases h_arch with ⟨M, hM⟩
-  
-  have h_tele_M := h_tele M
-  -- Combining h_tele_M and hM leads to x_{M+1} < 0, but we know x_{M+1} > 0.
-  have h_tele_M := h_tele M
-  have h_xM_pos : 0 ≤ newton_raphson_seq q n (σ M) := by
-    have h1 : Peano.Order.le₀ 1 (σ M) := Peano.Order.le_1_succ _
-    exact le_trans hr (h_all (σ M) h1)
-  
-  have h_M_delta_le : Mul.mul (ofNat₀ M) delta ≤ Add.add (newton_raphson_seq q n (σ M)) (Mul.mul (ofNat₀ M) delta) := by
-    have hz : Add.add 0 (Mul.mul (ofNat₀ M) delta) ≤ Add.add (newton_raphson_seq q n (σ M)) (Mul.mul (ofNat₀ M) delta) := add_le_add_right h_xM_pos _
-    rw [ℚ₀.zero_add] at hz
-    exact hz
 
-  have h_M_delta_le_x1 : Mul.mul (ofNat₀ M) delta ≤ newton_raphson_seq q n 1 := le_trans h_M_delta_le h_tele_M
-  
-  exact hM.2 h_M_delta_le_x1
+  rcases newton_bounded_search q r n delta h_delta_pos h_step M with h_wit | ⟨h_le_M, h_tele_M⟩
+  · exact h_wit
+  · -- Si no hay testigo hasta σM, la suma telescópica contradice la cota arquimediana:
+    -- de ahí se sigue lo que sea, en particular el testigo buscado (ex falso, constructivo).
+    exfalso
+    have h_xM_nonneg : 0 ≤ newton_raphson_seq q n (σ M) := le_trans hr h_le_M
+    have h_M_delta_le : Mul.mul (ofNat₀ M) delta ≤ Add.add (newton_raphson_seq q n (σ M)) (Mul.mul (ofNat₀ M) delta) := by
+      have hz : Add.add 0 (Mul.mul (ofNat₀ M) delta) ≤ Add.add (newton_raphson_seq q n (σ M)) (Mul.mul (ofNat₀ M) delta) := add_le_add_right h_xM_nonneg _
+      rw [ℚ₀.zero_add] at hz
+      exact hz
+
+    have h_M_delta_le_x1 : Mul.mul (ofNat₀ M) delta ≤ newton_raphson_seq q n 1 := le_trans h_M_delta_le h_tele_M
+
+    exact hM.2 h_M_delta_le_x1
 
 theorem newton_seq_apart_gt (q r : ℚ₀) (n : ℕ₂) (hq : 0 < q) (hr : 0 ≤ r) (h : q < pow r n.val.val) :
   ∃ N : ℕ₀, ∃ δ > (0:ℚ₀), ∀ k, Peano.Order.le₀ N k → δ ≤ Sub.sub r (newton_raphson_seq q n k) := by

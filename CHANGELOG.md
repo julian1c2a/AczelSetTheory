@@ -6,6 +6,51 @@ All notable changes to this project are documented here.
 
 ---
 
+## [2026-07-12] — Auditoría cruzada: pureza constructiva, higiene de repo, documentación
+
+### Fixed
+- **`Rationals/Irrational.lean`**: `newton_seq_eventually_lt` usaba `Classical.byContradiction`,
+  violando la MANDATORY M-1 de `DECISIONS.md` (cero `Classical`). Reescrito de forma
+  constructiva: búsqueda acotada por decidibilidad de `≤` en `ℚ₀` (nuevo lema privado
+  `newton_bounded_search`, inducción con disyunción testigo-o-cota-telescópica). Añadido
+  a `Meta/AxiomCheck.lean` (`#assert_no_classical ℚ₀.newton_seq_eventually_lt`) para que
+  una regresión futura falle el build en vez de pasar desapercibida — el gate no cubría
+  `Rationals/`/`Reals/` hasta ahora.
+- **`REFERENCE.md`**: eliminadas 3 filas fantasma (`Reals/{CauchySeq,Arithmetic,Order}.lean`,
+  borrados el 2026-07-05 en `173add2` pero documentados como "✅ Complete" desde entonces,
+  con IDs de fila duplicados 108c–108f). Añadidas las filas reales que faltaban
+  (`HFRat`, `HFRatOps`, `HFRatCauchy`, `HFRatCauchyAlgebra`, `MinAdd`, `Series`,
+  `Polynomial`, barrel `Reals.lean`) y corregida la dependencia documentada del barrel
+  `Rationals.lean` (19 módulos reales, no 4).
+- **`CURRENT-STATUS-PROJECT.md`**: corregido el recuento de `sorry` (afirmaba 0; son
+  **14** reales, listados por fichero:línea) y las métricas top-line (204 ficheros,
+  Lean v4.31.0, 266 jobs).
+
+### Removed
+- **`NEXT_STEPS.md`** (guión bajo): eliminado por coexistir de forma contradictoria con
+  `NEXT-STEPS.md` (guión, nombre canónico usado en Peano/FOL/ROBINSON_PlusPlus). Su
+  única tarea pendiente no reflejada ya en `NEXT-STEPS.md` (propiedades topológicas de
+  `HFReal`) se trasladó como "FRENTE 2".
+- **13 ficheros scratch/temporales commiteados en la raíz** (`scratch.lean`,
+  `scratch_hfrat.lean`, `temp_check.lean`…`temp_check11.lean`, `fix-ref.ps1`), añadidos
+  de golpe en `d1a5693` contradiciendo `WORKFLOW.md` ("avoid `git add -A`"). Añadidos
+  patrones `scratch*.lean`/`temp_*.lean`/`fix-*.ps1` a `.gitignore` para prevenir recurrencia.
+
+### Changed
+- **`.gitignore`**: reescrito en UTF-8 limpio (la línea `/.worktrees` estaba corrupta en
+  UTF-16 desde una redirección de PowerShell y no ignoraba nada realmente), deduplicadas
+  entradas repetidas de `.claude`.
+- **Protocolo de lock**: reactivado tras confirmarse que `locked_files.txt`/`frozen_files.txt`
+  llevaban vacíos desde el primer commit. `Rationals/Irrational.lean` y
+  `Meta/AxiomCheck.lean` bloqueados (lock temporal) al cierre de esta sesión.
+
+Ver [INFORME-AUDITORIA-2026-07-12.md](INFORME-AUDITORIA-2026-07-12.md) para el detalle
+completo de la auditoría (incluye comparativa de gobernanza con Peano/FOL/ROBINSON_PlusPlus
+y una propuesta de unificación de `AI-GUIDE.md`/`NAMING-CONVENTIONS.md`/`DECISIONS.md`/
+`DEPENDENCIES.md`, pendiente de decisión antes de propagarse vía `lean4-project-template`).
+
+---
+
 ## [2026-07-07] — Fusión de mejorias y Cierre de FASE B
 
 ### Added

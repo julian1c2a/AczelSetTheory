@@ -21,7 +21,10 @@ import AczelSetTheory.Rationals.Roots
 import AczelSetTheory.Rationals.PowOrder
 import AczelSetTheory.Rationals.RationalLog
 import AczelSetTheory.Rationals.HFRat
-import AczelSetTheory.Rationals.HFRatOps
+import AczelSetTheory.Rationals.MinAdd
+import AczelSetTheory.Rationals.Series
+import AczelSetTheory.Rationals.Polynomial
 import AczelSetTheory.Rationals.HFRatCauchy
+import AczelSetTheory.Rationals.HFRatCauchyAlgebra
 import AczelSetTheory.Rationals.Archimedean
 import AczelSetTheory.Rationals.Irrational

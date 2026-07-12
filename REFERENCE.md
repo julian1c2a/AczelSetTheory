@@ -1,10 +1,30 @@
 # Technical Reference — AczelSetTheory
 
-**Last updated:** 2026-06-08
+**Last updated:** 2026-07-12
 **Author**: Julián Calderón Almendros
-**Lean version**: v4.30.0
+**Lean version**: v4.31.0
 
-> **Nota (2026-06-08)**: la tabla §1 lista los módulos del núcleo histórico más las últimas adiciones. Para el inventario completo y al día (181 ficheros `.lean` totales bajo `AczelSetTheory/`), incluidos `Algebra/{Action,CosetAction,CorrespondenceTheorem,FirstIsomorphism,SecondIsomorphism,ThirdIsomorphism,Lattice,LinearSpace,Module,Monoid,NormalSubgroup,QuotientGroup,RingHom,Sylow,Zassenhaus,QuotientRing,HFMatrix}`, `Integers/Canonical`, `Combinatorics/Counting`, 14 módulos adicionales en `VN/`, etc., consulta [`AUDIT-MODULE-MATRIX.md`](AUDIT-MODULE-MATRIX.md). Documentación detallada por subsistema en [`doc/REFERENCE-Algebra.md`](doc/REFERENCE-Algebra.md), [`doc/REFERENCE-GroupTheory.md`](doc/REFERENCE-GroupTheory.md), [`doc/REFERENCE-Combinatorics.md`](doc/REFERENCE-Combinatorics.md) y [`doc/REFERENCE-VN.md`](doc/REFERENCE-VN.md).
+> ⚠️ **REFERENCE.md es un sistema, no un fichero único.** Este documento raíz es el
+> índice; la documentación detallada por subsistema vive en `doc/REFERENCE-{tema}.md`
+> y debe consultarse junto a este fichero, con hipervínculos en ambas direcciones
+> (cada fila de la tabla enlaza a su `doc/REFERENCE-*.md` cuando existe; cada
+> `doc/REFERENCE-*.md` debe referenciar de vuelta las filas §1 que documenta). Ver
+> [`doc/REFERENCE-Algebra.md`](doc/REFERENCE-Algebra.md),
+> [`doc/REFERENCE-GroupTheory.md`](doc/REFERENCE-GroupTheory.md),
+> [`doc/REFERENCE-Combinatorics.md`](doc/REFERENCE-Combinatorics.md),
+> [`doc/REFERENCE-VN.md`](doc/REFERENCE-VN.md),
+> [`doc/REFERENCE-CList.md`](doc/REFERENCE-CList.md),
+> [`doc/REFERENCE-PList.md`](doc/REFERENCE-PList.md),
+> [`doc/REFERENCE-HFList.md`](doc/REFERENCE-HFList.md),
+> [`doc/REFERENCE-Arithmetic.md`](doc/REFERENCE-Arithmetic.md),
+> [`doc/REFERENCE-Paridad-Peano-Aczel.md`](doc/REFERENCE-Paridad-Peano-Aczel.md),
+> [`doc/REFERENCE-Rationals.md`](doc/REFERENCE-Rationals.md) (cubre hasta
+> HFRat/HFRatOps/HFRatCauchy/MinAdd — falta proyectar `HFRatCauchyAlgebra.lean`,
+> `Series.lean`, `Polynomial.lean` y el subsistema `Reals/`).
+>
+> **Nota (2026-06-08, vigente):** la tabla §1 lista los módulos del núcleo histórico más las
+> últimas adiciones. Para el inventario completo y al día (204 ficheros `.lean` totales bajo
+> `AczelSetTheory/` a 2026-07-12), incluidos `Algebra/{Action,CosetAction,CorrespondenceTheorem,FirstIsomorphism,SecondIsomorphism,ThirdIsomorphism,Lattice,LinearSpace,Module,Monoid,NormalSubgroup,QuotientGroup,RingHom,Sylow,Zassenhaus,QuotientRing,HFMatrix}`, `Integers/{Canonical,HFInt,HFIntOps}`, `Combinatorics/Counting`, ~35 módulos en `VN/`, etc., consulta [`AUDIT-MODULE-MATRIX.md`](AUDIT-MODULE-MATRIX.md) (nota: desactualizado desde 2026-06-10, ver INFORME-AUDITORIA-2026-07-12.md).
 
 ---
 
@@ -154,12 +174,27 @@ Below are the keys for reading and searching theorems.
 | 108g| `AczelSetTheory/Rationals/RationalLog.lean` | `ℚ₀` | ✅ Complete | Rationals/Convergence | Rationals.lean |
 | 108h| `AczelSetTheory/Rationals/Roots.lean` | `ℚ₀` | ✅ Complete | Rationals/Bisection | Rationals.lean |
 | 108i| `AczelSetTheory/Rationals/CauchySeqAlgebra.lean` | `ℚ₀` | ✅ Complete | Rationals/IsCauchy, Rationals/Inv | Rationals.lean |
-| 108j| `AczelSetTheory/Rationals/Archimedean.lean` | `ℚ₀` | 🚧 Progress | Rationals/Bisection | Rationals/Irrational |
-| 108k| `AczelSetTheory/Rationals/Irrational.lean` | `ℚ₀` | 🚧 Progress | Rationals/Archimedean | Rationals.lean |
-| 108c| `AczelSetTheory/Reals/CauchySeq.lean` | `ℝ₀` | ✅ Complete | Rationals/IsCauchy, Rationals/Inv | Reals/Order, Reals/Arithmetic |
-| 108d| `AczelSetTheory/Reals/Arithmetic.lean` | `ℝ₀` | ✅ Complete | Reals/CauchySeq | Reals/Order |
-| 108e| `AczelSetTheory/Reals/Order.lean` | `ℝ₀` | ✅ Complete | Reals/CauchySeq, Reals/Arithmetic | Reals/Incompleteness |
-| 108f| `AczelSetTheory/Reals/Incompleteness.lean`| `ℝ₀` | 🚧 Skeleton | Reals/CauchySeq | — |
+| 108j| `AczelSetTheory/Rationals/Archimedean.lean` | `ℚ₀` | ✅ Complete | Rationals/Bisection | Rationals/Irrational |
+| 108k| `AczelSetTheory/Rationals/Irrational.lean` | `ℚ₀` | 🚧 Progress (1 sorry: `newton_seq_step_bound`) | Rationals/Archimedean | Rationals.lean, Reals/Incompleteness |
+| 108l| `AczelSetTheory/Rationals/HFRat.lean` | `HFRat` | ✅ Complete | Rationals/{Basic,Canonical,AbsVal}, Integers/HFInt, `Peano.PeanoNat.{Arith,Primes}` | HFRatOps, Polynomial, Rationals.lean |
+| 108m| `AczelSetTheory/Rationals/HFRatOps.lean` | `HFRat` | ✅ Complete | Rationals/{HFRat,Inv,AbsVal,Roots} | HFRatCauchy, Series |
+| 108n| `AczelSetTheory/Rationals/HFRatCauchy.lean` | `HFRat` | ✅ Complete | Rationals/{HFRatOps,IsCauchy,CauchySeqAlgebra} | HFRatCauchyAlgebra, Reals/Incompleteness, Rationals.lean |
+| 108o| `AczelSetTheory/Rationals/HFRatCauchyAlgebra.lean` | `HFRat` | ✅ Complete | Rationals/{HFRatCauchy,CauchySeqAlgebra,HFRatOps}, `Peano.PeanoNat.Arith` | Rationals.lean |
+| 108p| `AczelSetTheory/Rationals/MinAdd.lean` | `ℚ₀` | ✅ Complete | Rationals/Basic | Rationals.lean |
+| 108q| `AczelSetTheory/Rationals/Series.lean` | `ℚ₀`, `HFRat` | 🚧 Progress (6 sorry: `sum_add`, `sum_mul_left`, `sum_arithmetic`, `sum_geometric` ×2) | Rationals/HFRatOps | Rationals.lean |
+| 108r| `AczelSetTheory/Rationals/Polynomial.lean` | `HFRat` | 🚧 Progress (4 sorry: canonicalización tras `add`/`smul`/`mul`/`monomial`) | PList/Basic, Rationals/HFRat, Axioms/OrdinalNat | Rationals.lean |
+| 108s| `AczelSetTheory/Reals/Incompleteness.lean` | `ℝ₀` (namespace de propiedades sobre `HFRat`; **no** existe aún un tipo `ℝ₀`/`HFReal` como cociente — ver nota abajo) | 🚧 Progress (3 sorry: irracionalidad de √2 y convergencia) | Rationals/{HFRatCauchy,Irrational} | Reals.lean |
+
+> **Nota histórica (2026-07-12):** hasta el 2026-07-05 (commit `173add2`) existió un
+> primer intento de `ℝ₀` como tipo propio — `Reals/{CauchySeq,Arithmetic,Order,RealAxioms}.lean`,
+> con `CauchySeq := {f : ℕ₀ → ℚ₀ // IsCauchy f}` y aritmética/orden completos, pero con
+> `CauchySeq.inv` marcado `noncomputable`. Se sustituyó por extender directamente
+> `Rationals/` (relación de Cauchy sobre `HFRat`, culminando en `HFRatCauchy`/
+> `HFRatCauchyAlgebra`), evitando la `noncomputable` y unificando con `IsCauchy` ya
+> existente en `ℚ₀`. El tipo cociente real (`HFReal := Quotient` de estas sucesiones)
+> **todavía no se ha construido** — es el objetivo declarado de FRENTE 1 en
+> [`NEXT-STEPS.md`](NEXT-STEPS.md). Esas 4 filas se documentaban erróneamente como
+> "✅ Complete" en REFERENCE.md pese a llevar borradas desde julio; corregido aquí.
 | 109 | `AczelSetTheory/Integers/ZModN.lean` | `HFAlgebra` | ✅ Complete | Algebra/{Ring,Field}, VN/{Arithmetic,IsNat,CardVN}, `Peano.PeanoNat.NumberTheory.{ModEq,Wilson}` | Integers.lean |
 | 110 | `AczelSetTheory/Topology/Basic.lean` | `HFTopology` | ✅ Complete | HFSets, Axioms/{Union,Intersection,Setminus,Subset,Singleton} | Topology/Interior, Topology/Neighborhoods, Topology/Subspace |
 | 111 | `AczelSetTheory/Topology/Interior.lean` | `HFTopology` | ✅ Complete | Topology/Basic, Axioms/{Separation,Intersection,Setminus} | — |
@@ -175,7 +210,8 @@ Below are the keys for reading and searching theorems.
 | — | `AczelSetTheory/VN.lean` | — | ✅ Complete | VN/{Basic,Injective,IsNat,Arithmetic,FSet,PeanoAxioms,PeanoArith,PowVN,SubVN,DivVN,FactorialVN,CardVN,RankVN} | AczelSetTheory.lean |
 | — | `AczelSetTheory/PList.lean` | — | ✅ Complete | PList/{Basic,Lemmas,Omega0} | AczelSetTheory.lean |
 | — | `AczelSetTheory/Integers.lean` | — | ✅ Complete | Integers/{Basic,Order,Functions,Arithmetic,Bijection,PadicVal,MobiusLiouville,Canonical,Bezout,ZModN} | AczelSetTheory.lean |
-| — | `AczelSetTheory/Rationals.lean` | — | ✅ Barrel | Rationals/{Basic,AbsVal,IsCauchy,Density} | AczelSetTheory.lean |
+| — | `AczelSetTheory/Rationals.lean` | — | ✅ Barrel | Rationals/{Basic,AbsVal,IsCauchy,Density,CauchySeqAlgebra,Canonical,Convergence,Bisection,Roots,PowOrder,RationalLog,HFRat,MinAdd,Series,Polynomial,HFRatCauchy,HFRatCauchyAlgebra,Archimedean,Irrational} (19 módulos) | AczelSetTheory.lean, Reals.lean |
+| — | `AczelSetTheory/Reals.lean` | — | ✅ Barrel | Rationals/CauchySeqAlgebra, Reals/Incompleteness | AczelSetTheory.lean |
 | — | `AczelSetTheory.lean` | — | ✅ Complete | PList, CList, HFSets, Operations/*, Axioms/*, Integers, Notation | Main |
 | — | `Main.lean` | — | ✅ Complete | CList.Basic | — |
 

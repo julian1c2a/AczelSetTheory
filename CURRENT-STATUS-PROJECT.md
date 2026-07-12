@@ -1,7 +1,14 @@
 # Current Project Status — AczelSetTheory
 
-**Last updated:** 2026-06-29
+**Last updated:** 2026-07-12
 **Author**: Julián Calderón Almendros
+
+> ⚠️ **Nota de fiabilidad (2026-07-12, ver INFORME-AUDITORIA-2026-07-12.md):** el
+> resumen ejecutivo de abajo se ha corregido contra el estado real (204 ficheros,
+> 14 sorry). El "Module Inventory" que sigue (153/164 módulos) **no** se ha
+> reauditado fila por fila en esta pasada — no incluye `Rationals/`, `Reals/` ni
+> los módulos añadidos desde 2026-06-10 (ver REFERENCE.md y `git log` para el
+> estado módulo a módulo actual). Tratar esa tabla como histórica.
 
 ---
 
@@ -9,12 +16,12 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules (non-barrel) | 153 |
-| Total modules (incl. barrels) | 164 |
-| Modules with 0 sorry | 153 / 153 |
-| Total sorry | 0 |
-| Build status | ✅ Passing — 0 errors, 0 warnings (241 jobs) |
-| Lean version | v4.30.0 |
+| Total modules (non-barrel, working tree) | 204 |
+| Total modules (incl. barrels) | — (pendiente recuento; ver nota arriba) |
+| Modules with 0 sorry | 200 / 204 |
+| Total sorry | **14** (ver «Known Sorry Locations» abajo) |
+| Build status | ✅ Passing — 0 errors, 0 warnings (266 jobs) |
+| Lean version | v4.31.0 |
 | Naming convention | Mathlib-style (see NAMING-CONVENTIONS.md) |
 
 ---
@@ -238,7 +245,22 @@
 
 ## Known Sorry Locations
 
-None — **0 sorry** across the entire project.
+**14 sorry reales** (grep `sorry` fuera de comentarios, verificado 2026-07-12), todos en
+el subsistema `Rationals/`/`Reals/` (números racionales/reales constructivos, el frente
+de trabajo activo — el resto del proyecto, ~200 módulos, sigue en 0 sorry):
+
+| Fichero | Líneas | Cuenta | Contexto |
+|---|---|---|---|
+| `Rationals/Irrational.lean` | 353 | 1 | `newton_seq_step_bound` — cota de descenso por paso del método de Newton; falta acotar el paso usando que `x_k > r` (ver `int_sep_pow_lemma`/`newton_seq_apart_lt` cercanos). |
+| `Rationals/Polynomial.lean` | 57, 69, 80, 110 | 4 | Canonicalización (`trimZeros (result) = result`) tras `add`/`smul`/`mul`/`monomial` — falta un lema de idempotencia de `trimZeros`. |
+| `Rationals/Series.lean` | 17, 28, 38, 42, 70, 78 | 6 | `sum_add`, `sum_mul_left`, `sum_arithmetic`, `sum_geometric` (ℚ₀ y HFRat) — módulo recién creado, sin terminar. |
+| `Reals/Incompleteness.lean` | 28, 42, 48 | 3 | Irracionalidad de `√2` y convergencia — requieren multiplicatividad de la valuación 2-ádica en paridad, o un lema de descenso infinito en Peano (deuda técnica documentada en NEXT-STEPS.md). |
+
+Ninguno de estos usa `Classical`; los 14 son huecos de prueba genuinos (`sorry`), no
+atajos no constructivos. El uso de `Classical.byContradiction` que sí existía en
+`Rationals/Irrational.lean:395` (`newton_seq_eventually_lt`) se reescribió de forma
+constructiva el 2026-07-12 (ver `newton_bounded_search` en el mismo fichero y el gate
+`Meta/AxiomCheck.lean`).
 
 ---
 

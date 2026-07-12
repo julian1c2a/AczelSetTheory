@@ -10,9 +10,9 @@ License: MIT
 -- Objetivo de footprint del proyecto: #print axioms ⊆ {propext, Quot.sound}.
 --
 -- A medida que las fases del plan saneen módulos, se añaden aquí sus símbolos
--- clave. NO está importado en el barrel raíz hasta que la raíz (CList.evalOp,
--- Fase 1) sea constructiva; mientras tanto se compila con
---   lake build AczelSetTheory.Meta.AxiomCheck
+-- clave. Importado en el barrel raíz (AczelSetTheory.lean) desde el cierre de
+-- Fase 1 (2026-06-10): cada `lake build AczelSetTheory` verifica todos los
+-- símbolos listados abajo.
 
 import Lean.Elab.Command
 import Lean.Util.CollectAxioms
@@ -26,6 +26,7 @@ import AczelSetTheory.Integers.Bezout
 import AczelSetTheory.Integers.MobiusLiouville
 import AczelSetTheory.Algebra.Sylow
 import AczelSetTheory.Axioms.WellOrder
+import AczelSetTheory.Rationals.Irrational
 
 set_option autoImplicit false
 
@@ -79,7 +80,17 @@ end AczelSetTheory.Meta
 #assert_no_classical HFSet.no_infinite_descent
 #assert_no_classical HFAlgebra.sylow_first
 
+-- Fase 5 (2026-07-12): el gate no cubría Rationals/Reals — la auditoría cruzada
+-- de esa fecha encontró `Classical.byContradiction` activo en
+-- `newton_seq_eventually_lt` (introducido 2026-07-08, commit 98ad0bb). Reescrito
+-- de forma constructiva (búsqueda acotada por decidibilidad de ≤ en ℚ₀, ver
+-- `newton_bounded_search` en Rationals/Irrational.lean) y añadido aquí para que
+-- una regresión futura falle el build en vez de pasar desapercibida.
+#assert_no_classical ℚ₀.newton_seq_eventually_lt
+
 -- ─────────────────────────────────────────────────────────────────
--- PENDIENTES (Fase 3):
+-- PENDIENTES:
 --   • Heredado de peanolib: módulos no constructivos (FSet/Perm/Sign/…) si se usan.
+--   • Ampliar cobertura a más símbolos de Rationals/Reals a medida que se cierren
+--     los 14 sorry pendientes (ver INFORME-AUDITORIA-2026-07-12.md).
 -- ─────────────────────────────────────────────────────────────────
