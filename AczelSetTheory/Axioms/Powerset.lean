@@ -1,3 +1,9 @@
+/-
+Copyright (c) 2026. All rights reserved.
+Author: Julián Calderón Almendros
+License: MIT
+-/
+
 import AczelSetTheory.Operations.Powerset
 import AczelSetTheory.Axioms.Separation
 

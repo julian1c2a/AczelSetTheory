@@ -1,3 +1,9 @@
+/-
+Copyright (c) 2026. All rights reserved.
+Author: Julián Calderón Almendros
+License: MIT
+-/
+
 import AczelSetTheory.Operations.Setminus
 import AczelSetTheory.HFSets
 import AczelSetTheory.Axioms.Subset

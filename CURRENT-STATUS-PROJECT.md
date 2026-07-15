@@ -1,14 +1,16 @@
 # Current Project Status — AczelSetTheory
 
-**Last updated:** 2026-07-12
+**Last updated:** 2026-07-15
 **Author**: Julián Calderón Almendros
 
-> ⚠️ **Nota de fiabilidad (2026-07-12, ver INFORME-AUDITORIA-2026-07-12.md):** el
-> resumen ejecutivo de abajo se ha corregido contra el estado real (204 ficheros,
-> 14 sorry). El "Module Inventory" que sigue (153/164 módulos) **no** se ha
-> reauditado fila por fila en esta pasada — no incluye `Rationals/`, `Reals/` ni
-> los módulos añadidos desde 2026-06-10 (ver REFERENCE.md y `git log` para el
-> estado módulo a módulo actual). Tratar esa tabla como histórica.
+> ⚠️ **Nota de fiabilidad (2026-07-15, ver INFORME-AUDITORIA-2026-07-15.md):** el
+> resumen ejecutivo y la sección «Architecture» se han corregido contra el estado
+> real (204 ficheros, 14 sorry, 273 jobs, 19 warnings; gate constructivo ahora
+> **exhaustivo**). El "Module Inventory" detallado que sigue **no** se ha reauditado
+> fila por fila en esta pasada — la fuente de verdad módulo a módulo es
+> [`REFERENCE.md`](REFERENCE.md) §1 + `git log`. Conteos reales por subsistema
+> (2026-07-15): CList 7 · PList 4 · Operations 21 · Axioms 43 · VN 49 · Algebra 23 ·
+> Integers 12 · Rationals 21 · Reals 1 · Topology 5 · Combinatorics 1.
 
 ---
 
@@ -20,7 +22,7 @@
 | Total modules (incl. barrels) | — (pendiente recuento; ver nota arriba) |
 | Modules with 0 sorry | 200 / 204 |
 | Total sorry | **14** (ver «Known Sorry Locations» abajo) |
-| Build status | ✅ Passing — 0 errors, 0 warnings (266 jobs) |
+| Build status | ✅ Passing — 0 errors, **19 warnings** (5 unused-variable + 14 `sorry`), **273 jobs** |
 | Lean version | v4.31.0 |
 | Naming convention | Mathlib-style (see NAMING-CONVENTIONS.md) |
 
@@ -212,7 +214,7 @@
 | Algebra/QuotientRing.lean | `HFIdeal`, `toAddSubgroup`, `toAddSubgroup_isNormal`, `quotientMul`, `mul_welldefined`, `HFRing.quotient` (anillo cociente genérico) | ✅ |
 | Algebra/HFMatrix.lean | `finSumRing` (+ congr/swap/mul), `matrixCarrier`, `matAdd`, `matNeg`, `matZero`, `matOne`, `matMul`, `HFMatrixRing` (anillo de matrices n×n) | ✅ |
 
-### Integers/ (9 modules)
+### Integers/ (12 modules)
 | Module | Key exports | Status |
 |--------|-------------|--------|
 | Integers/Basic.lean | `ℤ₀`, ring instances, 18 ring laws, `ofNat` | ✅ |
@@ -222,8 +224,11 @@
 | Integers/Bijection.lean | biyecciones entre ℤ₀ y ℕ₀ | ✅ |
 | Integers/PadicVal.lean | `padic_val`, `Omega_prime`, multiplicatividad | ✅ |
 | Integers/MobiusLiouville.lean | `μ` (Möbius), `λ` (Liouville), multiplicatividad | ✅ |
+| Integers/Canonical.lean | `canonicalRep`, representante normal `(0,n)`/`(0,0)`/`(n,0)` (ADR-014) | ✅ |
 | Integers/Bezout.lean | `bezout_ofNat`, `bezout`, `bezout_coprime`, `extEuclidNat`, `extEuclidNat_spec`, `bezoutCoeffs` | ✅ |
 | Integers/ZModN.lean | `HFAlgebra.ZModN` (ℤ/nℤ anillo), `ZModN_mul_comm`, `ZModFieldP` (ℤ/pℤ cuerpo, `p` primo) | ✅ |
+| Integers/HFInt.lean | `HFInt` (entero como HFSet), operaciones y puente con ℤ₀ | ✅ |
+| Integers/HFIntOps.lean | operaciones aritméticas sobre `HFInt` | ✅ |
 
 ### Combinatorics/ (1 module)
 
@@ -261,6 +266,31 @@ atajos no constructivos. El uso de `Classical.byContradiction` que sí existía 
 `Rationals/Irrational.lean:395` (`newton_seq_eventually_lt`) se reescribió de forma
 constructiva el 2026-07-12 (ver `newton_bounded_search` en el mismo fichero y el gate
 `Meta/AxiomCheck.lean`).
+
+---
+
+## Recent Achievements (2026-07-15) — Gate constructivo EXHAUSTIVO + auditoría de Classical oculto
+
+- ✅ **`Meta/AxiomCheck.lean` reescrito como gate exhaustivo** (`#assert_constructive_footprint`):
+  recorre **las 3042 declaraciones propias** de AczelSetTheory vía `Lean.collectAxioms` (no una
+  lista curada de ~30 símbolos como antes) y **falla el build** si alguna tiene un axioma fuera de
+  `{propext, Quot.sound}` (+ `sorryAx` tolerado), salvo un **baseline documentado de 11 excepciones**.
+  Detecta el `Classical` OCULTO invisible a `grep` (núcleo Lean 4.31 + `by_cases`/`decide` sin
+  instancia `Decidable`). Verificado: build verde (273 jobs) + prueba negativa (falla nombrando el
+  símbolo si sale del baseline). El gate añade solo ~2.6 s al build.
+- ✅ **PUREZA CONSTRUCTIVA TOTAL — baseline 11 → 0 (INFORME-AUDITORIA-2026-07-15.md §5):** el gate
+  curado anterior daba falsa seguridad — la auditoría exhaustiva halló **11 símbolos** con footprint
+  no-constructivo oculto (9 con `Classical.choice`, 2 con `native_decide`). **Los 11 saneados:** 7
+  nativos (`by_cases`/`decide` → dicotomías/instancias `Decidable`) + 4 heredados de Peano
+  (`vN_wilson`/`vN_wilson_modEq`/`vN_totient_one/two`), estos últimos arreglados **aguas arriba en Peano**
+  (commit `9b6241d`, ADR-017: el `Classical.choice` de `wilson` venía de 3 lemas de `List.erase` del core
+  de Lean 4.31; `native_decide` de totient/Wilson → constructivo). Gate con **baseline vacío**;
+  footprint ⊆ {propext, Quot.sound} en todo el proyecto + Peano (+ sorryAx de los 14 sorry).
+- ✅ **Compila limpio contra la Peano *feature-frozen* actual** (`bf6d550`, 2026-07-14, ya cero-`Classical`
+  tras su ADR-017). Footprint del núcleo (`extensionality`, `sylow_first`, `wf_induction`) = `{propext, Quot.sound}`.
+- ✅ **Documentación saneada:** métricas reales (273 jobs, 19 warnings, no “0 warnings/266 jobs”),
+  contradicción Inventory↔Architecture resuelta, enlace roto a `NEXT_STEPS.md` corregido, doble fecha
+  del pie unificada, tabla `Integers/` completada (12 módulos), cabeceras de copyright añadidas (AI-GUIDE §21).
 
 ---
 
@@ -435,11 +465,14 @@ AczelSetTheory/
   CList/          — Core CList behavior (7 sub-modules)
   PList/          — Polymorphic list type over ℕ₀ (4 modules)
   Operations/     — Constructors and definitions over HFSet (21 modules)
-  Axioms/         — Axiomatic properties and theorems over HFSet (41 modules)
-  VN/             — Von Neumann embedding vN : ℕ₀ → HFSet (35 modules)
-  Algebra/        — Algebraic structures native in HFSet (9 modules)
-  Integers/       — Integer type ℤ₀ as quotient of ℕ₀ × ℕ₀ (7 modules)
-  Topology/       — Topological spaces over HFSet (4 modules)
+  Axioms/         — Axiomatic properties and theorems over HFSet (43 modules)
+  VN/             — Von Neumann embedding vN : ℕ₀ → HFSet (49 modules)
+  Algebra/        — Algebraic structures native in HFSet (23 modules)
+  Integers/       — Integer type ℤ₀ as quotient of ℕ₀ × ℕ₀ (12 modules)
+  Rationals/      — Rational type ℚ₀ + análisis constructivo (21 modules)
+  Reals/          — Incompletitud de HFRat; primeros pasos hacia HFReal (1 module)
+  Topology/       — Topological spaces over HFSet (5 modules)
+  Combinatorics/  — Combinatoria finita nativa (pigeonhole, incl-excl) (1 module)
   HFSets.lean     — Core HFSet quotient type
   HFList.lean     — Ordered sequences of HFSets (PList HFSet)
   HFListOps.lean  — toHFSet conversions (FinList/HFList → HFSet)
@@ -478,7 +511,7 @@ AczelSetTheory/
 | Integers | `ℤ₀` commutative ring (quotient ℕ₀ × ℕ₀) + Order, Functions, Arithmetic, Bijection, PadicVal, MobiusLiouville | ✅ |
 | Topology | `HFTopSpace`, topología de entornos, subespacio, aplicaciones continuas | ✅ |
 
-> See [NEXT_STEPS.md](NEXT_STEPS.md) for detailed planning and next priorities.
+> See [NEXT-STEPS.md](NEXT-STEPS.md) for detailed planning and next priorities.
 
 ---
 
@@ -497,6 +530,6 @@ AczelSetTheory/
 ---
 
 **Author**: Julián Calderón Almendros
-*Last updated: 2026-06-02*
+*Last updated: 2026-07-15*
 
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)

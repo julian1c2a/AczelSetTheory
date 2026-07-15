@@ -283,16 +283,16 @@ theorem extEq {t s : FinList n}
   apply FinList.ext
   apply PList.plist_ext_get?
   intro i
-  by_cases hlt : i < n
+  -- Constructivo (ADR-018): dicotomía `lt₀ ∨ le₀` de Peano (`Order.lt_or_ge`, sin
+  -- axiomas) en vez de `by_cases hlt : i < n` sobre el `<` de ℕ₀ (Classical.propDecidable).
+  rcases Peano.Order.lt_or_ge i n with hlt | hge
   · have htl : i < t.val.length := by rw [t.property]; exact hlt
     have hsl : i < s.val.length := by rw [s.property]; exact hlt
     have h' := h ⟨i, hlt⟩
     simp only [FinList.get, HFList.get] at h'
     rw [PList.get_eq_get? t.val ⟨i, htl⟩, PList.get_eq_get? s.val ⟨i, hsl⟩]
     exact congrArg some h'
-  · have hge : n ≤ i := by
-      simp only [PList.Omega0.ψ_lt_iff, PList.Omega0.ψ_le_iff] at *; omega
-    have tp : PList.length t.val = n := t.property
+  · have tp : PList.length t.val = n := t.property
     have sp : PList.length s.val = n := s.property
     rw [PList.get?_none_of_ge t.val i (by rw [tp]; exact hge),
         PList.get?_none_of_ge s.val i (by rw [sp]; exact hge)]

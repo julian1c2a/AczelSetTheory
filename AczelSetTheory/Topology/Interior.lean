@@ -1,7 +1,14 @@
+/-
+Copyright (c) 2026. All rights reserved.
+Author: Julián Calderón Almendros
+License: MIT
+-/
+
 import AczelSetTheory.Topology.Basic
 import AczelSetTheory.Axioms.Separation
 import AczelSetTheory.Axioms.Intersection
 import AczelSetTheory.Axioms.Setminus
+import AczelSetTheory.Axioms.Decidable
 
 namespace HFTopology
 
@@ -151,6 +158,19 @@ def HFTopSpace.isExteriorPt (ts : HFTopSpace) (x A : HFSet) : Prop :=
 /-- `x` es **punto de frontera** de `A` si no es interior ni exterior. -/
 def HFTopSpace.isBoundaryPt (ts : HFTopSpace) (x A : HFSet) : Prop :=
   x ∈ ts.X ∧ ¬ts.isInteriorPt x A ∧ ¬ts.isExteriorPt x A
+
+/-- `isInteriorPt` es DECIDIBLE (ADR-018): aunque su definición es un `∃ U : HFSet`
+    no acotado, equivale a `x ∈ int(A)` (`isInteriorPt_iff`), y la membresía en el
+    HFSet `int(A)` es decidible (`HFSet.mem_decidable`). Sin esta instancia, un
+    `by_cases` sobre `isInteriorPt` caía en `Classical.propDecidable`. -/
+instance HFTopSpace.decidableIsInteriorPt (ts : HFTopSpace) (x A : HFSet) :
+    Decidable (ts.isInteriorPt x A) :=
+  decidable_of_iff (x ∈ ts.interior A) (ts.isInteriorPt_iff x A).symm
+
+/-- `isExteriorPt` es DECIDIBLE: por definición es `isInteriorPt x (X \ A)`. -/
+instance HFTopSpace.decidableIsExteriorPt (ts : HFTopSpace) (x A : HFSet) :
+    Decidable (ts.isExteriorPt x A) :=
+  ts.decidableIsInteriorPt x (HFSet.setminus ts.X A)
 
 /-- `x` es **punto de acumulación** de `A` si cada abierto que contiene `x`
   intersecta `A` en algún punto distinto de `x`. -/

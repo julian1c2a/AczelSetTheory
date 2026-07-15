@@ -1,3 +1,9 @@
+/-
+Copyright (c) 2026. All rights reserved.
+Author: Julián Calderón Almendros
+License: MIT
+-/
+
 import AczelSetTheory.Operations.SymDiff
 import AczelSetTheory.Axioms.Setminus
 import AczelSetTheory.Axioms.Union

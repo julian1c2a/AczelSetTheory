@@ -18,6 +18,8 @@ License: MIT
 import AczelSetTheory.Operations.Cardinal
 import AczelSetTheory.Axioms.Adjunction
 import AczelSetTheory.Axioms.Induction
+import AczelSetTheory.Axioms.Decidable  -- `mem_decidable`: hace decidible `by_cases x ∈ A`
+                                        -- (evita `Classical.propDecidable`, ADR-018)
 
 open Peano
 

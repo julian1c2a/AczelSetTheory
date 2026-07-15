@@ -1,3 +1,9 @@
+/-
+Copyright (c) 2026. All rights reserved.
+Author: Julián Calderón Almendros
+License: MIT
+-/
+
 import AczelSetTheory.Algebra.Group
 import AczelSetTheory.Algebra.Subgroup
 import AczelSetTheory.Algebra.GroupHom

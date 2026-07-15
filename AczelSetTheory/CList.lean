@@ -1,3 +1,9 @@
+/-
+Copyright (c) 2026. All rights reserved.
+Author: Julián Calderón Almendros
+License: MIT
+-/
+
 -- Root module: importa todos los sub-módulos de CList
 import AczelSetTheory.CList.Basic
 import AczelSetTheory.CList.ExtEq

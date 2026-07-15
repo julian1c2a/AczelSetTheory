@@ -1,3 +1,9 @@
+/-
+Copyright (c) 2026. All rights reserved.
+Author: Julián Calderón Almendros
+License: MIT
+-/
+
 -- AczelSetTheory/PList.lean
 -- Barrel: lista polimórfica propia con indexación en ℕ₀
 import AczelSetTheory.PList.Basic

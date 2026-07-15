@@ -1687,14 +1687,21 @@ theorem orbitOf_eq_or_disjoint (grp : HFGroup) (n : ℕ₀) (t s : HFSet)
     (ht : t ∈ HFSet.nPow grp.G (σ n)) (hs : s ∈ HFSet.nPow grp.G (σ n)) :
     orbitOf grp n t = orbitOf grp n s ∨
     (∀ x, ¬ (x ∈ orbitOf grp n t ∧ x ∈ orbitOf grp n s)) := by
-  by_cases hdisj : ∀ x, ¬ (x ∈ orbitOf grp n t ∧ x ∈ orbitOf grp n s)
-  · exact Or.inr hdisj
-  · refine Or.inl ?_
-    -- Extracción clásica del testigo.
-    have hex : ∃ x, x ∈ orbitOf grp n t ∧ x ∈ orbitOf grp n s :=
-      Decidable.byContradiction (fun hne =>
-        hdisj (fun x hx => hne ⟨x, hx⟩))
-    obtain ⟨x, hxt, hxs⟩ := hex
+  -- Constructivo (ADR-018): la disyunción se decide por `DecidableEq HFSet` sobre
+  -- `inter = ∅` (las órbitas son subconjuntos finitos), NO por `by_cases` sobre el
+  -- `∀ x : HFSet` no acotado (que caía en `Classical.propDecidable`). El testigo del
+  -- caso no-disjunto se extrae con `nonempty_of_ne_empty` (constructivo).
+  by_cases hD : HFSet.inter (orbitOf grp n t) (orbitOf grp n s) = HFSet.empty
+  · -- Intersección vacía ⇒ órbitas disjuntas.
+    refine Or.inr (fun x hx => ?_)
+    have hxD : x ∈ HFSet.inter (orbitOf grp n t) (orbitOf grp n s) :=
+      (HFSet.mem_inter (orbitOf grp n t) (orbitOf grp n s) x).mpr hx
+    rw [hD] at hxD
+    exact HFSet.not_mem_empty x hxD
+  · -- Intersección no vacía ⇒ testigo común ⇒ órbitas iguales.
+    refine Or.inl ?_
+    obtain ⟨x, hxD⟩ := HFSet.nonempty_of_ne_empty _ hD
+    obtain ⟨hxt, hxs⟩ := (HFSet.mem_inter (orbitOf grp n t) (orbitOf grp n s) x).mp hxD
     have h1 : orbitOf grp n x = orbitOf grp n t :=
       orbitOf_eq_of_mem grp n t x ht hxt
     have h2 : orbitOf grp n x = orbitOf grp n s :=

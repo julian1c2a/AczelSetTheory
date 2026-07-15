@@ -6,6 +6,53 @@ All notable changes to this project are documented here.
 
 ---
 
+## [2026-07-15] — Gate constructivo EXHAUSTIVO + auditoría de Classical oculto
+
+### Added
+- **`Meta/AxiomCheck.lean` reescrito como gate exhaustivo** (`#assert_constructive_footprint`):
+  barre **las 3042 declaraciones propias** de AczelSetTheory con `Lean.collectAxioms` (en vez de
+  una lista curada de ~30 símbolos) y falla el build si alguna tiene un axioma fuera de
+  `{propext, Quot.sound}` (+ `sorryAx` tolerado), salvo un **baseline documentado de 11 excepciones**.
+  Avisa además si una excepción del baseline ya está limpia (para retirarla). Coste: ~2.6 s/build.
+- **INFORME-AUDITORIA-2026-07-15.md**: auditoría completa (código, compilación contra Peano frozen,
+  documentación, y **dependencias OCULTAS de `Classical`** al estilo Peano ADR-017 Fase C).
+
+### Fixed
+- **Documentación con datos falsos/desfasados**: `README.md` y `CURRENT-STATUS-PROJECT.md` afirmaban
+  “0 warnings” y “266 jobs”; el build real es **273 jobs / 19 warnings** (5 variables sin usar + 14
+  `sorry`). El salto 266→273 se debe a que Peano añadió módulos en su ADR-017 (2026-07-14), no a Aczel.
+- **`CURRENT-STATUS-PROJECT.md`**: resuelta la contradicción interna Inventory↔Architecture (VN 49,
+  Algebra 23, Integers 12, Topology 5, + Rationals/Reals/Combinatorics), enlace roto a `NEXT_STEPS.md`
+  (→ `NEXT-STEPS.md`), doble “last updated” (2026-07-12 vs 2026-06-02 → 2026-07-15) y tabla `Integers/`
+  incompleta (9 → 12 módulos: + Canonical, HFInt, HFIntOps).
+- **Cabecera de copyright (AI-GUIDE §21)**: añadida a los 44 ficheros `.lean` que la omitían.
+
+### Audit findings (no arreglados aún — próxima tarea)
+- **11 símbolos con footprint no-constructivo OCULTO** que el gate curado anterior no veía:
+  9 con `Classical.choice` (2 heredados de `Peano.Wilson.wilson`; 7 nativos por `by_cases`/`decide`
+  sobre proposición no decidible en contexto) + 2 con `native_decide` (`vN_totient_one/two` ←
+  `Peano.Totient`). Registrados como baseline en el gate; objetivo: vaciarlo. Ver informe §5.
+
+---
+
+## [2026-07-08] — FRENTE 4: tipos `HFRat`/`HFInt` + aproximación de Newton-Raphson
+
+### Added
+- **Tipos fundacionales `HFRat` y `HFInt`** (racional/entero como `HFSet`) con sus operaciones:
+  `HFRat.lean`, `HFRatOps.lean`, `HFRatCauchy.lean`, `HFRatCauchyAlgebra.lean`, `MinAdd.lean`;
+  `Integers/HFInt.lean`, `Integers/HFIntOps.lean` (+ integración con `Bezout`).
+- **Aproximación de raíces por Newton-Raphson en `ℚ₀`** (`Irrational.lean`): sucesión de Newton,
+  monotonía, positividad, apartness; `newton_seq_eventually_lt` resuelto de forma constructiva.
+- **`Reals/Incompleteness.lean`**: primeros pasos hacia `HFReal` — incompletitud de `HFRat`
+  (la sucesión de Cauchy hacia √2 no tiene límite racional).
+- **`Series.lean` y `Polynomial.lean`** (`ℚ₀`/`HFRat`): esqueletos de sumas finitas y polinomios.
+
+### Notes
+- Cierre de la arquitectura de **FRENTE 4**, dejando **14 `sorry` estructurales** en el frente activo
+  (`Irrational` 1, `Polynomial` 4, `Series` 6, `Incompleteness` 3) — ninguno usa `Classical`.
+
+---
+
 ## [2026-07-12] — Auditoría cruzada: pureza constructiva, higiene de repo, documentación
 
 ### Fixed

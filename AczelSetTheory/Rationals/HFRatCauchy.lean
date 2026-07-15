@@ -1,3 +1,9 @@
+/-
+Copyright (c) 2026. All rights reserved.
+Author: Julián Calderón Almendros
+License: MIT
+-/
+
 import AczelSetTheory.Rationals.HFRatOps
 import AczelSetTheory.Rationals.IsCauchy
 import AczelSetTheory.Rationals.CauchySeqAlgebra

@@ -152,14 +152,14 @@ theorem get_ext (l₁ l₂ : PList α) (heq : l₁.length = l₂.length)
     l₁ = l₂ := by
   apply plist_ext_get?
   intro i
-  by_cases hlt : i < l₁.length
+  -- Constructivo (ADR-018): dicotomía `lt₀ ∨ le₀` de Peano (`Order.lt_or_ge`, sin
+  -- axiomas) en vez de `by_cases hlt : i < l₁.length`, que sobre el `<` de ℕ₀ no
+  -- localiza `decidableLt` y caía en `Classical.propDecidable`.
+  rcases Peano.Order.lt_or_ge i l₁.length with hlt | hge
   · have hlt₂ : i < l₂.length := heq ▸ hlt
     rw [get_eq_get? l₁ ⟨i, hlt⟩, get_eq_get? l₂ ⟨i, hlt₂⟩]
     congr 1
     exact h ⟨i, hlt⟩
-  · have hge : l₁.length ≤ i := by
-      simp only [PList.Omega0.ψ_lt_iff, PList.Omega0.ψ_le_iff] at *
-      omega
-    rw [get?_none_of_ge l₁ i hge, get?_none_of_ge l₂ i (heq ▸ hge)]
+  · rw [get?_none_of_ge l₁ i hge, get?_none_of_ge l₂ i (heq ▸ hge)]
 
 end PList

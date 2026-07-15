@@ -1,6 +1,6 @@
 # Design Decisions — AczelSetTheory
 
-**Last updated:** 2026-06-10
+**Last updated:** 2026-07-15
 **Author**: Julián Calderón Almendros
 
 Architectural Decision Records (ADR) for this project.
@@ -19,7 +19,7 @@ de tocar cualquier `.lean`. Cada regla enlaza a su ADR justificativo.
 
 | # | MANDATORY | ADR | Verificación |
 |---|---|---|---|
-| **M-1** | **Lógica constructiva pura: CERO `Classical.*`.** Prohibido `Classical.byContradiction`, `Classical.em`, `Classical.propDecidable`, `Classical.choice`, `Classical.choose`, `open Classical`. Usar `Decidable.byContradiction`, `by_cases` (sobre instancia `Decidable`), `decidable_of_iff`. Footprint diana `#print axioms ⊆ {propext, Quot.sound}`. | [ADR-018](#adr-018) | gate `Meta/AxiomCheck.lean` (`#assert_no_classical`) |
+| **M-1** | **Lógica constructiva pura: CERO `Classical.*`.** Prohibido `Classical.byContradiction`, `Classical.em`, `Classical.propDecidable`, `Classical.choice`, `Classical.choose`, `open Classical`. Usar `Decidable.byContradiction`, `by_cases` (sobre instancia `Decidable`), `decidable_of_iff`. Footprint diana `#print axioms ⊆ {propext, Quot.sound}`. | [ADR-018](#adr-018), [ADR-020](#adr-020) | gate EXHAUSTIVO `Meta/AxiomCheck.lean` (`#assert_constructive_footprint`) — barre las 3044 decls propias; **baseline VACÍO (0)** desde 2026-07-15: los 11 símbolos iniciales saneados (4 vía Peano commit `9b6241d`). Footprint ⊆ {propext, Quot.sound} en todo el proyecto + Peano |
 | **M-2** | **`ℕ₀` (peanolib) siempre, nunca `Nat`** de Lean salvo kernel estrictamente inevitable (`sizeOf`, literales internos, `omega`). Aritmética/orden desde peanolib; metas con `omega₀`. | [ADR-018](#adr-018) | revisión + grep `\bNat\b` |
 | **M-3** | **Medidas de terminación lexicográficas `(Σ sizeOf, fase)`, NUNCA aritméticas ponderadas** (`sizeOf·k + peso`): estas últimas introducen `Classical.choice`. | [ADR-018](#adr-018) | gate + revisión de `termination_by` |
 | **M-4** | **Reutilizar los tipos públicos de peanolib** (`ℕ₁ = {n:ℕ₀ // n≠𝟘}`, `ℕ₂ = {n:ℕ₁ // n.val≠𝟙}`, …). **Prohibido redefinir subtipos privados que ya existen en Peano.** | [ADR-019](#adr-019) | revisión + grep `{.*: ℕ₀ //` |
@@ -586,6 +586,58 @@ fuente de los naturales y sus refinamientos». Reduce superficie de mantenimient
 - `PosNat₀` se reemplaza por `Peano.ℕ₁` (ver plan de limpieza en `PLANNING.md` §Limpieza).
 - Revisión periódica con `grep "{.*: ℕ₀ //"` para detectar reincidencias.
 - Verificación incluida en MANDATORY M-4.
+
+---
+
+## ADR-020: Gate constructivo EXHAUSTIVO (barrido de axiomas de todo el árbol)
+
+**Date**: 2026-07-15
+**Status**: Accepted
+
+**Context**: El gate `Meta/AxiomCheck.lean` original (ADR-018) verificaba una lista
+**curada a mano de ~30 símbolos** con `#assert_no_classical`. La auditoría del 2026-07-15
+(`INFORME-AUDITORIA-2026-07-15.md` §5), replicando la metodología de Peano (ADR-017 Fase C),
+ejecutó un barrido exhaustivo con `Lean.collectAxioms` sobre las 3042 declaraciones propias
+y encontró **11 símbolos con footprint no-constructivo que el gate curado NO cubría**:
+
+- 9 con `Classical.choice` **oculto** (invisible a `grep 'Classical\.'`): 2 heredados de
+  `Peano.Wilson.wilson`, 7 nativos por `by_cases`/`decide` sobre una proposición sin instancia
+  `Decidable` en contexto (∀/∃ no acotado, o instancia fuera de scope → `Classical.propDecidable`).
+- 2 con `native_decide` (`VN.vN_totient_one/two` ← `Peano.Totient.totient_{one,two}`), un axioma
+  de confianza en el compilador que está **fuera** incluso del footprint diana `{propext, Quot.sound}`.
+
+El gate curado daba, por tanto, una **falsa sensación de seguridad**.
+
+**Decision**: Se reescribe `Meta/AxiomCheck.lean` como **gate exhaustivo**
+(`#assert_constructive_footprint`):
+
+1. Recorre **toda** declaración cuyo módulo de definición esté bajo `AczelSetTheory.*`
+   (filtro por `env.const2ModIdx`, saltando nombres internos), vía `Lean.collectAxioms`.
+2. **Falla el build** si algún símbolo tiene un axioma fuera de `{propext, Quot.sound}`
+   (`sorryAx` se tolera: es la deuda de los 14 `sorry` activos, ya avisada por el compilador),
+   **salvo** un `baselineNonConstructive` explícito de las 11 excepciones actuales, cada una
+   justificada en el informe.
+3. **Avisa** (warning) si una excepción del baseline ya está limpia, para poder retirarla.
+4. Para ver todas las declaraciones sin ciclo, el módulo importa todos los barrels de
+   subsistema (no el barrel raíz, que a su vez lo importa el último).
+
+**Rationale**:
+- Un gate curado no escala ni detecta el Classical oculto; el barrido automático no requiere
+  mantenimiento (descubre símbolos nuevos solo).
+- El patrón *baseline + fallo en regresiones nuevas* es la forma estándar de introducir un
+  gate estricto sobre una base que aún no está 100 % limpia: se congela la deuda conocida y
+  se impide que crezca.
+- Coste medido: ~2.6 s por build (los `.olean` ya están compilados; `collectAxioms` es barato).
+
+**Consequences**:
+- El **objetivo** es vaciar `baselineNonConstructive`. Cada símbolo saneado se retira de la lista
+  (el propio gate avisa cuándo una excepción ya está limpia).
+- Clase A (heredado de Peano, `Peano` frozen por ADR-000): requiere certificar constructivamente
+  `Wilson.wilson`/`Totient.totient_*` aguas arriba, o aceptarlos como excepción metateórica.
+- Clase B (nativo): reescribir los `by_cases`/`decide` con `[DecidablePred P]`/instancias reales
+  o descomposición constructiva (trabajo planificado, ver informe §6 Prioridad 1).
+- Supersede el mecanismo de lista curada de ADR-018 (que se conserva como herramienta puntual
+  `#assert_no_classical`, útil para comprobar un símbolo concreto).
 
 ---
 
