@@ -1,6 +1,6 @@
 Guía Maestra de la IA — Estándares de Documentación y Desarrollo
 
-Última actualización: 2026-06-08
+Última actualización: 2026-07-16
 Autor: Julián Calderón Almendros
 
 Este documento establece los requisitos universales y estándares para la documentación técnica, escritura de código y flujo de trabajo de este proyecto Lean 4.
@@ -140,11 +140,16 @@ Actualizar el archivo doc/REFERENCE-{tema}.md correspondiente cada vez que se mo
 
 El sistema REFERENCE completo debe contener suficiente información para escribir nuevos módulos o pruebas sin cargar el resto del proyecto.
 
-(11-14.) Protocolo de "Proyección" y Exportaciones
+(11-14.) Protocolo de "Proyección"
 
 "Proyectar" significa trasladar todo lo público de un .lean al archivo doc/REFERENCE-{tema}.md que le corresponda.
 
-Todo lo exportable (no private) DEBE proyectarse y DEBE aparecer en el bloque export del archivo .lean.
+La **fuente de verdad** de la proyección es el conjunto de **declaraciones no-`private`** del
+módulo (ADR-021 — antes era el bloque `export`, que ha pasado a ser opcional y selectivo por
+ser inaplicable a raíz; ver §17). Todo lo no-`private` DEBE proyectarse, **sujeto a la regla
+(8)**: nada que dependa de `sorry` entra en el sistema REFERENCE, ni directa ni
+indirectamente — ojo con los `sorry` heredados de un lema auxiliar, que un grep no ve
+(verificar con `#print axioms`, buscando `sorryAx`).
 
 Formato y Estilo de Código
 
@@ -166,12 +171,25 @@ theorem subset_refl (A : Type) : A ⊆ A := fun_ h => h
 
 Arquitectura de Exportaciones y Directorios
 
-(17.) Bloques de Exportación (Export blocks)
+(17.) Bloques de Exportación (Export blocks) — OPCIONAL Y SELECTIVO (ver ADR-021)
 
-Todo módulo de producción (hoja) DEBE terminar con un bloque export que liste todas las definiciones, teoremas y lemas públicos. Las declaraciones private (o con sufijo _aux) nunca se exportan.
+El bloque export es **opcional**. Se usa solo para el «API titular» de un módulo y **solo con
+símbolos cuyo nombre sea único en el proyecto**. No exportar nada es conforme.
 
--- Al final del archivo, fuera del namespace
-export PROJECT_NAME.SubModulo (add_comm add_assoc)
+⚠️ **Por qué NO es obligatorio** (ADR-021): los export van a raíz (`export HFSet (foo)` crea
+`_root_.foo`), pero la convención Mathlib (ADR-004) prescribe no repetir el namespace en el
+miembro, así que el mismo nombre existe legítimamente en varios namespaces (`add_comm` ×6,
+`add_assoc` ×6, `ofNat` ×11, `inter` ×8…). Exportarlos todos a raíz produciría aliases
+ambiguos y **rompería el build**. La regla anterior («todo módulo hoja DEBE terminar en
+export») era inaplicable: la incumplían 200 de 204 módulos.
+
+Las declaraciones private (o con sufijo _aux) nunca se exportan.
+
+-- Al final del archivo, fuera del namespace. El primer argumento es el NAMESPACE semántico
+-- (no `PROJECT_NAME.SubModulo`). Ejemplo real: AczelSetTheory/Axioms/WellOrder.lean
+export HFSet (
+  wf_induction minimum_in_nonempty wellOrder_minimum_unique wo_induction no_infinite_descent
+)
 
 (18.) Archivos "Barrel" (Paraguas)
 

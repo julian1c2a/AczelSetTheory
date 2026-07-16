@@ -2,7 +2,7 @@
 # Usage: make <target>
 # Requires: bash, lake, git
 
-.PHONY: build clean rebuild sorry status lock unlock list init new help
+.PHONY: build clean rebuild sorry audit status lock unlock list init new root update-toolchain help
 
 ## Build the project
 build:
@@ -18,6 +18,10 @@ rebuild: clean build
 ## Check for sorry statements
 sorry:
 	@bash check-sorry.bash
+
+## Regenerate AUDIT-MODULE-MATRIX.md (falla si hay sorry fuera del frente declarado)
+audit:
+	@bash gen-audit-matrix.bash
 
 ## Show project status: locked files + sorry count
 status:

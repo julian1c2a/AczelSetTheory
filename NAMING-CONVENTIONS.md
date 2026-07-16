@@ -3,7 +3,7 @@ Convenciones de Nombres — Estilo Estricto Mathlib
 Documento de referencia permanente para este proyecto.
 Todas las reglas se basan estrictamente en las Mathlib Naming Conventions.
 
-Última actualización: 2026-06-08
+Última actualización: 2026-07-16
 Autor: Julián Calderón Almendros
 
 1. La Regla de Oro: Ante la duda, busca en Mathlib
@@ -265,17 +265,25 @@ Los teoremas con nombres matemáticos históricos mantienen sus nombres propios.
 
 Bien: cantor_schroeder_bernstein, cantor_no_surjection.
 
-REGLA 13: Sufijos de Dominio (Evitar colisiones)
+REGLA 13: Sufijos de Dominio — ⚠️ RETIRADA (ver ADR-021)
 
-Cuando se construyen estructuras avanzadas y se quieren evitar colisiones con operaciones nativas (como Nat.*), se debe añadir un sufijo en mayúscula.
+**Esta regla NO está en vigor.** Se retiró el 2026-07-16 (ADR-021) por dos motivos:
 
-Ejemplos:
+1. **Nunca se usó**: el proyecto desambigua con **namespaces anidados** (`ℤ₀.add`, `ℚ₀.add`),
+   tal como prescriben AI-GUIDE §3.5 y ADR-015 — no con sufijos de dominio.
+2. **Contradice ADR-004** (emular Mathlib con precisión quirúrgica): Mathlib usa
+   `Nat.add_comm`/`Int.add_comm`, no `add_commN`/`add_commZ`.
 
-Estructura Z: addZ, mulZ, leZ, isPositiveZ.
+Decía: *«Cuando se construyen estructuras avanzadas y se quieren evitar colisiones con
+operaciones nativas (como `Nat.*`), añadir un sufijo en mayúscula — `addZ`, `mulZ`, `leZ`,
+`isPositiveZ`; `addQ`, `mulQ`, `isPositiveQ`.»*
 
-Estructura Q: addQ, mulQ, isPositiveQ.
+Se conserva aquí como **ejemplo de convención local**: documéntala solo si algún día se usa
+de verdad. Para desambiguar, la vía correcta en este proyecto es el **namespace**, no el sufijo.
 
-Nota: Predicados como isPositiveZ bajan a minúscula inicial porque el sufijo de dominio ya actúa como demarcador.
+> Contexto: esta regla fue la única salida técnica para sostener la antigua AI-GUIDE §17
+> (`export` obligatorio a raíz en todo módulo hoja), que exigía nombres globalmente únicos.
+> Al retirarse §17 como obligatoria (ADR-021), la REGLA 13 pierde su única justificación.
 
 1. Estructura de Archivos, Directorios y Módulos
 
