@@ -105,7 +105,7 @@ def ofCls' (p : ℤ₀can) : ℤ₀ where
   pair := p
   hEq  := (congrArg Subtype.val (ℤ₀can.ofCls_toCls p)).symm
 
-theorem ofZ0_cls (z : ℤ₀cls) : (ofCls z).cls = z := rfl
+theorem ofCls_cls (z : ℤ₀cls) : (ofCls z).cls = z := rfl
 
 /-- Dos ℤ₀ son iguales si sus clases subyacentes son iguales. -/
 @[ext]

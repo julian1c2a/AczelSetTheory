@@ -35,17 +35,17 @@ def CauchySeq.ConvergesTo (f : CauchySeq) (q : ℚ₀) : Prop :=
 def toClsCauchySeq (f : CauchySeq) : ℚ₀cls.CauchySeq :=
   ⟨toClsSeq f.val, (isCauchy_iff_q0_isCauchy f.val).mp f.property⟩
 
-theorem toQ0Seq_add (f g : ℕ₀ → ℚ₀) : 
+theorem toClsSeq_add (f g : ℕ₀ → ℚ₀) : 
     toClsSeq (fun n => f n + g n) = fun n => toClsSeq f n + toClsSeq g n := by
   funext n
   rfl
 
-theorem toQ0Seq_neg (f : ℕ₀ → ℚ₀) : 
+theorem toClsSeq_neg (f : ℕ₀ → ℚ₀) : 
     toClsSeq (fun n => -f n) = fun n => -toClsSeq f n := by
   funext n
   rfl
 
-theorem toQ0Seq_sub (f g : ℕ₀ → ℚ₀) : 
+theorem toClsSeq_sub (f g : ℕ₀ → ℚ₀) : 
     toClsSeq (fun n => f n - g n) = fun n => toClsSeq f n - toClsSeq g n := by
   funext n
   rfl
