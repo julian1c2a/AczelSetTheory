@@ -1,6 +1,6 @@
 # Technical Reference — AczelSetTheory
 
-**Last updated:** 2026-07-12
+**Last updated:** 2026-07-16
 **Author**: Julián Calderón Almendros
 **Lean version**: v4.31.0
 
@@ -18,13 +18,12 @@
 > [`doc/REFERENCE-HFList.md`](doc/REFERENCE-HFList.md),
 > [`doc/REFERENCE-Arithmetic.md`](doc/REFERENCE-Arithmetic.md),
 > [`doc/REFERENCE-Paridad-Peano-Aczel.md`](doc/REFERENCE-Paridad-Peano-Aczel.md),
-> [`doc/REFERENCE-Rationals.md`](doc/REFERENCE-Rationals.md) (cubre hasta
-> ℚ₀/Q0Ops/Q0Cauchy/MinAdd — falta proyectar `Q0CauchyAlgebra.lean`,
-> `Series.lean`, `Polynomial.lean` y el subsistema `Reals/`).
+> [`doc/REFERENCE-Rationals.md`](doc/REFERENCE-Rationals.md) (ℚ₀/ℚ₀cls/ℚ₀can, incl. el
+> subsistema `Reals/`; los módulos legacy conservan el formato antiguo en su anexo).
 >
 > **Nota (2026-06-08, vigente):** la tabla §1 lista los módulos del núcleo histórico más las
 > últimas adiciones. Para el inventario completo y al día (204 ficheros `.lean` totales bajo
-> `AczelSetTheory/` a 2026-07-12), incluidos `Algebra/{Action,CosetAction,CorrespondenceTheorem,FirstIsomorphism,SecondIsomorphism,ThirdIsomorphism,Lattice,LinearSpace,Module,Monoid,NormalSubgroup,QuotientGroup,RingHom,Sylow,Zassenhaus,QuotientRing,HFMatrix}`, `Integers/{Canonical,ℤ₀,Z0Ops}`, `Combinatorics/Counting`, ~35 módulos en `VN/`, etc., consulta [`AUDIT-MODULE-MATRIX.md`](AUDIT-MODULE-MATRIX.md) (nota: desactualizado desde 2026-06-10, ver INFORME-AUDITORIA-2026-07-12.md).
+> `AczelSetTheory/` a 2026-07-12), incluidos `Algebra/{Action,CosetAction,CorrespondenceTheorem,FirstIsomorphism,SecondIsomorphism,ThirdIsomorphism,Lattice,LinearSpace,Module,Monoid,NormalSubgroup,QuotientGroup,RingHom,Sylow,Zassenhaus,QuotientRing,HFMatrix}`, `Integers/{Canonical,Z0,Z0Ops}`, `Combinatorics/Counting`, ~35 módulos en `VN/`, etc., consulta [`AUDIT-MODULE-MATRIX.md`](AUDIT-MODULE-MATRIX.md) (regenerable con `make audit` — ADR-022).
 
 ---
 
@@ -162,28 +161,28 @@ Below are the keys for reading and searching theorems.
 | 102 | `AczelSetTheory/Integers/PadicVal.lean` | `ℤ₀cls` | ✅ Complete | PList/Omega0, `Peano.PeanoNat.{Arith,Primes,WellFounded,Div}` | Integers/MobiusLiouville |
 | 103 | `AczelSetTheory/Integers/MobiusLiouville.lean` | `ℤ₀cls` | ✅ Complete | Integers/Basic, Integers/PadicVal | Integers.lean |
 | 104 | `AczelSetTheory/Integers/Bezout.lean` | `ℤ₀cls` | ✅ Complete | Integers/Basic, Integers/Arithmetic, Integers/Order, `Peano.PeanoNat.Arith` | (futuro) Integers/ZModN |
-| 105 | `AczelSetTheory/Rationals/Basic.lean` | `ℚ₀cls` | ✅ Complete | Integers/Order (ℤ₀cls), `Peano.{ℕ₁,PeanoNat.*}` | Rationals/AbsVal, Rationals/Density, Rationals.lean |
-| 106 | `AczelSetTheory/Rationals/AbsVal.lean` | `ℚ₀cls` | ✅ Complete | Rationals/Basic | Rationals/IsCauchy, Rationals/Density, Rationals.lean |
-| 107 | `AczelSetTheory/Rationals/IsCauchy.lean` | `ℚ₀cls` | ✅ Complete | Rationals/Basic, Rationals/AbsVal, `Peano.PeanoNat.Combinatorics.Pow` | Rationals/Convergence |
-| 108 | `AczelSetTheory/Rationals/Density.lean` | `ℚ₀cls` | 🚧 Skeleton | Rationals/Basic, Rationals/AbsVal | Rationals.lean |
-| 108b| `AczelSetTheory/Rationals/Inv.lean` | `ℚ₀cls` | ✅ Complete | Rationals/Basic | Rationals/CauchySeqAlgebra |
-| 108c| `AczelSetTheory/Rationals/Convergence.lean` | `ℚ₀cls` | ✅ Complete | Rationals/IsCauchy | Rationals/Bisection, Rationals/RationalLog |
-| 108d| `AczelSetTheory/Rationals/Bisection.lean` | `ℚ₀cls` | ✅ Complete | Rationals/Convergence | Rationals/Roots, Rationals/Archimedean |
-| 108e| `AczelSetTheory/Rationals/Canonical.lean` | `ℚ₀cls` | ✅ Complete | Rationals/Basic, `Peano.PeanoNat.Arith` | Rationals.lean |
-| 108f| `AczelSetTheory/Rationals/PowOrder.lean` | `ℚ₀cls` | ✅ Complete | Rationals/Basic, `Peano.PeanoNat.Combinatorics.Pow` | Rationals/IsCauchy |
-| 108g| `AczelSetTheory/Rationals/RationalLog.lean` | `ℚ₀cls` | ✅ Complete | Rationals/Convergence | Rationals.lean |
-| 108h| `AczelSetTheory/Rationals/Roots.lean` | `ℚ₀cls` | ✅ Complete | Rationals/Bisection | Rationals.lean |
-| 108i| `AczelSetTheory/Rationals/CauchySeqAlgebra.lean` | `ℚ₀cls` | ✅ Complete | Rationals/IsCauchy, Rationals/Inv | Rationals.lean |
-| 108j| `AczelSetTheory/Rationals/Archimedean.lean` | `ℚ₀cls` | ✅ Complete | Rationals/Bisection | Rationals/Irrational |
-| 108k| `AczelSetTheory/Rationals/Irrational.lean` | `ℚ₀cls` | 🚧 Progress (1 sorry: `newton_seq_step_bound`) | Rationals/Archimedean | Rationals.lean, Reals/Incompleteness |
-| 108l| `AczelSetTheory/Rationals/Q0.lean` | `ℚ₀` | ✅ Complete | Rationals/{Basic,Canonical,AbsVal}, Integers/ℤ₀, `Peano.PeanoNat.{Arith,Primes}` | Q0Ops, Polynomial, Rationals.lean |
-| 108m| `AczelSetTheory/Rationals/Q0Ops.lean` | `ℚ₀` | ✅ Complete | Rationals/{ℚ₀,Inv,AbsVal,Roots} | Q0Cauchy, Series |
-| 108n| `AczelSetTheory/Rationals/Q0Cauchy.lean` | `ℚ₀` | ✅ Complete | Rationals/{Q0Ops,IsCauchy,CauchySeqAlgebra} | Q0CauchyAlgebra, Reals/Incompleteness, Rationals.lean |
-| 108o| `AczelSetTheory/Rationals/Q0CauchyAlgebra.lean` | `ℚ₀` | ✅ Complete | Rationals/{Q0Cauchy,CauchySeqAlgebra,Q0Ops}, `Peano.PeanoNat.Arith` | Rationals.lean |
-| 108p| `AczelSetTheory/Rationals/MinAdd.lean` | `ℚ₀cls` | ✅ Complete | Rationals/Basic | Rationals.lean |
-| 108q| `AczelSetTheory/Rationals/Series.lean` | `ℚ₀cls`, `ℚ₀` | 🚧 Progress (6 sorry: `sum_add`, `sum_mul_left`, `sum_arithmetic`, `sum_geometric` ×2) | Rationals/Q0Ops | Rationals.lean |
-| 108r| `AczelSetTheory/Rationals/Polynomial.lean` | `ℚ₀` | 🚧 Progress (4 sorry: canonicalización tras `add`/`smul`/`mul`/`monomial`) | PList/Basic, Rationals/ℚ₀, Axioms/OrdinalNat | Rationals.lean |
-| 108s| `AczelSetTheory/Reals/Incompleteness.lean` | `ℝ₀` (namespace de propiedades sobre `ℚ₀`; **no** existe aún un tipo `ℝ₀`/`HFReal` como cociente — ver nota abajo) | 🚧 Progress (3 sorry: irracionalidad de √2 y convergencia) | Rationals/{Q0Cauchy,Irrational} | Reals.lean |
+| 105 | [`AczelSetTheory/Rationals/Basic.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀cls` | ✅ Complete | Integers/Order (ℤ₀cls), `Peano.{ℕ₁,PeanoNat.*}` | Rationals/AbsVal, Rationals/Density, Rationals.lean |
+| 106 | [`AczelSetTheory/Rationals/AbsVal.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀cls` | ✅ Complete | Rationals/Basic | Rationals/IsCauchy, Rationals/Density, Rationals.lean |
+| 107 | [`AczelSetTheory/Rationals/IsCauchy.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀cls` | ✅ Complete | Rationals/Basic, Rationals/AbsVal, `Peano.PeanoNat.Combinatorics.Pow` | Rationals/Convergence |
+| 108 | [`AczelSetTheory/Rationals/Density.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀cls` | 🚧 Skeleton | Rationals/Basic, Rationals/AbsVal | Rationals.lean |
+| 108b | [`AczelSetTheory/Rationals/Inv.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀cls` | ✅ Complete | Rationals/Basic | Rationals/CauchySeqAlgebra |
+| 108c | [`AczelSetTheory/Rationals/Convergence.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀cls` | ✅ Complete | Rationals/IsCauchy | Rationals/Bisection, Rationals/RationalLog |
+| 108d | [`AczelSetTheory/Rationals/Bisection.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀cls` | ✅ Complete | Rationals/Convergence | Rationals/Roots, Rationals/Archimedean |
+| 108e | [`AczelSetTheory/Rationals/Canonical.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀cls` | ✅ Complete | Rationals/Basic, `Peano.PeanoNat.Arith` | Rationals.lean |
+| 108f | [`AczelSetTheory/Rationals/PowOrder.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀cls` | ✅ Complete | Rationals/Basic, `Peano.PeanoNat.Combinatorics.Pow` | Rationals/IsCauchy |
+| 108g | [`AczelSetTheory/Rationals/RationalLog.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀cls` | ✅ Complete | Rationals/Convergence | Rationals.lean |
+| 108h | [`AczelSetTheory/Rationals/Roots.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀cls` | ✅ Complete | Rationals/Bisection | Rationals.lean |
+| 108i | [`AczelSetTheory/Rationals/CauchySeqAlgebra.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀cls` | ✅ Complete | Rationals/IsCauchy, Rationals/Inv | Rationals.lean |
+| 108j | [`AczelSetTheory/Rationals/Archimedean.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀cls` | ✅ Complete | Rationals/Bisection | Rationals/Irrational |
+| 108k | [`AczelSetTheory/Rationals/Irrational.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀cls` | 🚧 Progress (1 sorry: `newton_seq_step_bound`) | Rationals/Archimedean | Rationals.lean, Reals/Incompleteness |
+| 108l | [`AczelSetTheory/Rationals/Q0.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀` | ✅ Complete | Rationals/{Basic,Canonical,AbsVal}, Integers/ℤ₀, `Peano.PeanoNat.{Arith,Primes}` | Q0Ops, Polynomial, Rationals.lean |
+| 108m | [`AczelSetTheory/Rationals/Q0Ops.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀` | ✅ Complete | Rationals/{Q0,Inv,AbsVal,Roots} | Q0Cauchy, Series |
+| 108n | [`AczelSetTheory/Rationals/Q0Cauchy.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀` | ✅ Complete | Rationals/{Q0Ops,IsCauchy,CauchySeqAlgebra} | Q0CauchyAlgebra, Reals/Incompleteness, Rationals.lean |
+| 108o | [`AczelSetTheory/Rationals/Q0CauchyAlgebra.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀` | ✅ Complete | Rationals/{Q0Cauchy,CauchySeqAlgebra,Q0Ops}, `Peano.PeanoNat.Arith` | Rationals.lean |
+| 108p | [`AczelSetTheory/Rationals/MinAdd.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀cls` | ✅ Complete | Rationals/Basic | Rationals.lean |
+| 108q | [`AczelSetTheory/Rationals/Series.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀cls`, `ℚ₀` | 🚧 Progress (6 sorry: `sum_add`, `sum_mul_left`, `sum_arithmetic`, `sum_geometric` ×2) | Rationals/Q0Ops | Rationals.lean |
+| 108r | [`AczelSetTheory/Rationals/Polynomial.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀` | 🚧 Progress (4 sorry: canonicalización tras `add`/`smul`/`mul`/`monomial`) | PList/Basic, Rationals/ℚ₀, Axioms/OrdinalNat | Rationals.lean |
+| 108s | [`AczelSetTheory/Reals/Incompleteness.lean`](doc/REFERENCE-Rationals.md) | `ℝ₀` (namespace de propiedades sobre `ℚ₀`; **no** existe aún un tipo `ℝ₀`/`HFReal` como cociente — ver nota abajo) | 🚧 Progress (3 sorry: irracionalidad de √2 y convergencia) | Rationals/{Q0Cauchy,Irrational} | Reals.lean |
 
 > **Nota histórica (2026-07-12):** hasta el 2026-07-05 (commit `173add2`) existió un
 > primer intento de `ℝ₀` como tipo propio — `Reals/{CauchySeq,Arithmetic,Order,RealAxioms}.lean`,
@@ -210,7 +209,7 @@ Below are the keys for reading and searching theorems.
 | — | `AczelSetTheory/VN.lean` | — | ✅ Complete | VN/{Basic,Injective,IsNat,Arithmetic,FSet,PeanoAxioms,PeanoArith,PowVN,SubVN,DivVN,FactorialVN,CardVN,RankVN} | AczelSetTheory.lean |
 | — | `AczelSetTheory/PList.lean` | — | ✅ Complete | PList/{Basic,Lemmas,Omega0} | AczelSetTheory.lean |
 | — | `AczelSetTheory/Integers.lean` | — | ✅ Complete | Integers/{Basic,Order,Functions,Arithmetic,Bijection,PadicVal,MobiusLiouville,Canonical,Bezout,ZModN} | AczelSetTheory.lean |
-| — | `AczelSetTheory/Rationals.lean` | — | ✅ Barrel | Rationals/{Basic,AbsVal,IsCauchy,Density,CauchySeqAlgebra,Canonical,Convergence,Bisection,Roots,PowOrder,RationalLog,ℚ₀,MinAdd,Series,Polynomial,Q0Cauchy,Q0CauchyAlgebra,Archimedean,Irrational} (19 módulos) | AczelSetTheory.lean, Reals.lean |
+| — | `AczelSetTheory/Rationals.lean` | — | ✅ Barrel | Rationals/{Basic,AbsVal,IsCauchy,Density,CauchySeqAlgebra,Canonical,Convergence,Bisection,Roots,PowOrder,RationalLog,Q0,MinAdd,Series,Polynomial,Q0Cauchy,Q0CauchyAlgebra,Archimedean,Irrational} (19 módulos) | AczelSetTheory.lean, Reals.lean |
 | — | `AczelSetTheory/Reals.lean` | — | ✅ Barrel | Rationals/CauchySeqAlgebra, Reals/Incompleteness | AczelSetTheory.lean |
 | — | `AczelSetTheory.lean` | — | ✅ Complete | PList, CList, HFSets, Operations/*, Axioms/*, Integers, Notation | Main |
 | — | `Main.lean` | — | ✅ Complete | CList.Basic | — |

@@ -227,7 +227,7 @@
 | Integers/Canonical.lean | `canonicalRep`, representante normal `(0,n)`/`(0,0)`/`(n,0)` (ADR-014) | ✅ |
 | Integers/Bezout.lean | `bezout_ofNat`, `bezout`, `bezout_coprime`, `extEuclidNat`, `extEuclidNat_spec`, `bezoutCoeffs` | ✅ |
 | Integers/ZModN.lean | `HFAlgebra.ZModN` (ℤ/nℤ anillo), `ZModN_mul_comm`, `ZModFieldP` (ℤ/pℤ cuerpo, `p` primo) | ✅ |
-| Integers/ℤ₀.lean | `ℤ₀` (entero como HFSet), operaciones y puente con ℤ₀cls | ✅ |
+| Integers/Z0.lean | `ℤ₀` (entero como HFSet), operaciones y puente con ℤ₀cls | ✅ |
 | Integers/Z0Ops.lean | operaciones aritméticas sobre `ℤ₀` | ✅ |
 
 ### Combinatorics/ (1 module)

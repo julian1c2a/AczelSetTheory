@@ -131,7 +131,7 @@ Peano tenía `NumberSets.lean` con la definición de `ℤ_P` como pares. AczelSe
 | `Integers/Functions.lean` | Funciones de conversión, `abs`, `sign` | ✅ |
 | `Integers/MobiusLiouville.lean` | Función de Möbius `μ(n)` y función de Liouville `λ(n)` | ✅ 🆕 |
 | `Integers/PadicVal.lean` | Valuación p-ádica `v_p(n)` | ✅ 🆕 |
-| `Integers/ℤ₀.lean` | Wrapper `ℤ₀` con representante canónico | ✅ 🆕 |
+| `Integers/Z0.lean` | Wrapper `ℤ₀` con representante canónico | ✅ 🆕 |
 | `Integers/Z0Ops.lean` | Operaciones elevadas y comodidades `ℤ₀` | ✅ 🆕 |
 
 ---
