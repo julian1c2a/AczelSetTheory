@@ -1,6 +1,6 @@
 # Design Decisions — AczelSetTheory
 
-**Last updated:** 2026-07-15
+**Last updated:** 2026-07-16
 **Author**: Julián Calderón Almendros
 
 Architectural Decision Records (ADR) for this project.
@@ -638,6 +638,200 @@ El gate curado daba, por tanto, una **falsa sensación de seguridad**.
   o descomposición constructiva (trabajo planificado, ver informe §6 Prioridad 1).
 - Supersede el mecanismo de lista curada de ADR-018 (que se conserva como herramienta puntual
   `#assert_no_classical`, útil para comprobar un símbolo concreto).
+
+---
+
+## ADR-021: Regla 17 (bloques `export`) redefinida — incompatible con namespaces semánticos + ADR-004
+
+**Date**: 2026-07-16
+**Status**: Accepted (redefine AI-GUIDE §17 y §11-14; **retira** NAMING-CONVENTIONS REGLA 13)
+
+**Context**:
+La auditoría 2026-07-15/16 (`INFORME-AUDITORIA-2026-07-15.md`) constató que AI-GUIDE §17
+(«Todo módulo de producción (hoja) DEBE terminar con un bloque `export` que liste todas las
+definiciones, teoremas y lemas públicos») **la incumplen 200 de 204 módulos**: solo la
+cumplen `Algebra/Subgroup.lean`, `Axioms/Order.lean`, `Axioms/WellOrder.lean` y
+`Operations/Order.lean`.
+
+Al intentar aplicarla project-wide se descubrió que **es técnicamente inaplicable con el
+diseño de este proyecto**:
+
+- Los `export` del repo van **a raíz**: `export HFSet (wf_induction)` crea `_root_.wf_induction`.
+- ADR-004 (convención Mathlib) prescribe **no repetir el namespace en el miembro**, así que
+  el mismo nombre existe **legítimamente** en varios namespaces:
+
+  ```
+  add_comm ×6   add_assoc ×6   add_zero ×5   zero_mul ×5
+  mul_comm ×4   mul_one ×4     zero_add ×4
+  ofNat ×11     inter ×8       id ×7   comp ×7   get ×6
+  ```
+
+- Exportarlos todos a raíz crearía **aliases ambiguos** (`_root_.add_comm` con 6 orígenes) y
+  los usos de nombres desnudos (hay `open Peano` en muchos módulos) fallarían con
+  *"ambiguous, possible interpretations"* → **rompe el build**.
+- Los 4 módulos conformes lo son precisamente porque sus símbolos tienen nombre **único**
+  (`wf_induction`, `isSubgroupProp`, `isReflexive`…). **El patrón no escala.**
+
+La única forma de sostener §17 con export-a-raíz sería adoptar NAMING **REGLA 13** (sufijos
+de dominio: `addZ`, `mulQ`) generalizada a lemas (`add_commQ`, `add_commZ`…), lo cual:
+contradice **ADR-004** (Mathlib usa `Nat.add_comm`/`Int.add_comm` y **no** exporta a raíz);
+contradice **AI-GUIDE §3.5 / ADR-015** (namespaces anidados); exigiría renombrar cientos de
+símbolos y todos sus usos en 204 ficheros **sin beneficio funcional** (los namespaces ya
+desambiguan); y resucita una regla que la auditoría 2026-07-12 constató **nunca usada**.
+
+**Decision**:
+
+1. **§17 deja de ser obligatoria y universal.** El bloque `export` es **opcional y selectivo**:
+   se usa solo para el «API titular» de un módulo y **solo con símbolos cuyo nombre sea único
+   en el proyecto** — que es exactamente la práctica de los 4 módulos conformes. **No exportar
+   nada es conforme.**
+2. **NAMING REGLA 13 (sufijos de dominio) se retira** como regla universal; queda como
+   convención local, a documentar únicamente si algún día se usa de verdad.
+3. **Reglas 11-14 reformuladas**: la fuente de verdad de la proyección al sistema REFERENCE
+   deja de ser el bloque `export` y pasa a ser **el conjunto de declaraciones no-`private`**
+   del módulo. El índice de lo público lo provee `doc/REFERENCE-*.md` §7 («Exports per
+   Module»), que ya existe y no colisiona.
+4. El patrón real correcto es `export <Namespace> (sym₁ sym₂ …)` a raíz. El ejemplo del
+   AI-GUIDE (`export PROJECT_NAME.SubModulo (...)`) **era erróneo** y se corrige.
+
+**Rationale**:
+- El problema **no es el naming** —que es correcto y Mathlib-conforme— sino una regla que
+  exige **aplanarlo a raíz**, destruyendo la desambiguación que los namespaces ya aportan.
+- Una regla que incumple el 98 % del código y que, aplicada, **rompe el build**, no es una
+  norma: es deuda documental. O se hace cumplible o se retira.
+- El sistema REFERENCE ya cumple la función que §17 pretendía (índice navegable de lo
+  público) sin colisionar.
+
+**Consequences**:
+- No hay que tocar 200 módulos ni renombrar ningún símbolo.
+- Los 4 módulos con `export` siguen siendo válidos: son el patrón selectivo de referencia.
+- La proyección al REFERENCE se hace desde las declaraciones no-`private`, sujeta a la
+  regla (8) («nada que no esté probado entra en REFERENCE»).
+- Se actualizan `AI-GUIDE.md` (§17, §11-14) y `NAMING-CONVENTIONS.md` (REGLA 13).
+- Un `export` exhaustivo en el futuro exigiría antes adoptar un esquema de nombres
+  globalmente único (REGLA 13) y aceptar el conflicto con ADR-004: **no recomendado**.
+
+---
+
+## ADR-022: Invariante O6 desdoblado — 0/0/0 duro + frente de `sorry` acotado y declarado
+
+**Date**: 2026-07-16
+**Status**: Accepted (enmienda a O6 de `PLANNING-FASE-B.md`; no reescribe su enunciado histórico)
+
+**Context**:
+O6 (`PLANNING-FASE-B.md`) exige «0 sorry / 0 noncomputable / 0 axiom / 0 warnings», verificado
+con `lake build && make audit` tras cada milestone. La auditoría 2026-07-15/16 encontró tres
+defectos:
+
+1. **`make audit` nunca existió**: era un target fantasma. Tres documentos mandaban ejecutarlo
+   (`AUDITORIA-2026-06-05.md`, `INFORME-AUDITORIA-2026-06-08.md`, `PLANNING-FASE-B.md`) pero el
+   `Makefile` no lo definía. **El invariante no se verificaba: no había con qué.**
+2. **`AUDIT-MODULE-MATRIX.md` declaraba `sorry: 0`** mientras el árbol tiene **14**. La matriz
+   cubría 182 de 204 módulos y — la ironía — **los 14 `sorry` viven exactamente en los
+   subsistemas que la matriz no cubría** (`Rationals/`, `Reals/`). O6 «se mantenía» porque el
+   inventario era ciego.
+3. O6 está violado también en **warnings**: el build real emite 19 (5 unused-variable + 14 sorry),
+   no 0.
+
+Los 14 `sorry` no son un descubrimiento: están documentados y aceptados en
+`CURRENT-STATUS-PROJECT.md` §Known Sorry Locations, en `NEXT-STEPS.md`, y el gate de axiomas los
+tolera explícitamente (`sorryAx ∈ allowedAxioms`, ADR-020). Son el **frente de trabajo activo**
+(análisis real constructivo), no deuda oculta.
+
+**Decision**:
+O6 se **desdobla** en tres invariantes verificables. Su enunciado histórico en
+`PLANNING-FASE-B.md` **no se reescribe** (falsearía el registro); se enmienda por referencia a
+este ADR.
+
+- **O6a — duro, global, sin excepciones**: `0 axiom`, `0 admit`, `0 noncomputable def`, y
+  footprint de axiomas ⊆ `{propext, Quot.sound}` (+ `sorryAx`). Verificado mecánicamente por
+  `gen-audit-matrix.bash` y por el gate exhaustivo de ADR-020.
+- **O6b — frente de `sorry` acotado**: `0 sorry` **fuera del frente declarado**. El frente vive
+  en `SORRY_BASELINE` de `gen-audit-matrix.bash` (hoy: Series 6, Polynomial 4, Incompleteness 3,
+  Irrational 1 = 14) y **solo puede encoger**: `make audit` **falla** ante cualquier `sorry`
+  nuevo o fuera de la lista, y **avisa** cuando una cota queda obsoleta.
+- **O6c — warnings**: los 5 unused-variable quedan como deuda menor declarada; «0 warnings» se
+  reinterpreta como «**0 warnings nuevos**».
+
+**Rationale**:
+- Es **el mismo patrón que ADR-020** (baseline explícito + fallo ante regresiones), que este
+  proyecto ya adoptó y que le funcionó para llevar el footprint de 11 excepciones a 0.
+- Un `sorry: 0` **falso** es estrictamente peor que una deuda **declarada y acotada**: lo primero
+  no se puede vigilar; lo segundo falla el build en cuanto crece.
+- Regenerar la matriz no «rompe» O6: **revela** que O6 llevaba desde 2026-06-10 sin verificarse.
+  La honestidad del inventario es condición previa a cualquier invariante.
+
+**Consequences**:
+- `AUDIT-MODULE-MATRIX.md` dice `sorry: 14`, y eso es **correcto**, no una regresión.
+- El cierre de FASE B (M8B) no queda bloqueado: O6a se cumple y O6b está acotado. `Rationals/`
+  y `Reals/` son FRENTE 1 (post-FASE B), no perímetro de FASE B.
+- Cada `sorry` cerrado **baja la cota** en `SORRY_BASELINE`; el propio `make audit` avisa.
+- Queda cerrada la acción «regenerar con `make audit`» que reclamaban los informes de
+  2026-06-05 y 2026-06-08 (esos documentos son históricos y **no se editan**).
+
+---
+
+## ADR-023: El nombre titular `ℤ₀`/`ℚ₀` pasa al tipo empaquetado (antes `HFInt`/`HFRat`)
+
+**Date**: 2026-07-16
+**Status**: Accepted (decisión del usuario)
+
+**Context**:
+El proyecto tenía **tres** presentaciones de cada número, y el **nombre bueno lo tenía la
+representación interna**, no la que usa el consumidor:
+
+```lean
+structure HFInt where          structure HFRat where
+  cls  : ℤ₀                      cls  : ℚ₀        -- la CLASE de equivalencia (quotient)
+  pair : ℤ₀'                     pair : ℚ₀'       -- el par CANÓNICO
+  hEq  : pair.val = cls.repr     hEq  : ℚ₀'.toQ0 pair = cls   -- coherencia entre ambas
+```
+
+Es decir: `ℤ₀`/`ℚ₀` (el cociente) y `ℤ₀'`/`ℚ₀'` (el par canónico) son **dos representaciones**;
+`HFInt`/`HFRat` es el tipo que **empaqueta ambas con su prueba de coherencia** y es el que el
+resto del proyecto debe usar. Los propios nombres de campo (`cls`, `pair`) ya lo decían.
+
+**Decision**:
+El nombre titular pasa al tipo empaquetado; las representaciones se cualifican por su rol:
+
+| Antes | Ahora | Rol |
+|---|---|---|
+| `ℤ₀` | **`ℤ₀cls`** | cociente / clase de equivalencia (`Quotient intSetoid`) |
+| `ℤ₀'` | **`ℤ₀can`** | par canónico |
+| `HFInt` | **`ℤ₀`** | **titular**: clase + par canónico + coherencia |
+| `ℚ₀` | **`ℚ₀cls`** | cociente / clase de equivalencia |
+| `ℚ₀'` | **`ℚ₀can`** | par canónico |
+| `HFRat` | **`ℚ₀`** | **titular**: clase + par canónico + coherencia |
+
+Arrastra la cascada completa:
+- **Derivados ASCII** (~223 usos): `toQ0`/`toZ0` → `toCls`, `ofQ0`/`ofZ0` → `ofCls`,
+  `toQ0Seq` → `toClsSeq`, `toQ0CauchySeq` → `toClsCauchySeq`, `toQ0Pos` → `toClsPos`,
+  `toQ0ApartZero` → `toClsApartZero`, y los lemas de ida-y-vuelta `toQ0_ofQ0` → `toCls_ofCls`,
+  `ofQ0_toQ0` → `ofCls_toCls`.
+- **Ficheros/módulos** (6): `Integers/HFInt.lean` → `Integers/Z0.lean`, `HFIntOps` → `Z0Ops`;
+  `Rationals/HFRat.lean` → `Rationals/Q0.lean`, `HFRatOps` → `Q0Ops`, `HFRatCauchy` → `Q0Cauchy`,
+  `HFRatCauchyAlgebra` → `Q0CauchyAlgebra`. ASCII, por el precedente `PList/Fin0.lean` y porque
+  los módulos/ficheros no deben llevar unicode. `Basic.lean` **no se mueve**: sigue albergando el
+  cociente (`ℚ₀cls`), por la regla NAMING de definiciones fundamentales.
+
+**Rationale**:
+- **El consumidor debe escribir `ℚ₀`, no `HFRat`.** `HFRat`/`HFInt` eran nombres de andamio
+  («HF» = hereditariamente finito) filtrados a la API pública.
+- La distinción `cls`/`can` es **la que el código ya hacía** en sus campos: el renombrado se
+  limita a que los tipos digan lo que los campos ya decían.
+- Elimina la ambigüedad de tener `ℚ₀` (cociente) y `HFRat` (empaquetado) compitiendo por ser
+  «el racional», que obligaba a recordar cuál usar en cada API.
+
+**Consequences**:
+- ~3000 ocurrencias reescritas en 36 ficheros `.lean` + 6 renombrados. Build verificado.
+- **Los documentos históricos NO se reescriben** (informes de auditoría 2026-06-05/06-08/07-12/
+  07-15, entradas pasadas del CHANGELOG, y los cuerpos de ADR anteriores): describen el estado
+  en su fecha y reescribirlos falsearía el registro. **Esta tabla de mapeo es la clave de
+  lectura** para interpretarlos. En particular, ADR-014 («ℤ₀ como único entero canónico, sin
+  `HFInt`») debe leerse con el mapeo: su `ℤ₀` es hoy `ℤ₀cls`.
+- Los documentos vivos (README, REFERENCE + nodos, CURRENT-STATUS, NEXT-STEPS, DEPENDENCIES,
+  PLANNING) sí se actualizan a la nomenclatura nueva.
+- `AUDIT-MODULE-MATRIX.md` recoge los ficheros nuevos automáticamente vía `make audit` (ADR-022).
 
 ---
 

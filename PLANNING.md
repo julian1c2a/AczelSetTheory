@@ -20,10 +20,10 @@ Detalle completo en [`PLANNING-FASE-B.md`](PLANNING-FASE-B.md). Estado de los 9 
 | Milestone | Estado | Salida |
 |---|---|---|
 | M1B (auditoría ⚠️ + CosetCount) | ✅ CERRADO 2026-06-05 | ADR-012/013 |
-| M2B (ℚ₀ AbsVal + Density) | ✅ CERRADO | `Integers/Rationals/{AbsVal,Density}.lean` |
-| M3B (ℚ₀ métrica / Cauchy diádico) | ✅ CERRADO | `Integers/Rationals/IsCauchy.lean` |
-| M4B (canonicalRep ℤ₀) | ✅ CERRADO commit b9484c7 | `Integers/Canonical.lean` (ADR-014) |
-| M5B.0 (Bézout ℤ₀) | ✅ CERRADO commit 7d828db | `Integers/Bezout.lean` |
+| M2B (ℚ₀cls AbsVal + Density) | ✅ CERRADO | `Integers/Rationals/{AbsVal,Density}.lean` |
+| M3B (ℚ₀cls métrica / Cauchy diádico) | ✅ CERRADO | `Integers/Rationals/IsCauchy.lean` |
+| M4B (canonicalRep ℤ₀cls) | ✅ CERRADO commit b9484c7 | `Integers/Canonical.lean` (ADR-014) |
+| M5B.0 (Bézout ℤ₀cls) | ✅ CERRADO commit 7d828db | `Integers/Bezout.lean` |
 | M5B (ℤ/nℤ + ℤ/pℤ) | ✅ CERRADO commits bf96be7/28e78bb | `Integers/ZModN.lean` (ADR-016) |
 | M6B (matrices Mₙ sobre HFRing) | ✅ CERRADO 2026-06-10 | `Algebra/HFMatrix.lean` |
 | M7B (Combinatorics nativa) | ✅ CERRADO 2026-06-08 | `Combinatorics/Counting.lean` |
@@ -52,21 +52,21 @@ no se redefinen localmente.
 | `Peano.ℕ₂` | `{n : ℕ₁ // n.val ≠ 𝟙}` (≥ 2, factores propios) | ya usado en `VN/DigitsVN.lean` |
 
 **Revisión 2026-06-10:** la única duplicación detectada es `PosNat₀` (= `ℕ₁`). Procedimiento de
-limpieza para cada hallazgo: (1) `grep "{.*: ℕ₀ //"` y `"{.*: ℤ₀ //"`; (2) identificar el tipo
+limpieza para cada hallazgo: (1) `grep "{.*: ℕ₀ //"` y `"{.*: ℤ₀cls //"`; (2) identificar el tipo
 peanolib equivalente; (3) sustituir y reusar su aparato (lemas, instancias, notación); (4) si no
 existe en peanolib y es fundacional, evaluar añadirlo allí, no localmente. Revisión recurrente
 en cada `repasa` para evitar reincidencias.
 
 ### L2 — Reorganizar la jerarquía numérica: `/Rationals/` y `/Reals/` como pares de `/Integers/`
 
-Hoy `ℚ₀` cuelga de `Integers/Rationals*` (por dependencia: ℚ₀ se construye sobre ℤ₀), mientras
-`ℝ₀` ya es subsistema raíz (`Reals/`). Es una **asimetría**: conceptualmente ℚ₀ es un sistema
-numérico propio, par de ℤ₀ y ℝ₀.
+Hoy `ℚ₀cls` cuelga de `Integers/Rationals*` (por dependencia: ℚ₀cls se construye sobre ℤ₀cls), mientras
+`ℝ₀` ya es subsistema raíz (`Reals/`). Es una **asimetría**: conceptualmente ℚ₀cls es un sistema
+numérico propio, par de ℤ₀cls y ℝ₀.
 
 **Objetivo:** mover `Integers/Rationals.lean` y `Integers/Rationals/{AbsVal,Density,IsCauchy}.lean`
 a `AczelSetTheory/Rationals/` con barrel `Rationals.lean` (par de `Integers.lean`), actualizando
 imports y el barrel raíz. Coordinar con L1 (sustituir `PosNat₀`→`ℕ₁` en el mismo paso).
-Cadena de dependencias a respetar: `peanolib → … → Integers (ℤ₀) → Rationals (ℚ₀) → Reals (ℝ₀)`.
+Cadena de dependencias a respetar: `peanolib → … → Integers (ℤ₀cls) → Rationals (ℚ₀cls) → Reals (ℝ₀)`.
 
 **Coste estimado:** 1 sesión (mecánico pero transversal: ~5 ficheros + 2 barrels + REFERENCE).
 
@@ -207,9 +207,9 @@ Detalle táctico en `NEXT_STEPS.md`. Orden de ejecución aprobado (2026-05-28):
 
 Una vez cerrada la paridad, atacar las extensiones naturales que Peano no podía expresar pero que cierran el discurso aritmético:
 
-1. **B1. ℚ₀ extendido** ✅: valor absoluto (`AbsVal`), densidad (`Density`), Cauchy diádico (`IsCauchy`). Métrica/completitud total se difiere a FASE C (requiere ASet₁).
-2. **B2. Bridge `ℤ₀ ↔ HFInt`** ✅ *resuelto por decisión*: **ADR-014** descarta `HFInt`; se fija representante canónico único `canonicalRep` en `Integers/Canonical.lean`. No hay drift.
-3. **B3. Anillos cocientes concretos** ✅: `ℤ/nℤ` y cuerpo `ℤ/pℤ` (`Integers/ZModN.lean`, sobre `vN n`; **ADR-016**: no `HFRing_of_ℤ₀` por finitud hereditaria); anillo cociente genérico `R/I` (`Algebra/QuotientRing.lean`); matrices n×n `HFMatrixRing` sobre cualquier `HFRing` (`Algebra/HFMatrix.lean`, M6B). Determinante diferido a FASE C.
+1. **B1. ℚ₀cls extendido** ✅: valor absoluto (`AbsVal`), densidad (`Density`), Cauchy diádico (`IsCauchy`). Métrica/completitud total se difiere a FASE C (requiere ASet₁).
+2. **B2. Bridge `ℤ₀cls ↔ ℤ₀`** ✅ *resuelto por decisión*: **ADR-014** descarta `ℤ₀`; se fija representante canónico único `canonicalRep` en `Integers/Canonical.lean`. No hay drift.
+3. **B3. Anillos cocientes concretos** ✅: `ℤ/nℤ` y cuerpo `ℤ/pℤ` (`Integers/ZModN.lean`, sobre `vN n`; **ADR-016**: no `HFRing_of_ℤ₀cls` por finitud hereditaria); anillo cociente genérico `R/I` (`Algebra/QuotientRing.lean`); matrices n×n `HFMatrixRing` sobre cualquier `HFRing` (`Algebra/HFMatrix.lean`, M6B). Determinante diferido a FASE C.
 4. **B4. Documentación de cierre** ⏳ **PENDIENTE (= M8B)**: congelar `REFERENCE-Paridad-Peano-Aczel.md` con sello "Paridad completa" y redactar `RFC-FASE-C.md` (C1/C2/C3). Es el único milestone restante de FASE B.
 
 ### 🅲️ FASE C — Decisión: ¿extender HF o saltar a ASet₁? (punto de inflexión)
@@ -235,7 +235,7 @@ Lo que ya está documentado en este mismo archivo en §"Largo Plazo": ASet₁, J
 > 1. **Prioridad "Paridad antes que Extensión":** **aceptada.** Procedemos con Fase A íntegra antes de Fase B.
 > 2. **Sylow:** **se mantiene dentro del bloque mínimo** (M6). Es parte de la paridad Peano completa.
 > 3. **Punto de inflexión C:** **se mantiene** para discutir al cierre de Fase A. Escribiremos mini-RFC C1/C2/C3 tras M7.
-> 4. **⚠️ embebidos:** **se auditarán** (tarea T1 en `NEXT_STEPS.md`) antes de tocar ℚ₀ extendido en Fase B; decisión caso por caso.
+> 4. **⚠️ embebidos:** **se auditarán** (tarea T1 en `NEXT_STEPS.md`) antes de tocar ℚ₀cls extendido en Fase B; decisión caso por caso.
 > 5. **Cadencia de check-in:** **acordada.** Actualizar `PLANNING.md` y `REFERENCE-Paridad-Peano-Aczel.md` tras cada milestone con lecciones aprendidas + recálculo de estimación (tarea T3).
 
 Ver `NEXT_STEPS.md` para el plan de ejecución detallado de Fase A con todas las decisiones tácticas adicionales (paralelización, especialización de iso theorems, `PermVN := SymVN`, bundle).

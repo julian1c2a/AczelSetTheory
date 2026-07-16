@@ -11,11 +11,11 @@ import AczelSetTheory.Integers.Functions
 import Peano
 
 open Peano Peano.Order Peano.Axioms Peano.Add Peano.Mul
-open ℤ₀ ℚ₀
+open ℤ₀cls ℚ₀cls
 
-theorem le_ofNat_repr_fst (a : ℤ₀) : a ≤ ofNat a.repr.1 := by
-  have h := (ℤ₀.le_iff_mpr (a := a) (b := ofNat a.repr.1))
-  have hb : (ofNat a.repr.1 : ℤ₀).repr = (a.repr.1, 𝟘) := repr_ofNat _
+theorem le_ofNat_repr_fst (a : ℤ₀cls) : a ≤ ofNat a.repr.1 := by
+  have h := (ℤ₀cls.le_iff_mpr (a := a) (b := ofNat a.repr.1))
+  have hb : (ofNat a.repr.1 : ℤ₀cls).repr = (a.repr.1, 𝟘) := repr_ofNat _
   have h1 : add a.repr.1 𝟘 = a.repr.1 := by omega₀
   have h2 : add a.repr.2 a.repr.1 = add a.repr.1 a.repr.2 := by omega₀
   apply h
@@ -24,19 +24,19 @@ theorem le_ofNat_repr_fst (a : ℤ₀) : a ≤ ofNat a.repr.1 := by
   rw [h1, h2]
   exact le_self_add a.repr.1 a.repr.2
 
-theorem int_not_le_zero_implies_ge_one (a : ℤ₀) (h : ¬ a ≤ 0) : (1:ℤ₀) ≤ a := by
-  have hz : (0 : ℤ₀).repr = (𝟘, 𝟘) := by show (ofNat 𝟘).repr = (𝟘, 𝟘); exact repr_ofNat 𝟘
-  have ho : (1 : ℤ₀).repr = (𝟙, 𝟘) := by show (ofNat 𝟙).repr = (𝟙, 𝟘); exact repr_ofNat 𝟙
+theorem int_not_le_zero_implies_ge_one (a : ℤ₀cls) (h : ¬ a ≤ 0) : (1:ℤ₀cls) ≤ a := by
+  have hz : (0 : ℤ₀cls).repr = (𝟘, 𝟘) := by show (ofNat 𝟘).repr = (𝟘, 𝟘); exact repr_ofNat 𝟘
+  have ho : (1 : ℤ₀cls).repr = (𝟙, 𝟘) := by show (ofNat 𝟙).repr = (𝟙, 𝟘); exact repr_ofNat 𝟙
   have h_not : ¬ (add a.repr.1 𝟘 ≤ add a.repr.2 𝟘) := by
     intro hh
     apply h
-    apply ℤ₀.le_iff_mpr
+    apply ℤ₀cls.le_iff_mpr
     rw [hz]
     exact hh
   have h_add_zero1 : add a.repr.1 𝟘 = a.repr.1 := by omega₀
   have h_add_zero2 : add a.repr.2 𝟘 = a.repr.2 := by omega₀
   rw [h_add_zero1, h_add_zero2] at h_not
-  apply ℤ₀.le_iff_mpr
+  apply ℤ₀cls.le_iff_mpr
   rw [ho]
   -- we have h_not : ¬ le₀ a.repr.1 a.repr.2
   have h_gt : lt₀ a.repr.2 a.repr.1 := ngt_then_le a.repr.1 a.repr.2 h_not
@@ -50,32 +50,32 @@ theorem int_not_le_zero_implies_ge_one (a : ℤ₀) (h : ¬ a ≤ 0) : (1:ℤ₀
     exact lt_nm_then_le_nm _ _ h_gt
   exact h_le
 
-theorem int_lt_add_of_pos {a b : ℤ₀} (hb : 0 < b) : a < Add.add a b := by
+theorem int_lt_add_of_pos {a b : ℤ₀cls} (hb : 0 < b) : a < Add.add a b := by
   have h := add_lt_add_right hb a
   have h0 : Add.add 0 a = a := zero_add a
   rwa [h0, add_comm b a] at h
 
-theorem int_lt_of_le_of_lt {a b c : ℤ₀} (hab : a ≤ b) (hbc : b < c) : a < c := by
+theorem int_lt_of_le_of_lt {a b c : ℤ₀cls} (hab : a ≤ b) (hbc : b < c) : a < c := by
   have hac : a ≤ c := le_trans hab hbc.1
   refine ⟨hac, fun hca => hbc.2 (le_trans hca hab)⟩
 
-theorem int_lt_of_lt_of_le {a b c : ℤ₀} (hab : a < b) (hbc : b ≤ c) : a < c := by
+theorem int_lt_of_lt_of_le {a b c : ℤ₀cls} (hab : a < b) (hbc : b ≤ c) : a < c := by
   have hac : a ≤ c := le_trans hab.1 hbc
   refine ⟨hac, fun hca => hab.2 (le_trans hbc hca)⟩
 
-theorem int_zero_lt_one : (0:ℤ₀) < (1:ℤ₀) := by
-  have h1 : (0:ℤ₀) ≤ (1:ℤ₀) := zero_le_ofNat 1
-  have h2 : ¬ (1:ℤ₀) ≤ (0:ℤ₀) := by
+theorem int_zero_lt_one : (0:ℤ₀cls) < (1:ℤ₀cls) := by
+  have h1 : (0:ℤ₀cls) ≤ (1:ℤ₀cls) := zero_le_ofNat 1
+  have h2 : ¬ (1:ℤ₀cls) ≤ (0:ℤ₀cls) := by
     intro h
     have hh : ¬ ofNat 1 ≤ ofNat 𝟘 := by
       have hne : (1:ℕ₀) ≠ 0 := by
         intro hh; have hh2 : σ 𝟘 = 𝟘 := hh; exact succ_neq_zero 𝟘 hh2
-      have hpos : 0 < (ofNat 1:ℤ₀) := ofNat_pos_of_ne_zero hne
+      have hpos : 0 < (ofNat 1:ℤ₀cls) := ofNat_pos_of_ne_zero hne
       exact hpos.2
     exact hh h
   exact ⟨h1, h2⟩
 
-theorem archimedean_int (p1 q1 : ℤ₀) (p2 q2 : ℕ₀) (hx : ¬ p1 ≤ 0) (hq2_ne : q2 ≠ 𝟘) :
+theorem archimedean_int (p1 q1 : ℤ₀cls) (p2 q2 : ℕ₀) (hx : ¬ p1 ≤ 0) (hq2_ne : q2 ≠ 𝟘) :
     ∃ N : ℕ₀, ¬ Mul.mul (ofNat N) (Mul.mul p1 (ofNat q2)) ≤ Mul.mul q1 (ofNat p2) := by
   let A := Mul.mul p1 (ofNat q2)
   let B := Mul.mul q1 (ofNat p2)
@@ -83,14 +83,14 @@ theorem archimedean_int (p1 q1 : ℤ₀) (p2 q2 : ℕ₀) (hx : ¬ p1 ≤ 0) (hq
   let N := σ M
   refine ⟨N, ?_⟩
 
-  have hp1 : (1:ℤ₀) ≤ p1 := int_not_le_zero_implies_ge_one p1 hx
+  have hp1 : (1:ℤ₀cls) ≤ p1 := int_not_le_zero_implies_ge_one p1 hx
 
   have hq2_not_le_0 : ¬ ofNat q2 ≤ 0 := by
     intro h
     have hh : q2 = 𝟘 := by
-      have h1 : (0:ℤ₀).repr = (𝟘, 𝟘) := repr_ofNat _
-      have h2 : (ofNat q2 : ℤ₀).repr = (q2, 𝟘) := repr_ofNat _
-      have h' := ℤ₀.le_iff_mp h
+      have h1 : (0:ℤ₀cls).repr = (𝟘, 𝟘) := repr_ofNat _
+      have h2 : (ofNat q2 : ℤ₀cls).repr = (q2, 𝟘) := repr_ofNat _
+      have h' := ℤ₀cls.le_iff_mp h
       rw [h1, h2] at h'
       have hq2 : add q2 𝟘 = q2 := Peano.Add.add_zero q2
       have h00 : add 𝟘 𝟘 = 𝟘 := Peano.Add.add_zero 𝟘
@@ -98,24 +98,24 @@ theorem archimedean_int (p1 q1 : ℤ₀) (p2 q2 : ℕ₀) (hx : ¬ p1 ≤ 0) (hq
       exact (Peano.Order.le_zero_eq_zero q2).mp h'
     exact hq2_ne hh
 
-  have hq2_int : (1:ℤ₀) ≤ ofNat q2 := int_not_le_zero_implies_ge_one (ofNat q2) hq2_not_le_0
+  have hq2_int : (1:ℤ₀cls) ≤ ofNat q2 := int_not_le_zero_implies_ge_one (ofNat q2) hq2_not_le_0
 
-  have hA_ge1 : (1:ℤ₀) ≤ A := by
-    have h1 : Mul.mul (1:ℤ₀) (1:ℤ₀) = 1 := by
+  have hA_ge1 : (1:ℤ₀cls) ≤ A := by
+    have h1 : Mul.mul (1:ℤ₀cls) (1:ℤ₀cls) = 1 := by
       show ofNat (mul 1 1) = ofNat 1
       have hmul : mul 1 1 = 1 := by
         change Peano.Mul.mul 1 𝟙 = 1
         rw [Peano.Mul.mul_one]
       rw [hmul]
-    have hp1_nonneg : (0:ℤ₀) ≤ p1 := le_trans (zero_le_ofNat 1) hp1
-    have step1 : Mul.mul (1:ℤ₀) (1:ℤ₀) ≤ Mul.mul p1 (1:ℤ₀) :=
+    have hp1_nonneg : (0:ℤ₀cls) ≤ p1 := le_trans (zero_le_ofNat 1) hp1
+    have step1 : Mul.mul (1:ℤ₀cls) (1:ℤ₀cls) ≤ Mul.mul p1 (1:ℤ₀cls) :=
       mul_le_mul_right_of_nonneg hp1 (zero_le_ofNat 1)
-    have step2 : Mul.mul p1 (1:ℤ₀) ≤ Mul.mul p1 (ofNat q2) :=
+    have step2 : Mul.mul p1 (1:ℤ₀cls) ≤ Mul.mul p1 (ofNat q2) :=
       mul_le_mul_left_of_nonneg hq2_int hp1_nonneg
-    have hhh : Mul.mul (1:ℤ₀) (1:ℤ₀) ≤ A := le_trans step1 step2
+    have hhh : Mul.mul (1:ℤ₀cls) (1:ℤ₀cls) ≤ A := le_trans step1 step2
     rwa [h1] at hhh
 
-  have hA_pos : (0:ℤ₀) < A := int_lt_of_lt_of_le int_zero_lt_one hA_ge1
+  have hA_pos : (0:ℤ₀cls) < A := int_lt_of_lt_of_le int_zero_lt_one hA_ge1
 
   have hB_le_M : B ≤ ofNat M := by
     have hz : ofNat (mul q1.repr.1 p2) = Mul.mul (ofNat q1.repr.1) (ofNat p2) := ofNat_mul _ _
@@ -129,24 +129,24 @@ theorem archimedean_int (p1 q1 : ℤ₀) (p2 q2 : ℕ₀) (hx : ¬ p1 ≤ 0) (hq
     have hm1 : mul M 1 = M := by
       change Peano.Mul.mul M 𝟙 = M
       rw [Peano.Mul.mul_one]
-    have h1 : ofNat M = Mul.mul (ofNat M) (1:ℤ₀) := by
+    have h1 : ofNat M = Mul.mul (ofNat M) (1:ℤ₀cls) := by
       show ofNat M = Mul.mul (ofNat M) (ofNat 1)
       rw [← hm, hm1]
-    have step1 : Mul.mul (ofNat M) (1:ℤ₀) ≤ Mul.mul (ofNat M) A :=
+    have step1 : Mul.mul (ofNat M) (1:ℤ₀cls) ≤ Mul.mul (ofNat M) A :=
       mul_le_mul_left_of_nonneg hA_ge1 (zero_le_ofNat M)
     rwa [← h1] at step1
 
   have h_mul_N : Mul.mul (ofNat N) A = Add.add (Mul.mul (ofNat M) A) A := by
-    have hN : ofNat N = Add.add (ofNat M) (1:ℤ₀) := by
+    have hN : ofNat N = Add.add (ofNat M) (1:ℤ₀cls) := by
       show ofNat (σ M) = Add.add (ofNat M) (ofNat 1)
       rw [← ofNat_add]
       have hs : add M 1 = σ M := by
         change Peano.Add.add M 𝟙 = σ M
         rw [add_one]
       rw [hs]
-    rw [hN, ℤ₀.right_distrib]
-    have h_mul1 : Mul.mul (1:ℤ₀) A = A := by
-      have hh : Mul.mul (1:ℤ₀) A = Mul.mul A (1:ℤ₀) := mul_comm _ _
+    rw [hN, ℤ₀cls.right_distrib]
+    have h_mul1 : Mul.mul (1:ℤ₀cls) A = A := by
+      have hh : Mul.mul (1:ℤ₀cls) A = Mul.mul A (1:ℤ₀cls) := mul_comm _ _
       rw [hh]
       have hc : A = ofNat A.repr.1 := nonneg_eq_ofNat (le_trans (zero_le_ofNat 1) hA_ge1)
       rw [hc]
@@ -170,27 +170,27 @@ theorem archimedean_int (p1 q1 : ℤ₀) (p2 q2 : ℕ₀) (hx : ¬ p1 ≤ 0) (hq
   exact h_B_lt_NA.2
 
 
-theorem archimedean (x y : ℚ₀) : 0 < x → ∃ N : ℕ₀, y < Mul.mul (ofNat₀ N) x := by
+theorem archimedean (x y : ℚ₀cls) : 0 < x → ∃ N : ℕ₀, y < Mul.mul (ofNat₀ N) x := by
   revert x y
   refine Quotient.ind₂ (fun p q hx => ?_)
-  have h_zero : (0 : ℚ₀) = mk 0 den1 := rfl
+  have h_zero : (0 : ℚ₀cls) = mk 0 den1 := rfl
   have hx2 : ¬ mk p.1 p.2 ≤ mk 0 den1 := hx.2
   rw [mk_le_mk] at hx2
-  have hd1 : ℤ₀.ofNat den1.val = 1 := rfl
-  rw [hd1, ℤ₀.mul_one, ℤ₀.zero_mul] at hx2
+  have hd1 : ℤ₀cls.ofNat den1.val = 1 := rfl
+  rw [hd1, ℤ₀cls.mul_one, ℤ₀cls.zero_mul] at hx2
   have hq2_ne : q.2.val ≠ 𝟘 := q.2.property
   have h_arch := archimedean_int p.1 q.1 p.2.val q.2.val hx2 hq2_ne
   rcases h_arch with ⟨N, hN⟩
   refine ⟨N, ?_⟩
   have h_y_lt : ¬ Mul.mul (ofNat₀ N) (mk p.1 p.2) ≤ mk q.1 q.2 := by
     rw [ofNat₀_eq_mk]
-    have h_mul_mk : Mul.mul (mk (ℤ₀.ofNat N) den1) (mk p.1 p.2) = mk (Mul.mul (ℤ₀.ofNat N) p.1) (mulDen den1 p.2) := by
+    have h_mul_mk : Mul.mul (mk (ℤ₀cls.ofNat N) den1) (mk p.1 p.2) = mk (Mul.mul (ℤ₀cls.ofNat N) p.1) (mulDen den1 p.2) := by
       rfl
     rw [h_mul_mk, mk_le_mk]
-    have h_mulDen : ℤ₀.ofNat (mulDen den1 p.2).val = ℤ₀.ofNat p.2.val := by
-      change ℤ₀.ofNat (mul 𝟙 p.2.val) = ℤ₀.ofNat p.2.val
+    have h_mulDen : ℤ₀cls.ofNat (mulDen den1 p.2).val = ℤ₀cls.ofNat p.2.val := by
+      change ℤ₀cls.ofNat (mul 𝟙 p.2.val) = ℤ₀cls.ofNat p.2.val
       rw [Peano.Mul.one_mul]
     rw [h_mulDen]
-    rw [ℤ₀.mul_assoc]
+    rw [ℤ₀cls.mul_assoc]
     exact hN
-  exact ⟨(ℚ₀.le_total _ _).resolve_right h_y_lt, h_y_lt⟩
+  exact ⟨(ℚ₀cls.le_total _ _).resolve_right h_y_lt, h_y_lt⟩

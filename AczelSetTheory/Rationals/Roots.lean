@@ -7,82 +7,82 @@ License: MIT
 import AczelSetTheory.Rationals.Basic
 import AczelSetTheory.Rationals.Inv
 
-namespace ℚ₀
+namespace ℚ₀cls
 
 /--
 Potencia n-ésima natural de un número racional.
 x^n definido por inducción sobre ℕ₀.
 -/
-def pow (x : ℚ₀) : ℕ₀ → ℚ₀
+def pow (x : ℚ₀cls) : ℕ₀ → ℚ₀cls
   | 𝟘 => ofNat₀ 𝟙
   | σ k => Mul.mul x (pow x k)
 
 theorem ofNat₀_add (n m : ℕ₀) : ofNat₀ (Peano.Add.add n m) = Add.add (ofNat₀ n) (ofNat₀ m) := by
-  have hn : ofNat₀ n = mk (ℤ₀.ofNat n) den1 := ofNat₀_eq_mk n
-  have hm : ofNat₀ m = mk (ℤ₀.ofNat m) den1 := ofNat₀_eq_mk m
-  have hnm : ofNat₀ (Peano.Add.add n m) = mk (ℤ₀.ofNat (Peano.Add.add n m)) den1 := ofNat₀_eq_mk _
+  have hn : ofNat₀ n = mk (ℤ₀cls.ofNat n) den1 := ofNat₀_eq_mk n
+  have hm : ofNat₀ m = mk (ℤ₀cls.ofNat m) den1 := ofNat₀_eq_mk m
+  have hnm : ofNat₀ (Peano.Add.add n m) = mk (ℤ₀cls.ofNat (Peano.Add.add n m)) den1 := ofNat₀_eq_mk _
   rw [hn, hm, add_mk, hnm, mk_eq_iff]
-  have h_den_one : ℤ₀.ofNat den1.val = 1 := rfl
-  have h_mul_den_one : ℤ₀.ofNat (mulDen den1 den1).val = 1 := rfl
-  simp only [h_den_one, h_mul_den_one, ℤ₀.mul_one, ℤ₀.ofNat_add]
+  have h_den_one : ℤ₀cls.ofNat den1.val = 1 := rfl
+  have h_mul_den_one : ℤ₀cls.ofNat (mulDen den1 den1).val = 1 := rfl
+  simp only [h_den_one, h_mul_den_one, ℤ₀cls.mul_one, ℤ₀cls.ofNat_add]
 
 theorem ofNat₀_mul (n m : ℕ₀) : ofNat₀ (Peano.Mul.mul n m) = Mul.mul (ofNat₀ n) (ofNat₀ m) := by
-  have hn : ofNat₀ n = mk (ℤ₀.ofNat n) den1 := ofNat₀_eq_mk n
-  have hm : ofNat₀ m = mk (ℤ₀.ofNat m) den1 := ofNat₀_eq_mk m
-  have hnm : ofNat₀ (Peano.Mul.mul n m) = mk (ℤ₀.ofNat (Peano.Mul.mul n m)) den1 := ofNat₀_eq_mk _
+  have hn : ofNat₀ n = mk (ℤ₀cls.ofNat n) den1 := ofNat₀_eq_mk n
+  have hm : ofNat₀ m = mk (ℤ₀cls.ofNat m) den1 := ofNat₀_eq_mk m
+  have hnm : ofNat₀ (Peano.Mul.mul n m) = mk (ℤ₀cls.ofNat (Peano.Mul.mul n m)) den1 := ofNat₀_eq_mk _
   rw [hn, hm, mul_mk, hnm, mk_eq_iff]
-  have h_den_one : ℤ₀.ofNat den1.val = 1 := rfl
-  have h_mul_den_one : ℤ₀.ofNat (mulDen den1 den1).val = 1 := rfl
-  simp only [h_den_one, h_mul_den_one, ℤ₀.mul_one, ℤ₀.ofNat_mul]
+  have h_den_one : ℤ₀cls.ofNat den1.val = 1 := rfl
+  have h_mul_den_one : ℤ₀cls.ofNat (mulDen den1 den1).val = 1 := rfl
+  simp only [h_den_one, h_mul_den_one, ℤ₀cls.mul_one, ℤ₀cls.ofNat_mul]
 
-theorem ofNat₀_nonneg (n : ℕ₀) : (0:ℚ₀) ≤ ofNat₀ n := by
-  have h_mk : ofNat₀ n = mk (ℤ₀.ofNat n) den1 := ofNat₀_eq_mk n
+theorem ofNat₀_nonneg (n : ℕ₀) : (0:ℚ₀cls) ≤ ofNat₀ n := by
+  have h_mk : ofNat₀ n = mk (ℤ₀cls.ofNat n) den1 := ofNat₀_eq_mk n
   rw [h_mk]
-  apply (zero_le_iff_num_nonneg (ℤ₀.ofNat n, den1)).mpr
-  exact ℤ₀.zero_le_ofNat n
+  apply (zero_le_iff_num_nonneg (ℤ₀cls.ofNat n, den1)).mpr
+  exact ℤ₀cls.zero_le_ofNat n
 
-theorem square_nonneg (x : ℚ₀) : (0:ℚ₀) ≤ Mul.mul x x := by
-  cases le_total (0:ℚ₀) x with
+theorem square_nonneg (x : ℚ₀cls) : (0:ℚ₀cls) ≤ Mul.mul x x := by
+  cases le_total (0:ℚ₀cls) x with
   | inl h => exact mul_nonneg h h
   | inr h => exact mul_nonneg_of_nonpos_of_nonpos h h
 
-theorem le_add_of_nonneg_right {a b : ℚ₀} (hb : 0 ≤ b) : a ≤ Add.add a b := by
+theorem le_add_of_nonneg_right {a b : ℚ₀cls} (hb : 0 ≤ b) : a ≤ Add.add a b := by
   have h : Add.add a 0 ≤ Add.add a b := add_le_add_left hb a
   rw [add_zero] at h
   exact h
 
 -- Prove Bernoulli's inequality
-theorem bernoulli_ineq (x : ℚ₀) (hx : (0:ℚ₀) ≤ Add.add (1:ℚ₀) x) (n : ℕ₀) :
-  Add.add (1:ℚ₀) (Mul.mul (ofNat₀ n) x) ≤ pow (Add.add (1:ℚ₀) x) n := by
+theorem bernoulli_ineq (x : ℚ₀cls) (hx : (0:ℚ₀cls) ≤ Add.add (1:ℚ₀cls) x) (n : ℕ₀) :
+  Add.add (1:ℚ₀cls) (Mul.mul (ofNat₀ n) x) ≤ pow (Add.add (1:ℚ₀cls) x) n := by
   induction n with
   | zero =>
-    have h1 : Mul.mul (0:ℚ₀) x = (0:ℚ₀) := zero_mul x
-    have h2 : Add.add (1:ℚ₀) (0:ℚ₀) = (1:ℚ₀) := add_zero (1:ℚ₀)
-    have h3 : pow (Add.add (1:ℚ₀) x) 𝟘 = (1:ℚ₀) := rfl
-    have h4 : Add.add (1:ℚ₀) (Mul.mul (ofNat₀ 𝟘) x) = (1:ℚ₀) := by
-      have h_zero : ofNat₀ 𝟘 = (0:ℚ₀) := rfl
+    have h1 : Mul.mul (0:ℚ₀cls) x = (0:ℚ₀cls) := zero_mul x
+    have h2 : Add.add (1:ℚ₀cls) (0:ℚ₀cls) = (1:ℚ₀cls) := add_zero (1:ℚ₀cls)
+    have h3 : pow (Add.add (1:ℚ₀cls) x) 𝟘 = (1:ℚ₀cls) := rfl
+    have h4 : Add.add (1:ℚ₀cls) (Mul.mul (ofNat₀ 𝟘) x) = (1:ℚ₀cls) := by
+      have h_zero : ofNat₀ 𝟘 = (0:ℚ₀cls) := rfl
       rw [h_zero, h1, h2]
     rw [h4, h3]
-    exact le_refl (1:ℚ₀)
+    exact le_refl (1:ℚ₀cls)
   | succ k hk =>
-    have h_pow_succ : pow (Add.add (1:ℚ₀) x) (σ k) = Mul.mul (Add.add (1:ℚ₀) x) (pow (Add.add (1:ℚ₀) x) k) := rfl
-    have h_mul_ih : Mul.mul (Add.add (1:ℚ₀) x) (Add.add (1:ℚ₀) (Mul.mul (ofNat₀ k) x)) ≤ Mul.mul (Add.add (1:ℚ₀) x) (pow (Add.add (1:ℚ₀) x) k) :=
+    have h_pow_succ : pow (Add.add (1:ℚ₀cls) x) (σ k) = Mul.mul (Add.add (1:ℚ₀cls) x) (pow (Add.add (1:ℚ₀cls) x) k) := rfl
+    have h_mul_ih : Mul.mul (Add.add (1:ℚ₀cls) x) (Add.add (1:ℚ₀cls) (Mul.mul (ofNat₀ k) x)) ≤ Mul.mul (Add.add (1:ℚ₀cls) x) (pow (Add.add (1:ℚ₀cls) x) k) :=
       mul_le_mul_left_of_nonneg hk hx
     
-    have h_k_succ : ofNat₀ (σ k) = Add.add (ofNat₀ k) (1:ℚ₀) := by
+    have h_k_succ : ofNat₀ (σ k) = Add.add (ofNat₀ k) (1:ℚ₀cls) := by
       have h1 : σ k = Peano.Add.add k 𝟙 := rfl
-      have h2 : ofNat₀ 𝟙 = (1:ℚ₀) := rfl
+      have h2 : ofNat₀ 𝟙 = (1:ℚ₀cls) := rfl
       rw [h1, ofNat₀_add, h2]
 
-    have h_LHS : Add.add (1:ℚ₀) (Mul.mul (ofNat₀ (σ k)) x) = Add.add (Add.add (1:ℚ₀) (Mul.mul (ofNat₀ k) x)) x := by
+    have h_LHS : Add.add (1:ℚ₀cls) (Mul.mul (ofNat₀ (σ k)) x) = Add.add (Add.add (1:ℚ₀cls) (Mul.mul (ofNat₀ k) x)) x := by
       rw [h_k_succ]
       change Add.add 1 (Add.add (ofNat₀ k) 1 * x) = Add.add (Add.add 1 (Mul.mul (ofNat₀ k) x)) x
       rw [right_distrib, one_mul]
       change Add.add 1 (Add.add (Mul.mul (ofNat₀ k) x) x) = Add.add (Add.add 1 (Mul.mul (ofNat₀ k) x)) x
       rw [←add_assoc]
 
-    have h_RHS : Mul.mul (Add.add (1:ℚ₀) x) (Add.add (1:ℚ₀) (Mul.mul (ofNat₀ k) x)) = Add.add (Add.add (Add.add (1:ℚ₀) (Mul.mul (ofNat₀ k) x)) x) (Mul.mul (ofNat₀ k) (Mul.mul x x)) := by
-      change Add.add (1:ℚ₀) x * (Add.add (1:ℚ₀) (Mul.mul (ofNat₀ k) x)) = _
+    have h_RHS : Mul.mul (Add.add (1:ℚ₀cls) x) (Add.add (1:ℚ₀cls) (Mul.mul (ofNat₀ k) x)) = Add.add (Add.add (Add.add (1:ℚ₀cls) (Mul.mul (ofNat₀ k) x)) x) (Mul.mul (ofNat₀ k) (Mul.mul x x)) := by
+      change Add.add (1:ℚ₀cls) x * (Add.add (1:ℚ₀cls) (Mul.mul (ofNat₀ k) x)) = _
       rw [right_distrib]
       change Add.add (1 * Add.add 1 (Mul.mul (ofNat₀ k) x)) (x * Add.add 1 (Mul.mul (ofNat₀ k) x)) = _
       rw [one_mul]
@@ -96,69 +96,69 @@ theorem bernoulli_ineq (x : ℚ₀) (hx : (0:ℚ₀) ≤ Add.add (1:ℚ₀) x) (
         rw [←mul_assoc, mul_comm x (ofNat₀ k), mul_assoc]
       rw [h_comm]
 
-    have h_nonneg : (0:ℚ₀) ≤ Mul.mul (ofNat₀ k) (Mul.mul x x) := by
-      have h1 : (0:ℚ₀) ≤ ofNat₀ k := ofNat₀_nonneg k
-      have h2 : (0:ℚ₀) ≤ Mul.mul x x := square_nonneg x
+    have h_nonneg : (0:ℚ₀cls) ≤ Mul.mul (ofNat₀ k) (Mul.mul x x) := by
+      have h1 : (0:ℚ₀cls) ≤ ofNat₀ k := ofNat₀_nonneg k
+      have h2 : (0:ℚ₀cls) ≤ Mul.mul x x := square_nonneg x
       exact mul_nonneg h1 h2
 
-    have h_le : Add.add (Add.add (1:ℚ₀) (Mul.mul (ofNat₀ k) x)) x ≤ Add.add (Add.add (Add.add (1:ℚ₀) (Mul.mul (ofNat₀ k) x)) x) (Mul.mul (ofNat₀ k) (Mul.mul x x)) := by
+    have h_le : Add.add (Add.add (1:ℚ₀cls) (Mul.mul (ofNat₀ k) x)) x ≤ Add.add (Add.add (Add.add (1:ℚ₀cls) (Mul.mul (ofNat₀ k) x)) x) (Mul.mul (ofNat₀ k) (Mul.mul x x)) := by
       exact le_add_of_nonneg_right h_nonneg
 
     rw [h_pow_succ, h_LHS]
-    have h_trans : Add.add (Add.add (1:ℚ₀) (Mul.mul (ofNat₀ k) x)) x ≤ Mul.mul (Add.add (1:ℚ₀) x) (pow (Add.add (1:ℚ₀) x) k) := by
-      have h_step : Add.add (Add.add (Add.add (1:ℚ₀) (Mul.mul (ofNat₀ k) x)) x) (Mul.mul (ofNat₀ k) (Mul.mul x x)) = Mul.mul (Add.add (1:ℚ₀) x) (Add.add (1:ℚ₀) (Mul.mul (ofNat₀ k) x)) := h_RHS.symm
-      have h_le2 : Add.add (Add.add (1:ℚ₀) (Mul.mul (ofNat₀ k) x)) x ≤ Mul.mul (Add.add (1:ℚ₀) x) (Add.add (1:ℚ₀) (Mul.mul (ofNat₀ k) x)) := by
+    have h_trans : Add.add (Add.add (1:ℚ₀cls) (Mul.mul (ofNat₀ k) x)) x ≤ Mul.mul (Add.add (1:ℚ₀cls) x) (pow (Add.add (1:ℚ₀cls) x) k) := by
+      have h_step : Add.add (Add.add (Add.add (1:ℚ₀cls) (Mul.mul (ofNat₀ k) x)) x) (Mul.mul (ofNat₀ k) (Mul.mul x x)) = Mul.mul (Add.add (1:ℚ₀cls) x) (Add.add (1:ℚ₀cls) (Mul.mul (ofNat₀ k) x)) := h_RHS.symm
+      have h_le2 : Add.add (Add.add (1:ℚ₀cls) (Mul.mul (ofNat₀ k) x)) x ≤ Mul.mul (Add.add (1:ℚ₀cls) x) (Add.add (1:ℚ₀cls) (Mul.mul (ofNat₀ k) x)) := by
         rw [←h_step]
         exact h_le
       exact le_trans h_le2 h_mul_ih
     exact h_trans
 
-theorem lt_of_le_of_ne {a b : ℚ₀} (h_le : a ≤ b) (h_ne : a ≠ b) : a < b := by
+theorem lt_of_le_of_ne {a b : ℚ₀cls} (h_le : a ≤ b) (h_ne : a ≠ b) : a < b := by
   constructor
   · exact h_le
   · intro h_ba
     have heq : a = b := le_antisymm h_le h_ba
     exact h_ne heq
 
-theorem pos_of_gt_zero {a : ℚ₀} (h : 0 < a) : 0 ≤ a ∧ a ≠ 0 := by
+theorem pos_of_gt_zero {a : ℚ₀cls} (h : 0 < a) : 0 ≤ a ∧ a ≠ 0 := by
   constructor
   · exact h.1
   · intro heq
     have h2 : a ≤ 0 := by rw [heq]; exact le_refl 0
     exact h.2 h2
 
-theorem inv_ne_zero {a : ℚ₀} (h : a ≠ 0) : a⁻¹ ≠ 0 := by
+theorem inv_ne_zero {a : ℚ₀cls} (h : a ≠ 0) : a⁻¹ ≠ 0 := by
   intro h_inv_zero
   have h1 : a * a⁻¹ = 1 := mul_inv_cancel h
   have h2 : a * a⁻¹ = 0 := by rw [h_inv_zero, mul_zero]
   rw [h2] at h1
   exact one_ne_zero h1.symm
 
-theorem inv_pos {a : ℚ₀} (h : 0 < a) : 0 < a⁻¹ := by
+theorem inv_pos {a : ℚ₀cls} (h : 0 < a) : 0 < a⁻¹ := by
   have h_ne : a ≠ 0 := (pos_of_gt_zero h).2
   have h_le : 0 ≤ a⁻¹ := inv_nonneg (pos_of_gt_zero h).1 h_ne
   have h_inv_ne : a⁻¹ ≠ 0 := inv_ne_zero h_ne
   exact lt_of_le_of_ne h_le h_inv_ne.symm
 
-theorem add_nonneg {a b : ℚ₀} (ha : 0 ≤ a) (hb : 0 ≤ b) : 0 ≤ Add.add a b := by
-  have h1 : Add.add (0:ℚ₀) (0:ℚ₀) ≤ Add.add a b := add_le_add ha hb
-  have h2 : Add.add (0:ℚ₀) (0:ℚ₀) = (0:ℚ₀) := add_zero (0:ℚ₀)
+theorem add_nonneg {a b : ℚ₀cls} (ha : 0 ≤ a) (hb : 0 ≤ b) : 0 ≤ Add.add a b := by
+  have h1 : Add.add (0:ℚ₀cls) (0:ℚ₀cls) ≤ Add.add a b := add_le_add ha hb
+  have h2 : Add.add (0:ℚ₀cls) (0:ℚ₀cls) = (0:ℚ₀cls) := add_zero (0:ℚ₀cls)
   rw [h2] at h1
   exact h1
 
-theorem eq_neg_of_add_eq_zero_pub {x y : ℚ₀} (h : Add.add x y = 0) : x = -y := by
+theorem eq_neg_of_add_eq_zero_pub {x y : ℚ₀cls} (h : Add.add x y = 0) : x = -y := by
   have h1 : Add.add (Add.add x y) (-y) = Add.add 0 (-y) := congrArg (fun z => Add.add z (-y)) h
   rw [add_assoc, add_neg_self, add_zero] at h1
   have h2 : Add.add 0 (-y) = -y := zero_add (-y)
   rw [h2] at h1
   exact h1
 
-theorem add_pos_of_nonneg_of_pos {a b : ℚ₀} (ha : 0 ≤ a) (hb : 0 < b) : 0 < Add.add a b := by
+theorem add_pos_of_nonneg_of_pos {a b : ℚ₀cls} (ha : 0 ≤ a) (hb : 0 < b) : 0 < Add.add a b := by
   have h_le : 0 ≤ Add.add a b := add_nonneg ha (pos_of_gt_zero hb).1
   have h_ne : Add.add a b ≠ 0 := by
     intro h_eq_zero
     have h_a_eq_neg_b : a = Neg.neg b := eq_neg_of_add_eq_zero_pub h_eq_zero
-    have h_neg_b_le_neg_zero : Neg.neg b ≤ Neg.neg (0:ℚ₀) := neg_le_neg (pos_of_gt_zero hb).1
+    have h_neg_b_le_neg_zero : Neg.neg b ≤ Neg.neg (0:ℚ₀cls) := neg_le_neg (pos_of_gt_zero hb).1
     rw [neg_zero] at h_neg_b_le_neg_zero
     rw [← h_a_eq_neg_b] at h_neg_b_le_neg_zero
     have h_a_eq_zero : a = 0 := le_antisymm h_neg_b_le_neg_zero ha
@@ -167,15 +167,15 @@ theorem add_pos_of_nonneg_of_pos {a b : ℚ₀} (ha : 0 ≤ a) (hb : 0 < b) : 0 
     exact (pos_of_gt_zero hb).2 h_eq_zero
   exact lt_of_le_of_ne h_le h_ne.symm
 
-theorem add_pos {a b : ℚ₀} (ha : 0 < a) (hb : 0 < b) : 0 < Add.add a b :=
+theorem add_pos {a b : ℚ₀cls} (ha : 0 < a) (hb : 0 < b) : 0 < Add.add a b :=
   add_pos_of_nonneg_of_pos (pos_of_gt_zero ha).1 hb
 
-theorem eq_zero_of_mul_eq_zero {a b : ℚ₀} (h : a * b = 0) (hb : b ≠ 0) : a = 0 := by
+theorem eq_zero_of_mul_eq_zero {a b : ℚ₀cls} (h : a * b = 0) (hb : b ≠ 0) : a = 0 := by
   have h1 : (a * b) * b⁻¹ = 0 * b⁻¹ := congrArg (fun z => z * b⁻¹) h
   rw [mul_assoc, mul_inv_cancel hb, mul_one, zero_mul] at h1
   exact h1
 
-theorem mul_pos_pub {a b : ℚ₀} (ha : 0 < a) (hb : 0 < b) : 0 < a * b := by
+theorem mul_pos_pub {a b : ℚ₀cls} (ha : 0 < a) (hb : 0 < b) : 0 < a * b := by
   have h_le : 0 ≤ a * b := mul_nonneg (pos_of_gt_zero ha).1 (pos_of_gt_zero hb).1
   have h_ne : a * b ≠ 0 := by
     intro h_eq_zero
@@ -183,14 +183,14 @@ theorem mul_pos_pub {a b : ℚ₀} (ha : 0 < a) (hb : 0 < b) : 0 < a * b := by
     exact (pos_of_gt_zero ha).2 h_a_eq_zero
   exact lt_of_le_of_ne h_le h_ne.symm
 
-theorem zero_lt_one : (0:ℚ₀) < 1 := by
-  have h_le : (0:ℚ₀) ≤ 1 := by
-    have h1 : (1:ℚ₀) = ofNat₀ 𝟙 := rfl
+theorem zero_lt_one : (0:ℚ₀cls) < 1 := by
+  have h_le : (0:ℚ₀cls) ≤ 1 := by
+    have h1 : (1:ℚ₀cls) = ofNat₀ 𝟙 := rfl
     rw [h1]
     exact ofNat₀_nonneg 𝟙
   exact lt_of_le_of_ne h_le (fun h => one_ne_zero h.symm)
 
-theorem pow_pos {x : ℚ₀} (k : ℕ₀) (hx : 0 < x) : 0 < pow x k := by
+theorem pow_pos {x : ℚ₀cls} (k : ℕ₀) (hx : 0 < x) : 0 < pow x k := by
   induction k with
   | zero =>
     -- pow x 0 es 1
@@ -201,14 +201,14 @@ theorem pow_pos {x : ℚ₀} (k : ℕ₀) (hx : 0 < x) : 0 < pow x k := by
     exact mul_pos_pub hx ih
 
 theorem ofNat₀_inj_zero {n : ℕ₀} (h : ofNat₀ n = 0) : n = 0 := by
-  have h1 : mk (ℤ₀.ofNat n) den1 = 0 := by
+  have h1 : mk (ℤ₀cls.ofNat n) den1 = 0 := by
     rw [←ofNat₀_eq_mk n]
     exact h
-  have h2 : ℤ₀.ofNat n = 0 := mk_eq_zero_iff.mp h1
-  have h3 : ℤ₀.ofNat n = ℤ₀.ofNat 𝟘 := by
+  have h2 : ℤ₀cls.ofNat n = 0 := mk_eq_zero_iff.mp h1
+  have h3 : ℤ₀cls.ofNat n = ℤ₀cls.ofNat 𝟘 := by
     rw [h2]
-    exact ℤ₀.ofNat_zero.symm
-  exact ℤ₀.ofNat_injective h3
+    exact ℤ₀cls.ofNat_zero.symm
+  exact ℤ₀cls.ofNat_injective h3
 
 theorem ofNat₀_pos {k : ℕ₀} (hk : k ≠ 0) : 0 < ofNat₀ k := by
   have h_le : 0 ≤ ofNat₀ k := ofNat₀_nonneg k
@@ -223,9 +223,9 @@ Aproximación por el método de Newton-Raphson.
 Para calcular la raíz n-ésima de q, se itera:
 x_{k+1} = (1 / n) * ((n - 1) * x_k + q / (x_k ^ (n - 1)))
 -/
-def newton_raphson_step (q : ℚ₀) (n : Peano.ℕ₂) (x : ℚ₀) : ℚ₀ :=
+def newton_raphson_step (q : ℚ₀cls) (n : Peano.ℕ₂) (x : ℚ₀cls) : ℚ₀cls :=
   -- Si q = 0 o q = 1, la sucesión es constante y vale q (evitamos divisiones por cero u otras indefiniciones)
-  if q = (0:ℚ₀) ∨ q = (1:ℚ₀) then
+  if q = (0:ℚ₀cls) ∨ q = (1:ℚ₀cls) then
     q
   else
     -- Queremos calcular: (1/n) * [ (n-1)*x + q * inv (x^(n-1)) ]
@@ -241,11 +241,11 @@ def newton_raphson_step (q : ℚ₀) (n : Peano.ℕ₂) (x : ℚ₀) : ℚ₀ :=
 Sucesión de aproximaciones de Newton-Raphson para la raíz n-ésima de q.
 Comienza con la semilla x_0 = q.
 -/
-def newton_raphson_seq (q : ℚ₀) (n : Peano.ℕ₂) : ℕ₀ → ℚ₀
+def newton_raphson_seq (q : ℚ₀cls) (n : Peano.ℕ₂) : ℕ₀ → ℚ₀cls
   | 𝟘 => q
   | σ k => newton_raphson_step q n (newton_raphson_seq q n k)
 
-theorem newton_seq_pos (q : ℚ₀) (n : Peano.ℕ₂) (hq : 0 < q) (k : ℕ₀) : 0 < newton_raphson_seq q n k := by
+theorem newton_seq_pos (q : ℚ₀cls) (n : Peano.ℕ₂) (hq : 0 < q) (k : ℕ₀) : 0 < newton_raphson_seq q n k := by
   induction k with
   | zero =>
     exact hq
@@ -265,26 +265,26 @@ theorem newton_seq_pos (q : ℚ₀) (n : Peano.ℕ₂) (hq : 0 < q) (k : ℕ₀)
       have h_inv_n_pos : 0 < inv (ofNat₀ n.val.val) := inv_pos (ofNat₀_pos n.val.property)
       exact mul_pos_pub h_inv_n_pos h_sum_pos
 
-theorem le_of_add_le_add_right {a b c : ℚ₀} (h : Add.add a c ≤ Add.add b c) : a ≤ b := by
+theorem le_of_add_le_add_right {a b c : ℚ₀cls} (h : Add.add a c ≤ Add.add b c) : a ≤ b := by
   have h1 : Add.add (Add.add a c) (Neg.neg c) ≤ Add.add (Add.add b c) (Neg.neg c) := add_le_add_right h (Neg.neg c)
   have ha : Add.add (Add.add a c) (Neg.neg c) = a := by rw [add_assoc, add_neg_self, add_zero]
   have hb : Add.add (Add.add b c) (Neg.neg c) = b := by rw [add_assoc, add_neg_self, add_zero]
   rw [ha, hb] at h1
   exact h1
 
-theorem le_add_right (a b : ℚ₀) (hb : 0 ≤ b) : a ≤ Add.add a b := by
+theorem le_add_right (a b : ℚ₀cls) (hb : 0 ≤ b) : a ≤ Add.add a b := by
   have h1 : Add.add a 0 ≤ Add.add a b := add_le_add_left hb a
   rw [add_zero] at h1
   exact h1
 
-theorem le_add_left (a b : ℚ₀) (ha : 0 ≤ a) : b ≤ Add.add a b := by
+theorem le_add_left (a b : ℚ₀cls) (ha : 0 ≤ a) : b ≤ Add.add a b := by
   have h1 : Add.add 0 b ≤ Add.add a b := add_le_add_right ha b
   rw [zero_add] at h1
   exact h1
 
-theorem le_of_lt {a b : ℚ₀} (h : a < b) : a ≤ b := h.1
+theorem le_of_lt {a b : ℚ₀cls} (h : a < b) : a ≤ b := h.1
 
-theorem le_w_sq_add_one {w : ℚ₀} (hw : 0 ≤ w) : w ≤ Add.add (Mul.mul w w) 1 := by
+theorem le_w_sq_add_one {w : ℚ₀cls} (hw : 0 ≤ w) : w ≤ Add.add (Mul.mul w w) 1 := by
   cases le_total 1 w with
   | inl h1 =>
     have h2 : Mul.mul w 1 ≤ Mul.mul w w := mul_le_mul_left_of_nonneg h1 hw
@@ -297,61 +297,61 @@ theorem le_w_sq_add_one {w : ℚ₀} (hw : 0 ≤ w) : w ≤ Add.add (Mul.mul w w
     have h3 : 1 ≤ Add.add (Mul.mul w w) 1 := le_add_left _ _ hsq
     exact le_trans h2 h3
 
-theorem bernoulli_ineq_alt2 (w : ℚ₀) (hw : 0 ≤ w) (n : ℕ₀) :
-  Add.add (1:ℚ₀) (Mul.mul (ofNat₀ n) w) ≤ Add.add (pow w n) (ofNat₀ n) := by
-  let x := Add.add w (Neg.neg (1:ℚ₀))
-  have h_w_eq : Add.add (1:ℚ₀) x = w := by
-    have hc : Add.add (1:ℚ₀) x = Add.add (1:ℚ₀) (Add.add w (Neg.neg (1:ℚ₀))) := rfl
-    have hc2 : Add.add (1:ℚ₀) (Add.add w (Neg.neg (1:ℚ₀))) = Add.add (Add.add (1:ℚ₀) w) (Neg.neg (1:ℚ₀)) := (add_assoc _ _ _).symm
-    have hc3 : Add.add (1:ℚ₀) w = Add.add w (1:ℚ₀) := add_comm _ _
-    have hc4 : Add.add (Add.add w (1:ℚ₀)) (Neg.neg (1:ℚ₀)) = Add.add w (Add.add (1:ℚ₀) (Neg.neg (1:ℚ₀))) := add_assoc _ _ _
-    have hc5 : Add.add (1:ℚ₀) (Neg.neg (1:ℚ₀)) = (0:ℚ₀) := add_neg_self _
-    have hc6 : Add.add w (0:ℚ₀) = w := add_zero _
+theorem bernoulli_ineq_alt2 (w : ℚ₀cls) (hw : 0 ≤ w) (n : ℕ₀) :
+  Add.add (1:ℚ₀cls) (Mul.mul (ofNat₀ n) w) ≤ Add.add (pow w n) (ofNat₀ n) := by
+  let x := Add.add w (Neg.neg (1:ℚ₀cls))
+  have h_w_eq : Add.add (1:ℚ₀cls) x = w := by
+    have hc : Add.add (1:ℚ₀cls) x = Add.add (1:ℚ₀cls) (Add.add w (Neg.neg (1:ℚ₀cls))) := rfl
+    have hc2 : Add.add (1:ℚ₀cls) (Add.add w (Neg.neg (1:ℚ₀cls))) = Add.add (Add.add (1:ℚ₀cls) w) (Neg.neg (1:ℚ₀cls)) := (add_assoc _ _ _).symm
+    have hc3 : Add.add (1:ℚ₀cls) w = Add.add w (1:ℚ₀cls) := add_comm _ _
+    have hc4 : Add.add (Add.add w (1:ℚ₀cls)) (Neg.neg (1:ℚ₀cls)) = Add.add w (Add.add (1:ℚ₀cls) (Neg.neg (1:ℚ₀cls))) := add_assoc _ _ _
+    have hc5 : Add.add (1:ℚ₀cls) (Neg.neg (1:ℚ₀cls)) = (0:ℚ₀cls) := add_neg_self _
+    have hc6 : Add.add w (0:ℚ₀cls) = w := add_zero _
     rw [hc, hc2, hc3, hc4, hc5, hc6]
   
-  have hx_cond : (0:ℚ₀) ≤ Add.add (1:ℚ₀) x := by
+  have hx_cond : (0:ℚ₀cls) ≤ Add.add (1:ℚ₀cls) x := by
     rw [h_w_eq]
     exact hw
     
   have h_bern := bernoulli_ineq x hx_cond n
   
   have h_nx : Mul.mul (ofNat₀ n) x = Add.add (Mul.mul (ofNat₀ n) w) (Neg.neg (ofNat₀ n)) := by
-    have d : Mul.mul (ofNat₀ n) x = Add.add (Mul.mul (ofNat₀ n) w) (Mul.mul (ofNat₀ n) (Neg.neg (1:ℚ₀))) := left_distrib _ _ _
-    have mn : Mul.mul (ofNat₀ n) (Neg.neg (1:ℚ₀)) = Neg.neg (Mul.mul (ofNat₀ n) (1:ℚ₀)) := mul_neg _ _
-    have mo : Mul.mul (ofNat₀ n) (1:ℚ₀) = ofNat₀ n := mul_one _
+    have d : Mul.mul (ofNat₀ n) x = Add.add (Mul.mul (ofNat₀ n) w) (Mul.mul (ofNat₀ n) (Neg.neg (1:ℚ₀cls))) := left_distrib _ _ _
+    have mn : Mul.mul (ofNat₀ n) (Neg.neg (1:ℚ₀cls)) = Neg.neg (Mul.mul (ofNat₀ n) (1:ℚ₀cls)) := mul_neg _ _
+    have mo : Mul.mul (ofNat₀ n) (1:ℚ₀cls) = ofNat₀ n := mul_one _
     rw [d, mn, mo]
     
-  have h_lhs : Add.add (1:ℚ₀) (Mul.mul (ofNat₀ n) x) = Add.add (Add.add (1:ℚ₀) (Mul.mul (ofNat₀ n) w)) (Neg.neg (ofNat₀ n)) := by
+  have h_lhs : Add.add (1:ℚ₀cls) (Mul.mul (ofNat₀ n) x) = Add.add (Add.add (1:ℚ₀cls) (Mul.mul (ofNat₀ n) w)) (Neg.neg (ofNat₀ n)) := by
     rw [h_nx, ← add_assoc]
     
   rw [h_w_eq, h_lhs] at h_bern
   
   have h_add_n := add_le_add_right h_bern (ofNat₀ n)
   
-  have h_cancel : Add.add (Add.add (Add.add (1:ℚ₀) (Mul.mul (ofNat₀ n) w)) (Neg.neg (ofNat₀ n))) (ofNat₀ n) = Add.add (1:ℚ₀) (Mul.mul (ofNat₀ n) w) := by
-    have hc1 : Add.add (Add.add (Add.add (1:ℚ₀) (Mul.mul (ofNat₀ n) w)) (Neg.neg (ofNat₀ n))) (ofNat₀ n) = Add.add (Add.add (1:ℚ₀) (Mul.mul (ofNat₀ n) w)) (Add.add (Neg.neg (ofNat₀ n)) (ofNat₀ n)) := add_assoc _ _ _
-    have hc2 : Add.add (Neg.neg (ofNat₀ n)) (ofNat₀ n) = (0:ℚ₀) := neg_add_self _
-    have hc3 : Add.add (Add.add (1:ℚ₀) (Mul.mul (ofNat₀ n) w)) (0:ℚ₀) = Add.add (1:ℚ₀) (Mul.mul (ofNat₀ n) w) := add_zero _
+  have h_cancel : Add.add (Add.add (Add.add (1:ℚ₀cls) (Mul.mul (ofNat₀ n) w)) (Neg.neg (ofNat₀ n))) (ofNat₀ n) = Add.add (1:ℚ₀cls) (Mul.mul (ofNat₀ n) w) := by
+    have hc1 : Add.add (Add.add (Add.add (1:ℚ₀cls) (Mul.mul (ofNat₀ n) w)) (Neg.neg (ofNat₀ n))) (ofNat₀ n) = Add.add (Add.add (1:ℚ₀cls) (Mul.mul (ofNat₀ n) w)) (Add.add (Neg.neg (ofNat₀ n)) (ofNat₀ n)) := add_assoc _ _ _
+    have hc2 : Add.add (Neg.neg (ofNat₀ n)) (ofNat₀ n) = (0:ℚ₀cls) := neg_add_self _
+    have hc3 : Add.add (Add.add (1:ℚ₀cls) (Mul.mul (ofNat₀ n) w)) (0:ℚ₀cls) = Add.add (1:ℚ₀cls) (Mul.mul (ofNat₀ n) w) := add_zero _
     rw [hc1, hc2, hc3]
     
   rw [h_cancel] at h_add_n
   exact h_add_n
 
-theorem one_pow (n : ℕ₀) : pow (1:ℚ₀) n = (1:ℚ₀) := by
+theorem one_pow (n : ℕ₀) : pow (1:ℚ₀cls) n = (1:ℚ₀cls) := by
   induction n with
   | zero => rfl
   | succ k ih =>
-    have h1 : pow (1:ℚ₀) (σ k) = Mul.mul (1:ℚ₀) (pow (1:ℚ₀) k) := rfl
-    have hm : Mul.mul (1:ℚ₀) (1:ℚ₀) = (1:ℚ₀) := one_mul _
+    have h1 : pow (1:ℚ₀cls) (σ k) = Mul.mul (1:ℚ₀cls) (pow (1:ℚ₀cls) k) := rfl
+    have hm : Mul.mul (1:ℚ₀cls) (1:ℚ₀cls) = (1:ℚ₀cls) := one_mul _
     rw [h1, ih, hm]
 
-theorem pow_ne_zero_of_pos {x : ℚ₀} (hx : 0 < x) (n : ℕ₀) : pow x n ≠ 0 := by
+theorem pow_ne_zero_of_pos {x : ℚ₀cls} (hx : 0 < x) (n : ℕ₀) : pow x n ≠ 0 := by
   have hp : 0 < pow x n := pow_pos n hx
   intro h
   rw [h] at hp
   exact hp.2 (le_refl 0)
 
-theorem pow_mul_distrib (a b : ℚ₀) (n : ℕ₀) : pow (Mul.mul a b) n = Mul.mul (pow a n) (pow b n) := by
+theorem pow_mul_distrib (a b : ℚ₀cls) (n : ℕ₀) : pow (Mul.mul a b) n = Mul.mul (pow a n) (pow b n) := by
   induction n with
   | zero => rfl
   | succ k ih =>
@@ -368,31 +368,31 @@ theorem pow_mul_distrib (a b : ℚ₀) (n : ℕ₀) : pow (Mul.mul a b) n = Mul.
     have hc3 : Mul.mul a (Mul.mul (pow a k) (Mul.mul b (pow b k))) = Mul.mul (Mul.mul a (pow a k)) (Mul.mul b (pow b k)) := (mul_assoc _ _ _).symm
     rw [hc1, hc2, hc3]
 
-theorem pow_inv (b : ℚ₀) (hb : 0 < b) (n : ℕ₀) : pow (inv b) n = inv (pow b n) := by
-  have h_mul : Mul.mul (pow b n) (pow (inv b) n) = (1:ℚ₀) := by
+theorem pow_inv (b : ℚ₀cls) (hb : 0 < b) (n : ℕ₀) : pow (inv b) n = inv (pow b n) := by
+  have h_mul : Mul.mul (pow b n) (pow (inv b) n) = (1:ℚ₀cls) := by
     have hd : Mul.mul (pow b n) (pow (inv b) n) = pow (Mul.mul b (inv b)) n := (pow_mul_distrib b (inv b) n).symm
     have hb_ne : b ≠ 0 := by
       intro hc; rw [hc] at hb; exact hb.2 (le_refl 0)
-    have hi : Mul.mul b (inv b) = (1:ℚ₀) := mul_inv_cancel hb_ne
-    have ho : pow (1:ℚ₀) n = (1:ℚ₀) := one_pow n
+    have hi : Mul.mul b (inv b) = (1:ℚ₀cls) := mul_inv_cancel hb_ne
+    have ho : pow (1:ℚ₀cls) n = (1:ℚ₀cls) := one_pow n
     rw [hd, hi, ho]
   
   have hb_pow_ne_zero : pow b n ≠ 0 := pow_ne_zero_of_pos hb n
   exact inv_unique hb_pow_ne_zero h_mul
 
-theorem newton_seq_pow_ge (q : ℚ₀) (n : Peano.ℕ₂) (hq : 0 < q) (k : ℕ₀) :
+theorem newton_seq_pow_ge (q : ℚ₀cls) (n : Peano.ℕ₂) (hq : 0 < q) (k : ℕ₀) :
   q ≤ pow (newton_raphson_seq q n (σ k)) n.val.val := by
   let x_k := newton_raphson_seq q n k
   have hx_k_pos : 0 < x_k := newton_seq_pos q n hq k
   let x_next := newton_raphson_seq q n (σ k)
   
   -- Si q = 1, es trivial
-  by_cases hq_one : q = (1:ℚ₀)
+  by_cases hq_one : q = (1:ℚ₀cls)
   · have h_step : newton_raphson_seq q n (σ k) = newton_raphson_step q n x_k := rfl
-    have h_or : q = (0:ℚ₀) ∨ q = (1:ℚ₀) := Or.inr hq_one
+    have h_or : q = (0:ℚ₀cls) ∨ q = (1:ℚ₀cls) := Or.inr hq_one
     have h_if : newton_raphson_step q n x_k = q := if_pos h_or
     rw [h_step, h_if, hq_one, one_pow]
-    exact le_refl (1:ℚ₀)
+    exact le_refl (1:ℚ₀cls)
   
   -- Si q ≠ 1, usamos la expansión algebraica
   · let n_val := n.val.val
@@ -418,7 +418,7 @@ theorem newton_seq_pow_ge (q : ℚ₀) (n : Peano.ℕ₂) (hq : 0 < q) (k : ℕ�
     have hx_next_pos : 0 < x_next := newton_seq_pos q n hq (σ k)
     have hw_nonneg : 0 ≤ w := mul_nonneg (le_of_lt hx_next_pos) (inv_nonneg (le_of_lt hx_k_pos) hx_ne)
     
-    have h_or : ¬(q = (0:ℚ₀) ∨ q = (1:ℚ₀)) := by
+    have h_or : ¬(q = (0:ℚ₀cls) ∨ q = (1:ℚ₀cls)) := by
       intro hc
       cases hc with
       | inl h0 => rw [h0] at hq; exact hq.2 (le_refl 0)
@@ -442,7 +442,7 @@ theorem newton_seq_pow_ge (q : ℚ₀) (n : Peano.ℕ₂) (hq : 0 < q) (k : ℕ�
       rw [h_assoc]
       have h_mul_inv : Mul.mul (ofNat₀ n_val) (inv (ofNat₀ n_val)) = 1 := mul_inv_cancel hn_ne_0
       rw [h_mul_inv]
-      exact ℚ₀.one_mul _
+      exact ℚ₀cls.one_mul _
       
     have h_nw_step1 : Mul.mul (ofNat₀ n_val) w = Mul.mul (Add.add (Mul.mul (ofNat₀ n_min_1) x_k) (Mul.mul q (inv (pow x_k n_min_1)))) (inv x_k) := by
       change Mul.mul (ofNat₀ n_val) (Mul.mul x_next (inv x_k)) = _
@@ -456,7 +456,7 @@ theorem newton_seq_pow_ge (q : ℚ₀) (n : Peano.ℕ₂) (hq : 0 < q) (k : ℕ�
       rw [h_assoc_term1]
       have h_xk_inv : Mul.mul x_k (inv x_k) = 1 := mul_inv_cancel hx_ne
       rw [h_xk_inv]
-      exact ℚ₀.mul_one _
+      exact ℚ₀cls.mul_one _
 
     have h_term2 : Mul.mul (Mul.mul q (inv (pow x_k n_min_1))) (inv x_k) = Mul.mul q (inv (pow x_k n_val)) := by
       have h_assoc_term2 : Mul.mul (Mul.mul q (inv (pow x_k n_min_1))) (inv x_k) = Mul.mul q (Mul.mul (inv (pow x_k n_min_1)) (inv x_k)) := mul_assoc _ _ _
@@ -473,12 +473,12 @@ theorem newton_seq_pow_ge (q : ℚ₀) (n : Peano.ℕ₂) (hq : 0 < q) (k : ℕ�
     have h_nw : Mul.mul (ofNat₀ n_val) w = Add.add (ofNat₀ n_min_1) (Mul.mul q (inv (pow x_k n_val))) := by
       rw [h_nw_step1, h_nw_step2, h_term1, h_term2]
       
-    have h_one_add_nw : Add.add (1:ℚ₀) (Mul.mul (ofNat₀ n_val) w) = Add.add (ofNat₀ n_val) (Mul.mul q (inv (pow x_k n_val))) := by
+    have h_one_add_nw : Add.add (1:ℚ₀cls) (Mul.mul (ofNat₀ n_val) w) = Add.add (ofNat₀ n_val) (Mul.mul q (inv (pow x_k n_val))) := by
       rw [h_nw]
-      have h_assoc_add : Add.add (1:ℚ₀) (Add.add (ofNat₀ n_min_1) (Mul.mul q (inv (pow x_k n_val)))) = Add.add (Add.add (1:ℚ₀) (ofNat₀ n_min_1)) (Mul.mul q (inv (pow x_k n_val))) := (add_assoc _ _ _).symm
+      have h_assoc_add : Add.add (1:ℚ₀cls) (Add.add (ofNat₀ n_min_1) (Mul.mul q (inv (pow x_k n_val)))) = Add.add (Add.add (1:ℚ₀cls) (ofNat₀ n_min_1)) (Mul.mul q (inv (pow x_k n_val))) := (add_assoc _ _ _).symm
       rw [h_assoc_add]
-      have h_one_add_n_min_1 : Add.add (1:ℚ₀) (ofNat₀ n_min_1) = ofNat₀ n_val := by
-        have h1_def : (1:ℚ₀) = ofNat₀ 𝟙 := rfl
+      have h_one_add_n_min_1 : Add.add (1:ℚ₀cls) (ofNat₀ n_min_1) = ofNat₀ n_val := by
+        have h1_def : (1:ℚ₀cls) = ofNat₀ 𝟙 := rfl
         rw [h1_def, ← ofNat₀_add]
         have h_add_comm : Peano.Add.add 𝟙 n_min_1 = Peano.Add.add n_min_1 𝟙 := Peano.Add.add_comm _ _
         rw [h_add_comm]
@@ -503,20 +503,20 @@ theorem newton_seq_pow_ge (q : ℚ₀) (n : Peano.ℕ₂) (hq : 0 < q) (k : ℕ�
     
     have h_cancel1 : Mul.mul (Mul.mul q (inv (pow x_k n_val))) (pow x_k n_val) = q := by
       have h_assoc : Mul.mul (Mul.mul q (inv (pow x_k n_val))) (pow x_k n_val) = Mul.mul q (Mul.mul (inv (pow x_k n_val)) (pow x_k n_val)) := mul_assoc _ _ _
-      have h_inv : Mul.mul (inv (pow x_k n_val)) (pow x_k n_val) = (1:ℚ₀) := inv_mul_cancel (pow_ne_zero_of_pos hx_k_pos n_val)
-      have hm1 : Mul.mul q (1:ℚ₀) = q := mul_one _
+      have h_inv : Mul.mul (inv (pow x_k n_val)) (pow x_k n_val) = (1:ℚ₀cls) := inv_mul_cancel (pow_ne_zero_of_pos hx_k_pos n_val)
+      have hm1 : Mul.mul q (1:ℚ₀cls) = q := mul_one _
       rw [h_assoc, h_inv, hm1]
       
     have h_cancel2 : Mul.mul (Mul.mul (pow x_next n_val) (inv (pow x_k n_val))) (pow x_k n_val) = pow x_next n_val := by
       have h_assoc : Mul.mul (Mul.mul (pow x_next n_val) (inv (pow x_k n_val))) (pow x_k n_val) = Mul.mul (pow x_next n_val) (Mul.mul (inv (pow x_k n_val)) (pow x_k n_val)) := mul_assoc _ _ _
-      have h_inv : Mul.mul (inv (pow x_k n_val)) (pow x_k n_val) = (1:ℚ₀) := inv_mul_cancel (pow_ne_zero_of_pos hx_k_pos n_val)
-      have hm2 : Mul.mul (pow x_next n_val) (1:ℚ₀) = pow x_next n_val := mul_one _
+      have h_inv : Mul.mul (inv (pow x_k n_val)) (pow x_k n_val) = (1:ℚ₀cls) := inv_mul_cancel (pow_ne_zero_of_pos hx_k_pos n_val)
+      have hm2 : Mul.mul (pow x_next n_val) (1:ℚ₀cls) = pow x_next n_val := mul_one _
       rw [h_assoc, h_inv, hm2]
       
     rw [h_cancel1, h_cancel2] at h_mul_xn
     exact h_mul_xn
 
-theorem newton_seq_monotone (q : ℚ₀) (n : Peano.ℕ₂) (hq : 0 < q) (k : ℕ₀) :
+theorem newton_seq_monotone (q : ℚ₀cls) (n : Peano.ℕ₂) (hq : 0 < q) (k : ℕ₀) :
   newton_raphson_seq q n (σ (σ k)) ≤ newton_raphson_seq q n (σ k) := by
   by_cases hq_one : q = 1
   · have h_step1 : newton_raphson_seq q n (σ k) = newton_raphson_step q n (newton_raphson_seq q n k) := rfl
@@ -537,7 +537,7 @@ theorem newton_seq_monotone (q : ℚ₀) (n : Peano.ℕ₂) (hq : 0 < q) (k : �
     
     let y_next := newton_raphson_seq q n (σ (σ k))
     
-    have h_or : ¬(q = (0:ℚ₀) ∨ q = (1:ℚ₀)) := by
+    have h_or : ¬(q = (0:ℚ₀cls) ∨ q = (1:ℚ₀cls)) := by
       intro hc
       cases hc with
       | inl h0 => rw [h0] at hq; exact hq.2 (le_refl 0)
@@ -568,12 +568,12 @@ theorem newton_seq_monotone (q : ℚ₀) (n : Peano.ℕ₂) (hq : 0 < q) (k : �
       intro hc; rw [hc] at hn_pos; exact hn_pos.2 (le_refl 0)
 
     have hn_val_y : Mul.mul (ofNat₀ n_val) y = Add.add (Mul.mul (ofNat₀ n_min_1) y) y := by
-      have h_one_add : ofNat₀ n_val = Add.add (ofNat₀ n_min_1) (1:ℚ₀) := by
+      have h_one_add : ofNat₀ n_val = Add.add (ofNat₀ n_min_1) (1:ℚ₀cls) := by
         have hh : ofNat₀ n_val = ofNat₀ (Peano.Add.add n_min_1 𝟙) := by rw [hn_eq]; rfl
         rw [hh, ofNat₀_add]
         rfl
-      have hd : Mul.mul (Add.add (ofNat₀ n_min_1) (1:ℚ₀)) y = Add.add (Mul.mul (ofNat₀ n_min_1) y) (Mul.mul (1:ℚ₀) y) := right_distrib _ _ _
-      have h1 : Mul.mul (1:ℚ₀) y = y := one_mul y
+      have hd : Mul.mul (Add.add (ofNat₀ n_min_1) (1:ℚ₀cls)) y = Add.add (Mul.mul (ofNat₀ n_min_1) y) (Mul.mul (1:ℚ₀cls) y) := right_distrib _ _ _
+      have h1 : Mul.mul (1:ℚ₀cls) y = y := one_mul y
       rw [h_one_add, hd, h1]
       
     have h_n_ynext : Mul.mul (ofNat₀ n_val) y_next = Add.add (Mul.mul (ofNat₀ n_min_1) y) (Mul.mul q (inv (pow y n_min_1))) := by
@@ -581,7 +581,7 @@ theorem newton_seq_monotone (q : ℚ₀) (n : Peano.ℕ₂) (hq : 0 < q) (k : �
       have h_assoc : Mul.mul (ofNat₀ n_val) (Mul.mul (inv (ofNat₀ n_val)) (Add.add (Mul.mul (ofNat₀ n_min_1) y) (Mul.mul q (inv (pow y n_min_1))))) = Mul.mul (Mul.mul (ofNat₀ n_val) (inv (ofNat₀ n_val))) (Add.add (Mul.mul (ofNat₀ n_min_1) y) (Mul.mul q (inv (pow y n_min_1)))) := (mul_assoc _ _ _).symm
       rw [h_assoc]
       have h_inv : Mul.mul (ofNat₀ n_val) (inv (ofNat₀ n_val)) = 1 := mul_inv_cancel hn_ne_0
-      have h1 : Mul.mul (1:ℚ₀) (Add.add (Mul.mul (ofNat₀ n_min_1) y) (Mul.mul q (inv (pow y n_min_1)))) = Add.add (Mul.mul (ofNat₀ n_min_1) y) (Mul.mul q (inv (pow y n_min_1))) := one_mul _
+      have h1 : Mul.mul (1:ℚ₀cls) (Add.add (Mul.mul (ofNat₀ n_min_1) y) (Mul.mul q (inv (pow y n_min_1)))) = Add.add (Mul.mul (ofNat₀ n_min_1) y) (Mul.mul q (inv (pow y n_min_1))) := one_mul _
       rw [h_inv, h1]
 
     have h_pow_pos : 0 < pow y n_min_1 := pow_pos n_min_1 hy_pos
@@ -597,7 +597,7 @@ theorem newton_seq_monotone (q : ℚ₀) (n : Peano.ℕ₂) (hq : 0 < q) (k : �
       have h_assoc : Mul.mul (Mul.mul y (pow y n_min_1)) (inv (pow y n_min_1)) = Mul.mul y (Mul.mul (pow y n_min_1) (inv (pow y n_min_1))) := mul_assoc _ _ _
       rw [h_assoc]
       have h_inv : Mul.mul (pow y n_min_1) (inv (pow y n_min_1)) = 1 := mul_inv_cancel (pow_ne_zero_of_pos hy_pos _)
-      have h1 : Mul.mul y (1:ℚ₀) = y := mul_one y
+      have h1 : Mul.mul y (1:ℚ₀cls) = y := mul_one y
       rw [h_inv, h1]
 
     rw [h_cancel] at h_mul_le_pow
@@ -614,17 +614,17 @@ theorem newton_seq_monotone (q : ℚ₀) (n : Peano.ℕ₂) (hq : 0 < q) (k : �
     
     have h_left : Mul.mul (inv (ofNat₀ n_val)) (Mul.mul (ofNat₀ n_val) y_next) = y_next := by
       have h_assoc : Mul.mul (inv (ofNat₀ n_val)) (Mul.mul (ofNat₀ n_val) y_next) = Mul.mul (Mul.mul (inv (ofNat₀ n_val)) (ofNat₀ n_val)) y_next := (mul_assoc _ _ _).symm
-      have h1 : Mul.mul (1:ℚ₀) y_next = y_next := one_mul y_next
+      have h1 : Mul.mul (1:ℚ₀cls) y_next = y_next := one_mul y_next
       rw [h_assoc, h_inv_cancel, h1]
     have h_right : Mul.mul (inv (ofNat₀ n_val)) (Mul.mul (ofNat₀ n_val) y) = y := by
       have h_assoc : Mul.mul (inv (ofNat₀ n_val)) (Mul.mul (ofNat₀ n_val) y) = Mul.mul (Mul.mul (inv (ofNat₀ n_val)) (ofNat₀ n_val)) y := (mul_assoc _ _ _).symm
-      have h1 : Mul.mul (1:ℚ₀) y = y := one_mul y
+      have h1 : Mul.mul (1:ℚ₀cls) y = y := one_mul y
       rw [h_assoc, h_inv_cancel, h1]
       
     rw [h_left, h_right] at h_final_mul
     exact h_final_mul
 
-theorem newton_seq_le_x1 (q : ℚ₀) (n : ℕ₂) (hq : 0 < q) (k : ℕ₀) :
+theorem newton_seq_le_x1 (q : ℚ₀cls) (n : ℕ₂) (hq : 0 < q) (k : ℕ₀) :
   newton_raphson_seq q n (σ k) ≤ newton_raphson_seq q n 1 := by
   induction k with
   | zero => exact le_refl _
@@ -632,4 +632,4 @@ theorem newton_seq_le_x1 (q : ℚ₀) (n : ℕ₂) (hq : 0 < q) (k : ℕ₀) :
     have h_mono := newton_seq_monotone q n hq k'
     exact le_trans h_mono ih
 
-end ℚ₀
+end ℚ₀cls

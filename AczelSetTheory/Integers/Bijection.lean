@@ -5,18 +5,18 @@ License: MIT
 -/
 
 -- AczelSetTheory/Integers/Bijection.lean
--- Biyección ℤ₀ ↔ ℕ₀ vía codificación de Cantor.
+-- Biyección ℤ₀cls ↔ ℕ₀ vía codificación de Cantor.
 --
 -- Público:
---   ℤ₀.encode           : ℤ₀ → ℕ₀
---   ℤ₀.decode           : ℕ₀ → ℤ₀
---   ℤ₀.decode_encode    : decode (encode z) = z
---   ℤ₀.encode_injective : encode a = encode b → a = b
+--   ℤ₀cls.encode           : ℤ₀cls → ℕ₀
+--   ℤ₀cls.decode           : ℕ₀ → ℤ₀cls
+--   ℤ₀cls.decode_encode    : decode (encode z) = z
+--   ℤ₀cls.encode_injective : encode a = encode b → a = b
 
 import AczelSetTheory.Integers.Functions
 import Peano.PeanoNat.Pairing
 
-namespace ℤ₀
+namespace ℤ₀cls
 
 open Peano Peano.Add Peano.Sub Peano.Mul
 
@@ -24,8 +24,8 @@ open Peano Peano.Add Peano.Sub Peano.Mul
 -- Helper privado: reconstrucción desde el representante canónico
 -- ─────────────────────────────────────────────────────────────────────────────
 
-/-- Todo entero z es igual a repr.1 − repr.2 (interpretado en ℤ₀). -/
-theorem ofNat_sub_repr (z : ℤ₀) :
+/-- Todo entero z es igual a repr.1 − repr.2 (interpretado en ℤ₀cls). -/
+theorem ofNat_sub_repr (z : ℤ₀cls) :
     Add.add (ofNat z.repr.1) (Neg.neg (ofNat z.repr.2)) = z := by
   apply repr_inj
   -- Componentes del representante de −(ofNat z.repr.2)
@@ -54,20 +54,20 @@ theorem ofNat_sub_repr (z : ℤ₀) :
 -- ─────────────────────────────────────────────────────────────────────────────
 
 /-- Codifica un entero como número natural vía el par de Cantor de su representante. -/
-def encode (z : ℤ₀) : ℕ₀ := Peano.Pairing.cantorPair z.repr.1 z.repr.2
+def encode (z : ℤ₀cls) : ℕ₀ := Peano.Pairing.cantorPair z.repr.1 z.repr.2
 
 /-- Decodifica un natural como entero usando el desempaquetado de Cantor. -/
-def decode (n : ℕ₀) : ℤ₀ :=
+def decode (n : ℕ₀) : ℤ₀cls :=
   Add.add (ofNat (Peano.Pairing.cantorUnpair n).1)
           (Neg.neg (ofNat (Peano.Pairing.cantorUnpair n).2))
 
-theorem decode_encode (z : ℤ₀) : decode (encode z) = z := by
+theorem decode_encode (z : ℤ₀cls) : decode (encode z) = z := by
   simp only [decode, encode, Peano.Pairing.cantorUnpair_cantorPair]
   exact ofNat_sub_repr z
 
-theorem encode_injective {a b : ℤ₀} (h : encode a = encode b) : a = b := by
+theorem encode_injective {a b : ℤ₀cls} (h : encode a = encode b) : a = b := by
   unfold encode at h
   have heq := Peano.Pairing.cantorPair_injective _ _ _ _ h
   exact repr_inj (Prod.ext heq.1 heq.2)
 
-end ℤ₀
+end ℤ₀cls

@@ -10,7 +10,7 @@ License: MIT
 -- ESTADO: M5B (2026-06-06). Anillo unitario `ZModN n hn : HFRing`.
 --
 -- Diseño (ADR-016): como `HFSet` es hereditariamente finito, ℤ/nℤ NO se construye
--- como cociente de ℤ₀ (infinito), sino como un HFRing finito cuyo PORTADOR es el
+-- como cociente de ℤ₀cls (infinito), sino como un HFRing finito cuyo PORTADOR es el
 -- ordinal de von Neumann `vN n = {vN 0, …, vN (n−1)}`. Cada residuo es el HFSet
 -- `vN k` con `k < n`. Las operaciones usan el puente `card`/`vN`:
 --     add x y := vN ((card x + card y) mod n)

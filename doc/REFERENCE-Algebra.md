@@ -2073,7 +2073,7 @@ def HFRing.quotient (rng : HFRing) (J : HFIdeal rng) : HFRing
 
 ### Notas técnicas
 
-- **Decisión arquitectónica (ADR-016)**: no existe `HFRing_of_ℤ₀` porque `HFSet` es hereditariamente finito y `ℤ₀` es infinito; ningún anillo infinito puede ser portador `HFRing`. Por ello el cociente se construye de forma **genérica** sobre cualquier `HFRing`, no sobre `ℤ₀`.
+- **Decisión arquitectónica (ADR-016)**: no existe `HFRing_of_ℤ₀cls` porque `HFSet` es hereditariamente finito y `ℤ₀cls` es infinito; ningún anillo infinito puede ser portador `HFRing`. Por ello el cociente se construye de forma **genérica** sobre cualquier `HFRing`, no sobre `ℤ₀cls`.
 - El lema `add_telescope` es `private`.
 - Reutiliza toda la maquinaria de `Algebra/QuotientGroup.lean` (`cosetRep`, `cosetOf`, `quotientOp`, `quotientOp_cosetOf`, `cosetEq_iff_rightCoset_eq`) para la parte aditiva.
 

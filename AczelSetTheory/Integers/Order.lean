@@ -5,21 +5,21 @@ License: MIT
 -/
 
 -- AczelSetTheory/Integers/Order.lean
--- Orden total en ℤ₀: a ≤ b ↔ a.repr.1 + b.repr.2 ≤ a.repr.2 + b.repr.1 (en ℕ₀).
+-- Orden total en ℤ₀cls: a ≤ b ↔ a.repr.1 + b.repr.2 ≤ a.repr.2 + b.repr.1 (en ℕ₀).
 --
 -- Público:
---   instance : LE ℤ₀, LT ℤ₀
+--   instance : LE ℤ₀cls, LT ℤ₀cls
 --   instDecidableLE, instDecidableLT
---   ℤ₀.le_refl, le_antisymm, le_trans, le_total
---   ℤ₀.lt_iff_le_not_le
---   ℤ₀.ofNat_le, ofNat_lt, zero_le_ofNat
---   ℤ₀.add_le_add_left
---   ℤ₀.neg_le_neg
+--   ℤ₀cls.le_refl, le_antisymm, le_trans, le_total
+--   ℤ₀cls.lt_iff_le_not_le
+--   ℤ₀cls.ofNat_le, ofNat_lt, zero_le_ofNat
+--   ℤ₀cls.add_le_add_left
+--   ℤ₀cls.neg_le_neg
 
 import AczelSetTheory.Integers.Basic
 import Peano.PeanoNat.Decidable
 
-namespace ℤ₀
+namespace ℤ₀cls
 
 open Peano Peano.Add Peano.Sub Peano.Mul Peano.Order
 
@@ -28,10 +28,10 @@ open Peano Peano.Add Peano.Sub Peano.Mul Peano.Order
 -- a ≤ b se define via le₀ en los representantes canónicos
 -- ─────────────────────────────────────────────────────────────────────────────
 
-instance : LE ℤ₀ where
+instance : LE ℤ₀cls where
   le a b := le₀ (add a.repr.1 b.repr.2) (add a.repr.2 b.repr.1)
 
-instance : LT ℤ₀ where
+instance : LT ℤ₀cls where
   lt a b := a ≤ b ∧ ¬ b ≤ a
 
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -39,35 +39,35 @@ instance : LT ℤ₀ where
 -- omega₀ requires @LE.le ℕ₀ (not le₀) so helpers expose ≤ notation.
 -- ─────────────────────────────────────────────────────────────────────────────
 
-theorem le_iff (a b : ℤ₀) :
+theorem le_iff (a b : ℤ₀cls) :
     a ≤ b ↔ (add a.repr.1 b.repr.2 : ℕ₀) ≤ add a.repr.2 b.repr.1 :=
   Iff.rfl
 
-theorem le_iff_mp {a b : ℤ₀} (h : a ≤ b) :
+theorem le_iff_mp {a b : ℤ₀cls} (h : a ≤ b) :
     (add a.repr.1 b.repr.2 : ℕ₀) ≤ add a.repr.2 b.repr.1 := h
 
-theorem le_iff_mpr {a b : ℤ₀}
+theorem le_iff_mpr {a b : ℤ₀cls}
     (h : (add a.repr.1 b.repr.2 : ℕ₀) ≤ add a.repr.2 b.repr.1) : a ≤ b := h
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Decidibilidad
 -- ─────────────────────────────────────────────────────────────────────────────
 
-instance instDecidableLE (a b : ℤ₀) : Decidable (a ≤ b) :=
+instance instDecidableLE (a b : ℤ₀cls) : Decidable (a ≤ b) :=
   show Decidable ((add a.repr.1 b.repr.2 : ℕ₀) ≤ add a.repr.2 b.repr.1) from
     inferInstance
 
-instance instDecidableLT (a b : ℤ₀) : Decidable (a < b) :=
+instance instDecidableLT (a b : ℤ₀cls) : Decidable (a < b) :=
   show Decidable (a ≤ b ∧ ¬ b ≤ a) from inferInstance
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Propiedades de orden
 -- ─────────────────────────────────────────────────────────────────────────────
 
-theorem le_refl (a : ℤ₀) : a ≤ a :=
+theorem le_refl (a : ℤ₀cls) : a ≤ a :=
   le_iff_mpr (by omega₀)
 
-theorem le_antisymm {a b : ℤ₀} (h1 : a ≤ b) (h2 : b ≤ a) : a = b := by
+theorem le_antisymm {a b : ℤ₀cls} (h1 : a ≤ b) (h2 : b ≤ a) : a = b := by
   have h1' := le_iff_mp h1
   have h2' := le_iff_mp h2
   have heq : add a.repr.1 b.repr.2 = add a.repr.2 b.repr.1 := by omega₀
@@ -80,26 +80,26 @@ theorem le_antisymm {a b : ℤ₀} (h1 : a ≤ b) (h2 : b ≤ a) : a = b := by
                    (ha.trans (by omega₀ : b.repr.2 = 𝟘).symm)
   · exact Prod.ext (by omega₀) (ha.trans hb.symm)
 
-theorem le_trans {a b c : ℤ₀} (h1 : a ≤ b) (h2 : b ≤ c) : a ≤ c := by
+theorem le_trans {a b c : ℤ₀cls} (h1 : a ≤ b) (h2 : b ≤ c) : a ≤ c := by
   have h1' := le_iff_mp h1
   have h2' := le_iff_mp h2
   rcases repr_normalized b with hb | hb
   · exact le_iff_mpr (by omega₀)
   · exact le_iff_mpr (by omega₀)
 
-theorem le_total (a b : ℤ₀) : a ≤ b ∨ b ≤ a := by
+theorem le_total (a b : ℤ₀cls) : a ≤ b ∨ b ≤ a := by
   by_cases h : (add a.repr.1 b.repr.2 : ℕ₀) ≤ add a.repr.2 b.repr.1
   · exact Or.inl (le_iff_mpr h)
   · exact Or.inr (le_iff_mpr (by omega₀))
 
-theorem lt_iff_le_not_le (a b : ℤ₀) : a < b ↔ a ≤ b ∧ ¬ b ≤ a := Iff.rfl
+theorem lt_iff_le_not_le (a b : ℤ₀cls) : a < b ↔ a ≤ b ∧ ¬ b ≤ a := Iff.rfl
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Compatibilidad con ofNat
 -- ─────────────────────────────────────────────────────────────────────────────
 
-theorem zero_le_ofNat (n : ℕ₀) : (0 : ℤ₀) ≤ ofNat n := by
-  have h0 : (0 : ℤ₀).repr = (𝟘, 𝟘) := by
+theorem zero_le_ofNat (n : ℕ₀) : (0 : ℤ₀cls) ≤ ofNat n := by
+  have h0 : (0 : ℤ₀cls).repr = (𝟘, 𝟘) := by
     show (ofNat 𝟘).repr = (𝟘, 𝟘); exact repr_ofNat 𝟘
   exact le_iff_mpr (by rw [h0, repr_ofNat]; omega₀)
 
@@ -123,7 +123,7 @@ theorem ofNat_lt {m n : ℕ₀} (h : (m : ℕ₀) ≤ n) (hne : m ≠ n) : ofNat
 -- Monotonía de la suma
 -- ─────────────────────────────────────────────────────────────────────────────
 
-theorem add_le_add_left (a b c : ℤ₀) (h : b ≤ c) : Add.add a b ≤ Add.add a c := by
+theorem add_le_add_left (a b c : ℤ₀cls) (h : b ≤ c) : Add.add a b ≤ Add.add a c := by
   have h' := le_iff_mp h
   have hab := repr_add_intEq a b
   have hac := repr_add_intEq a c
@@ -134,7 +134,7 @@ theorem add_le_add_left (a b c : ℤ₀) (h : b ≤ c) : Add.add a b ≤ Add.add
 -- Negación invierte el orden
 -- ─────────────────────────────────────────────────────────────────────────────
 
-theorem neg_le_neg {a b : ℤ₀} (h : a ≤ b) : -b ≤ -a := by
+theorem neg_le_neg {a b : ℤ₀cls} (h : a ≤ b) : -b ≤ -a := by
   have h' := le_iff_mp h
   have ha := repr_neg_intEq a
   have hb := repr_neg_intEq b
@@ -145,19 +145,19 @@ theorem neg_le_neg {a b : ℤ₀} (h : a ≤ b) : -b ≤ -a := by
 -- Relaciones ≤ / <
 -- ─────────────────────────────────────────────────────────────────────────────
 
-theorem le_of_lt {a b : ℤ₀} (h : a < b) : a ≤ b := h.1
+theorem le_of_lt {a b : ℤ₀cls} (h : a < b) : a ≤ b := h.1
 
-theorem lt_of_le_of_lt {a b c : ℤ₀} (h1 : a ≤ b) (h2 : b < c) : a < c :=
+theorem lt_of_le_of_lt {a b c : ℤ₀cls} (h1 : a ≤ b) (h2 : b < c) : a < c :=
   ⟨le_trans h1 h2.1, fun hca => h2.2 (le_trans hca h1)⟩
 
-theorem lt_of_lt_of_le {a b c : ℤ₀} (h1 : a < b) (h2 : b ≤ c) : a < c :=
+theorem lt_of_lt_of_le {a b c : ℤ₀cls} (h1 : a < b) (h2 : b ≤ c) : a < c :=
   ⟨le_trans h1.1 h2, fun hca => h1.2 (le_trans h2 hca)⟩
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Monotonía de la suma (derecha)
 -- ─────────────────────────────────────────────────────────────────────────────
 
-theorem add_le_add_right {b c : ℤ₀} (h : b ≤ c) (a : ℤ₀) : Add.add b a ≤ Add.add c a := by
+theorem add_le_add_right {b c : ℤ₀cls} (h : b ≤ c) (a : ℤ₀cls) : Add.add b a ≤ Add.add c a := by
   have h' := le_iff_mp h
   have hba := repr_add_intEq b a
   have hca := repr_add_intEq c a
@@ -168,7 +168,7 @@ theorem add_le_add_right {b c : ℤ₀} (h : b ≤ c) (a : ℤ₀) : Add.add b a
 -- Cancelación por la izquierda
 -- ─────────────────────────────────────────────────────────────────────────────
 
-private theorem add_left_cancel_le {a b c : ℤ₀} (h : Add.add a b ≤ Add.add a c) : b ≤ c := by
+private theorem add_left_cancel_le {a b c : ℤ₀cls} (h : Add.add a b ≤ Add.add a c) : b ≤ c := by
   have h' := le_iff_mp (show HAdd.hAdd a b ≤ HAdd.hAdd a c from h)
   have hab := repr_add_intEq a b
   have hac := repr_add_intEq a c
@@ -181,10 +181,10 @@ private theorem add_left_cancel_le {a b c : ℤ₀} (h : Add.add a b ≤ Add.add
 -- Monotonía estricta de la suma
 -- ─────────────────────────────────────────────────────────────────────────────
 
-theorem add_lt_add_left (a b c : ℤ₀) (h : b < c) : Add.add a b < Add.add a c :=
+theorem add_lt_add_left (a b c : ℤ₀cls) (h : b < c) : Add.add a b < Add.add a c :=
   ⟨add_le_add_left a b c h.1, fun hle => h.2 (add_left_cancel_le hle)⟩
 
-theorem add_lt_add_right {b c : ℤ₀} (h : b < c) (a : ℤ₀) : Add.add b a < Add.add c a := by
+theorem add_lt_add_right {b c : ℤ₀cls} (h : b < c) (a : ℤ₀cls) : Add.add b a < Add.add c a := by
   refine ⟨add_le_add_right h.1 a, fun hle => h.2 ?_⟩
   apply add_left_cancel_le (a := a)
   rwa [add_comm a c, add_comm a b]
@@ -193,20 +193,20 @@ theorem add_lt_add_right {b c : ℤ₀} (h : b < c) (a : ℤ₀) : Add.add b a <
 -- Positividad del producto
 -- ─────────────────────────────────────────────────────────────────────────────
 
-private theorem pos_repr {a : ℤ₀} (ha : 0 < a) : a.repr.2 = 𝟘 ∧ a.repr.1 ≠ 𝟘 := by
-  have h2 : ¬ (add a.repr.1 (0 : ℤ₀).repr.2 ≤ add a.repr.2 (0 : ℤ₀).repr.1) :=
+private theorem pos_repr {a : ℤ₀cls} (ha : 0 < a) : a.repr.2 = 𝟘 ∧ a.repr.1 ≠ 𝟘 := by
+  have h2 : ¬ (add a.repr.1 (0 : ℤ₀cls).repr.2 ≤ add a.repr.2 (0 : ℤ₀cls).repr.1) :=
     fun h => ha.2 (le_iff_mpr h)
-  have h0 : (0 : ℤ₀).repr = (𝟘, 𝟘) := by
+  have h0 : (0 : ℤ₀cls).repr = (𝟘, 𝟘) := by
     show (ofNat 𝟘).repr = (𝟘, 𝟘); exact repr_ofNat 𝟘
   simp only [h0] at h2
   rcases repr_normalized a with ha₀ | ha₀
   · exfalso; exact h2 (by rw [ha₀]; omega₀)
   · exact ⟨ha₀, fun heq => h2 (by rw [heq, ha₀]; omega₀)⟩
 
-private theorem eq_ofNat_of_pos {a : ℤ₀} (ha : 0 < a) : a = ofNat a.repr.1 :=
+private theorem eq_ofNat_of_pos {a : ℤ₀cls} (ha : 0 < a) : a = ofNat a.repr.1 :=
   repr_inj (by rw [repr_ofNat]; exact Prod.ext rfl (pos_repr ha).1)
 
-theorem mul_pos {a b : ℤ₀} (ha : 0 < a) (hb : 0 < b) : 0 < Mul.mul a b := by
+theorem mul_pos {a b : ℤ₀cls} (ha : 0 < a) (hb : 0 < b) : 0 < Mul.mul a b := by
   obtain ⟨_, ha1⟩ := pos_repr ha
   obtain ⟨_, hb1⟩ := pos_repr hb
   rw [eq_ofNat_of_pos ha, eq_ofNat_of_pos hb, ← ofNat_mul]
@@ -215,12 +215,12 @@ theorem mul_pos {a b : ℤ₀} (ha : 0 < a) (hb : 0 < b) : 0 < Mul.mul a b := by
   exact ofNat_lt (Or.inl hpos) (Ne.symm hne)
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- P1: ofNat de nonzero ℕ₀ es positivo en ℤ₀
+-- P1: ofNat de nonzero ℕ₀ es positivo en ℤ₀cls
 -- ─────────────────────────────────────────────────────────────────────────────
 
-/-- Si `n ≠ 𝟘`, entonces `ofNat n` es estrictamente positivo en ℤ₀. -/
-theorem ofNat_pos_of_ne_zero {n : ℕ₀} (hn : n ≠ 𝟘) : (0 : ℤ₀) < ofNat n := by
-  have h0 : (ofNat 𝟘 : ℤ₀) = 0 := ofNat_zero
+/-- Si `n ≠ 𝟘`, entonces `ofNat n` es estrictamente positivo en ℤ₀cls. -/
+theorem ofNat_pos_of_ne_zero {n : ℕ₀} (hn : n ≠ 𝟘) : (0 : ℤ₀cls) < ofNat n := by
+  have h0 : (ofNat 𝟘 : ℤ₀cls) = 0 := ofNat_zero
   rw [← h0]
   exact ofNat_lt (Peano.Order.zero_le n) (fun h => hn h.symm)
 
@@ -255,7 +255,7 @@ private theorem nat_le_cancel_mul_right {a b k : ℕ₀} (hk : k ≠ 𝟘)
 -- ─────────────────────────────────────────────────────────────────────────────
 
 /-- Monotonía y cancelación del producto por `ofNat k` positivo (lado derecho). -/
-theorem mul_le_mul_right_ofNat_pos {k : ℕ₀} (hk : k ≠ 𝟘) (a b : ℤ₀) :
+theorem mul_le_mul_right_ofNat_pos {k : ℕ₀} (hk : k ≠ 𝟘) (a b : ℤ₀cls) :
     a ≤ b ↔ Mul.mul a (ofNat k) ≤ Mul.mul b (ofNat k) := by
   have ha := repr_mul_ofNat_intEq a k
   have hb := repr_mul_ofNat_intEq b k
@@ -282,7 +282,7 @@ theorem mul_le_mul_right_ofNat_pos {k : ℕ₀} (hk : k ≠ 𝟘) (a b : ℤ₀)
 -- ─────────────────────────────────────────────────────────────────────────────
 
 /-- Monotonía y cancelación del producto por `ofNat k` positivo (lado izquierdo). -/
-theorem mul_le_mul_left_ofNat_pos {k : ℕ₀} (hk : k ≠ 𝟘) (a b : ℤ₀) :
+theorem mul_le_mul_left_ofNat_pos {k : ℕ₀} (hk : k ≠ 𝟘) (a b : ℤ₀cls) :
     a ≤ b ↔ Mul.mul (ofNat k) a ≤ Mul.mul (ofNat k) b := by
   rw [mul_comm (ofNat k) a, mul_comm (ofNat k) b]
   exact mul_le_mul_right_ofNat_pos hk a b
@@ -292,9 +292,9 @@ theorem mul_le_mul_left_ofNat_pos {k : ℕ₀} (hk : k ≠ 𝟘) (a b : ℤ₀) 
 -- ─────────────────────────────────────────────────────────────────────────────
 
 /-- Si `0 ≤ a` entonces `a` es la imagen vía `ofNat` de su numerador canónico. -/
-theorem nonneg_eq_ofNat {a : ℤ₀} (h : 0 ≤ a) : a = ofNat a.repr.1 := by
+theorem nonneg_eq_ofNat {a : ℤ₀cls} (h : 0 ≤ a) : a = ofNat a.repr.1 := by
   have h' := le_iff_mp h
-  have h0 : (0 : ℤ₀).repr = (𝟘, 𝟘) := by
+  have h0 : (0 : ℤ₀cls).repr = (𝟘, 𝟘) := by
     show (ofNat 𝟘).repr = (𝟘, 𝟘); exact repr_ofNat 𝟘
   rw [h0] at h'
   apply repr_inj
@@ -306,7 +306,7 @@ theorem nonneg_eq_ofNat {a : ℤ₀} (h : 0 ≤ a) : a = ofNat a.repr.1 := by
   · -- a.repr.2 = 𝟘
     exact Prod.ext rfl ha
 
-theorem mul_le_mul_right_of_nonneg {a b c : ℤ₀} (h1 : a ≤ b) (h2 : 0 ≤ c) : Mul.mul a c ≤ Mul.mul b c := by
+theorem mul_le_mul_right_of_nonneg {a b c : ℤ₀cls} (h1 : a ≤ b) (h2 : 0 ≤ c) : Mul.mul a c ≤ Mul.mul b c := by
   have hc : c = ofNat c.repr.1 := nonneg_eq_ofNat h2
   rw [hc]
   by_cases h0 : c.repr.1 = 𝟘
@@ -316,7 +316,7 @@ theorem mul_le_mul_right_of_nonneg {a b c : ℤ₀} (h1 : a ≤ b) (h2 : 0 ≤ c
     exact le_refl 0
   · exact (mul_le_mul_right_ofNat_pos h0 a b).mp h1
 
-theorem mul_le_mul_left_of_nonneg {a b c : ℤ₀} (h1 : a ≤ b) (h2 : 0 ≤ c) : Mul.mul c a ≤ Mul.mul c b := by
+theorem mul_le_mul_left_of_nonneg {a b c : ℤ₀cls} (h1 : a ≤ b) (h2 : 0 ≤ c) : Mul.mul c a ≤ Mul.mul c b := by
   rw [mul_comm c a, mul_comm c b]
   exact mul_le_mul_right_of_nonneg h1 h2
 
@@ -324,35 +324,35 @@ theorem mul_le_mul_left_of_nonneg {a b c : ℤ₀} (h1 : a ≤ b) (h2 : 0 ≤ c)
 -- No negatividad del producto
 -- ─────────────────────────────────────────────────────────────────────────────
 
-private theorem neg_zero_local : Neg.neg (0 : ℤ₀) = 0 := by
-  have h := neg_add_self (0 : ℤ₀)
+private theorem neg_zero_local : Neg.neg (0 : ℤ₀cls) = 0 := by
+  have h := neg_add_self (0 : ℤ₀cls)
   rwa [add_zero] at h
 
 /-- Si `0 ≤ a` y `0 ≤ b` entonces `0 ≤ a · b`. -/
-theorem mul_nonneg {a b : ℤ₀} (ha : 0 ≤ a) (hb : 0 ≤ b) : 0 ≤ Mul.mul a b := by
+theorem mul_nonneg {a b : ℤ₀cls} (ha : 0 ≤ a) (hb : 0 ≤ b) : 0 ≤ Mul.mul a b := by
   rw [nonneg_eq_ofNat ha, nonneg_eq_ofNat hb, ← ofNat_mul]
   exact zero_le_ofNat _
 
 /-- Si `0 ≤ a` y `b ≤ 0` entonces `a · b ≤ 0`. -/
-theorem mul_nonpos_of_nonneg_of_nonpos {a b : ℤ₀}
+theorem mul_nonpos_of_nonneg_of_nonpos {a b : ℤ₀cls}
     (ha : 0 ≤ a) (hb : b ≤ 0) : Mul.mul a b ≤ 0 := by
-  have hnb : (0 : ℤ₀) ≤ -b := by
+  have hnb : (0 : ℤ₀cls) ≤ -b := by
     have h := neg_le_neg hb; rwa [neg_zero_local] at h
-  have hpos : (0 : ℤ₀) ≤ Mul.mul a (-b) := mul_nonneg ha hnb
+  have hpos : (0 : ℤ₀cls) ≤ Mul.mul a (-b) := mul_nonneg ha hnb
   rw [mul_neg] at hpos
   have hflip := neg_le_neg hpos
   rw [neg_zero_local, neg_neg] at hflip
   exact hflip
 
 /-- Si `a ≤ 0` y `b ≤ 0` entonces `0 ≤ a · b`. -/
-theorem mul_nonneg_of_nonpos_of_nonpos {a b : ℤ₀}
+theorem mul_nonneg_of_nonpos_of_nonpos {a b : ℤ₀cls}
     (ha : a ≤ 0) (hb : b ≤ 0) : 0 ≤ Mul.mul a b := by
-  have hna : (0 : ℤ₀) ≤ -a := by
+  have hna : (0 : ℤ₀cls) ≤ -a := by
     have h := neg_le_neg ha; rwa [neg_zero_local] at h
-  have hnb : (0 : ℤ₀) ≤ -b := by
+  have hnb : (0 : ℤ₀cls) ≤ -b := by
     have h := neg_le_neg hb; rwa [neg_zero_local] at h
-  have hpos : (0 : ℤ₀) ≤ Mul.mul (-a) (-b) := mul_nonneg hna hnb
+  have hpos : (0 : ℤ₀cls) ≤ Mul.mul (-a) (-b) := mul_nonneg hna hnb
   rw [neg_mul, mul_neg, neg_neg] at hpos
   exact hpos
 
-end ℤ₀
+end ℤ₀cls

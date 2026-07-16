@@ -5,12 +5,12 @@ License: MIT
 -/
 
 -- AczelSetTheory/Integers/Canonical.lean
--- Representante canónico único para ℤ₀: `(0, n)` o `(n, 0)`.
+-- Representante canónico único para ℤ₀cls: `(0, n)` o `(n, 0)`.
 --
 -- ESTADO: M4B completo (cerrado 2026-06-05, commit b9484c7). 0 sorry.
 --
--- DECISIÓN: ADR-014 — opción B: NO se introduce un tipo `HFInt` separado;
--- ℤ₀ = Quotient intSetoid se mantiene como único entero, pero se añade
+-- DECISIÓN: ADR-014 — opción B: NO se introduce un tipo `ℤ₀` separado;
+-- ℤ₀cls = Quotient intSetoid se mantiene como único entero, pero se añade
 -- `canonicalRep` para igualdad decidible eficiente.
 --
 -- API:
@@ -29,7 +29,7 @@ import AczelSetTheory.Integers.Basic
 
 open Peano Peano.Add Peano.Sub Peano.Order
 
-namespace ℤ₀
+namespace ℤ₀cls
 
 -- ============================================================
 -- Sección 1: Función canonicalRep
@@ -114,4 +114,4 @@ theorem canonicalRep_unique {p q : ℕ₀ × ℕ₀}
 -- La igualdad pointwise `canonicalRep p = normalize p` se puede probar
 -- pero no se necesita para el objetivo principal de M4B.
 
-end ℤ₀
+end ℤ₀cls

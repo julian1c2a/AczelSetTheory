@@ -217,18 +217,18 @@
 ### Integers/ (12 modules)
 | Module | Key exports | Status |
 |--------|-------------|--------|
-| Integers/Basic.lean | `ℤ₀`, ring instances, 18 ring laws, `ofNat` | ✅ |
-| Integers/Order.lean | orden en ℤ₀, `≤`, `<`, compatibilidad con operaciones | ✅ |
-| Integers/Functions.lean | homomorfismos ℤ₀ → ℤ₀ | ✅ |
-| Integers/Arithmetic.lean | GCD, divisibilidad, lemas aritméticos en ℤ₀ | ✅ |
-| Integers/Bijection.lean | biyecciones entre ℤ₀ y ℕ₀ | ✅ |
+| Integers/Basic.lean | `ℤ₀cls`, ring instances, 18 ring laws, `ofNat` | ✅ |
+| Integers/Order.lean | orden en ℤ₀cls, `≤`, `<`, compatibilidad con operaciones | ✅ |
+| Integers/Functions.lean | homomorfismos ℤ₀cls → ℤ₀cls | ✅ |
+| Integers/Arithmetic.lean | GCD, divisibilidad, lemas aritméticos en ℤ₀cls | ✅ |
+| Integers/Bijection.lean | biyecciones entre ℤ₀cls y ℕ₀ | ✅ |
 | Integers/PadicVal.lean | `padic_val`, `Omega_prime`, multiplicatividad | ✅ |
 | Integers/MobiusLiouville.lean | `μ` (Möbius), `λ` (Liouville), multiplicatividad | ✅ |
 | Integers/Canonical.lean | `canonicalRep`, representante normal `(0,n)`/`(0,0)`/`(n,0)` (ADR-014) | ✅ |
 | Integers/Bezout.lean | `bezout_ofNat`, `bezout`, `bezout_coprime`, `extEuclidNat`, `extEuclidNat_spec`, `bezoutCoeffs` | ✅ |
 | Integers/ZModN.lean | `HFAlgebra.ZModN` (ℤ/nℤ anillo), `ZModN_mul_comm`, `ZModFieldP` (ℤ/pℤ cuerpo, `p` primo) | ✅ |
-| Integers/HFInt.lean | `HFInt` (entero como HFSet), operaciones y puente con ℤ₀ | ✅ |
-| Integers/HFIntOps.lean | operaciones aritméticas sobre `HFInt` | ✅ |
+| Integers/ℤ₀.lean | `ℤ₀` (entero como HFSet), operaciones y puente con ℤ₀cls | ✅ |
+| Integers/Z0Ops.lean | operaciones aritméticas sobre `ℤ₀` | ✅ |
 
 ### Combinatorics/ (1 module)
 
@@ -258,7 +258,7 @@ de trabajo activo — el resto del proyecto, ~200 módulos, sigue en 0 sorry):
 |---|---|---|---|
 | `Rationals/Irrational.lean` | 353 | 1 | `newton_seq_step_bound` — cota de descenso por paso del método de Newton; falta acotar el paso usando que `x_k > r` (ver `int_sep_pow_lemma`/`newton_seq_apart_lt` cercanos). |
 | `Rationals/Polynomial.lean` | 57, 69, 80, 110 | 4 | Canonicalización (`trimZeros (result) = result`) tras `add`/`smul`/`mul`/`monomial` — falta un lema de idempotencia de `trimZeros`. |
-| `Rationals/Series.lean` | 17, 28, 38, 42, 70, 78 | 6 | `sum_add`, `sum_mul_left`, `sum_arithmetic`, `sum_geometric` (ℚ₀ y HFRat) — módulo recién creado, sin terminar. |
+| `Rationals/Series.lean` | 17, 28, 38, 42, 70, 78 | 6 | `sum_add`, `sum_mul_left`, `sum_arithmetic`, `sum_geometric` (ℚ₀cls y ℚ₀) — módulo recién creado, sin terminar. |
 | `Reals/Incompleteness.lean` | 28, 42, 48 | 3 | Irracionalidad de `√2` y convergencia — requieren multiplicatividad de la valuación 2-ádica en paridad, o un lema de descenso infinito en Peano (deuda técnica documentada en NEXT-STEPS.md). |
 
 Ninguno de estos usa `Classical`; los 14 son huecos de prueba genuinos (`sorry`), no
@@ -331,16 +331,16 @@ constructiva el 2026-07-12 (ver `newton_bounded_search` en el mismo fichero y el
 
 ---
 
-## Recent Achievements (2026-06-06) — M5B: anillo cociente genérico + Bézout en ℤ₀
+## Recent Achievements (2026-06-06) — M5B: anillo cociente genérico + Bézout en ℤ₀cls
 - ✅ **Anillo cociente `R/I`** genérico sobre `HFRing` — nuevo módulo
   `AczelSetTheory/Algebra/QuotientRing.lean` (0 sorry / 0 noncomputable / 0 warnings).
   - `HFIdeal` (ideal bilátero), `HFRing.quotient` (anillo cociente completo).
   - Parte aditiva reutiliza `quotientGroup`; multiplicación bien-definida vía absorción.
-  - **ADR-016**: construcción genérica (no sobre `ℤ₀`) por finitud hereditaria de `HFSet`.
-- ✅ **Identidad de Bézout en ℤ₀** — nuevo módulo `AczelSetTheory/Integers/Bezout.lean`.
+  - **ADR-016**: construcción genérica (no sobre `ℤ₀cls`) por finitud hereditaria de `HFSet`.
+- ✅ **Identidad de Bézout en ℤ₀cls** — nuevo módulo `AczelSetTheory/Integers/Bezout.lean`.
   - `extEuclidNat` + `extEuclidNat_spec` (algoritmo extendido de Euclides, sin sorry).
   - `bezout_ofNat`, `bezout_coprime_ofNat`, `bezoutCoeffs` (computable).
-  - `bezout` / `bezout_coprime` generales sobre ℤ₀ completos (reducción a `bezout_ofNat`
+  - `bezout` / `bezout_coprime` generales sobre ℤ₀cls completos (reducción a `bezout_ofNat`
     vía descomposición de signo); **0 sorry**.
 - ✅ **Anillo ℤ/nℤ (`ZModN`)** — módulo `AczelSetTheory/Integers/ZModN.lean`.
   - `HFAlgebra.ZModN (n) (hn : n ≠ 𝟘) : HFRing` — HFRing finito con portador `vN n`
@@ -453,7 +453,7 @@ constructiva el 2026-07-12 (ver `newton_bounded_search` en el mismo fichero y el
 - ✅ **Fase A: aritmética completa** — ModEqVN (extendido, `ModEq_HF`), TotientVN (extendido), PrimeVN (TFA, Lema de Gauss, `dvd_HF`/`prime_HF`/`coprime_HF`), FermatVN (Pequeño Teorema de Fermat, Teorema de Wilson), CRTVN (Teorema Chino del Resto).
 - ✅ **Algebra/Group.lean** — `HFAlgebra.HFGroup` con axiomas mínimos izquierdos; 10 lemas derivados: `op_inv_left_apply`, `left_cancel`, `op_inv_right`, `op_id_right`, `right_cancel`, `inv_inv`, `inv_e`, `inv_op`, `unique_id`, `unique_inv`.
 - ✅ **Axioms/LinearOrder.lean** — `LT HFSet` + `StrictLinearOrder HFSet` vía `CList.lt` en representantes canónicos. Instancias: `instDecidableLt`, `StrictLinearOrder HFSet`.
-- ✅ **Integers/Basic.lean** — `ℤ₀ = Quotient intSetoid` (enteros como cociente de ℕ₀ × ℕ₀). Representante canónico `normalize`. Instancias: `Zero`, `One`, `Add`, `Neg`, `Mul`, `Sub`. Leyes de anillo conmutativo completas (18 teoremas). Embedding `ofNat : ℕ₀ → ℤ₀` inyectivo.
+- ✅ **Integers/Basic.lean** — `ℤ₀cls = Quotient intSetoid` (enteros como cociente de ℕ₀ × ℕ₀). Representante canónico `normalize`. Instancias: `Zero`, `One`, `Add`, `Neg`, `Mul`, `Sub`. Leyes de anillo conmutativo completas (18 teoremas). Embedding `ofNat : ℕ₀ → ℤ₀cls` inyectivo.
 - ✅ **Barrel fix** — `HFListOps.lean` añadido a `AczelSetTheory.lean` (era módulo huérfano).
 
 ---
@@ -468,9 +468,9 @@ AczelSetTheory/
   Axioms/         — Axiomatic properties and theorems over HFSet (43 modules)
   VN/             — Von Neumann embedding vN : ℕ₀ → HFSet (49 modules)
   Algebra/        — Algebraic structures native in HFSet (23 modules)
-  Integers/       — Integer type ℤ₀ as quotient of ℕ₀ × ℕ₀ (12 modules)
-  Rationals/      — Rational type ℚ₀ + análisis constructivo (21 modules)
-  Reals/          — Incompletitud de HFRat; primeros pasos hacia HFReal (1 module)
+  Integers/       — Integer type ℤ₀cls as quotient of ℕ₀ × ℕ₀ (12 modules)
+  Rationals/      — Rational type ℚ₀cls + análisis constructivo (21 modules)
+  Reals/          — Incompletitud de ℚ₀; primeros pasos hacia HFReal (1 module)
   Topology/       — Topological spaces over HFSet (5 modules)
   Combinatorics/  — Combinatoria finita nativa (pigeonhole, incl-excl) (1 module)
   HFSets.lean     — Core HFSet quotient type
@@ -508,7 +508,7 @@ AczelSetTheory/
 | Fase A | ModEqVN (ext.), TotientVN (ext.), PrimeVN, FermatVN, CRTVN | ✅ |
 | Algebra | `HFAlgebra.HFGroup` with 10 derived lemmas | ✅ |
 | LinearOrder | `LT HFSet`, `StrictLinearOrder HFSet` | ✅ |
-| Integers | `ℤ₀` commutative ring (quotient ℕ₀ × ℕ₀) + Order, Functions, Arithmetic, Bijection, PadicVal, MobiusLiouville | ✅ |
+| Integers | `ℤ₀cls` commutative ring (quotient ℕ₀ × ℕ₀) + Order, Functions, Arithmetic, Bijection, PadicVal, MobiusLiouville | ✅ |
 | Topology | `HFTopSpace`, topología de entornos, subespacio, aplicaciones continuas | ✅ |
 
 > See [NEXT-STEPS.md](NEXT-STEPS.md) for detailed planning and next priorities.

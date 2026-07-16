@@ -7,28 +7,28 @@ License: MIT
 -- AczelSetTheory/Rationals/Polynomial.lean
 
 import AczelSetTheory.PList.Basic
-import AczelSetTheory.Rationals.HFRat
+import AczelSetTheory.Rationals.Q0
 import AczelSetTheory.Axioms.OrdinalNat
 
 open Peano
 
-namespace HFRat
+namespace ℚ₀
 
 -- ─────────────────────────────────────────────────────────────────
--- Polinomios sobre HFRat
+-- Polinomios sobre ℚ₀
 -- ─────────────────────────────────────────────────────────────────
 
 /-- Elimina los ceros a la derecha (los coeficientes de mayor grado nulos) -/
-def trimZeros (l : PList HFRat) : PList HFRat :=
+def trimZeros (l : PList ℚ₀) : PList ℚ₀ :=
   match l with
   | PList.nil => PList.nil
   | PList.cons h t =>
       let t' := trimZeros t
-      if h.pair = (0 : HFRat).pair ∧ t'.isEmpty then PList.nil
+      if h.pair = (0 : ℚ₀).pair ∧ t'.isEmpty then PList.nil
       else PList.cons h t'
 
-/-- Un polinomio sobre HFRat es una lista de coeficientes, donde el último (si existe) no es cero. -/
-def Polynomial := { l : PList HFRat // trimZeros l = l }
+/-- Un polinomio sobre ℚ₀ es una lista de coeficientes, donde el último (si existe) no es cero. -/
+def Polynomial := { l : PList ℚ₀ // trimZeros l = l }
 
 namespace Polynomial
 
@@ -47,7 +47,7 @@ def degree (p : Polynomial) : ℕ₀ :=
 -- ─────────────────────────────────────────────────────────────────
 
 /-- Suma de listas de coeficientes (componente a componente) -/
-def addList (l1 l2 : PList HFRat) : PList HFRat :=
+def addList (l1 l2 : PList ℚ₀) : PList ℚ₀ :=
   match l1, l2 with
   | PList.nil, l => l
   | l, PList.nil => l
@@ -61,17 +61,17 @@ def add (p1 p2 : Polynomial) : Polynomial :=
 instance : Add Polynomial := ⟨add⟩
 
 /-- Multiplicación por escalar -/
-def smulList (c : HFRat) (l : PList HFRat) : PList HFRat :=
+def smulList (c : ℚ₀) (l : PList ℚ₀) : PList ℚ₀ :=
   match l with
   | PList.nil => PList.nil
   | PList.cons h t => PList.cons (c * h) (smulList c t)
 
-def smul (c : HFRat) (p : Polynomial) : Polynomial :=
-  if c.pair = (0 : HFRat).pair then zero
+def smul (c : ℚ₀) (p : Polynomial) : Polynomial :=
+  if c.pair = (0 : ℚ₀).pair then zero
   else ⟨trimZeros (smulList c p.val), sorry⟩
 
 /-- Convolución de listas de coeficientes (multiplicación polinómica) -/
-def mulList (l1 l2 : PList HFRat) : PList HFRat :=
+def mulList (l1 l2 : PList ℚ₀) : PList ℚ₀ :=
   match l1 with
   | PList.nil => PList.nil
   | PList.cons h1 t1 =>
@@ -87,13 +87,13 @@ instance : Mul Polynomial := ⟨mul⟩
 -- ─────────────────────────────────────────────────────────────────
 
 /-- Evaluación de Horner para una lista de coeficientes -/
-def evalList (l : PList HFRat) (x : HFRat) : HFRat :=
+def evalList (l : PList ℚ₀) (x : ℚ₀) : ℚ₀ :=
   match l with
   | PList.nil => 0
   | PList.cons h t => h + x * evalList t x
 
 /-- Evalúa el polinomio en el punto `x` -/
-def eval (p : Polynomial) (x : HFRat) : HFRat :=
+def eval (p : Polynomial) (x : ℚ₀) : ℚ₀ :=
   evalList p.val x
 
 -- ─────────────────────────────────────────────────────────────────
@@ -101,16 +101,16 @@ def eval (p : Polynomial) (x : HFRat) : HFRat :=
 -- ─────────────────────────────────────────────────────────────────
 
 /-- Lista auxiliar para crear un monomio -/
-def monomialList (c : HFRat) (k : ℕ₀) : PList HFRat :=
+def monomialList (c : ℚ₀) (k : ℕ₀) : PList ℚ₀ :=
   match k with
   | 𝟘 => PList.cons c PList.nil
   | σ n => PList.cons 0 (monomialList c n)
 
 /-- Crea el monomio `c * x^k` -/
-def monomial (c : HFRat) (k : ℕ₀) : Polynomial :=
-  if c.pair = (0 : HFRat).pair then zero
+def monomial (c : ℚ₀) (k : ℕ₀) : Polynomial :=
+  if c.pair = (0 : ℚ₀).pair then zero
   else ⟨trimZeros (monomialList c k), sorry⟩
 
 end Polynomial
 
-end HFRat
+end ℚ₀

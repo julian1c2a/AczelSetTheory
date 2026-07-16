@@ -5,21 +5,21 @@ License: MIT
 -/
 
 -- AczelSetTheory/Integers/Basic.lean
--- ℤ₀: enteros como cociente de (ℕ₀ × ℕ₀) por (a,b) ~ (c,d) ↔ a+d = b+c.
+-- ℤ₀cls: enteros como cociente de (ℕ₀ × ℕ₀) por (a,b) ~ (c,d) ↔ a+d = b+c.
 -- Representante canónico: el primero o el segundo componente es siempre 𝟘.
 --
 -- Público:
---   ℤ₀                            : tipo de los enteros
---   ℤ₀.repr                       : ℤ₀ → ℕ₀ × ℕ₀  (representante canónico)
+--   ℤ₀cls                            : tipo de los enteros
+--   ℤ₀cls.repr                       : ℤ₀cls → ℕ₀ × ℕ₀  (representante canónico)
 --   instances: Zero, One, Add, Neg, Mul, Sub
---   ℤ₀.negOne                     : el entero -1
---   ℤ₀.ofNat                      : ℕ₀ → ℤ₀  (embedding inyectivo)
+--   ℤ₀cls.negOne                     : el entero -1
+--   ℤ₀cls.ofNat                      : ℕ₀ → ℤ₀cls  (embedding inyectivo)
 --   Leyes de anillo conmutativo:
---     ℤ₀.add_comm, add_assoc, zero_add, add_zero
---     ℤ₀.add_neg_self, neg_add_self, neg_neg
---     ℤ₀.mul_comm, mul_assoc, one_mul, mul_one, zero_mul, mul_zero
---     ℤ₀.left_distrib, right_distrib, neg_mul, mul_neg
---   ℤ₀.ofNat_injective, ofNat_add, ofNat_mul
+--     ℤ₀cls.add_comm, add_assoc, zero_add, add_zero
+--     ℤ₀cls.add_neg_self, neg_add_self, neg_neg
+--     ℤ₀cls.mul_comm, mul_assoc, one_mul, mul_one, zero_mul, mul_zero
+--     ℤ₀cls.left_distrib, right_distrib, neg_mul, mul_neg
+--   ℤ₀cls.ofNat_injective, ofNat_add, ofNat_mul
 
 import AczelSetTheory.PList.Omega0
 import Peano.PeanoNat.Sub
@@ -40,7 +40,7 @@ open Peano Peano.Add Peano.Sub Peano.Mul Peano.Order
 -- Relación de equivalencia en ℕ₀ × ℕ₀
 -- ─────────────────────────────────────────────────────────────────────────────
 
-/-- Relación de equivalencia que define ℤ₀: (a,b) ~ (c,d) ↔ a+d = b+c. -/
+/-- Relación de equivalencia que define ℤ₀cls: (a,b) ~ (c,d) ↔ a+d = b+c. -/
 def intEq (p q : ℕ₀ × ℕ₀) : Prop :=
   add p.1 q.2 = add p.2 q.1
 
@@ -59,16 +59,16 @@ private instance intSetoid : Setoid (ℕ₀ × ℕ₀) where
   iseqv := ⟨intEq_refl, intEq_symm, intEq_trans⟩
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- Tipo ℤ₀
+-- Tipo ℤ₀cls
 -- ─────────────────────────────────────────────────────────────────────────────
 
 /-- Los enteros: pares (positivo, negativo) de naturales módulo equivalencia.
     El representante canónico tiene un componente igual a 𝟘. -/
-def ℤ₀ := Quotient intSetoid
+def ℤ₀cls := Quotient intSetoid
 
-namespace ℤ₀
+namespace ℤ₀cls
 
-abbrev mk (p : ℕ₀ × ℕ₀) : ℤ₀ := Quotient.mk intSetoid p
+abbrev mk (p : ℕ₀ × ℕ₀) : ℤ₀cls := Quotient.mk intSetoid p
 
 theorem mk_eq_iff {p q : ℕ₀ × ℕ₀} : mk p = mk q ↔ intEq p q := by
   constructor
@@ -105,22 +105,22 @@ private theorem normalize_eq_of_equiv {p q : ℕ₀ × ℕ₀} (h : intEq p q) :
       have hq1 := sub_k_add_k q.2 q.1 hq'
       exact Prod.ext rfl (by omega₀)
 
-/-- El representante canónico de un ℤ₀ (un componente siempre es 𝟘). -/
-def repr (z : ℤ₀) : ℕ₀ × ℕ₀ :=
+/-- El representante canónico de un ℤ₀cls (un componente siempre es 𝟘). -/
+def repr (z : ℤ₀cls) : ℕ₀ × ℕ₀ :=
   Quotient.lift normalize (fun _ _ h => normalize_eq_of_equiv h) z
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Constantes y embedding
 -- ─────────────────────────────────────────────────────────────────────────────
 
-instance : Zero ℤ₀ where zero := mk (𝟘, 𝟘)
-instance : One  ℤ₀ where one  := mk (𝟙, 𝟘)
+instance : Zero ℤ₀cls where zero := mk (𝟘, 𝟘)
+instance : One  ℤ₀cls where one  := mk (𝟙, 𝟘)
 
 /-- El entero -1. -/
-def negOne : ℤ₀ := mk (𝟘, 𝟙)
+def negOne : ℤ₀cls := mk (𝟘, 𝟙)
 
-/-- Embedding inyectivo de ℕ₀ en ℤ₀. -/
-def ofNat (n : ℕ₀) : ℤ₀ := mk (n, 𝟘)
+/-- Embedding inyectivo de ℕ₀ en ℤ₀cls. -/
+def ofNat (n : ℕ₀) : ℤ₀cls := mk (n, 𝟘)
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Operaciones internas (Peano.Add y Peano.Mul en scope aquí)
@@ -170,19 +170,19 @@ private theorem mulRaw_respects (p₁ q₁ p₂ q₂ : ℕ₀ × ℕ₀)
 -- Instancias de operación
 -- ─────────────────────────────────────────────────────────────────────────────
 
-instance : Add ℤ₀ where
+instance : Add ℤ₀cls where
   add a b := Quotient.liftOn₂ a b (fun p q => mk (addRaw p q))
     (fun p₁ q₁ p₂ q₂ h1 h2 => Quotient.sound (addRaw_respects p₁ q₁ p₂ q₂ h1 h2))
 
-instance : Neg ℤ₀ where
+instance : Neg ℤ₀cls where
   neg a := Quotient.liftOn a (fun p => mk (negRaw p))
     (fun p q h => Quotient.sound (negRaw_respects p q h))
 
-instance : Mul ℤ₀ where
+instance : Mul ℤ₀cls where
   mul a b := Quotient.liftOn₂ a b (fun p q => mk (mulRaw p q))
     (fun p₁ q₁ p₂ q₂ h1 h2 => Quotient.sound (mulRaw_respects p₁ q₁ p₂ q₂ h1 h2))
 
-instance : Sub ℤ₀ where sub a b := HAdd.hAdd a (Neg.neg b)
+instance : Sub ℤ₀cls where sub a b := HAdd.hAdd a (Neg.neg b)
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Lemas de cómputo
@@ -212,19 +212,19 @@ theorem normalize_is_intEq (p : ℕ₀ × ℕ₀) : intEq (normalize p) p :=
 -- For all of the following, `repr (mk p) = normalize p` holds definitionally.
 theorem repr_mk (p : ℕ₀ × ℕ₀) : repr (mk p) = normalize p := rfl
 
-theorem mk_repr (a : ℤ₀) : mk a.repr = a := by
+theorem mk_repr (a : ℤ₀cls) : mk a.repr = a := by
   rcases Quotient.exists_rep a with ⟨p, rfl⟩
   rw [repr_mk, mk_eq_iff]
   exact normalize_is_intEq p
 
-theorem repr_normalized (a : ℤ₀) : a.repr.1 = 𝟘 ∨ a.repr.2 = 𝟘 := by
+theorem repr_normalized (a : ℤ₀cls) : a.repr.1 = 𝟘 ∨ a.repr.2 = 𝟘 := by
   rcases Quotient.exists_rep a with ⟨p, rfl⟩
   rw [repr_mk]; unfold normalize
   by_cases h : p.2 ≤ p.1
   · rw [if_pos h]; exact Or.inr rfl
   · rw [if_neg h]; exact Or.inl rfl
 
-theorem repr_inj {a b : ℤ₀} (h : a.repr = b.repr) : a = b := by
+theorem repr_inj {a b : ℤ₀cls} (h : a.repr = b.repr) : a = b := by
   rcases Quotient.exists_rep a with ⟨p, rfl⟩
   rcases Quotient.exists_rep b with ⟨q, rfl⟩
   rw [repr_mk, repr_mk] at h
@@ -256,7 +256,7 @@ theorem repr_inj {a b : ℤ₀} (h : a.repr = b.repr) : a = b := by
     have hq1 := sub_k_add_k q.2 q.1 h2'
     omega₀
 
-theorem repr_add_intEq (a b : ℤ₀) :
+theorem repr_add_intEq (a b : ℤ₀cls) :
     add (HAdd.hAdd a b).repr.1 (add a.repr.2 b.repr.2) =
     add (HAdd.hAdd a b).repr.2 (add a.repr.1 b.repr.1) := by
   rcases Quotient.exists_rep a with ⟨p, rfl⟩
@@ -268,7 +268,7 @@ theorem repr_add_intEq (a b : ℤ₀) :
   have h3 := normalize_intEq q
   omega₀
 
-theorem repr_neg_intEq (a : ℤ₀) :
+theorem repr_neg_intEq (a : ℤ₀cls) :
     add (Neg.neg a).repr.1 a.repr.1 = add (Neg.neg a).repr.2 a.repr.2 := by
   rcases Quotient.exists_rep a with ⟨p, rfl⟩
   rw [neg_mk, repr_mk, repr_mk]
@@ -284,33 +284,33 @@ theorem repr_ofNat (n : ℕ₀) : (ofNat n).repr = (n, 𝟘) := by
   rw [if_pos h]
   exact Prod.ext (sub_zero n) rfl
 
-end ℤ₀
+end ℤ₀cls
 
 end PrivateDefs
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Leyes de anillo.
 -- Note: the ring law theorem types use `+`, `*`, `-` (unary) from the standard
--- Lean 4 instances (HAdd.hAdd, HMul.hMul, Neg.neg) via our Add/Mul/Neg ℤ₀
+-- Lean 4 instances (HAdd.hAdd, HMul.hMul, Neg.neg) via our Add/Mul/Neg ℤ₀cls
 -- instances. We do NOT open Peano here, because opening Peano causes the global
 -- Peano `+` notation to take precedence over the built-in infixl, giving type
--- errors when `a b : ℤ₀`. Without `open Peano`, the built-in `infixl:65 " + "
--- => HAdd.hAdd` correctly resolves to our Add ℤ₀ instance.
+-- errors when `a b : ℤ₀cls`. Without `open Peano`, the built-in `infixl:65 " + "
+-- => HAdd.hAdd` correctly resolves to our Add ℤ₀cls instance.
 -- ─────────────────────────────────────────────────────────────────────────────
 
-namespace ℤ₀
+namespace ℤ₀cls
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Leyes de adición
 -- ─────────────────────────────────────────────────────────────────────────────
 
-theorem add_comm (a b : ℤ₀) : Add.add a b = Add.add b a := by
+theorem add_comm (a b : ℤ₀cls) : Add.add a b = Add.add b a := by
   rcases Quotient.exists_rep a with ⟨p, rfl⟩
   rcases Quotient.exists_rep b with ⟨q, rfl⟩
   show HAdd.hAdd (mk p) (mk q) = HAdd.hAdd (mk q) (mk p)
   rw [add_mk, add_mk, mk_eq_iff]; unfold intEq addRaw; omega₀
 
-theorem add_assoc (a b c : ℤ₀) : Add.add (Add.add a b) c = Add.add a (Add.add b c) := by
+theorem add_assoc (a b c : ℤ₀cls) : Add.add (Add.add a b) c = Add.add a (Add.add b c) := by
   rcases Quotient.exists_rep a with ⟨p, rfl⟩
   rcases Quotient.exists_rep b with ⟨q, rfl⟩
   rcases Quotient.exists_rep c with ⟨r, rfl⟩
@@ -318,27 +318,27 @@ theorem add_assoc (a b c : ℤ₀) : Add.add (Add.add a b) c = Add.add a (Add.ad
        HAdd.hAdd (mk p) (HAdd.hAdd (mk q) (mk r))
   rw [add_mk, add_mk, add_mk, add_mk, mk_eq_iff]; unfold intEq addRaw; omega₀
 
-theorem zero_add (a : ℤ₀) : Add.add 0 a = a := by
+theorem zero_add (a : ℤ₀cls) : Add.add 0 a = a := by
   rcases Quotient.exists_rep a with ⟨p, rfl⟩
   show HAdd.hAdd (mk (𝟘, 𝟘)) (mk p) = mk p
   rw [add_mk, mk_eq_iff]; unfold intEq addRaw; omega₀
 
-theorem add_zero (a : ℤ₀) : Add.add a 0 = a := by
+theorem add_zero (a : ℤ₀cls) : Add.add a 0 = a := by
   rcases Quotient.exists_rep a with ⟨p, rfl⟩
   show HAdd.hAdd (mk p) (mk (𝟘, 𝟘)) = mk p
   rw [add_mk, mk_eq_iff]; unfold intEq addRaw; omega₀
 
-theorem add_neg_self (a : ℤ₀) : Add.add a (Neg.neg a) = 0 := by
+theorem add_neg_self (a : ℤ₀cls) : Add.add a (Neg.neg a) = 0 := by
   rcases Quotient.exists_rep a with ⟨p, rfl⟩
   show HAdd.hAdd (mk p) (Neg.neg (mk p)) = mk (𝟘, 𝟘)
   rw [neg_mk, add_mk, mk_eq_iff]; unfold intEq addRaw negRaw; omega₀
 
-theorem neg_add_self (a : ℤ₀) : Add.add (Neg.neg a) a = 0 := by
+theorem neg_add_self (a : ℤ₀cls) : Add.add (Neg.neg a) a = 0 := by
   rcases Quotient.exists_rep a with ⟨p, rfl⟩
   show HAdd.hAdd (Neg.neg (mk p)) (mk p) = mk (𝟘, 𝟘)
   rw [neg_mk, add_mk, mk_eq_iff]; unfold intEq addRaw negRaw; omega₀
 
-theorem neg_neg (a : ℤ₀) : Neg.neg (Neg.neg a) = a := by
+theorem neg_neg (a : ℤ₀cls) : Neg.neg (Neg.neg a) = a := by
   rcases Quotient.exists_rep a with ⟨p, rfl⟩
   show Neg.neg (Neg.neg (mk p)) = mk p
   rw [neg_mk, neg_mk, mk_eq_iff]; unfold intEq negRaw; omega₀
@@ -347,7 +347,7 @@ theorem neg_neg (a : ℤ₀) : Neg.neg (Neg.neg a) = a := by
 -- Leyes de multiplicación
 -- ─────────────────────────────────────────────────────────────────────────────
 
-theorem mul_comm (a b : ℤ₀) : Mul.mul a b = Mul.mul b a := by
+theorem mul_comm (a b : ℤ₀cls) : Mul.mul a b = Mul.mul b a := by
   rcases Quotient.exists_rep a with ⟨p, rfl⟩
   rcases Quotient.exists_rep b with ⟨q, rfl⟩
   show HMul.hMul (mk p) (mk q) = HMul.hMul (mk q) (mk p)
@@ -357,7 +357,7 @@ theorem mul_comm (a b : ℤ₀) : Mul.mul a b = Mul.mul b a := by
     Peano.Mul.mul_comm p.2 q.1, Peano.Mul.mul_comm p.2 q.2]
   omega₀
 
-theorem mul_assoc (a b c : ℤ₀) : Mul.mul (Mul.mul a b) c = Mul.mul a (Mul.mul b c) := by
+theorem mul_assoc (a b c : ℤ₀cls) : Mul.mul (Mul.mul a b) c = Mul.mul a (Mul.mul b c) := by
   rcases Quotient.exists_rep a with ⟨p, rfl⟩
   rcases Quotient.exists_rep b with ⟨q, rfl⟩
   rcases Quotient.exists_rep c with ⟨r, rfl⟩
@@ -368,14 +368,14 @@ theorem mul_assoc (a b c : ℤ₀) : Mul.mul (Mul.mul a b) c = Mul.mul a (Mul.mu
     Peano.Mul.add_mul, Peano.Mul.mul_add, Peano.Mul.mul_assoc]
   omega₀
 
-theorem one_mul (a : ℤ₀) : Mul.mul 1 a = a := by
+theorem one_mul (a : ℤ₀cls) : Mul.mul 1 a = a := by
   rcases Quotient.exists_rep a with ⟨p, rfl⟩
   show HMul.hMul (mk (𝟙, 𝟘)) (mk p) = mk p
   rw [mul_mk, mk_eq_iff]
   simp only [intEq, mulRaw, Peano.Mul.one_mul, Peano.Mul.zero_mul, Peano.Add.add_zero]
   omega₀
 
-theorem mul_one (a : ℤ₀) : Mul.mul a 1 = a := by
+theorem mul_one (a : ℤ₀cls) : Mul.mul a 1 = a := by
   rcases Quotient.exists_rep a with ⟨p, rfl⟩
   show HMul.hMul (mk p) (mk (𝟙, 𝟘)) = mk p
   rw [mul_mk, mk_eq_iff]
@@ -383,13 +383,13 @@ theorem mul_one (a : ℤ₀) : Mul.mul a 1 = a := by
     Peano.Mul.mul_one, Peano.Mul.mul_zero, Peano.Add.add_zero, Peano.Add.zero_add]
   omega₀
 
-theorem zero_mul (a : ℤ₀) : Mul.mul 0 a = 0 := by
+theorem zero_mul (a : ℤ₀cls) : Mul.mul 0 a = 0 := by
   rcases Quotient.exists_rep a with ⟨p, rfl⟩
   show HMul.hMul (mk (𝟘, 𝟘)) (mk p) = mk (𝟘, 𝟘)
   rw [mul_mk, mk_eq_iff]
   simp only [intEq, mulRaw, Peano.Mul.zero_mul, Peano.Add.add_zero]
 
-theorem mul_zero (a : ℤ₀) : Mul.mul a 0 = 0 := by
+theorem mul_zero (a : ℤ₀cls) : Mul.mul a 0 = 0 := by
   rcases Quotient.exists_rep a with ⟨p, rfl⟩
   show HMul.hMul (mk p) (mk (𝟘, 𝟘)) = mk (𝟘, 𝟘)
   rw [mul_mk, mk_eq_iff]
@@ -399,7 +399,7 @@ theorem mul_zero (a : ℤ₀) : Mul.mul a 0 = 0 := by
 -- Distributividad
 -- ─────────────────────────────────────────────────────────────────────────────
 
-theorem left_distrib (a b c : ℤ₀) : Mul.mul a (Add.add b c) = Add.add (Mul.mul a b) (Mul.mul a c) := by
+theorem left_distrib (a b c : ℤ₀cls) : Mul.mul a (Add.add b c) = Add.add (Mul.mul a b) (Mul.mul a c) := by
   rcases Quotient.exists_rep a with ⟨p, rfl⟩
   rcases Quotient.exists_rep b with ⟨q, rfl⟩
   rcases Quotient.exists_rep c with ⟨r, rfl⟩
@@ -409,7 +409,7 @@ theorem left_distrib (a b c : ℤ₀) : Mul.mul a (Add.add b c) = Add.add (Mul.m
   simp only [intEq, mulRaw, addRaw, Peano.Mul.mul_add]
   omega₀
 
-theorem right_distrib (a b c : ℤ₀) : Mul.mul (Add.add a b) c = Add.add (Mul.mul a c) (Mul.mul b c) := by
+theorem right_distrib (a b c : ℤ₀cls) : Mul.mul (Add.add a b) c = Add.add (Mul.mul a c) (Mul.mul b c) := by
   rcases Quotient.exists_rep a with ⟨p, rfl⟩
   rcases Quotient.exists_rep b with ⟨q, rfl⟩
   rcases Quotient.exists_rep c with ⟨r, rfl⟩
@@ -423,7 +423,7 @@ theorem right_distrib (a b c : ℤ₀) : Mul.mul (Add.add a b) c = Add.add (Mul.
 -- Signo y multiplicación
 -- ─────────────────────────────────────────────────────────────────────────────
 
-theorem neg_mul (a b : ℤ₀) : Mul.mul (Neg.neg a) b = Neg.neg (Mul.mul a b) := by
+theorem neg_mul (a b : ℤ₀cls) : Mul.mul (Neg.neg a) b = Neg.neg (Mul.mul a b) := by
   rcases Quotient.exists_rep a with ⟨p, rfl⟩
   rcases Quotient.exists_rep b with ⟨q, rfl⟩
   show HMul.hMul (Neg.neg (mk p)) (mk q) = Neg.neg (HMul.hMul (mk p) (mk q))
@@ -431,7 +431,7 @@ theorem neg_mul (a b : ℤ₀) : Mul.mul (Neg.neg a) b = Neg.neg (Mul.mul a b) :
   simp only [intEq, mulRaw, negRaw]
   omega₀
 
-theorem mul_neg (a b : ℤ₀) : Mul.mul a (Neg.neg b) = Neg.neg (Mul.mul a b) := by
+theorem mul_neg (a b : ℤ₀cls) : Mul.mul a (Neg.neg b) = Neg.neg (Mul.mul a b) := by
   rcases Quotient.exists_rep a with ⟨p, rfl⟩
   rcases Quotient.exists_rep b with ⟨q, rfl⟩
   show HMul.hMul (mk p) (Neg.neg (mk q)) = Neg.neg (HMul.hMul (mk p) (mk q))
@@ -467,7 +467,7 @@ theorem ofNat_injective {m n : ℕ₀} (h : ofNat m = ofNat n) : m = n := by
 -- ─────────────────────────────────────────────────────────────────────────────
 
 /-- Si `k ≠ 𝟘` entonces multiplicar por `ofNat k` por la izquierda es cancelativo. -/
-theorem mul_left_cancel_ofNat {k : ℕ₀} (hk : k ≠ 𝟘) {x y : ℤ₀}
+theorem mul_left_cancel_ofNat {k : ℕ₀} (hk : k ≠ 𝟘) {x y : ℤ₀cls}
     (h : Mul.mul (ofNat k) x = Mul.mul (ofNat k) y) : x = y := by
   rcases Quotient.exists_rep x with ⟨p, rfl⟩
   rcases Quotient.exists_rep y with ⟨q, rfl⟩
@@ -482,7 +482,7 @@ theorem mul_left_cancel_ofNat {k : ℕ₀} (hk : k ≠ 𝟘) {x y : ℤ₀}
   exact Peano.Mul.mul_cancelation_left k _ _ hk h2
 
 /-- Bridge: `(a * ofNat k).repr` satisface la relación intEq con `(a.r.1·k, a.r.2·k)`. -/
-theorem repr_mul_ofNat_intEq (a : ℤ₀) (k : ℕ₀) :
+theorem repr_mul_ofNat_intEq (a : ℤ₀cls) (k : ℕ₀) :
     Peano.Add.add (HMul.hMul a (ofNat k)).repr.1 (Peano.Mul.mul a.repr.2 k) =
     Peano.Add.add (HMul.hMul a (ofNat k)).repr.2 (Peano.Mul.mul a.repr.1 k) := by
   rcases Quotient.exists_rep a with ⟨p, rfl⟩
@@ -506,10 +506,10 @@ theorem repr_mul_ofNat_intEq (a : ℤ₀) (k : ℕ₀) :
 -- Decidibilidad de la Igualdad
 -- ─────────────────────────────────────────────────────────────────────────────
 
-instance instDecidableEq (a b : ℤ₀) : Decidable (a = b) :=
+instance instDecidableEq (a b : ℤ₀cls) : Decidable (a = b) :=
   if h : a.repr = b.repr then
     isTrue (repr_inj h)
   else
     isFalse (fun heq => h (congrArg repr heq))
 
-end ℤ₀
+end ℤ₀cls

@@ -32,7 +32,7 @@ PList/  ──►  CList/  ──►  HFSets  ──►  Operations/  ──► 
         ┌─────────────────┼───────────────────┬───────────────────┐
         ▼                 ▼                   ▼                   ▼
    Algebra/          Integers/            Topology/          (otras capas
-   (HFGroup,         (ℤ₀, ℚ₀, ZModN,      (HFTopSpace,        nativas futuras)
+   (HFGroup,         (ℤ₀cls, ℚ₀cls, ZModN,      (HFTopSpace,        nativas futuras)
     HFRing,           Bezout,              T₀–T₄)
     Sylow,            Canonical)
     QuotientRing,        │

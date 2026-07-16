@@ -23,7 +23,7 @@
 - **Corregido 2026-07-12**: `Rationals/Irrational.lean:395` (`newton_seq_eventually_lt`)
   usaba `Classical.byContradiction`, violando la directiva de pureza constructiva
   (DECISIONS.md MANDATORY M-1). Reescrito de forma constructiva (búsqueda acotada por
-  decidibilidad de `≤` en `ℚ₀`, lema `newton_bounded_search`) y añadido al gate
+  decidibilidad de `≤` en `ℚ₀cls`, lema `newton_bounded_search`) y añadido al gate
   `Meta/AxiomCheck.lean` para que una regresión futura falle el build.
 
 ## Próximo Objetivo: Iniciar el FRENTE 1
@@ -31,7 +31,7 @@ Al retomar el trabajo, nuestro objetivo es arrancar el **FRENTE 1: Análisis Rea
 
 ### Tareas Inmediatas al Reanudar:
 1. **Definir `HFReal`**:
-   - Crear el tipo de los Números Reales como el cociente de las Sucesiones de Cauchy en `HFRat` bajo la relación de equivalencia estándar (sucesiones cuya diferencia tiende a cero).
+   - Crear el tipo de los Números Reales como el cociente de las Sucesiones de Cauchy en `ℚ₀` bajo la relación de equivalencia estándar (sucesiones cuya diferencia tiende a cero).
 2. **Aritmética en `HFReal`**:
    - Levantar las operaciones de suma, multiplicación y negación desde las sucesiones de Cauchy al espacio cociente `HFReal`.
 3. **Estructura de Cuerpo y Métrica**:
@@ -46,7 +46,7 @@ Al retomar el trabajo, nuestro objetivo es arrancar el **FRENTE 1: Análisis Rea
   Depende de que `HFReal` exista como tipo (FRENTE 1); no iniciar antes.
 
 ## Deuda documental pendiente (ver INFORME-AUDITORIA-2026-07-12.md)
-- `doc/REFERENCE-Rationals.md` no cubre `HFRatCauchyAlgebra.lean`, `Series.lean`,
+- `doc/REFERENCE-Rationals.md` no cubre `Q0CauchyAlgebra.lean`, `Series.lean`,
   `Polynomial.lean` ni el subsistema `Reals/`.
 - `AUDIT-MODULE-MATRIX.md` no se regenera desde 2026-06-10.
 - Unificación pendiente de `AI-GUIDE.md`/`NAMING-CONVENTIONS.md`/`DECISIONS.md`/

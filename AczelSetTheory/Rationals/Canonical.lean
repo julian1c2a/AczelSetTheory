@@ -5,9 +5,9 @@ License: MIT
 -/
 
 -- AczelSetTheory/Rationals/Canonical.lean
--- Representante canónico (forma reducida) para ℚ₀.
+-- Representante canónico (forma reducida) para ℚ₀cls.
 --
--- Forma canónica de un par (n : ℤ₀, d : ℕ₁):
+-- Forma canónica de un par (n : ℤ₀cls, d : ℕ₁):
 --   g := gcd |n| d ; num := sign(n) · (|n| / g) ; den := d / g.
 --   Si n = 0 ⇒ g = d ⇒ num = 0, den = 1 (regla "num 0 ⇒ den 1", automática).
 --   Si n ≠ 0 ⇒ num, den coprimos.
@@ -15,9 +15,9 @@ License: MIT
 -- ESTADO: PASO 1 (reduce + reduce_ratEq + reduce_reduced).
 --
 -- API (paso 1):
---   ℚ₀.reduce          : ℤ₀ × ℕ₁ → ℤ₀ × ℕ₁
---   ℚ₀.reduce_ratEq    : n · ofNat (reduce p).den = (reduce p).num · ofNat p.den
---   ℚ₀.reduce_reduced  : Coprime |«num de reduce»| (reduce p).den
+--   ℚ₀cls.reduce          : ℤ₀cls × ℕ₁ → ℤ₀cls × ℕ₁
+--   ℚ₀cls.reduce_ratEq    : n · ofNat (reduce p).den = (reduce p).num · ofNat p.den
+--   ℚ₀cls.reduce_reduced  : Coprime |«num de reduce»| (reduce p).den
 --
 -- Dependencies: AczelSetTheory.Rationals.Basic, Integers.Functions, Peano gcd/Primes
 -- @axiom_system: ZF (sin elección)
@@ -30,10 +30,10 @@ import Peano.PeanoNat.Primes
 
 open Peano Peano.Axioms Peano.Add Peano.Mul Peano.Order Peano.Arith Peano.Primes
 
-namespace ℚ₀
+namespace ℚ₀cls
 
 -- ============================================================
--- Sección 0: Lemas auxiliares sobre ℕ₀ y ℤ₀
+-- Sección 0: Lemas auxiliares sobre ℕ₀ y ℤ₀cls
 -- ============================================================
 
 /-- `𝟘 / d = 𝟘` para `d ≠ 𝟘`. -/
@@ -52,49 +52,49 @@ private theorem mul_div_swap {A d g : ℕ₀} (hgA : g ∣ A) (hgd : g ∣ d) (h
     _ = mul (A / g) d := by rw [hd]
 
 /-- Un entero se descompone como signo · magnitud: `z = sign z · ofNat |z|`. -/
-theorem self_eq_sign_mul_toNat_abs (z : ℤ₀) :
-    z = Mul.mul (ℤ₀.sign z) (ℤ₀.ofNat (ℤ₀.toNat (ℤ₀.abs z))) := by
-  have hAbsEq : ℤ₀.ofNat (ℤ₀.toNat (ℤ₀.abs z)) = ℤ₀.abs z :=
-    (ℤ₀.nonneg_eq_ofNat (ℤ₀.abs_nonneg z)).symm
+theorem self_eq_sign_mul_toNat_abs (z : ℤ₀cls) :
+    z = Mul.mul (ℤ₀cls.sign z) (ℤ₀cls.ofNat (ℤ₀cls.toNat (ℤ₀cls.abs z))) := by
+  have hAbsEq : ℤ₀cls.ofNat (ℤ₀cls.toNat (ℤ₀cls.abs z)) = ℤ₀cls.abs z :=
+    (ℤ₀cls.nonneg_eq_ofNat (ℤ₀cls.abs_nonneg z)).symm
   rw [hAbsEq]
-  by_cases hpos : (0 : ℤ₀) < z
-  · have hs : ℤ₀.sign z = 1 := by unfold ℤ₀.sign; rw [if_pos hpos]
-    have habs : ℤ₀.abs z = z := by unfold ℤ₀.abs; rw [if_pos hpos.1]
-    rw [hs, habs, ℤ₀.one_mul]
-  · by_cases hlt : z < (0 : ℤ₀)
-    · have hs : ℤ₀.sign z = -1 := ℤ₀.sign_neg z hlt
-      have habs : ℤ₀.abs z = -z := by unfold ℤ₀.abs; rw [if_neg hlt.2]
-      rw [hs, habs, ℤ₀.neg_mul, ℤ₀.one_mul, ℤ₀.neg_neg]
+  by_cases hpos : (0 : ℤ₀cls) < z
+  · have hs : ℤ₀cls.sign z = 1 := by unfold ℤ₀cls.sign; rw [if_pos hpos]
+    have habs : ℤ₀cls.abs z = z := by unfold ℤ₀cls.abs; rw [if_pos hpos.1]
+    rw [hs, habs, ℤ₀cls.one_mul]
+  · by_cases hlt : z < (0 : ℤ₀cls)
+    · have hs : ℤ₀cls.sign z = -1 := ℤ₀cls.sign_neg z hlt
+      have habs : ℤ₀cls.abs z = -z := by unfold ℤ₀cls.abs; rw [if_neg hlt.2]
+      rw [hs, habs, ℤ₀cls.neg_mul, ℤ₀cls.one_mul, ℤ₀cls.neg_neg]
     · have hz : z = 0 := by
-        rcases ℤ₀.le_total 0 z with h | h
+        rcases ℤ₀cls.le_total 0 z with h | h
         · by_cases hle : z ≤ 0
-          · exact ℤ₀.le_antisymm hle h
-          · exact absurd (show (0 : ℤ₀) < z from ⟨h, hle⟩) hpos
-        · by_cases hge : (0 : ℤ₀) ≤ z
-          · exact ℤ₀.le_antisymm h hge
-          · exact absurd (show z < (0 : ℤ₀) from ⟨h, hge⟩) hlt
-      rw [hz, ℤ₀.sign_zero, ℤ₀.zero_mul]
+          · exact ℤ₀cls.le_antisymm hle h
+          · exact absurd (show (0 : ℤ₀cls) < z from ⟨h, hle⟩) hpos
+        · by_cases hge : (0 : ℤ₀cls) ≤ z
+          · exact ℤ₀cls.le_antisymm h hge
+          · exact absurd (show z < (0 : ℤ₀cls) from ⟨h, hge⟩) hlt
+      rw [hz, ℤ₀cls.sign_zero, ℤ₀cls.zero_mul]
 
 /-- `|sign z · ofNat m| = m` (magnitud recuperada), con la salvedad `z = 0 ⇒ m = 𝟘`. -/
-private theorem toNat_abs_sign_mul_ofNat (z : ℤ₀) (m : ℕ₀) (hz0 : z = 0 → m = 𝟘) :
-    ℤ₀.toNat (ℤ₀.abs (Mul.mul (ℤ₀.sign z) (ℤ₀.ofNat m))) = m := by
-  by_cases hpos : (0 : ℤ₀) < z
-  · have hs : ℤ₀.sign z = 1 := by unfold ℤ₀.sign; rw [if_pos hpos]
-    rw [hs, ℤ₀.one_mul, ℤ₀.abs_ofNat, ℤ₀.toNat_ofNat]
-  · by_cases hlt : z < (0 : ℤ₀)
-    · have hs : ℤ₀.sign z = -1 := ℤ₀.sign_neg z hlt
-      rw [hs, ℤ₀.neg_mul, ℤ₀.one_mul, ℤ₀.abs_neg, ℤ₀.abs_ofNat, ℤ₀.toNat_ofNat]
+private theorem toNat_abs_sign_mul_ofNat (z : ℤ₀cls) (m : ℕ₀) (hz0 : z = 0 → m = 𝟘) :
+    ℤ₀cls.toNat (ℤ₀cls.abs (Mul.mul (ℤ₀cls.sign z) (ℤ₀cls.ofNat m))) = m := by
+  by_cases hpos : (0 : ℤ₀cls) < z
+  · have hs : ℤ₀cls.sign z = 1 := by unfold ℤ₀cls.sign; rw [if_pos hpos]
+    rw [hs, ℤ₀cls.one_mul, ℤ₀cls.abs_ofNat, ℤ₀cls.toNat_ofNat]
+  · by_cases hlt : z < (0 : ℤ₀cls)
+    · have hs : ℤ₀cls.sign z = -1 := ℤ₀cls.sign_neg z hlt
+      rw [hs, ℤ₀cls.neg_mul, ℤ₀cls.one_mul, ℤ₀cls.abs_neg, ℤ₀cls.abs_ofNat, ℤ₀cls.toNat_ofNat]
     · have hz : z = 0 := by
-        rcases ℤ₀.le_total 0 z with h | h
+        rcases ℤ₀cls.le_total 0 z with h | h
         · by_cases hle : z ≤ 0
-          · exact ℤ₀.le_antisymm hle h
-          · exact absurd (show (0 : ℤ₀) < z from ⟨h, hle⟩) hpos
-        · by_cases hge : (0 : ℤ₀) ≤ z
-          · exact ℤ₀.le_antisymm h hge
-          · exact absurd (show z < (0 : ℤ₀) from ⟨h, hge⟩) hlt
-      rw [hz0 hz, ℤ₀.ofNat_zero, ℤ₀.mul_zero,
-          show ℤ₀.abs (0 : ℤ₀) = 0 from ℤ₀.abs_eq_zero_iff.mpr rfl,
-          show ℤ₀.toNat (0 : ℤ₀) = 𝟘 from by rw [← ℤ₀.ofNat_zero, ℤ₀.toNat_ofNat]]
+          · exact ℤ₀cls.le_antisymm hle h
+          · exact absurd (show (0 : ℤ₀cls) < z from ⟨h, hle⟩) hpos
+        · by_cases hge : (0 : ℤ₀cls) ≤ z
+          · exact ℤ₀cls.le_antisymm h hge
+          · exact absurd (show z < (0 : ℤ₀cls) from ⟨h, hge⟩) hlt
+      rw [hz0 hz, ℤ₀cls.ofNat_zero, ℤ₀cls.mul_zero,
+          show ℤ₀cls.abs (0 : ℤ₀cls) = 0 from ℤ₀cls.abs_eq_zero_iff.mpr rfl,
+          show ℤ₀cls.toNat (0 : ℤ₀cls) = 𝟘 from by rw [← ℤ₀cls.ofNat_zero, ℤ₀cls.toNat_ofNat]]
 
 /-- Al dividir por el gcd se obtienen coprimos: `Coprime (A/gcd A d) (d/gcd A d)`. -/
 private theorem coprime_div_gcd {A d : ℕ₀} (hd : d ≠ 𝟘) :
@@ -140,14 +140,14 @@ private theorem coprime_div_gcd {A d : ℕ₀} (hd : d ≠ 𝟘) :
     (key (gcd (A / gcd A d) (d / gcd A d)) (gcd_dvd_left _ _) (gcd_dvd_right _ _))
     (one_divides _)
 
-/-- Identidad núcleo del respeto de `reduce` por la equivalencia (a nivel ℤ₀). -/
-private theorem ratEq_core (s : ℤ₀) {A d g : ℕ₀}
+/-- Identidad núcleo del respeto de `reduce` por la equivalencia (a nivel ℤ₀cls). -/
+private theorem ratEq_core (s : ℤ₀cls) {A d g : ℕ₀}
     (hgA : g ∣ A) (hgd : g ∣ d) (hg : g ≠ 𝟘) :
-    Mul.mul (Mul.mul s (ℤ₀.ofNat A)) (ℤ₀.ofNat (d / g))
-      = Mul.mul (Mul.mul s (ℤ₀.ofNat (A / g))) (ℤ₀.ofNat d) := by
-  rw [ℤ₀.mul_assoc s (ℤ₀.ofNat A) (ℤ₀.ofNat (d / g)),
-      ℤ₀.mul_assoc s (ℤ₀.ofNat (A / g)) (ℤ₀.ofNat d),
-      ← ℤ₀.ofNat_mul A (d / g), ← ℤ₀.ofNat_mul (A / g) d,
+    Mul.mul (Mul.mul s (ℤ₀cls.ofNat A)) (ℤ₀cls.ofNat (d / g))
+      = Mul.mul (Mul.mul s (ℤ₀cls.ofNat (A / g))) (ℤ₀cls.ofNat d) := by
+  rw [ℤ₀cls.mul_assoc s (ℤ₀cls.ofNat A) (ℤ₀cls.ofNat (d / g)),
+      ℤ₀cls.mul_assoc s (ℤ₀cls.ofNat (A / g)) (ℤ₀cls.ofNat d),
+      ← ℤ₀cls.ofNat_mul A (d / g), ← ℤ₀cls.ofNat_mul (A / g) d,
       mul_div_swap hgA hgd hg]
 
 -- ============================================================
@@ -155,54 +155,54 @@ private theorem ratEq_core (s : ℤ₀) {A d g : ℕ₀}
 -- ============================================================
 
 /-- El denominador reducido `d / gcd |n| d` es no nulo. -/
-private theorem reduceDen_ne_zero (n : ℤ₀) (d : ℕ₁) :
-    d.val / gcd (ℤ₀.toNat (ℤ₀.abs n)) d.val ≠ 𝟘 := by
+private theorem reduceDen_ne_zero (n : ℤ₀cls) (d : ℕ₁) :
+    d.val / gcd (ℤ₀cls.toNat (ℤ₀cls.abs n)) d.val ≠ 𝟘 := by
   intro h
-  have hg0 : gcd (ℤ₀.toNat (ℤ₀.abs n)) d.val ≠ 𝟘 := gcd_ne_zero_right d.property
-  have hdvd : gcd (ℤ₀.toNat (ℤ₀.abs n)) d.val ∣ d.val := gcd_dvd_right _ _
+  have hg0 : gcd (ℤ₀cls.toNat (ℤ₀cls.abs n)) d.val ≠ 𝟘 := gcd_ne_zero_right d.property
+  have hdvd : gcd (ℤ₀cls.toNat (ℤ₀cls.abs n)) d.val ∣ d.val := gcd_dvd_right _ _
   have hcancel :
-      mul (d.val / gcd (ℤ₀.toNat (ℤ₀.abs n)) d.val)
-          (gcd (ℤ₀.toNat (ℤ₀.abs n)) d.val) = d.val :=
+      mul (d.val / gcd (ℤ₀cls.toNat (ℤ₀cls.abs n)) d.val)
+          (gcd (ℤ₀cls.toNat (ℤ₀cls.abs n)) d.val) = d.val :=
     div_mul_cancel hg0 hdvd
   rw [h, Peano.Mul.zero_mul] at hcancel
   exact d.property hcancel.symm
 
 /-- Forma reducida de un par `(n, d)`: numerador `sign n · (|n|/g)`, denominador `d/g`
     con `g = gcd |n| d`. -/
-def reduce (p : ℤ₀ × ℕ₁) : ℤ₀ × ℕ₁ :=
-  ( Mul.mul (ℤ₀.sign p.1)
-      (ℤ₀.ofNat (ℤ₀.toNat (ℤ₀.abs p.1) / gcd (ℤ₀.toNat (ℤ₀.abs p.1)) p.2.val)),
-    ⟨p.2.val / gcd (ℤ₀.toNat (ℤ₀.abs p.1)) p.2.val, reduceDen_ne_zero p.1 p.2⟩ )
+def reduce (p : ℤ₀cls × ℕ₁) : ℤ₀cls × ℕ₁ :=
+  ( Mul.mul (ℤ₀cls.sign p.1)
+      (ℤ₀cls.ofNat (ℤ₀cls.toNat (ℤ₀cls.abs p.1) / gcd (ℤ₀cls.toNat (ℤ₀cls.abs p.1)) p.2.val)),
+    ⟨p.2.val / gcd (ℤ₀cls.toNat (ℤ₀cls.abs p.1)) p.2.val, reduceDen_ne_zero p.1 p.2⟩ )
 
 -- ============================================================
 -- Sección 2: reduce respeta la equivalencia
 -- ============================================================
 
 /-- `reduce p` es equivalente a `p`: cruce `n · den' = num' · d`. -/
-theorem reduce_ratEq (p : ℤ₀ × ℕ₁) :
-    Mul.mul p.1 (ℤ₀.ofNat (reduce p).2.val)
-      = Mul.mul (reduce p).1 (ℤ₀.ofNat p.2.val) := by
+theorem reduce_ratEq (p : ℤ₀cls × ℕ₁) :
+    Mul.mul p.1 (ℤ₀cls.ofNat (reduce p).2.val)
+      = Mul.mul (reduce p).1 (ℤ₀cls.ofNat p.2.val) := by
   have e1 : (reduce p).1
-      = Mul.mul (ℤ₀.sign p.1)
-          (ℤ₀.ofNat (ℤ₀.toNat (ℤ₀.abs p.1)
-            / gcd (ℤ₀.toNat (ℤ₀.abs p.1)) p.2.val)) := rfl
+      = Mul.mul (ℤ₀cls.sign p.1)
+          (ℤ₀cls.ofNat (ℤ₀cls.toNat (ℤ₀cls.abs p.1)
+            / gcd (ℤ₀cls.toNat (ℤ₀cls.abs p.1)) p.2.val)) := rfl
   have e2 : (reduce p).2.val
-      = p.2.val / gcd (ℤ₀.toNat (ℤ₀.abs p.1)) p.2.val := rfl
+      = p.2.val / gcd (ℤ₀cls.toNat (ℤ₀cls.abs p.1)) p.2.val := rfl
   rw [e1, e2]
-  have hdec : p.1 = Mul.mul (ℤ₀.sign p.1) (ℤ₀.ofNat (ℤ₀.toNat (ℤ₀.abs p.1))) :=
+  have hdec : p.1 = Mul.mul (ℤ₀cls.sign p.1) (ℤ₀cls.ofNat (ℤ₀cls.toNat (ℤ₀cls.abs p.1))) :=
     self_eq_sign_mul_toNat_abs p.1
-  calc Mul.mul p.1 (ℤ₀.ofNat (p.2.val / gcd (ℤ₀.toNat (ℤ₀.abs p.1)) p.2.val))
-      = Mul.mul (Mul.mul (ℤ₀.sign p.1) (ℤ₀.ofNat (ℤ₀.toNat (ℤ₀.abs p.1))))
-                (ℤ₀.ofNat (p.2.val / gcd (ℤ₀.toNat (ℤ₀.abs p.1)) p.2.val)) :=
+  calc Mul.mul p.1 (ℤ₀cls.ofNat (p.2.val / gcd (ℤ₀cls.toNat (ℤ₀cls.abs p.1)) p.2.val))
+      = Mul.mul (Mul.mul (ℤ₀cls.sign p.1) (ℤ₀cls.ofNat (ℤ₀cls.toNat (ℤ₀cls.abs p.1))))
+                (ℤ₀cls.ofNat (p.2.val / gcd (ℤ₀cls.toNat (ℤ₀cls.abs p.1)) p.2.val)) :=
         congrArg
-          (fun t => Mul.mul t (ℤ₀.ofNat (p.2.val / gcd (ℤ₀.toNat (ℤ₀.abs p.1)) p.2.val)))
+          (fun t => Mul.mul t (ℤ₀cls.ofNat (p.2.val / gcd (ℤ₀cls.toNat (ℤ₀cls.abs p.1)) p.2.val)))
           hdec
-    _ = Mul.mul (Mul.mul (ℤ₀.sign p.1)
-            (ℤ₀.ofNat (ℤ₀.toNat (ℤ₀.abs p.1) / gcd (ℤ₀.toNat (ℤ₀.abs p.1)) p.2.val)))
-          (ℤ₀.ofNat p.2.val) :=
-        ratEq_core (ℤ₀.sign p.1)
-          (gcd_dvd_left (ℤ₀.toNat (ℤ₀.abs p.1)) p.2.val)
-          (gcd_dvd_right (ℤ₀.toNat (ℤ₀.abs p.1)) p.2.val)
+    _ = Mul.mul (Mul.mul (ℤ₀cls.sign p.1)
+            (ℤ₀cls.ofNat (ℤ₀cls.toNat (ℤ₀cls.abs p.1) / gcd (ℤ₀cls.toNat (ℤ₀cls.abs p.1)) p.2.val)))
+          (ℤ₀cls.ofNat p.2.val) :=
+        ratEq_core (ℤ₀cls.sign p.1)
+          (gcd_dvd_left (ℤ₀cls.toNat (ℤ₀cls.abs p.1)) p.2.val)
+          (gcd_dvd_right (ℤ₀cls.toNat (ℤ₀cls.abs p.1)) p.2.val)
           (gcd_ne_zero_right p.2.property)
 
 -- ============================================================
@@ -210,23 +210,23 @@ theorem reduce_ratEq (p : ℤ₀ × ℕ₁) :
 -- ============================================================
 
 /-- El par reducido tiene numerador (en magnitud) y denominador coprimos. -/
-theorem reduce_reduced (p : ℤ₀ × ℕ₁) :
-    Coprime (ℤ₀.toNat (ℤ₀.abs (reduce p).1)) (reduce p).2.val := by
+theorem reduce_reduced (p : ℤ₀cls × ℕ₁) :
+    Coprime (ℤ₀cls.toNat (ℤ₀cls.abs (reduce p).1)) (reduce p).2.val := by
   have e1 : (reduce p).1
-      = Mul.mul (ℤ₀.sign p.1)
-          (ℤ₀.ofNat (ℤ₀.toNat (ℤ₀.abs p.1)
-            / gcd (ℤ₀.toNat (ℤ₀.abs p.1)) p.2.val)) := rfl
+      = Mul.mul (ℤ₀cls.sign p.1)
+          (ℤ₀cls.ofNat (ℤ₀cls.toNat (ℤ₀cls.abs p.1)
+            / gcd (ℤ₀cls.toNat (ℤ₀cls.abs p.1)) p.2.val)) := rfl
   have e2 : (reduce p).2.val
-      = p.2.val / gcd (ℤ₀.toNat (ℤ₀.abs p.1)) p.2.val := rfl
+      = p.2.val / gcd (ℤ₀cls.toNat (ℤ₀cls.abs p.1)) p.2.val := rfl
   rw [e1, e2]
-  have hm : ℤ₀.toNat (ℤ₀.abs (Mul.mul (ℤ₀.sign p.1)
-      (ℤ₀.ofNat (ℤ₀.toNat (ℤ₀.abs p.1) / gcd (ℤ₀.toNat (ℤ₀.abs p.1)) p.2.val))))
-      = ℤ₀.toNat (ℤ₀.abs p.1) / gcd (ℤ₀.toNat (ℤ₀.abs p.1)) p.2.val := by
+  have hm : ℤ₀cls.toNat (ℤ₀cls.abs (Mul.mul (ℤ₀cls.sign p.1)
+      (ℤ₀cls.ofNat (ℤ₀cls.toNat (ℤ₀cls.abs p.1) / gcd (ℤ₀cls.toNat (ℤ₀cls.abs p.1)) p.2.val))))
+      = ℤ₀cls.toNat (ℤ₀cls.abs p.1) / gcd (ℤ₀cls.toNat (ℤ₀cls.abs p.1)) p.2.val := by
     apply toNat_abs_sign_mul_ofNat
     intro hz
-    have hA0 : ℤ₀.toNat (ℤ₀.abs p.1) = 𝟘 := by
-      rw [hz, show ℤ₀.abs (0 : ℤ₀) = 0 from ℤ₀.abs_eq_zero_iff.mpr rfl,
-          show ℤ₀.toNat (0 : ℤ₀) = 𝟘 from by rw [← ℤ₀.ofNat_zero, ℤ₀.toNat_ofNat]]
+    have hA0 : ℤ₀cls.toNat (ℤ₀cls.abs p.1) = 𝟘 := by
+      rw [hz, show ℤ₀cls.abs (0 : ℤ₀cls) = 0 from ℤ₀cls.abs_eq_zero_iff.mpr rfl,
+          show ℤ₀cls.toNat (0 : ℤ₀cls) = 𝟘 from by rw [← ℤ₀cls.ofNat_zero, ℤ₀cls.toNat_ofNat]]
     rw [hA0, zero_div_eq (gcd_ne_zero_right p.2.property)]
   rw [hm]
   exact coprime_div_gcd p.2.property
@@ -235,67 +235,67 @@ theorem reduce_reduced (p : ℤ₀ × ℕ₁) :
 -- Sección 4: Multiplicatividad de |·| y toNat (para unicidad)
 -- ============================================================
 
-private theorem int_abs_of_nonneg {z : ℤ₀} (h : (0 : ℤ₀) ≤ z) : ℤ₀.abs z = z := by
-  unfold ℤ₀.abs; rw [if_pos h]
+private theorem int_abs_of_nonneg {z : ℤ₀cls} (h : (0 : ℤ₀cls) ≤ z) : ℤ₀cls.abs z = z := by
+  unfold ℤ₀cls.abs; rw [if_pos h]
 
-private theorem int_neg_zero : Neg.neg (0 : ℤ₀) = 0 := by
-  have h := ℤ₀.neg_add_self (0 : ℤ₀); rwa [ℤ₀.add_zero] at h
+private theorem int_neg_zero : Neg.neg (0 : ℤ₀cls) = 0 := by
+  have h := ℤ₀cls.neg_add_self (0 : ℤ₀cls); rwa [ℤ₀cls.add_zero] at h
 
-private theorem int_abs_of_nonpos {z : ℤ₀} (h : z ≤ 0) : ℤ₀.abs z = -z := by
-  by_cases h0 : (0 : ℤ₀) ≤ z
-  · have hz : z = 0 := ℤ₀.le_antisymm h h0
-    rw [hz, ℤ₀.abs_eq_zero_iff.mpr rfl, int_neg_zero]
-  · unfold ℤ₀.abs; rw [if_neg h0]
+private theorem int_abs_of_nonpos {z : ℤ₀cls} (h : z ≤ 0) : ℤ₀cls.abs z = -z := by
+  by_cases h0 : (0 : ℤ₀cls) ≤ z
+  · have hz : z = 0 := ℤ₀cls.le_antisymm h h0
+    rw [hz, ℤ₀cls.abs_eq_zero_iff.mpr rfl, int_neg_zero]
+  · unfold ℤ₀cls.abs; rw [if_neg h0]
 
-private theorem int_mul_nonpos_of_nonpos_of_nonneg {a b : ℤ₀}
-    (ha : a ≤ 0) (hb : (0 : ℤ₀) ≤ b) : Mul.mul a b ≤ 0 := by
-  have h := ℤ₀.mul_nonpos_of_nonneg_of_nonpos hb ha
-  rwa [ℤ₀.mul_comm b a] at h
+private theorem int_mul_nonpos_of_nonpos_of_nonneg {a b : ℤ₀cls}
+    (ha : a ≤ 0) (hb : (0 : ℤ₀cls) ≤ b) : Mul.mul a b ≤ 0 := by
+  have h := ℤ₀cls.mul_nonpos_of_nonneg_of_nonpos hb ha
+  rwa [ℤ₀cls.mul_comm b a] at h
 
-/-- Valor absoluto multiplicativo en ℤ₀. -/
-private theorem int_abs_mul (x y : ℤ₀) :
-    ℤ₀.abs (Mul.mul x y) = Mul.mul (ℤ₀.abs x) (ℤ₀.abs y) := by
-  by_cases hx : (0 : ℤ₀) ≤ x <;> by_cases hy : (0 : ℤ₀) ≤ y
+/-- Valor absoluto multiplicativo en ℤ₀cls. -/
+private theorem int_abs_mul (x y : ℤ₀cls) :
+    ℤ₀cls.abs (Mul.mul x y) = Mul.mul (ℤ₀cls.abs x) (ℤ₀cls.abs y) := by
+  by_cases hx : (0 : ℤ₀cls) ≤ x <;> by_cases hy : (0 : ℤ₀cls) ≤ y
   · rw [int_abs_of_nonneg hx, int_abs_of_nonneg hy,
-        int_abs_of_nonneg (ℤ₀.mul_nonneg hx hy)]
-  · have hy' : y ≤ 0 := (ℤ₀.le_total y 0).resolve_right hy
+        int_abs_of_nonneg (ℤ₀cls.mul_nonneg hx hy)]
+  · have hy' : y ≤ 0 := (ℤ₀cls.le_total y 0).resolve_right hy
     rw [int_abs_of_nonneg hx, int_abs_of_nonpos hy',
-        int_abs_of_nonpos (ℤ₀.mul_nonpos_of_nonneg_of_nonpos hx hy'), ℤ₀.mul_neg]
-  · have hx' : x ≤ 0 := (ℤ₀.le_total x 0).resolve_right hx
+        int_abs_of_nonpos (ℤ₀cls.mul_nonpos_of_nonneg_of_nonpos hx hy'), ℤ₀cls.mul_neg]
+  · have hx' : x ≤ 0 := (ℤ₀cls.le_total x 0).resolve_right hx
     rw [int_abs_of_nonpos hx', int_abs_of_nonneg hy,
-        int_abs_of_nonpos (int_mul_nonpos_of_nonpos_of_nonneg hx' hy), ℤ₀.neg_mul]
-  · have hx' : x ≤ 0 := (ℤ₀.le_total x 0).resolve_right hx
-    have hy' : y ≤ 0 := (ℤ₀.le_total y 0).resolve_right hy
+        int_abs_of_nonpos (int_mul_nonpos_of_nonpos_of_nonneg hx' hy), ℤ₀cls.neg_mul]
+  · have hx' : x ≤ 0 := (ℤ₀cls.le_total x 0).resolve_right hx
+    have hy' : y ≤ 0 := (ℤ₀cls.le_total y 0).resolve_right hy
     rw [int_abs_of_nonpos hx', int_abs_of_nonpos hy',
-        int_abs_of_nonneg (ℤ₀.mul_nonneg_of_nonpos_of_nonpos hx' hy'),
-        ℤ₀.neg_mul, ℤ₀.mul_neg, ℤ₀.neg_neg]
+        int_abs_of_nonneg (ℤ₀cls.mul_nonneg_of_nonpos_of_nonpos hx' hy'),
+        ℤ₀cls.neg_mul, ℤ₀cls.mul_neg, ℤ₀cls.neg_neg]
 
 /-- `toNat ∘ abs` es multiplicativo. -/
-private theorem toNat_abs_mul (x y : ℤ₀) :
-    ℤ₀.toNat (ℤ₀.abs (Mul.mul x y))
-      = mul (ℤ₀.toNat (ℤ₀.abs x)) (ℤ₀.toNat (ℤ₀.abs y)) := by
-  have hax : ℤ₀.abs x = ℤ₀.ofNat (ℤ₀.toNat (ℤ₀.abs x)) :=
-    ℤ₀.nonneg_eq_ofNat (ℤ₀.abs_nonneg x)
-  have hay : ℤ₀.abs y = ℤ₀.ofNat (ℤ₀.toNat (ℤ₀.abs y)) :=
-    ℤ₀.nonneg_eq_ofNat (ℤ₀.abs_nonneg y)
-  have key : ℤ₀.abs (Mul.mul x y)
-      = ℤ₀.ofNat (mul (ℤ₀.toNat (ℤ₀.abs x)) (ℤ₀.toNat (ℤ₀.abs y))) :=
-    calc ℤ₀.abs (Mul.mul x y)
-        = Mul.mul (ℤ₀.abs x) (ℤ₀.abs y) := int_abs_mul x y
-      _ = Mul.mul (ℤ₀.ofNat (ℤ₀.toNat (ℤ₀.abs x)))
-              (ℤ₀.ofNat (ℤ₀.toNat (ℤ₀.abs y))) := by rw [← hax, ← hay]
-      _ = ℤ₀.ofNat (mul (ℤ₀.toNat (ℤ₀.abs x)) (ℤ₀.toNat (ℤ₀.abs y))) :=
-            (ℤ₀.ofNat_mul _ _).symm
-  rw [key, ℤ₀.toNat_ofNat]
+private theorem toNat_abs_mul (x y : ℤ₀cls) :
+    ℤ₀cls.toNat (ℤ₀cls.abs (Mul.mul x y))
+      = mul (ℤ₀cls.toNat (ℤ₀cls.abs x)) (ℤ₀cls.toNat (ℤ₀cls.abs y)) := by
+  have hax : ℤ₀cls.abs x = ℤ₀cls.ofNat (ℤ₀cls.toNat (ℤ₀cls.abs x)) :=
+    ℤ₀cls.nonneg_eq_ofNat (ℤ₀cls.abs_nonneg x)
+  have hay : ℤ₀cls.abs y = ℤ₀cls.ofNat (ℤ₀cls.toNat (ℤ₀cls.abs y)) :=
+    ℤ₀cls.nonneg_eq_ofNat (ℤ₀cls.abs_nonneg y)
+  have key : ℤ₀cls.abs (Mul.mul x y)
+      = ℤ₀cls.ofNat (mul (ℤ₀cls.toNat (ℤ₀cls.abs x)) (ℤ₀cls.toNat (ℤ₀cls.abs y))) :=
+    calc ℤ₀cls.abs (Mul.mul x y)
+        = Mul.mul (ℤ₀cls.abs x) (ℤ₀cls.abs y) := int_abs_mul x y
+      _ = Mul.mul (ℤ₀cls.ofNat (ℤ₀cls.toNat (ℤ₀cls.abs x)))
+              (ℤ₀cls.ofNat (ℤ₀cls.toNat (ℤ₀cls.abs y))) := by rw [← hax, ← hay]
+      _ = ℤ₀cls.ofNat (mul (ℤ₀cls.toNat (ℤ₀cls.abs x)) (ℤ₀cls.toNat (ℤ₀cls.abs y))) :=
+            (ℤ₀cls.ofNat_mul _ _).symm
+  rw [key, ℤ₀cls.toNat_ofNat]
 
-/-- Cancelación multiplicativa por `ofNat k` positivo (lado derecho) en ℤ₀. -/
-private theorem int_mul_right_cancel_ofNat {k : ℕ₀} (hk : k ≠ 𝟘) {x y : ℤ₀}
-    (h : Mul.mul x (ℤ₀.ofNat k) = Mul.mul y (ℤ₀.ofNat k)) : x = y := by
+/-- Cancelación multiplicativa por `ofNat k` positivo (lado derecho) en ℤ₀cls. -/
+private theorem int_mul_right_cancel_ofNat {k : ℕ₀} (hk : k ≠ 𝟘) {x y : ℤ₀cls}
+    (h : Mul.mul x (ℤ₀cls.ofNat k) = Mul.mul y (ℤ₀cls.ofNat k)) : x = y := by
   have h1 : x ≤ y :=
-    (ℤ₀.mul_le_mul_right_ofNat_pos hk x y).mpr (by rw [h]; exact ℤ₀.le_refl _)
+    (ℤ₀cls.mul_le_mul_right_ofNat_pos hk x y).mpr (by rw [h]; exact ℤ₀cls.le_refl _)
   have h2 : y ≤ x :=
-    (ℤ₀.mul_le_mul_right_ofNat_pos hk y x).mpr (by rw [h]; exact ℤ₀.le_refl _)
-  exact ℤ₀.le_antisymm h1 h2
+    (ℤ₀cls.mul_le_mul_right_ofNat_pos hk y x).mpr (by rw [h]; exact ℤ₀cls.le_refl _)
+  exact ℤ₀cls.le_antisymm h1 h2
 
 -- ============================================================
 -- Sección 5: Unicidad de la fracción reducida (ℕ₀) y reduce_unique
@@ -315,8 +315,8 @@ private theorem nat_frac_unique {a b c e : ℕ₀}
   exact ⟨mul_cancelation_right a c e he hae, hbe⟩
 
 /-- **Unicidad del reducido**: pares equivalentes tienen la misma forma reducida. -/
-theorem reduce_unique (p q : ℤ₀ × ℕ₁)
-    (h : Mul.mul p.1 (ℤ₀.ofNat q.2.val) = Mul.mul q.1 (ℤ₀.ofNat p.2.val)) :
+theorem reduce_unique (p q : ℤ₀cls × ℕ₁)
+    (h : Mul.mul p.1 (ℤ₀cls.ofNat q.2.val) = Mul.mul q.1 (ℤ₀cls.ofNat p.2.val)) :
     reduce p = reduce q := by
   -- Cruce de los reducidos vía mk_eq_iff (público).
   have hmkp : mk (reduce p).1 (reduce p).2 = mk p.1 p.2 :=
@@ -324,21 +324,21 @@ theorem reduce_unique (p q : ℤ₀ × ℕ₁)
   have hmkq : mk (reduce q).1 (reduce q).2 = mk q.1 q.2 :=
     (mk_eq_iff (reduce q).1 q.1 (reduce q).2 q.2).mpr (reduce_ratEq q).symm
   have hpq : mk p.1 p.2 = mk q.1 q.2 := (mk_eq_iff p.1 q.1 p.2 q.2).mpr h
-  have hstar : Mul.mul (reduce p).1 (ℤ₀.ofNat (reduce q).2.val)
-             = Mul.mul (reduce q).1 (ℤ₀.ofNat (reduce p).2.val) :=
+  have hstar : Mul.mul (reduce p).1 (ℤ₀cls.ofNat (reduce q).2.val)
+             = Mul.mul (reduce q).1 (ℤ₀cls.ofNat (reduce p).2.val) :=
     (mk_eq_iff (reduce p).1 (reduce q).1 (reduce p).2 (reduce q).2).mp
       (hmkp.trans (hpq.trans hmkq.symm))
   -- Magnitudes.
-  have hmag : mul (ℤ₀.toNat (ℤ₀.abs (reduce p).1)) (reduce q).2.val
-            = mul (ℤ₀.toNat (ℤ₀.abs (reduce q).1)) (reduce p).2.val := by
-    have hraw : ℤ₀.toNat (ℤ₀.abs (Mul.mul (reduce p).1 (ℤ₀.ofNat (reduce q).2.val)))
-              = ℤ₀.toNat (ℤ₀.abs (Mul.mul (reduce q).1 (ℤ₀.ofNat (reduce p).2.val))) :=
-      congrArg (fun z => ℤ₀.toNat (ℤ₀.abs z)) hstar
+  have hmag : mul (ℤ₀cls.toNat (ℤ₀cls.abs (reduce p).1)) (reduce q).2.val
+            = mul (ℤ₀cls.toNat (ℤ₀cls.abs (reduce q).1)) (reduce p).2.val := by
+    have hraw : ℤ₀cls.toNat (ℤ₀cls.abs (Mul.mul (reduce p).1 (ℤ₀cls.ofNat (reduce q).2.val)))
+              = ℤ₀cls.toNat (ℤ₀cls.abs (Mul.mul (reduce q).1 (ℤ₀cls.ofNat (reduce p).2.val))) :=
+      congrArg (fun z => ℤ₀cls.toNat (ℤ₀cls.abs z)) hstar
     rw [toNat_abs_mul, toNat_abs_mul,
-        show ℤ₀.toNat (ℤ₀.abs (ℤ₀.ofNat (reduce q).2.val)) = (reduce q).2.val from by
-          rw [ℤ₀.abs_ofNat, ℤ₀.toNat_ofNat],
-        show ℤ₀.toNat (ℤ₀.abs (ℤ₀.ofNat (reduce p).2.val)) = (reduce p).2.val from by
-          rw [ℤ₀.abs_ofNat, ℤ₀.toNat_ofNat]] at hraw
+        show ℤ₀cls.toNat (ℤ₀cls.abs (ℤ₀cls.ofNat (reduce q).2.val)) = (reduce q).2.val from by
+          rw [ℤ₀cls.abs_ofNat, ℤ₀cls.toNat_ofNat],
+        show ℤ₀cls.toNat (ℤ₀cls.abs (ℤ₀cls.ofNat (reduce p).2.val)) = (reduce p).2.val from by
+          rw [ℤ₀cls.abs_ofNat, ℤ₀cls.toNat_ofNat]] at hraw
     exact hraw
   -- Unicidad nat.
   obtain ⟨_, hden⟩ :=
@@ -350,33 +350,33 @@ theorem reduce_unique (p q : ℤ₀ × ℕ₁)
   exact Prod.ext hnum hden1
 
 -- ============================================================
--- Sección 6: Representante canónico de ℚ₀ (lift al cociente)
+-- Sección 6: Representante canónico de ℚ₀cls (lift al cociente)
 -- ============================================================
 
 /-- Representante canónico (numerador entero, denominador positivo coprimos). -/
-def repr : ℚ₀ → ℤ₀ × ℕ₁ :=
+def repr : ℚ₀cls → ℤ₀cls × ℕ₁ :=
   Quotient.lift reduce (fun a b hab => reduce_unique a b hab)
 
 /-- Numerador canónico de un racional. -/
-def num (r : ℚ₀) : ℤ₀ := (repr r).1
+def num (r : ℚ₀cls) : ℤ₀cls := (repr r).1
 
 /-- Denominador canónico (positivo) de un racional. -/
-def den (r : ℚ₀) : ℕ₁ := (repr r).2
+def den (r : ℚ₀cls) : ℕ₁ := (repr r).2
 
-theorem mk_repr (r : ℚ₀) : mk (repr r).1 (repr r).2 = r := by
+theorem mk_repr (r : ℚ₀cls) : mk (repr r).1 (repr r).2 = r := by
   refine Quotient.inductionOn r (fun p => ?_)
   show mk (reduce p).1 (reduce p).2 = mk p.1 p.2
   exact (mk_eq_iff (reduce p).1 p.1 (reduce p).2 p.2).mpr (reduce_ratEq p).symm
 
-theorem repr_inj {a b : ℚ₀} (h : repr a = repr b) : a = b := by
+theorem repr_inj {a b : ℚ₀cls} (h : repr a = repr b) : a = b := by
   have ha := mk_repr a
   have hb := mk_repr b
   rw [← ha, ← hb, h]
 
 /-- El representante canónico tiene numerador (en magnitud) y denominador coprimos. -/
-theorem repr_reduced (r : ℚ₀) :
-    Coprime (ℤ₀.toNat (ℤ₀.abs (repr r).1)) (repr r).2.val := by
+theorem repr_reduced (r : ℚ₀cls) :
+    Coprime (ℤ₀cls.toNat (ℤ₀cls.abs (repr r).1)) (repr r).2.val := by
   refine Quotient.inductionOn r (fun p => ?_)
   exact reduce_reduced p
 
-end ℚ₀
+end ℚ₀cls

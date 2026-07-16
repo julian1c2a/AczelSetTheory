@@ -30,10 +30,10 @@ namespace AczelSetTheory
             p = HFSet.orderedPair x y ∧ x ∈ y ∧ (HFSet.apply f y) ∈ (HFSet.apply f x))
 
       /-- La signatura devuelve `1` si el número de inversiones es par, y `-1` si es impar. -/
-      def sign (n : ℕ₀) (f : HFSet) : ℤ₀ :=
+      def sign (n : ℕ₀) (f : HFSet) : ℤ₀cls :=
         let invs := inversions n f
         let c := HFSet.card invs
-        if Peano.Arith.IsEven c then (1 : ℤ₀) else ℤ₀.negOne
+        if Peano.Arith.IsEven c then (1 : ℤ₀cls) else ℤ₀cls.negOne
 
     end Sign
   end VN

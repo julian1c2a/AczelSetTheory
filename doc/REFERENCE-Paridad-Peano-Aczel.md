@@ -59,7 +59,7 @@
 | `Combinatorics/Counting.lean` | ✅ | `VN/CountingVN.lean` | Equivalente documental: Peano `Counting` quedó como módulo vacío (headers §1/§2/§3); AczelSetTheory conserva la correspondencia estructural para paridad formal. |
 | `Combinatorics/Perm.lean` | ✅ | `VN/SymGroupVN.lean` + `VN/PermVN.lean` | `SymGroupVN` cubre §1-§2 de Peano (FunPerm, Sym). §3 (ciclos) implementado en `PermVN.lean`. |
 | `Combinatorics/Orbit.lean` | ✅ | `VN/OrbitVN.lean` | Órbitas definidas funcionalmente en `PermVN` (`funOrb`), teoría de acción en `Action.lean`. |
-| `Combinatorics/Sign.lean` | ✅ | `VN/SignVN.lean` | Signatura implementada definiendo inversiones y devolviendo `1` o `-1` de `ℤ₀`. |
+| `Combinatorics/Sign.lean` | ✅ | `VN/SignVN.lean` | Signatura implementada definiendo inversiones y devolviendo `1` o `-1` de `ℤ₀cls`. |
 | `Combinatorics/Group.lean` | ✅ | `Algebra/Group.lean` + `VN/SymGroupVN.lean` | AczelSetTheory tiene `HFGroup` abstracto y `SymVN` concreto: grupo simétrico sobre segmentos VN `vnSeg n`; `SymVN.id`, `SymVN.comp`, `vnSeg_card`, `mem_vnSeg_iff`. |
 
 ---
@@ -124,15 +124,15 @@ Peano tenía `NumberSets.lean` con la definición de `ℤ_P` como pares. AczelSe
 
 | Módulo AczelSetTheory | Contenido | Estado |
 |---|---|---|
-| `Integers/Basic.lean` | Tipo `ℤ₀` base como clases de equivalencia de pares | ✅ |
-| `Integers/Arithmetic.lean` | `+`, `-`, `*`, división, gcd, lcm sobre `ℤ₀` | ✅ |
-| `Integers/Order.lean` | Orden `≤` sobre `ℤ₀` | ✅ |
-| `Integers/Bijection.lean` | Biyección `ℤ₀ ↔ ℤ` (vía isomorfismo con Lean `Int`) | ✅ |
+| `Integers/Basic.lean` | Tipo `ℤ₀cls` base como clases de equivalencia de pares | ✅ |
+| `Integers/Arithmetic.lean` | `+`, `-`, `*`, división, gcd, lcm sobre `ℤ₀cls` | ✅ |
+| `Integers/Order.lean` | Orden `≤` sobre `ℤ₀cls` | ✅ |
+| `Integers/Bijection.lean` | Biyección `ℤ₀cls ↔ ℤ` (vía isomorfismo con Lean `Int`) | ✅ |
 | `Integers/Functions.lean` | Funciones de conversión, `abs`, `sign` | ✅ |
 | `Integers/MobiusLiouville.lean` | Función de Möbius `μ(n)` y función de Liouville `λ(n)` | ✅ 🆕 |
 | `Integers/PadicVal.lean` | Valuación p-ádica `v_p(n)` | ✅ 🆕 |
-| `Integers/HFInt.lean` | Wrapper `HFInt` con representante canónico | ✅ 🆕 |
-| `Integers/HFIntOps.lean` | Operaciones elevadas y comodidades `HFInt` | ✅ 🆕 |
+| `Integers/ℤ₀.lean` | Wrapper `ℤ₀` con representante canónico | ✅ 🆕 |
+| `Integers/Z0Ops.lean` | Operaciones elevadas y comodidades `ℤ₀` | ✅ 🆕 |
 
 ---
 
@@ -254,9 +254,9 @@ Axiomática de conjuntos, álgebra abstracta, topología, enteros extendidos (M�
 3. **Completado (2026-06-03)**: Sylow I `sylow_first` y corolarios.
 
 4. **Alta prioridad** (FASE B — consolidación post-paridad):
-   - `Integers/Rationals.lean` — ℚ₀ como cociente `HFInt × ℕ₀⁺`; cuerpo ordenado.
-   - Bridge `ℤ₀ ↔ HFInt` si persiste drift.
-   - Anillos cocientes concretos sobre HFRing: `ℤ₀/(n)`, `Mₙ(ℤ₀)`.
+   - `Integers/Rationals.lean` — ℚ₀cls como cociente `ℤ₀ × ℕ₀⁺`; cuerpo ordenado.
+   - Bridge `ℤ₀cls ↔ ℤ₀` si persiste drift.
+   - Anillos cocientes concretos sobre HFRing: `ℤ₀cls/(n)`, `Mₙ(ℤ₀cls)`.
 
 5. **Media prioridad**:
    - `OrbitVN.lean` — ecuación de clases concreta sobre VN.

@@ -84,15 +84,15 @@ AczelSetTheory/
     Field, Module, LinearSpace, Lattice, Action, CosetAction, QuotientGroup,
     FirstIsomorphism, SecondIsomorphism, ThirdIsomorphism, CorrespondenceTheorem,
     Sylow, Zassenhaus, QuotientRing, HFMatrix
-  Integers/          — Integer type ℤ₀ (12 sub-modules)
+  Integers/          — Integer type ℤ₀cls (12 sub-modules)
     Basic, Order, Functions, Arithmetic, Bijection, PadicVal, MobiusLiouville,
-    Canonical, Bezout, ZModN, HFInt, HFIntOps
-  Rationals/         — Rational type ℚ₀ and analytic theory (21 sub-modules)
+    Canonical, Bezout, ZModN, ℤ₀, Z0Ops
+  Rationals/         — Rational type ℚ₀cls and analytic theory (21 sub-modules)
     Basic, AbsVal, Density, IsCauchy, Inv, Bisection, Canonical, Convergence,
     PowOrder, RationalLog, Roots, CauchySeqAlgebra, Archimedean, Irrational,
-    HFRat, HFRatOps, HFRatCauchy, HFRatCauchyAlgebra, MinAdd, Series, Polynomial
+    ℚ₀, Q0Ops, Q0Cauchy, Q0CauchyAlgebra, MinAdd, Series, Polynomial
     (Series/Polynomial 🚧 in progress — see CURRENT-STATUS-PROJECT.md)
-  Reals/             — Incompleteness of HFRat, first steps towards HFReal (1 sub-module)
+  Reals/             — Incompleteness of ℚ₀, first steps towards HFReal (1 sub-module)
     Incompleteness  — 🚧 in progress; HFReal (quotient of Cauchy sequences) not built yet
   Combinatorics/     — Native finite combinatorics in HFSet (1 sub-module)
     Counting  — pigeonhole, inclusion–exclusion (2 and 3 sets), card lemmas
@@ -110,7 +110,7 @@ Beyond the Zermelo axioms, the library includes:
 | **Abstract algebra** | `HFGroup`, `HFSubgroup`, `HFGroupHom`, `HFNormalSubgroup`, `HFRing`, `HFField`, `HFModule`, quotient groups, three isomorphism theorems, correspondence theorem, **Zassenhaus' butterfly lemma** |
 | **Group actions & Sylow** | `HFGroupAction`, orbits, stabilizers, orbit-stabilizer (via Lagrange); McKay's combinatorial proof of Cauchy's theorem; **Sylow I + II** (`sylow_first`, `sylowConjugate` via the p-group fixed-point theorem) |
 | **Rings, fields & matrices** | Generic quotient ring `R/I` (`HFIdeal`, `HFRing.quotient`); `ℤ/nℤ` ring and `ℤ/pℤ` field (`ZModN`, `ZModFieldP`, inverse via Fermat); n×n matrix ring `HFMatrixRing` over any `HFRing` |
-| **Integers & rationals** | `ℤ₀ = Quotient (ℕ₀×ℕ₀)`, commutative ring laws, order, GCD, p-adic valuation, Möbius μ, Liouville λ, Bézout, canonical representative; `ℚ₀` with absolute value, density, dyadic Cauchy sequences |
+| **Integers & rationals** | `ℤ₀cls = Quotient (ℕ₀×ℕ₀)`, commutative ring laws, order, GCD, p-adic valuation, Möbius μ, Liouville λ, Bézout, canonical representative; `ℚ₀cls` with absolute value, density, dyadic Cauchy sequences |
 | **Combinatorics** | Native pigeonhole principle, inclusion–exclusion (2 and 3 sets), cardinality/injectivity/surjectivity lemmas (`Combinatorics/Counting`) |
 | **Order theory** | Preorder, partial/total/well order; `wf_induction`, `no_infinite_descent` |
 | **Topology** | `HFTopSpace`, interior/closure/boundary, subspace topology, continuous maps, neighborhood spaces, separation axioms T₀–T₄ |

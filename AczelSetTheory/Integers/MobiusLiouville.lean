@@ -5,12 +5,12 @@ License: MIT
 -/
 
 -- AczelSetTheory/Integers/MobiusLiouville.lean
--- Función de Möbius μ y función de Liouville λ con valores en ℤ₀.
+-- Función de Möbius μ y función de Liouville λ con valores en ℤ₀cls.
 --
 -- Público:
---   ℤ₀.negOnePow  : ℕ₀ → ℤ₀        ((-1)^k)
---   ℤ₀.mobius     : ℕ₀ → ℤ₀        (μ(n))
---   ℤ₀.liouville  : ℕ₀ → ℤ₀        (λ(n))
+--   ℤ₀cls.negOnePow  : ℕ₀ → ℤ₀cls        ((-1)^k)
+--   ℤ₀cls.mobius     : ℕ₀ → ℤ₀cls        (μ(n))
+--   ℤ₀cls.liouville  : ℕ₀ → ℤ₀cls        (λ(n))
 --
 -- Lemas:
 --   negOnePow_zero, negOnePow_succ, negOnePow_one, negOnePow_two
@@ -23,18 +23,18 @@ License: MIT
 import AczelSetTheory.Integers.Basic
 import AczelSetTheory.Integers.PadicVal
 
-namespace ℤ₀
+namespace ℤ₀cls
 
 open Peano Peano.Axioms Peano.Add Peano.Mul Peano.Order Peano.StrictOrder
 open Peano.Arith
 open Peano.Primes
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- (-1)^k en ℤ₀
+-- (-1)^k en ℤ₀cls
 -- ─────────────────────────────────────────────────────────────────────────────
 
-/-- Potencia de -1 en ℤ₀ por recursión estructural sobre ℕ₀. -/
-def negOnePow (k : ℕ₀) : ℤ₀ :=
+/-- Potencia de -1 en ℤ₀cls por recursión estructural sobre ℕ₀. -/
+def negOnePow (k : ℕ₀) : ℤ₀cls :=
   match k with
   | .zero    => 1
   | .succ k' => Neg.neg (negOnePow k')
@@ -54,7 +54,7 @@ theorem negOnePow_two : negOnePow 𝟚 = 1 := by
 -- Propiedades algebraicas de negOnePow
 -- ─────────────────────────────────────────────────────────────────────────────
 
-private theorem neg_mul_neg (a b : ℤ₀) :
+private theorem neg_mul_neg (a b : ℤ₀cls) :
     Mul.mul (Neg.neg a) (Neg.neg b) = Mul.mul a b := by
   rw [neg_mul, mul_neg, neg_neg]
 
@@ -136,7 +136,7 @@ private instance (n : ℕ₀) : Decidable (squarefree n) :=
           Decidable.byContradiction (fun h => hnw ⟨p, hle, hp, h⟩)))
 
 /-- μ(n) = (-1)^Ω(n) si n es libre de cuadrados, 0 en otro caso. -/
-def mobius (n : ℕ₀) : ℤ₀ :=
+def mobius (n : ℕ₀) : ℤ₀cls :=
   if squarefree n then negOnePow (Omega_prime n) else 0
 
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -144,7 +144,7 @@ def mobius (n : ℕ₀) : ℤ₀ :=
 -- ─────────────────────────────────────────────────────────────────────────────
 
 /-- λ(n) = (-1)^Ω(n), donde Ω(n) es el número de factores primos con multiplicidad. -/
-def liouville (n : ℕ₀) : ℤ₀ :=
+def liouville (n : ℕ₀) : ℤ₀cls :=
   negOnePow (Omega_prime n)
 
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -224,4 +224,4 @@ theorem liouville_prime_pow {p k : ℕ₀} (hp : Peano.Arith.Prime p) :
         ih, liouville_prime hp, ← negOnePow_one, ← negOnePow_add]
     congr 1
 
-end ℤ₀
+end ℤ₀cls

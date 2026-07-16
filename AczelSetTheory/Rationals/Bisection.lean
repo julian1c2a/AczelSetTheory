@@ -5,7 +5,7 @@ License: MIT
 -/
 
 -- AczelSetTheory/Rationals/Bisection.lean
--- Andamiaje diádico para construir sucesiones de Cauchy en ℚ₀.
+-- Andamiaje diádico para construir sucesiones de Cauchy en ℚ₀cls.
 --
 -- Núcleo reutilizable: si los términos CONSECUTIVOS de una sucesión distan
 -- a lo sumo 1/2^(n+1), entonces la sucesión es de Cauchy (diádica).
@@ -14,7 +14,7 @@ License: MIT
 --   * sumas parciales de series con cola geométrica/factorial (p. ej. artanh).
 --
 -- API:
---   ℚ₀.isCauchy_of_dyadic_step : (∀ k, |f (σ k) - f k| ≤ 1/2^(k+1)) → IsCauchy f
+--   ℚ₀cls.isCauchy_of_dyadic_step : (∀ k, |f (σ k) - f k| ≤ 1/2^(k+1)) → IsCauchy f
 --
 -- Dependencies: AczelSetTheory.Rationals.Convergence
 -- @axiom_system: ZF (sin elección)
@@ -22,14 +22,14 @@ License: MIT
 
 import AczelSetTheory.Rationals.Convergence
 
-namespace ℚ₀
+namespace ℚ₀cls
 
 -- ============================================================
--- Sección 0: Identidades aditivas auxiliares en ℚ₀
+-- Sección 0: Identidades aditivas auxiliares en ℚ₀cls
 -- ============================================================
 
 /-- `a + (-b) ≤ a` cuando `0 ≤ b`. -/
-private theorem sub_le_self {a b : ℚ₀} (hb : 0 ≤ b) : Add.add a (Neg.neg b) ≤ a := by
+private theorem sub_le_self {a b : ℚ₀cls} (hb : 0 ≤ b) : Add.add a (Neg.neg b) ≤ a := by
   have hnb : Neg.neg b ≤ 0 := by
     have h := neg_le_neg hb
     rwa [neg_zero] at h
@@ -37,7 +37,7 @@ private theorem sub_le_self {a b : ℚ₀} (hb : 0 ≤ b) : Add.add a (Neg.neg b
   rwa [add_zero] at hh
 
 /-- `a + (b - 2a) = b - a` (identidad del grupo aditivo). -/
-private theorem add_neg_add_self (a b : ℚ₀) :
+private theorem add_neg_add_self (a b : ℚ₀cls) :
     Add.add a (Add.add b (Neg.neg (Add.add a a))) = Add.add b (Neg.neg a) := by
   rw [neg_add]
   calc Add.add a (Add.add b (Add.add (Neg.neg a) (Neg.neg a)))
@@ -50,7 +50,7 @@ private theorem add_neg_add_self (a b : ℚ₀) :
     _ = Add.add b (Neg.neg a) := by rw [add_zero b]
 
 /-- Descomposición `x - z = (x - y) + (y - z)`. -/
-private theorem sub_decomp (x y z : ℚ₀) :
+private theorem sub_decomp (x y z : ℚ₀cls) :
     Add.add x (Neg.neg z)
       = Add.add (Add.add x (Neg.neg y)) (Add.add y (Neg.neg z)) := by
   calc Add.add x (Neg.neg z)
@@ -65,7 +65,7 @@ private theorem sub_decomp (x y z : ℚ₀) :
 
 /-- Si los pasos consecutivos distan ≤ 1/2^(k+1), la distancia entre `f (n+d)`
     y `f n` está acotada por `1/2^n - 1/2^(n+d)` (suma geométrica telescópica). -/
-private theorem dyadic_telescope {f : ℕ₀ → ℚ₀}
+private theorem dyadic_telescope {f : ℕ₀ → ℚ₀cls}
     (h : ∀ k : ℕ₀, absVal (Add.add (f (σ k)) (Neg.neg (f k))) ≤ pow2 (σ k)) (n : ℕ₀) :
     ∀ d : ℕ₀, absVal (Add.add (f (Peano.Add.add n d)) (Neg.neg (f n)))
       ≤ Add.add (pow2 n) (Neg.neg (pow2 (Peano.Add.add n d))) := by
@@ -97,7 +97,7 @@ private theorem dyadic_telescope {f : ℕ₀ → ℚ₀}
 
 /-- **Núcleo diádico**: si términos consecutivos distan ≤ `1/2^(k+1)`, la sucesión
     es de Cauchy. Base común para bisección y para series de cola rápida. -/
-theorem isCauchy_of_dyadic_step {f : ℕ₀ → ℚ₀}
+theorem isCauchy_of_dyadic_step {f : ℕ₀ → ℚ₀cls}
     (h : ∀ k : ℕ₀, absVal (f (σ k) - f k) ≤ pow2 (σ k)) : IsCauchy f := by
   refine (isCauchy_iff_isCauchy₂ f).mpr ?_
   intro n m hnm
@@ -117,17 +117,17 @@ theorem isCauchy_of_dyadic_step {f : ℕ₀ → ℚ₀}
     el valor parcial actual, si añadir el bit `1/2^(n+1)`. Sea cual sea `g`, la
     sucesión resultante es de Cauchy (los pasos consecutivos distan 0 o
     `1/2^(n+1)`). El oráculo concreto (raíz q-ésima, log, …) fija a qué converge. -/
-def bisectSeq (g : ℕ₀ → ℚ₀ → Bool) (a₀ : ℚ₀) : ℕ₀ → ℚ₀
+def bisectSeq (g : ℕ₀ → ℚ₀cls → Bool) (a₀ : ℚ₀cls) : ℕ₀ → ℚ₀cls
   | 𝟘 => a₀
   | σ n => bif g n (bisectSeq g a₀ n) then Add.add (bisectSeq g a₀ n) (pow2 (σ n))
                                        else bisectSeq g a₀ n
 
-theorem bisectSeq_succ (g : ℕ₀ → ℚ₀ → Bool) (a₀ : ℚ₀) (n : ℕ₀) :
+theorem bisectSeq_succ (g : ℕ₀ → ℚ₀cls → Bool) (a₀ : ℚ₀cls) (n : ℕ₀) :
     bisectSeq g a₀ (σ n)
       = bif g n (bisectSeq g a₀ n) then Add.add (bisectSeq g a₀ n) (pow2 (σ n))
                                    else bisectSeq g a₀ n := rfl
 
-private theorem bisectSeq_step (g : ℕ₀ → ℚ₀ → Bool) (a₀ : ℚ₀) (n : ℕ₀) :
+private theorem bisectSeq_step (g : ℕ₀ → ℚ₀cls → Bool) (a₀ : ℚ₀cls) (n : ℕ₀) :
     absVal (Add.add (bisectSeq g a₀ (σ n)) (Neg.neg (bisectSeq g a₀ n))) ≤ pow2 (σ n) := by
   rw [bisectSeq_succ]
   cases hb : g n (bisectSeq g a₀ n) with
@@ -150,8 +150,8 @@ private theorem bisectSeq_step (g : ℕ₀ → ℚ₀ → Bool) (a₀ : ℚ₀) 
     exact le_refl (pow2 (σ n))
 
 /-- La sucesión de bisección dinámica es de Cauchy, para cualquier oráculo. -/
-theorem bisectSeq_isCauchy (g : ℕ₀ → ℚ₀ → Bool) (a₀ : ℚ₀) :
+theorem bisectSeq_isCauchy (g : ℕ₀ → ℚ₀cls → Bool) (a₀ : ℚ₀cls) :
     IsCauchy (bisectSeq g a₀) :=
   isCauchy_of_dyadic_step (bisectSeq_step g a₀)
 
-end ℚ₀
+end ℚ₀cls

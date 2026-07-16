@@ -4,10 +4,10 @@ Author: Julián Calderón Almendros
 License: MIT
 -/
 
--- AczelSetTheory/Integers/HFInt.lean
+-- AczelSetTheory/Integers/ℤ₀.lean
 --
--- HFInt: Tipo canónico para los enteros.
--- Encapsula un ℤ₀ junto con su par representante canónico en ℤ₀' (donde uno de los
+-- ℤ₀: Tipo canónico para los enteros.
+-- Encapsula un ℤ₀cls junto con su par representante canónico en ℤ₀can (donde uno de los
 -- componentes es 𝟘), lo que permite convertir igualdades observacionales en proposicionales.
 
 import AczelSetTheory.Integers.Basic
@@ -17,28 +17,28 @@ import Peano.PeanoNat.Sub
 import Peano.PeanoNat.Decidable
 
 /-- El tipo de los pares normalizados de ℕ₀ × ℕ₀, donde al menos uno es 𝟘. -/
-def ℤ₀' := { p : ℕ₀ × ℕ₀ // p.1 = 𝟘 ∨ p.2 = 𝟘 }
+def ℤ₀can := { p : ℕ₀ × ℕ₀ // p.1 = 𝟘 ∨ p.2 = 𝟘 }
 
-namespace ℤ₀'
+namespace ℤ₀can
 
-/-- Convierte una clase ℤ₀ a su representante canónico ℤ₀'. -/
-def ofZ0 (z : ℤ₀) : ℤ₀' := ⟨z.repr, ℤ₀.repr_normalized z⟩
+/-- Convierte una clase ℤ₀cls a su representante canónico ℤ₀can. -/
+def ofCls (z : ℤ₀cls) : ℤ₀can := ⟨z.repr, ℤ₀cls.repr_normalized z⟩
 
-/-- Convierte el representante canónico ℤ₀' de vuelta a la clase ℤ₀. -/
-def toZ0 (p : ℤ₀') : ℤ₀ := Sub.sub (ℤ₀.ofNat p.val.1) (ℤ₀.ofNat p.val.2)
+/-- Convierte el representante canónico ℤ₀can de vuelta a la clase ℤ₀cls. -/
+def toCls (p : ℤ₀can) : ℤ₀cls := Sub.sub (ℤ₀cls.ofNat p.val.1) (ℤ₀cls.ofNat p.val.2)
 
-theorem toZ0_ofZ0 (z : ℤ₀) : toZ0 (ofZ0 z) = z := ℤ₀.ofNat_sub_repr z
-theorem ofZ0_toZ0 (p : ℤ₀') : ofZ0 (toZ0 p) = p := by
+theorem toCls_ofCls (z : ℤ₀cls) : toCls (ofCls z) = z := ℤ₀cls.ofNat_sub_repr z
+theorem ofCls_toCls (p : ℤ₀can) : ofCls (toCls p) = p := by
   apply Subtype.ext
   have hp : p.val.1 = 𝟘 ∨ p.val.2 = 𝟘 := p.property
-  have H : toZ0 p = ℤ₀.mk p.val := by
-    show ℤ₀.mk (ℤ₀.addRaw (p.val.1, 𝟘) (ℤ₀.negRaw (p.val.2, 𝟘))) = ℤ₀.mk p.val
-    rw [ℤ₀.mk_eq_iff]
-    unfold intEq ℤ₀.addRaw ℤ₀.negRaw
+  have H : toCls p = ℤ₀cls.mk p.val := by
+    show ℤ₀cls.mk (ℤ₀cls.addRaw (p.val.1, 𝟘) (ℤ₀cls.negRaw (p.val.2, 𝟘))) = ℤ₀cls.mk p.val
+    rw [ℤ₀cls.mk_eq_iff]
+    unfold intEq ℤ₀cls.addRaw ℤ₀cls.negRaw
     omega₀
-  change (toZ0 p).repr = p.val
-  rw [H, ℤ₀.repr_mk]
-  unfold ℤ₀.normalize
+  change (toCls p).repr = p.val
+  rw [H, ℤ₀cls.repr_mk]
+  unfold ℤ₀cls.normalize
   by_cases h : p.val.2 ≤ p.val.1
   · rw [if_pos h]
     rcases hp with hp1 | hp2
@@ -56,60 +56,60 @@ theorem ofZ0_toZ0 (p : ℤ₀') : ofZ0 (toZ0 p) = p := by
       · rw [hp1]; exact Peano.Sub.sub_zero p.val.2
     · exfalso; omega₀
 
-instance : Zero ℤ₀' where zero := ofZ0 0
-instance : One  ℤ₀' where one  := ofZ0 1
-instance : Add  ℤ₀' where add a b := ofZ0 (Add.add (toZ0 a) (toZ0 b))
-instance : Mul  ℤ₀' where mul a b := ofZ0 (Mul.mul (toZ0 a) (toZ0 b))
-instance : Neg  ℤ₀' where neg a := ofZ0 (Neg.neg (toZ0 a))
-instance : Sub  ℤ₀' where sub a b := ofZ0 (Sub.sub (toZ0 a) (toZ0 b))
+instance : Zero ℤ₀can where zero := ofCls 0
+instance : One  ℤ₀can where one  := ofCls 1
+instance : Add  ℤ₀can where add a b := ofCls (Add.add (toCls a) (toCls b))
+instance : Mul  ℤ₀can where mul a b := ofCls (Mul.mul (toCls a) (toCls b))
+instance : Neg  ℤ₀can where neg a := ofCls (Neg.neg (toCls a))
+instance : Sub  ℤ₀can where sub a b := ofCls (Sub.sub (toCls a) (toCls b))
 
-instance : LE ℤ₀' where le a b := toZ0 a ≤ toZ0 b
-instance : LT ℤ₀' where lt a b := toZ0 a < toZ0 b
-instance instDecidableEq (a b : ℤ₀') : Decidable (a = b) :=
-  match decEq (toZ0 a) (toZ0 b) with
-  | isTrue h  => isTrue (by rw [←ofZ0_toZ0 a, ←ofZ0_toZ0 b, h])
+instance : LE ℤ₀can where le a b := toCls a ≤ toCls b
+instance : LT ℤ₀can where lt a b := toCls a < toCls b
+instance instDecidableEq (a b : ℤ₀can) : Decidable (a = b) :=
+  match decEq (toCls a) (toCls b) with
+  | isTrue h  => isTrue (by rw [←ofCls_toCls a, ←ofCls_toCls b, h])
   | isFalse h => isFalse (fun heq => h (by rw [heq]))
 
-instance instDecidableLE (a b : ℤ₀') : Decidable (a ≤ b) := inferInstanceAs (Decidable (toZ0 a ≤ toZ0 b))
-instance instDecidableLT (a b : ℤ₀') : Decidable (a < b) := inferInstanceAs (Decidable (toZ0 a < toZ0 b))
+instance instDecidableLE (a b : ℤ₀can) : Decidable (a ≤ b) := inferInstanceAs (Decidable (toCls a ≤ toCls b))
+instance instDecidableLT (a b : ℤ₀can) : Decidable (a < b) := inferInstanceAs (Decidable (toCls a < toCls b))
 
 -- Ejemplo de transporte de estructura
-theorem add_comm (a b : ℤ₀') : Add.add a b = Add.add b a := by
-  change ofZ0 (Add.add (toZ0 a) (toZ0 b)) = ofZ0 (Add.add (toZ0 b) (toZ0 a))
-  rw [ℤ₀.add_comm]
+theorem add_comm (a b : ℤ₀can) : Add.add a b = Add.add b a := by
+  change ofCls (Add.add (toCls a) (toCls b)) = ofCls (Add.add (toCls b) (toCls a))
+  rw [ℤ₀cls.add_comm]
 
-theorem add_assoc (a b c : ℤ₀') : Add.add (Add.add a b) c = Add.add a (Add.add b c) := by
-  change ofZ0 (Add.add (toZ0 (ofZ0 (Add.add (toZ0 a) (toZ0 b)))) (toZ0 c)) =
-         ofZ0 (Add.add (toZ0 a) (toZ0 (ofZ0 (Add.add (toZ0 b) (toZ0 c)))))
-  rw [toZ0_ofZ0, toZ0_ofZ0, ℤ₀.add_assoc]
+theorem add_assoc (a b c : ℤ₀can) : Add.add (Add.add a b) c = Add.add a (Add.add b c) := by
+  change ofCls (Add.add (toCls (ofCls (Add.add (toCls a) (toCls b)))) (toCls c)) =
+         ofCls (Add.add (toCls a) (toCls (ofCls (Add.add (toCls b) (toCls c)))))
+  rw [toCls_ofCls, toCls_ofCls, ℤ₀cls.add_assoc]
 
-end ℤ₀'
+end ℤ₀can
 
-/-- La estructura HFInt agrupa la clase de equivalencia ℤ₀ y su representante canónico ℤ₀'. -/
-structure HFInt where
-  cls  : ℤ₀
-  pair : ℤ₀'
+/-- La estructura ℤ₀ agrupa la clase de equivalencia ℤ₀cls y su representante canónico ℤ₀can. -/
+structure ℤ₀ where
+  cls  : ℤ₀cls
+  pair : ℤ₀can
   hEq  : pair.val = cls.repr
 
-namespace HFInt
+namespace ℤ₀
 
-/-- Construye un HFInt a partir de un entero estándar ℤ₀. -/
-def ofZ0 (z : ℤ₀) : HFInt where
+/-- Construye un ℤ₀ a partir de un entero estándar ℤ₀cls. -/
+def ofCls (z : ℤ₀cls) : ℤ₀ where
   cls  := z
-  pair := ⟨z.repr, ℤ₀.repr_normalized z⟩
+  pair := ⟨z.repr, ℤ₀cls.repr_normalized z⟩
   hEq  := rfl
 
-/-- Construye un HFInt a partir de su representante canónico ℤ₀'. -/
-def ofZ0' (p : ℤ₀') : HFInt where
-  cls  := ℤ₀'.toZ0 p
+/-- Construye un ℤ₀ a partir de su representante canónico ℤ₀can. -/
+def ofCls' (p : ℤ₀can) : ℤ₀ where
+  cls  := ℤ₀can.toCls p
   pair := p
-  hEq  := (congrArg Subtype.val (ℤ₀'.ofZ0_toZ0 p)).symm
+  hEq  := (congrArg Subtype.val (ℤ₀can.ofCls_toCls p)).symm
 
-theorem ofZ0_cls (z : ℤ₀) : (ofZ0 z).cls = z := rfl
+theorem ofZ0_cls (z : ℤ₀cls) : (ofCls z).cls = z := rfl
 
-/-- Dos HFInt son iguales si sus clases subyacentes son iguales. -/
+/-- Dos ℤ₀ son iguales si sus clases subyacentes son iguales. -/
 @[ext]
-theorem ext (a b : HFInt) (h : a.cls = b.cls) : a = b := by
+theorem ext (a b : ℤ₀) (h : a.cls = b.cls) : a = b := by
   have h_repr : a.cls.repr = b.cls.repr := by rw [h]
   have h_val : a.pair.val = b.pair.val := by
     rw [a.hEq, b.hEq, h_repr]
@@ -125,136 +125,136 @@ theorem ext (a b : HFInt) (h : a.cls = b.cls) : a = b := by
 -- Instancias Algebraicas
 -- ─────────────────────────────────────────────────────────────────────────────
 
-instance : Zero HFInt where zero := ofZ0 0
-instance : One  HFInt where one  := ofZ0 1
-instance : Add  HFInt where add a b := ofZ0 (Add.add a.cls b.cls)
-instance : Mul  HFInt where mul a b := ofZ0 (Mul.mul a.cls b.cls)
-instance : Neg  HFInt where neg a := ofZ0 (Neg.neg a.cls)
-instance : Sub  HFInt where sub a b := ofZ0 (Sub.sub a.cls b.cls)
+instance : Zero ℤ₀ where zero := ofCls 0
+instance : One  ℤ₀ where one  := ofCls 1
+instance : Add  ℤ₀ where add a b := ofCls (Add.add a.cls b.cls)
+instance : Mul  ℤ₀ where mul a b := ofCls (Mul.mul a.cls b.cls)
+instance : Neg  ℤ₀ where neg a := ofCls (Neg.neg a.cls)
+instance : Sub  ℤ₀ where sub a b := ofCls (Sub.sub a.cls b.cls)
 
-def ofNat (n : ℕ₀) : HFInt := ofZ0 (ℤ₀.ofNat n)
+def ofNat (n : ℕ₀) : ℤ₀ := ofCls (ℤ₀cls.ofNat n)
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- Lemas de anillo (heredados trivialmente de ℤ₀)
+-- Lemas de anillo (heredados trivialmente de ℤ₀cls)
 -- ─────────────────────────────────────────────────────────────────────────────
 
-theorem add_comm (a b : HFInt) : Add.add a b = Add.add b a := by
+theorem add_comm (a b : ℤ₀) : Add.add a b = Add.add b a := by
   apply ext
-  exact ℤ₀.add_comm a.cls b.cls
+  exact ℤ₀cls.add_comm a.cls b.cls
 
-theorem add_assoc (a b c : HFInt) : Add.add (Add.add a b) c = Add.add a (Add.add b c) := by
+theorem add_assoc (a b c : ℤ₀) : Add.add (Add.add a b) c = Add.add a (Add.add b c) := by
   apply ext
-  exact ℤ₀.add_assoc a.cls b.cls c.cls
+  exact ℤ₀cls.add_assoc a.cls b.cls c.cls
 
-theorem zero_add (a : HFInt) : Add.add 0 a = a := by
+theorem zero_add (a : ℤ₀) : Add.add 0 a = a := by
   apply ext
-  exact ℤ₀.zero_add a.cls
+  exact ℤ₀cls.zero_add a.cls
 
-theorem add_zero (a : HFInt) : Add.add a 0 = a := by
+theorem add_zero (a : ℤ₀) : Add.add a 0 = a := by
   apply ext
-  exact ℤ₀.add_zero a.cls
+  exact ℤ₀cls.add_zero a.cls
 
-theorem add_neg_self (a : HFInt) : Add.add a (Neg.neg a) = 0 := by
+theorem add_neg_self (a : ℤ₀) : Add.add a (Neg.neg a) = 0 := by
   apply ext
-  exact ℤ₀.add_neg_self a.cls
+  exact ℤ₀cls.add_neg_self a.cls
 
-theorem neg_add_self (a : HFInt) : Add.add (Neg.neg a) a = 0 := by
+theorem neg_add_self (a : ℤ₀) : Add.add (Neg.neg a) a = 0 := by
   apply ext
-  exact ℤ₀.neg_add_self a.cls
+  exact ℤ₀cls.neg_add_self a.cls
 
-theorem neg_neg (a : HFInt) : Neg.neg (Neg.neg a) = a := by
+theorem neg_neg (a : ℤ₀) : Neg.neg (Neg.neg a) = a := by
   apply ext
-  exact ℤ₀.neg_neg a.cls
+  exact ℤ₀cls.neg_neg a.cls
 
-theorem mul_comm (a b : HFInt) : Mul.mul a b = Mul.mul b a := by
+theorem mul_comm (a b : ℤ₀) : Mul.mul a b = Mul.mul b a := by
   apply ext
-  exact ℤ₀.mul_comm a.cls b.cls
+  exact ℤ₀cls.mul_comm a.cls b.cls
 
-theorem mul_assoc (a b c : HFInt) : Mul.mul (Mul.mul a b) c = Mul.mul a (Mul.mul b c) := by
+theorem mul_assoc (a b c : ℤ₀) : Mul.mul (Mul.mul a b) c = Mul.mul a (Mul.mul b c) := by
   apply ext
-  exact ℤ₀.mul_assoc a.cls b.cls c.cls
+  exact ℤ₀cls.mul_assoc a.cls b.cls c.cls
 
-theorem one_mul (a : HFInt) : Mul.mul 1 a = a := by
+theorem one_mul (a : ℤ₀) : Mul.mul 1 a = a := by
   apply ext
-  exact ℤ₀.one_mul a.cls
+  exact ℤ₀cls.one_mul a.cls
 
-theorem mul_one (a : HFInt) : Mul.mul a 1 = a := by
+theorem mul_one (a : ℤ₀) : Mul.mul a 1 = a := by
   apply ext
-  exact ℤ₀.mul_one a.cls
+  exact ℤ₀cls.mul_one a.cls
 
-theorem zero_mul (a : HFInt) : Mul.mul 0 a = 0 := by
+theorem zero_mul (a : ℤ₀) : Mul.mul 0 a = 0 := by
   apply ext
-  exact ℤ₀.zero_mul a.cls
+  exact ℤ₀cls.zero_mul a.cls
 
-theorem mul_zero (a : HFInt) : Mul.mul a 0 = 0 := by
+theorem mul_zero (a : ℤ₀) : Mul.mul a 0 = 0 := by
   apply ext
-  exact ℤ₀.mul_zero a.cls
+  exact ℤ₀cls.mul_zero a.cls
 
-theorem left_distrib (a b c : HFInt) : Mul.mul a (Add.add b c) = Add.add (Mul.mul a b) (Mul.mul a c) := by
+theorem left_distrib (a b c : ℤ₀) : Mul.mul a (Add.add b c) = Add.add (Mul.mul a b) (Mul.mul a c) := by
   apply ext
-  exact ℤ₀.left_distrib a.cls b.cls c.cls
+  exact ℤ₀cls.left_distrib a.cls b.cls c.cls
 
-theorem right_distrib (a b c : HFInt) : Mul.mul (Add.add a b) c = Add.add (Mul.mul a c) (Mul.mul b c) := by
+theorem right_distrib (a b c : ℤ₀) : Mul.mul (Add.add a b) c = Add.add (Mul.mul a c) (Mul.mul b c) := by
   apply ext
-  exact ℤ₀.right_distrib a.cls b.cls c.cls
+  exact ℤ₀cls.right_distrib a.cls b.cls c.cls
 
-theorem neg_mul (a b : HFInt) : Mul.mul (Neg.neg a) b = Neg.neg (Mul.mul a b) := by
+theorem neg_mul (a b : ℤ₀) : Mul.mul (Neg.neg a) b = Neg.neg (Mul.mul a b) := by
   apply ext
-  exact ℤ₀.neg_mul a.cls b.cls
+  exact ℤ₀cls.neg_mul a.cls b.cls
 
-theorem mul_neg (a b : HFInt) : Mul.mul a (Neg.neg b) = Neg.neg (Mul.mul a b) := by
+theorem mul_neg (a b : ℤ₀) : Mul.mul a (Neg.neg b) = Neg.neg (Mul.mul a b) := by
   apply ext
-  exact ℤ₀.mul_neg a.cls b.cls
+  exact ℤ₀cls.mul_neg a.cls b.cls
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Decidibilidad de la Igualdad
 -- ─────────────────────────────────────────────────────────────────────────────
 
-instance instDecidableEq (a b : HFInt) : Decidable (a = b) :=
+instance instDecidableEq (a b : ℤ₀) : Decidable (a = b) :=
   match decEq a.cls b.cls with
   | isTrue h  => isTrue (ext a b h)
   | isFalse h => isFalse (fun heq => h (by rw [heq]))
 
-instance : LE HFInt where le a b := a.cls ≤ b.cls
-instance : LT HFInt where lt a b := a.cls < b.cls
+instance : LE ℤ₀ where le a b := a.cls ≤ b.cls
+instance : LT ℤ₀ where lt a b := a.cls < b.cls
 
-instance instDecidableLE (a b : HFInt) : Decidable (a ≤ b) := inferInstanceAs (Decidable (a.cls ≤ b.cls))
-instance instDecidableLT (a b : HFInt) : Decidable (a < b) := inferInstanceAs (Decidable (a.cls < b.cls))
+instance instDecidableLE (a b : ℤ₀) : Decidable (a ≤ b) := inferInstanceAs (Decidable (a.cls ≤ b.cls))
+instance instDecidableLT (a b : ℤ₀) : Decidable (a < b) := inferInstanceAs (Decidable (a.cls < b.cls))
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Subtipos Estructurados
 -- ─────────────────────────────────────────────────────────────────────────────
 
-/-- Elementos no nulos (HFInt^*) -/
-def NonZero := { x : HFInt // x ≠ 0 }
+/-- Elementos no nulos (ℤ₀^*) -/
+def NonZero := { x : ℤ₀ // x ≠ 0 }
 
-/-- Unidades de HFInt (solo 1 y -1) -/
-def Units := { x : HFInt // x = 1 ∨ x = -1 }
+/-- Unidades de ℤ₀ (solo 1 y -1) -/
+def Units := { x : ℤ₀ // x = 1 ∨ x = -1 }
 
-/-- Kernel de HFInt (0, 1 y -1) -/
-def Kernel := { x : HFInt // x = 0 ∨ x = 1 ∨ x = -1 }
+/-- Kernel de ℤ₀ (0, 1 y -1) -/
+def Kernel := { x : ℤ₀ // x = 0 ∨ x = 1 ∨ x = -1 }
 
 /-- Elementos fuera del kernel -/
-def OutKernel := { x : HFInt // x ≠ 0 ∧ x ≠ 1 ∧ x ≠ -1 }
+def OutKernel := { x : ℤ₀ // x ≠ 0 ∧ x ≠ 1 ∧ x ≠ -1 }
 
 /-- Estrictamente positivos -/
-def Pos := { x : HFInt // 0 < x }
+def Pos := { x : ℤ₀ // 0 < x }
 
 /-- Estrictamente negativos -/
-def Neg := { x : HFInt // x < 0 }
+def Neg := { x : ℤ₀ // x < 0 }
 
 /-- No negativos (imagen de ℕ₀) -/
-def NonNeg := { x : HFInt // 0 ≤ x }
+def NonNeg := { x : ℤ₀ // 0 ≤ x }
 
--- Coerciones para usar los subtipos como HFInt directamente
-instance : Coe NonZero HFInt where coe := Subtype.val
-instance : Coe Units HFInt where coe := Subtype.val
-instance : Coe Kernel HFInt where coe := Subtype.val
-instance : Coe OutKernel HFInt where coe := Subtype.val
-instance : Coe Pos HFInt where coe := Subtype.val
-instance : Coe Neg HFInt where coe := Subtype.val
-instance : Coe NonNeg HFInt where coe := Subtype.val
+-- Coerciones para usar los subtipos como ℤ₀ directamente
+instance : Coe NonZero ℤ₀ where coe := Subtype.val
+instance : Coe Units ℤ₀ where coe := Subtype.val
+instance : Coe Kernel ℤ₀ where coe := Subtype.val
+instance : Coe OutKernel ℤ₀ where coe := Subtype.val
+instance : Coe Pos ℤ₀ where coe := Subtype.val
+instance : Coe Neg ℤ₀ where coe := Subtype.val
+instance : Coe NonNeg ℤ₀ where coe := Subtype.val
 
-instance : Coe Peano.ℕ₀ HFInt where coe := ofNat
+instance : Coe Peano.ℕ₀ ℤ₀ where coe := ofNat
 
-end HFInt
+end ℤ₀

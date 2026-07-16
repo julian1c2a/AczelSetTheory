@@ -5,29 +5,29 @@ License: MIT
 -/
 
 -- AczelSetTheory/Integers/Bezout.lean
--- Identidad de Bézout extendida sobre ℤ₀.
+-- Identidad de Bézout extendida sobre ℤ₀cls.
 --
 -- Público:
---   ℤ₀.bezout_ofNat      : ∀ a b : ℕ₀, ∃ x y : ℤ₀,
+--   ℤ₀cls.bezout_ofNat      : ∀ a b : ℕ₀, ∃ x y : ℤ₀cls,
 --                             Add.add (Mul.mul (ofNat a) x) (Mul.mul (ofNat b) y) = ofNat (gcd a b)
---   ℤ₀.bezout_coprime_ofNat : gcd a b = 𝟙 → ∃ x y : ℤ₀,
+--   ℤ₀cls.bezout_coprime_ofNat : gcd a b = 𝟙 → ∃ x y : ℤ₀cls,
 --                             Add.add (Mul.mul (ofNat a) x) (Mul.mul (ofNat b) y) = 1
---   ℤ₀.bezout            : ∀ a b : ℤ₀, ∃ x y : ℤ₀,
+--   ℤ₀cls.bezout            : ∀ a b : ℤ₀cls, ∃ x y : ℤ₀cls,
 --                             Add.add (Mul.mul a x) (Mul.mul b y) = gcdZ a b
---   ℤ₀.bezout_coprime     : gcdZ a b = 1 → ∃ x y : ℤ₀,
+--   ℤ₀cls.bezout_coprime     : gcdZ a b = 1 → ∃ x y : ℤ₀cls,
 --                             Add.add (Mul.mul a x) (Mul.mul b y) = 1
---   ℤ₀.bezoutCoeffs      : ℤ₀ → ℤ₀ → ℤ₀ × ℤ₀
+--   ℤ₀cls.bezoutCoeffs      : ℤ₀cls → ℤ₀cls → ℤ₀cls × ℤ₀cls
 --                             función computable; (x,y) := bezoutCoeffs a b satisface
 --                             a·x + b·y = gcdZ a b  (spec pendiente)
 --
 -- Notas de diseño:
 -- - peanolib declara `notation a "+" b => Peano.Add.add a b` (global en Add.lean).
 --   Esta notación compite con `HAdd.hAdd`, haciendo que `a + b` sea ambiguo cuando
---   a b : ℤ₀.  Solución adoptada en todo el proyecto (ver Basic.lean §295):
+--   a b : ℤ₀cls.  Solución adoptada en todo el proyecto (ver Basic.lean §295):
 --   usar Add.add y Mul.mul explícitamente en los enunciados de teoremas.
--- - La forma substractiva de Bézout en ℕ₀ (bezout_natform) se levanta a ℤ₀
+-- - La forma substractiva de Bézout en ℕ₀ (bezout_natform) se levanta a ℤ₀cls
 --   vía ofNat_sub_ofNat (puente privado).
--- - El caso general (ℤ₀) se reduce a bezout_ofNat vía descomposición de signo
+-- - El caso general (ℤ₀cls) se reduce a bezout_ofNat vía descomposición de signo
 --   (todo entero es ±ofNat de su valor absoluto): sin sorry.
 -- - `bezoutCoeffs` implementa el algoritmo extendido de Euclides directamente sobre ℕ₀
 --   (via `extEuclidNat`) y ajusta el signo. `gcd_step` ya es público en peanolib (b7ccbd0).
@@ -45,14 +45,14 @@ import AczelSetTheory.Integers.Arithmetic
 import AczelSetTheory.Integers.Order
 import Peano.PeanoNat.Arith
 
--- Abrimos sub-namespaces de Peano que no tienen conflicto con ℤ₀.
+-- Abrimos sub-namespaces de Peano que no tienen conflicto con ℤ₀cls.
 -- NO abrimos Peano ni Peano.Add (causarían la ambigüedad descrita arriba).
 open Peano.Sub Peano.Order Peano.Arith
 
-namespace ℤ₀
+namespace ℤ₀cls
 
 -- ============================================================
--- Sección 0: Lemas privados de puente ℕ₀ ↔ ℤ₀
+-- Sección 0: Lemas privados de puente ℕ₀ ↔ ℤ₀cls
 -- ============================================================
 
 /-- Si ¬ le₀ m n, entonces sub n m = 𝟘 (sustracción truncada en ℕ₀). -/
@@ -74,13 +74,13 @@ private theorem ofNat_sub_ofNat {m n : ℕ₀} (h : le₀ m n) :
     _ = Add.add (ofNat n) (Neg.neg (ofNat m)) := by rw [key]
 
 -- ============================================================
--- Sección 1: Bézout para ℕ₀ (coeficientes en ℤ₀)
+-- Sección 1: Bézout para ℕ₀ (coeficientes en ℤ₀cls)
 -- ============================================================
 
-/-- Identidad de Bézout para naturales (coeficientes en ℤ₀):
-    existen `x y : ℤ₀` tales que `ofNat a · x + ofNat b · y = ofNat (gcd a b)`. -/
+/-- Identidad de Bézout para naturales (coeficientes en ℤ₀cls):
+    existen `x y : ℤ₀cls` tales que `ofNat a · x + ofNat b · y = ofNat (gcd a b)`. -/
 theorem bezout_ofNat (a b : ℕ₀) :
-    ∃ x y : ℤ₀,
+    ∃ x y : ℤ₀cls,
       Add.add (Mul.mul (ofNat a) x) (Mul.mul (ofNat b) y) = ofNat (gcd a b) := by
   obtain ⟨n, m, h | h⟩ := bezout_natform a b
   · -- Caso 1: gcd a b = sub (mul n a) (mul m b)
@@ -133,24 +133,24 @@ theorem bezout_ofNat (a b : ℕ₀) :
 -- Sección 2: Corolarios sobre coprimalidad (ℕ₀)
 -- ============================================================
 
-/-- Si `gcd a b = 1`, existen `x y : ℤ₀` con `ofNat a · x + ofNat b · y = 1`. -/
+/-- Si `gcd a b = 1`, existen `x y : ℤ₀cls` con `ofNat a · x + ofNat b · y = 1`. -/
 theorem bezout_coprime_ofNat {a b : ℕ₀} (h : gcd a b = 𝟙) :
-    ∃ x y : ℤ₀,
+    ∃ x y : ℤ₀cls,
       Add.add (Mul.mul (ofNat a) x) (Mul.mul (ofNat b) y) = 1 := by
   obtain ⟨x, y, hxy⟩ := bezout_ofNat a b
   exact ⟨x, y, by rw [hxy, h, ofNat_one]⟩
 
 -- ============================================================
--- Sección 3: Bézout general para ℤ₀
+-- Sección 3: Bézout general para ℤ₀cls
 -- ============================================================
 -- Reducción a bezout_ofNat vía descomposición de signo
 -- (todo entero es ±ofNat de su valor absoluto).
 
 /-- Descomposición de signo: todo entero es `ofNat (toNat |a|)` o su negativo. -/
-private theorem self_eq_or_neg_ofNat_toNat_abs (a : ℤ₀) :
+private theorem self_eq_or_neg_ofNat_toNat_abs (a : ℤ₀cls) :
     a = ofNat (toNat (abs a)) ∨ a = Neg.neg (ofNat (toNat (abs a))) := by
   have habs : abs a = ofNat (toNat (abs a)) := nonneg_eq_ofNat (abs_nonneg a)
-  by_cases h : (0 : ℤ₀) ≤ a
+  by_cases h : (0 : ℤ₀cls) ≤ a
   · left
     have haa : abs a = a := by unfold abs; rw [if_pos h]
     exact haa.symm.trans habs
@@ -162,8 +162,8 @@ private theorem self_eq_or_neg_ofNat_toNat_abs (a : ℤ₀) :
 
 /-- Absorción del signo en un coeficiente de Bézout: para todo `x`, existe `x'`
     tal que `ofNat (toNat |a|) · x = a · x'`. -/
-private theorem mul_ofNat_toNat_abs (a x : ℤ₀) :
-    ∃ x' : ℤ₀, Mul.mul (ofNat (toNat (abs a))) x = Mul.mul a x' := by
+private theorem mul_ofNat_toNat_abs (a x : ℤ₀cls) :
+    ∃ x' : ℤ₀cls, Mul.mul (ofNat (toNat (abs a))) x = Mul.mul a x' := by
   rcases self_eq_or_neg_ofNat_toNat_abs a with ha | ha
   · exact ⟨x, by rw [← ha]⟩
   · refine ⟨Neg.neg x, ?_⟩
@@ -173,9 +173,9 @@ private theorem mul_ofNat_toNat_abs (a x : ℤ₀) :
       exact hc.symm
     rw [heq, neg_mul, mul_neg]
 
-/-- Identidad de Bézout para enteros: existen `x y : ℤ₀` con `a·x + b·y = gcdZ a b`. -/
-theorem bezout (a b : ℤ₀) :
-    ∃ x y : ℤ₀, Add.add (Mul.mul a x) (Mul.mul b y) = gcdZ a b := by
+/-- Identidad de Bézout para enteros: existen `x y : ℤ₀cls` con `a·x + b·y = gcdZ a b`. -/
+theorem bezout (a b : ℤ₀cls) :
+    ∃ x y : ℤ₀cls, Add.add (Mul.mul a x) (Mul.mul b y) = gcdZ a b := by
   obtain ⟨x, y, hxy⟩ := bezout_ofNat (toNat (abs a)) (toNat (abs b))
   obtain ⟨x', hx'⟩ := mul_ofNat_toNat_abs a x
   obtain ⟨y', hy'⟩ := mul_ofNat_toNat_abs b y
@@ -184,9 +184,9 @@ theorem bezout (a b : ℤ₀) :
   rw [hg, ← hx', ← hy']
   exact hxy
 
-/-- Si `gcdZ a b = 1`, existen `x y : ℤ₀` con `a·x + b·y = 1`. -/
-theorem bezout_coprime {a b : ℤ₀} (h : gcdZ a b = 1) :
-    ∃ x y : ℤ₀, Add.add (Mul.mul a x) (Mul.mul b y) = 1 := by
+/-- Si `gcdZ a b = 1`, existen `x y : ℤ₀cls` con `a·x + b·y = 1`. -/
+theorem bezout_coprime {a b : ℤ₀cls} (h : gcdZ a b = 1) :
+    ∃ x y : ℤ₀cls, Add.add (Mul.mul a x) (Mul.mul b y) = 1 := by
   obtain ⟨x, y, hxy⟩ := bezout a b
   exact ⟨x, y, hxy.trans h⟩
 
@@ -200,10 +200,10 @@ theorem bezout_coprime {a b : ℤ₀} (h : gcdZ a b = 1) :
 -- (público desde peanolib v2.0.0-12-gb7ccbd0).
 
 set_option linter.unusedVariables false in
-/-- Algoritmo extendido de Euclides sobre ℕ₀, devolviendo coeficientes en ℤ₀.
+/-- Algoritmo extendido de Euclides sobre ℕ₀, devolviendo coeficientes en ℤ₀cls.
     Recurrencia: `extEuclidNat a b = (t, s − (a/b)·t)`
     donde `(s, t) = extEuclidNat b (a % b)`. Termina porque `a % b < b`. -/
-def extEuclidNat (a b : ℕ₀) : ℤ₀ × ℤ₀ :=
+def extEuclidNat (a b : ℕ₀) : ℤ₀cls × ℤ₀cls :=
   if hb : b = 𝟘 then
     (1, 0)    -- gcd(a,0)=a : 1·a + 0·0 = a ✓
   else
@@ -218,8 +218,8 @@ def extEuclidNat (a b : ℕ₀) : ℤ₀ × ℤ₀ :=
 termination_by b
 decreasing_by exact Peano.Div.mod_lt a b hb
 
-/-- Lema algebraico auxiliar: `(A+C)+(D+(-A)) = D+C` en ℤ₀. -/
-private theorem bezout_ring_cancel (A C D : ℤ₀) :
+/-- Lema algebraico auxiliar: `(A+C)+(D+(-A)) = D+C` en ℤ₀cls. -/
+private theorem bezout_ring_cancel (A C D : ℤ₀cls) :
     Add.add (Add.add A C) (Add.add D (Neg.neg A)) = Add.add D C := by
   rw [← add_assoc (Add.add A C) D (Neg.neg A),
       add_assoc A C D,
@@ -286,15 +286,15 @@ theorem extEuclidNat_spec (a b : ℕ₀) :
       -- Ahora la meta tiene la forma (A+C)+(D+(-A)) = D+C
       exact bezout_ring_cancel _ _ _
 
-/-- Coeficientes de Bézout para enteros ℤ₀ vía descomposición por signo.
+/-- Coeficientes de Bézout para enteros ℤ₀cls vía descomposición por signo.
     Para `(x, y) := bezoutCoeffs a b` se tiene
     `Mul.mul a x + Mul.mul b y = gcdZ a b`.
     La prueba formal de esta propiedad (`bezoutCoeffs_spec`) está pendiente.
     Idea: `|a|·x' + |b|·y' = gcd(|a|,|b|)`  (de `extEuclidNat_spec`)
     →  `a·(x'·sign a) + b·(y'·sign b) = gcdZ a b`
     pues `a·sign(a) = |a|` (lema `mul_sign_eq_abs`, pendiente). -/
-def bezoutCoeffs (a b : ℤ₀) : ℤ₀ × ℤ₀ :=
+def bezoutCoeffs (a b : ℤ₀cls) : ℤ₀cls × ℤ₀cls :=
   let (x, y) := extEuclidNat (toNat (abs a)) (toNat (abs b))
   (Mul.mul x (sign a), Mul.mul y (sign b))
 
-end ℤ₀
+end ℤ₀cls

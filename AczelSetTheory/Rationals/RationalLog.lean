@@ -5,7 +5,7 @@ License: MIT
 -/
 
 -- AczelSetTheory/Rationals/RationalLog.lean
--- Logaritmo de un racional `r > 0` como sucesión de Cauchy de ℚ₀, por la serie
+-- Logaritmo de un racional `r > 0` como sucesión de Cauchy de ℚ₀cls, por la serie
 -- del `artanh` con reducción de argumento:
 --
 --   ln r = ln n + 2·Σ_{k≥0} u^(2k+1)/(2k+1),   u = (r-n)/(r+n),   n ∈ ℕ elegido.
@@ -23,7 +23,7 @@ import AczelSetTheory.Rationals.PowOrder
 import AczelSetTheory.Rationals.Bisection
 import AczelSetTheory.Rationals.Inv
 
-namespace ℚ₀
+namespace ℚ₀cls
 
 -- ============================================================
 -- Sección 1: Puente entre pow2 y pow (1/2)
@@ -31,7 +31,7 @@ namespace ℚ₀
 
 /-- `1/2^0 = 1`. -/
 theorem pow2_zero : pow2 𝟘 = 1 := by
-  show mk (ℤ₀.ofNat (σ 𝟘)) (pow2_den 𝟘) = 1
+  show mk (ℤ₀cls.ofNat (σ 𝟘)) (pow2_den 𝟘) = 1
   have hden : pow2_den 𝟘 = den1 := by
     apply Subtype.ext
     show Peano.Pow.pow (σ (σ 𝟘)) 𝟘 = 𝟙
@@ -56,7 +56,7 @@ theorem pow_pow2_one (m : ℕ₀) : pow (pow2 𝟙) m = pow2 m := by
 -- ============================================================
 
 /-- Si `|u| ≤ 1/2`, entonces `|u|^m ≤ 1/2^m` para todo `m`. -/
-theorem pow_absVal_le_pow2 {u : ℚ₀} (hu : absVal u ≤ pow2 𝟙) (m : ℕ₀) :
+theorem pow_absVal_le_pow2 {u : ℚ₀cls} (hu : absVal u ≤ pow2 𝟙) (m : ℕ₀) :
     pow (absVal u) m ≤ pow2 m := by
   have h := pow_le_pow_left (absVal_nonneg u) hu m
   rwa [pow_pow2_one] at h
@@ -69,11 +69,11 @@ theorem pow_absVal_le_pow2 {u : ℚ₀} (hu : absVal u ≤ pow2 𝟙) (m : ℕ�
 def oddIdx (j : ℕ₀) : ℕ₀ := σ (Peano.Mul.mul (σ (σ 𝟘)) j)
 
 /-- `j`-ésimo término de la serie del artanh: `u^(2j+1)/(2j+1)`. -/
-def artanhTerm (u : ℚ₀) (j : ℕ₀) : ℚ₀ :=
+def artanhTerm (u : ℚ₀cls) (j : ℕ₀) : ℚ₀cls :=
   pow u (oddIdx j) * inv (ofNat₀ (oddIdx j))
 
 /-- Sumas parciales de `Σ_{j=0}^{k} u^(2j+1)/(2j+1)`. -/
-def artanhSeq (u : ℚ₀) : ℕ₀ → ℚ₀
+def artanhSeq (u : ℚ₀cls) : ℕ₀ → ℚ₀cls
   | 𝟘 => artanhTerm u 𝟘
   | σ k => Add.add (artanhSeq u k) (artanhTerm u (σ k))
 
@@ -86,7 +86,7 @@ theorem oddIdx_ne_zero (j : ℕ₀) : oddIdx j ≠ 𝟘 := by
 
 theorem ofNat₀_ne_zero {m : ℕ₀} (hm : m ≠ 𝟘) : ofNat₀ m ≠ 0 := by
   rw [ofNat₀_eq_mk]; intro h
-  exact hm (ℤ₀.ofNat_injective ((mk_eq_zero_iff.mp h).trans ℤ₀.ofNat_zero.symm))
+  exact hm (ℤ₀cls.ofNat_injective ((mk_eq_zero_iff.mp h).trans ℤ₀cls.ofNat_zero.symm))
 
 /-- `j ≤ 2j+1`. -/
 theorem self_le_oddIdx (j : ℕ₀) : Peano.Order.le₀ j (oddIdx j) := by
@@ -97,15 +97,15 @@ theorem self_le_oddIdx (j : ℕ₀) : Peano.Order.le₀ j (oddIdx j) := by
   exact Peano.Order.le_trans _ _ _ h1 (Peano.Order.le_succ_self _)
 
 /-- `1 ≤ ofNat₀ (2j+1)`. -/
-theorem one_le_ofNat₀_oddIdx (j : ℕ₀) : (1 : ℚ₀) ≤ ofNat₀ (oddIdx j) := by
+theorem one_le_ofNat₀_oddIdx (j : ℕ₀) : (1 : ℚ₀cls) ≤ ofNat₀ (oddIdx j) := by
   have h : Peano.Order.le₀ 𝟙 (oddIdx j) := by
     unfold oddIdx
     exact Peano.Order.succ_le_succ_if (Peano.Order.zero_le _)
   have h2 := ofNat₀_le_ofNat₀ h
-  rwa [show ofNat₀ 𝟙 = (1 : ℚ₀) from rfl] at h2
+  rwa [show ofNat₀ 𝟙 = (1 : ℚ₀cls) from rfl] at h2
 
 /-- Cota del `(k+1)`-ésimo término: `|u^(2k+3)/(2k+3)| ≤ 1/2^(k+1)` si `|u| ≤ 1/2`. -/
-theorem artanhTerm_bound {u : ℚ₀} (hu : absVal u ≤ pow2 𝟙) (k : ℕ₀) :
+theorem artanhTerm_bound {u : ℚ₀cls} (hu : absVal u ≤ pow2 𝟙) (k : ℕ₀) :
     absVal (artanhTerm u (σ k)) ≤ pow2 (σ k) := by
   show absVal (pow u (oddIdx (σ k)) * inv (ofNat₀ (oddIdx (σ k)))) ≤ pow2 (σ k)
   rw [absVal_mul, absVal_pow]
@@ -120,7 +120,7 @@ theorem artanhTerm_bound {u : ℚ₀} (hu : absVal u ≤ pow2 𝟙) (k : ℕ₀)
   rw [mul_one] at hstep1
   exact le_trans hstep1 (pow2_le_of_le (self_le_oddIdx (σ k)))
 
-theorem artanhSeq_step {u : ℚ₀} (hu : absVal u ≤ pow2 𝟙) (k : ℕ₀) :
+theorem artanhSeq_step {u : ℚ₀cls} (hu : absVal u ≤ pow2 𝟙) (k : ℕ₀) :
     absVal (artanhSeq u (σ k) - artanhSeq u k) ≤ pow2 (σ k) := by
   have he : Add.add (artanhSeq u (σ k)) (Neg.neg (artanhSeq u k)) = artanhTerm u (σ k) := by
     show Add.add (Add.add (artanhSeq u k) (artanhTerm u (σ k))) (Neg.neg (artanhSeq u k))
@@ -131,7 +131,7 @@ theorem artanhSeq_step {u : ℚ₀} (hu : absVal u ≤ pow2 𝟙) (k : ℕ₀) :
   exact artanhTerm_bound hu k
 
 /-- **La serie del artanh es de Cauchy** cuando `|u| ≤ 1/2`. -/
-theorem artanhSeq_isCauchy {u : ℚ₀} (hu : absVal u ≤ pow2 𝟙) : IsCauchy (artanhSeq u) :=
+theorem artanhSeq_isCauchy {u : ℚ₀cls} (hu : absVal u ≤ pow2 𝟙) : IsCauchy (artanhSeq u) :=
   isCauchy_of_dyadic_step (artanhSeq_step hu)
 
-end ℚ₀
+end ℚ₀cls
