@@ -355,7 +355,7 @@ theorem newton_seq_step_bound (q r : ℚ₀cls) (n : ℕ₂) (hq : 0 < q) (hr : 
   Add.add (newton_raphson_seq q n (σ k)) delta ≤ newton_raphson_seq q n k := sorry
 
 -- Helper lemma: Telescoping sum of the lower bound.
-theorem newton_seq_telescope (f : ℕ₀ → ℚ₀cls) (delta : ℚ₀cls) (h_delta : 0 < delta) 
+theorem newton_seq_telescope (f : ℕ₀ → ℚ₀cls) (delta : ℚ₀cls) (_h_delta : 0 < delta) 
   (h_step : ∀ k : ℕ₀, Peano.Order.le₀ 1 k → Add.add (f (σ k)) delta ≤ f k) :
   ∀ k : ℕ₀, Add.add (f (σ k)) (Mul.mul (ofNat₀ k) delta) ≤ f 1 := by
   intro k

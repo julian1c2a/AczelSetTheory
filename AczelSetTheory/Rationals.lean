@@ -10,6 +10,7 @@ License: MIT
 -- Cadena: peanolib → … → Integers (ℤ₀cls) → Rationals (ℚ₀cls) → Reals (ℝ₀).
 
 import AczelSetTheory.Rationals.Basic
+import AczelSetTheory.Rationals.Inv
 import AczelSetTheory.Rationals.AbsVal
 import AczelSetTheory.Rationals.IsCauchy
 import AczelSetTheory.Rationals.Density
@@ -21,6 +22,7 @@ import AczelSetTheory.Rationals.Roots
 import AczelSetTheory.Rationals.PowOrder
 import AczelSetTheory.Rationals.RationalLog
 import AczelSetTheory.Rationals.Q0
+import AczelSetTheory.Rationals.Q0Ops
 import AczelSetTheory.Rationals.MinAdd
 import AczelSetTheory.Rationals.Series
 import AczelSetTheory.Rationals.Polynomial

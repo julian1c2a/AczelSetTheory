@@ -396,7 +396,7 @@ theorem absVal_inv_sub_inv (x y : ℚ₀cls) (hx : x ≠ 0) (hy : y ≠ 0) :
   rw [absVal_inv _ h_xy_ne_0]
   rw [ℚ₀cls.absVal_mul]
 
-theorem inv_bound_lemma (x y d p Z : ℚ₀cls) (hx : 0 ≤ x) (hy : 0 ≤ y) (hd : 0 ≤ d) (hp : 0 ≤ p)
+theorem inv_bound_lemma (x y d p Z : ℚ₀cls) (hx : 0 ≤ x) (hy : 0 ≤ y) (_hd : 0 ≤ d) (hp : 0 ≤ p)
     (hZ_pos : 0 ≤ Z) (hZ_nz : Z ≠ 0)
     (h_Z_le : Z ≤ x * y)
     (h_diff : d ≤ p * Z) :
