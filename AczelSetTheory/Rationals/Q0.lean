@@ -316,6 +316,23 @@ instance instDecidableEq (a b : ℚ₀) : Decidable (a = b) :=
 instance : LE ℚ₀ where le a b := a.cls ≤ b.cls
 instance : LT ℚ₀ where lt a b := a.cls < b.cls
 
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Homomorfismo `.cls` — BASE DEL API BRIDGE (ADR-023, migración de tipos)
+-- Las operaciones del struct fijan `cls := (op sobre cls)`, así que `.cls` conmuta con
+-- todas ellas por `rfl`. `@[simp]` + `@[ext]` transfieren cualquier hecho de `ℚ₀cls` a `ℚ₀`.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+@[simp] theorem cls_zero : (0 : ℚ₀).cls = 0 := rfl
+@[simp] theorem cls_one  : (1 : ℚ₀).cls = 1 := rfl
+@[simp] theorem cls_add (a b : ℚ₀) : (a + b).cls = a.cls + b.cls := rfl
+@[simp] theorem cls_mul (a b : ℚ₀) : (a * b).cls = a.cls * b.cls := rfl
+@[simp] theorem cls_neg (a : ℚ₀)   : (-a).cls   = -a.cls := rfl
+@[simp] theorem cls_sub (a b : ℚ₀) : (a - b).cls = a.cls - b.cls := rfl
+
+/-- El orden del struct es, por definición, el de sus clases. -/
+theorem le_iff_cls (a b : ℚ₀) : a ≤ b ↔ a.cls ≤ b.cls := Iff.rfl
+theorem lt_iff_cls (a b : ℚ₀) : a < b ↔ a.cls < b.cls := Iff.rfl
+
 theorem le_pair_iff (a b : ℚ₀) : a ≤ b ↔ a.pair ≤ b.pair := by
   change a.cls ≤ b.cls ↔ ℚ₀can.toCls a.pair ≤ ℚ₀can.toCls b.pair
   rw [a.hEq, b.hEq]

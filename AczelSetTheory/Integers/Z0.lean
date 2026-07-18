@@ -221,6 +221,28 @@ instance instDecidableEq (a b : ℤ₀) : Decidable (a = b) :=
 instance : LE ℤ₀ where le a b := a.cls ≤ b.cls
 instance : LT ℤ₀ where lt a b := a.cls < b.cls
 
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Homomorfismo `.cls` — BASE DEL API BRIDGE (ADR-023, migración de tipos)
+--
+-- Las operaciones del struct están definidas como `ofCls (op sobre cls)`, así que la
+-- proyección `.cls` conmuta con TODAS ellas por `rfl`. Estos `@[simp]` + `@[ext]`
+-- convierten cualquier hecho de `ℤ₀cls` en su versión sobre `ℤ₀` en una línea:
+--   theorem foo (a b : ℤ₀) : a ⊕ b = b ⊕ a := by ext; simp; exact ℤ₀cls.foo a.cls b.cls
+-- y el orden vía `le_iff_cls`/`lt_iff_cls`. La teoría original sobre `ℤ₀cls` no se toca.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+@[simp] theorem cls_zero   : (0 : ℤ₀).cls = 0 := rfl
+@[simp] theorem cls_one    : (1 : ℤ₀).cls = 1 := rfl
+@[simp] theorem cls_negOne : negOne.cls = ℤ₀cls.negOne := rfl
+@[simp] theorem cls_add (a b : ℤ₀) : (a + b).cls = a.cls + b.cls := rfl
+@[simp] theorem cls_mul (a b : ℤ₀) : (a * b).cls = a.cls * b.cls := rfl
+@[simp] theorem cls_neg (a : ℤ₀)   : (-a).cls   = -a.cls := rfl
+@[simp] theorem cls_sub (a b : ℤ₀) : (a - b).cls = a.cls - b.cls := rfl
+
+/-- El orden del struct es, por definición, el de sus clases. -/
+theorem le_iff_cls (a b : ℤ₀) : a ≤ b ↔ a.cls ≤ b.cls := Iff.rfl
+theorem lt_iff_cls (a b : ℤ₀) : a < b ↔ a.cls < b.cls := Iff.rfl
+
 instance instDecidableLE (a b : ℤ₀) : Decidable (a ≤ b) := inferInstanceAs (Decidable (a.cls ≤ b.cls))
 instance instDecidableLT (a b : ℤ₀) : Decidable (a < b) := inferInstanceAs (Decidable (a.cls < b.cls))
 
