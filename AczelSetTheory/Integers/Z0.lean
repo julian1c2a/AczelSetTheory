@@ -127,6 +127,9 @@ theorem ext (a b : ℤ₀) (h : a.cls = b.cls) : a = b := by
 
 instance : Zero ℤ₀ where zero := ofCls 0
 instance : One  ℤ₀ where one  := ofCls 1
+
+/-- `-1` empaquetado. Bridge trivial sobre `ℤ₀cls.negOne` (migración de tipos, ADR-023). -/
+def negOne : ℤ₀ := ofCls ℤ₀cls.negOne
 instance : Add  ℤ₀ where add a b := ofCls (Add.add a.cls b.cls)
 instance : Mul  ℤ₀ where mul a b := ofCls (Mul.mul a.cls b.cls)
 instance : Neg  ℤ₀ where neg a := ofCls (Neg.neg a.cls)
