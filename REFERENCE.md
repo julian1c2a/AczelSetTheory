@@ -19,7 +19,7 @@
 > [`doc/REFERENCE-Arithmetic.md`](doc/REFERENCE-Arithmetic.md),
 > [`doc/REFERENCE-Paridad-Peano-Aczel.md`](doc/REFERENCE-Paridad-Peano-Aczel.md),
 > [`doc/REFERENCE-Rationals.md`](doc/REFERENCE-Rationals.md) (ℚ₀/ℚ₀cls/ℚ₀can, incl. el
-> subsistema `Reals/`; los módulos legacy conservan el formato antiguo en su anexo).
+> subsistema `Reals/`; los 22 módulos proyectados al estándar §4/§6/§7, ADR-023 2026-07-18).
 >
 > **Nota (2026-06-08, vigente):** la tabla §1 lista los módulos del núcleo histórico más las
 > últimas adiciones. Para el inventario completo y al día (204 ficheros `.lean` totales bajo
