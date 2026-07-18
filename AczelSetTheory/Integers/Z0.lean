@@ -257,4 +257,12 @@ instance : Coe NonNeg ℤ₀ where coe := Subtype.val
 
 instance : Coe Peano.ℕ₀ ℤ₀ where coe := ofNat
 
+/-- Coerción olvidadiza `ℤ₀ → ℤ₀cls` (proyección al campo `cls`): permite usar un `ℤ₀`
+    (entero empaquetado) allí donde se espera la clase de equivalencia `ℤ₀cls`. Es el
+    homomorfismo natural — las operaciones del struct están definidas como
+    `ofCls (op sobre cls)`, así que `(a ⊕ b).cls = a.cls ⊕ b.cls` por `rfl` (ver `ofCls_cls`).
+    Con esto, migrar un consumidor a `ℤ₀` no obliga a reescribir su teoría: sigue apoyándose
+    en la de `ℤ₀cls` vía esta coerción (ADR-023 / migración de tipos). -/
+instance : Coe ℤ₀ ℤ₀cls where coe := ℤ₀.cls
+
 end ℤ₀

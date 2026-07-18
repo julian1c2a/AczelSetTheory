@@ -374,4 +374,9 @@ instance : Coe NonNeg ℚ₀ where coe := Subtype.val
 instance : Coe PuncturedUnitBall ℚ₀ where coe := Subtype.val
 instance : Coe OutsideBall ℚ₀ where coe := Subtype.val
 
+/-- Coerción olvidadiza `ℚ₀ → ℚ₀cls` (proyección al campo `cls`): permite usar un `ℚ₀`
+    (racional empaquetado) allí donde se espera la clase `ℚ₀cls`. Homomorfismo natural
+    (las ops del struct son `ofCls (op sobre cls)`). Ver la análoga `Coe ℤ₀ ℤ₀cls` y ADR-023. -/
+instance : Coe ℚ₀ ℚ₀cls where coe := ℚ₀.cls
+
 end ℚ₀
