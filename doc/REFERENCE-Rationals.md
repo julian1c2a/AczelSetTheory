@@ -1,8 +1,8 @@
 # Technical Reference — Rationals `ℚ₀` / `ℚ₀cls` & Constructive Cauchy Analysis
 
-**Last updated:** 2026-07-18 (ADR-023: migración del anexo legacy al estándar §4/§6/§7 — los
-22 módulos del subsistema `Rationals/` + `Reals/` proyectados con firmas exactas; renombrado
-`ℚ₀`/`ℚ₀cls`/`ℚ₀can`)
+**Last updated:** 2026-07-18 (ADR-023: migración del anexo legacy al estándar §4/§6/§7; +
+paridad total del struct `ℚ₀` — 6 módulos nuevos `Q0Order`/`Q0Ops`(API cuerpo)/`Q0Convergence`/
+`Q0Roots`/`Q0RationalLog`/`Q0Bisection` proyectados; renombrado `ℚ₀`/`ℚ₀cls`/`ℚ₀can`)
 **Parent:** [../REFERENCE.md](../REFERENCE.md)
 **Related:** [REFERENCE-Arithmetic.md](REFERENCE-Arithmetic.md) | [REFERENCE-Algebra.md](REFERENCE-Algebra.md) | [REFERENCE-Paridad-Peano-Aczel.md](REFERENCE-Paridad-Peano-Aczel.md)
 
@@ -84,11 +84,17 @@ PowOrder, Bisection, Inv          → RationalLog
 Basic, AbsVal, IsCauchy, Inv, MinAdd → CauchySeqAlgebra
 Roots, Archimedean                → Irrational
 
--- capa del struct ℚ₀ --
+-- capa del struct ℚ₀ (titular) --
 Basic, Canonical, AbsVal          → Q0 ─┬→ Q0Order
                                         └→ Polynomial
 Q0, Inv, AbsVal, Roots, PowOrder  → Q0Ops → Series
 Q0Ops, IsCauchy, CauchySeqAlgebra → Q0Cauchy → Q0CauchyAlgebra
+
+-- paridad total del struct (2026-07-18): API de análisis sobre ℚ₀ --
+Q0Cauchy, Q0Order, Convergence, Archimedean → Q0Convergence
+Q0Ops, Q0Order, Roots             → Q0Roots
+Q0Convergence, Q0Roots, RationalLog → Q0RationalLog
+Q0Convergence, Bisection          → Q0Bisection
 
 Q0Cauchy, Irrational              → Reals/Incompleteness
 ```
@@ -477,6 +483,50 @@ def sqrt2Seq : ℕ₀ → ℚ₀
 
 - **Math**: la sucesión de Newton–Raphson hacia √2 sobre `ℚ₀`
 - Computable. Único símbolo del módulo libre de `sorry`.
+
+### 4.108u Rationals/Q0Convergence.lean — `namespace ℚ₀`
+
+Teoría de convergencia sobre `ℚ₀` (predicados redefinidos nativamente, estilo `Q0Cauchy`).
+
+```lean
+def IsBounded (f : ℕ₀ → ℚ₀) : Prop
+def ConvergesTo (f : ℕ₀ → ℚ₀) (L : ℚ₀) : Prop
+def IsConvergent (f : ℕ₀ → ℚ₀) : Prop
+```
+
+- **Math**: `IsBounded f` ⟺ ∃ M, ∀ n, |f n| ≤ M · `ConvergesTo f L` ⟺ ∀ n, |f n − L| ≤ 1/2^(n+1) · `IsConvergent f` ⟺ ∃ L, f → L.
+- Se atan a `ℚ₀cls` con `isBounded_iff`/`convergesTo_iff`/`isConvergent_iff` (§6.108u); también los 10 lemas de `pow2` y la propiedad arquimediana.
+
+### 4.108v Rationals/Q0Roots.lean — `namespace ℚ₀`
+
+```lean
+def newton_raphson_step (q : ℚ₀) (n : Peano.ℕ₂) (x : ℚ₀) : ℚ₀
+def newton_raphson_seq (q : ℚ₀) (n : Peano.ℕ₂) : ℕ₀ → ℚ₀
+```
+
+- **Math**: paso e iteración de Newton–Raphson hacia `ⁿ√q` sobre `ℚ₀` (semilla x₀ = q). `pow` vive en `Q0Ops`.
+- Computables (`ofCls` de la versión de `ℚ₀cls`). Acompañadas de los lemas de potencia/orden que faltaban y los `newton_seq_*` (§6.108v).
+
+### 4.108w Rationals/Q0RationalLog.lean — `namespace ℚ₀`
+
+```lean
+def artanhTerm (u : ℚ₀) (j : ℕ₀) : ℚ₀
+def artanhSeq (u : ℚ₀) : ℕ₀ → ℚ₀
+```
+
+- **Math**: `artanhTerm u j` = u^(2j+1)/(2j+1) · `artanhSeq u k` = sumas parciales de artanh. (`oddIdx : ℕ₀ → ℕ₀` es ℕ₀-puro y no se empaqueta.)
+- Computables. La serie es de Cauchy (§6.108w).
+
+### 4.108x Rationals/Q0Bisection.lean — `namespace ℚ₀`
+
+```lean
+def bisectSeq (g : ℕ₀ → ℚ₀ → Bool) (a₀ : ℚ₀) : ℕ₀ → ℚ₀
+```
+
+- **Math**: bisección diádica dinámica dirigida por `g`; de Cauchy por construcción.
+- Definida vía `ofCls` de `ℚ₀cls.bisectSeq` (el decisor se adapta con `ofCls`). **No expone la
+  recurrencia `bisectSeq_succ`**: su condición `bif` depende del decisor aplicado al tipo, que no
+  atraviesa `ofCls` por `rfl` — para calcularla, usar `ℚ₀cls.bisectSeq`.
 
 ## 6. Theorems
 
@@ -879,6 +929,82 @@ Orden y valor absoluto de `ℚ₀` (cuerpo ordenado). El orden del struct es *po
 
 *(sin secciones 6.108r/6.108s: `Polynomial` e `Incompleteness` no tienen ningún teorema libre de `sorry`)*
 
+### 6.108u Rationals/Q0Convergence.lean — `namespace ℚ₀`
+
+| # | Theorem | Lean signature |
+| --- | --------- | --------------- |
+| 1 | `pow2_nonneg` | `(n : ℕ₀) : 0 ≤ pow2 n` |
+| 2 | `pow2_ne_zero` | `(k : ℕ₀) : pow2 k ≠ 0` |
+| 3 | `pow2_succ_add` | `(n : ℕ₀) : Add.add (pow2 (σ n)) (pow2 (σ n)) = pow2 n` |
+| 4 | `pow2_add` | `(n m : ℕ₀) : pow2 (Peano.Add.add n m) = Mul.mul (pow2 n) (pow2 m)` |
+| 5 | `pow2_le_one` | `(k : ℕ₀) : pow2 k ≤ ofNat₀ 𝟙` |
+| 6 | `pow2_bound` | `(K : ℕ₀) : Mul.mul (ofNat₀ K) (pow2 K) ≤ ofNat₀ 𝟙` |
+| 7 | `pow2_step` | `(n : ℕ₀) : pow2 (σ n) ≤ pow2 n` |
+| 8 | `pow2_add_le` | `(a d : ℕ₀) : pow2 (Peano.Add.add a d) ≤ pow2 a` |
+| 9 | `pow2_le_of_le` | `{a b : ℕ₀} (h : Peano.Order.le₀ a b) : pow2 b ≤ pow2 a` |
+| 10 | `isBounded_iff` | `(f : ℕ₀ → ℚ₀) : IsBounded f ↔ ℚ₀cls.IsBounded (toClsSeq f)` |
+| 11 | `convergesTo_iff` | `(f : ℕ₀ → ℚ₀) (L : ℚ₀) : ConvergesTo f L ↔ ℚ₀cls.ConvergesTo (toClsSeq f) L.cls` |
+| 12 | `isConvergent_iff` | `(f : ℕ₀ → ℚ₀) : IsConvergent f ↔ ℚ₀cls.IsConvergent (toClsSeq f)` |
+| 13 | `isCauchy₂_iff` | `(f : ℕ₀ → ℚ₀) : IsCauchy₂ f ↔ ℚ₀cls.IsCauchy₂ (toClsSeq f)` |
+| 14 | `isBounded_of_isCauchy` | `{f : ℕ₀ → ℚ₀} (h : IsCauchy f) : IsBounded f` |
+| 15 | `isCauchy_of_convergesTo` | `{f : ℕ₀ → ℚ₀} {L : ℚ₀} (h : ConvergesTo f L) : IsCauchy f` |
+| 16 | `isCauchy₂_of_convergesTo` | `{f : ℕ₀ → ℚ₀} {L : ℚ₀} (h : ConvergesTo f L) : IsCauchy₂ f` |
+| 17 | `isCauchy_of_isConvergent` | `{f : ℕ₀ → ℚ₀} (h : IsConvergent f) : IsCauchy f` |
+| 18 | `isBounded_of_convergesTo` | `{f : ℕ₀ → ℚ₀} {L : ℚ₀} (h : ConvergesTo f L) : IsBounded f` |
+| 19 | `isBounded_of_isConvergent` | `{f : ℕ₀ → ℚ₀} (h : IsConvergent f) : IsBounded f` |
+| 20 | `convergesTo_unique` | `{f : ℕ₀ → ℚ₀} {L₁ L₂ : ℚ₀} (h1 : ConvergesTo f L₁) (h2 : ConvergesTo f L₂) : L₁ = L₂` |
+| 21 | `eq_zero_of_le_pow2_all` | `{q : ℚ₀} (hq : 0 ≤ q) (h : ∀ n : ℕ₀, q ≤ pow2 n) : q = 0` |
+| 22 | `archimedean` | `(x y : ℚ₀) (hx : 0 < x) : ∃ N : ℕ₀, y < Mul.mul (ofNat₀ N) x` |
+
+### 6.108v Rationals/Q0Roots.lean — `namespace ℚ₀`
+
+Homomorfismo `@[simp]`: `cls_newton_raphson_step`, `cls_newton_raphson_seq`.
+
+| # | Theorem | Lean signature |
+| --- | --------- | --------------- |
+| 1 | `one_pow` | `(n : ℕ₀) : (1 : ℚ₀).pow n = 1` |
+| 2 | `pow_pos` | `{x : ℚ₀} (k : ℕ₀) (hx : 0 < x) : 0 < x.pow k` |
+| 3 | `pow_ne_zero_of_pos` | `{x : ℚ₀} (hx : 0 < x) (n : ℕ₀) : x.pow n ≠ 0` |
+| 4 | `pow_mul_distrib` | `(a b : ℚ₀) (n : ℕ₀) : (Mul.mul a b).pow n = Mul.mul (a.pow n) (b.pow n)` |
+| 5 | `pow_inv` | `(b : ℚ₀) (hb : 0 < b) (n : ℕ₀) : (b⁻¹).pow n = (b.pow n)⁻¹` |
+| 6 | `square_nonneg` | `(x : ℚ₀) : (0:ℚ₀) ≤ Mul.mul x x` |
+| 7 | `zero_lt_one` | `(0:ℚ₀) < 1` |
+| 8 | `add_nonneg` | `{a b : ℚ₀} (ha : 0 ≤ a) (hb : 0 ≤ b) : 0 ≤ Add.add a b` |
+| 9 | `add_pos` | `{a b : ℚ₀} (ha : 0 < a) (hb : 0 < b) : 0 < Add.add a b` |
+| 10 | `mul_pos` | `{a b : ℚ₀} (ha : 0 < a) (hb : 0 < b) : 0 < Mul.mul a b` |
+| 11 | `le_of_lt` | `{a b : ℚ₀} (h : a < b) : a ≤ b` |
+| 12 | `lt_of_le_of_ne` | `{a b : ℚ₀} (h_le : a ≤ b) (h_ne : a ≠ b) : a < b` |
+| 13 | `inv_pos` | `{a : ℚ₀} (h : 0 < a) : 0 < a⁻¹` |
+| 14 | `inv_ne_zero` | `{a : ℚ₀} (h : a ≠ 0) : a⁻¹ ≠ 0` |
+| 15 | `eq_zero_of_mul_eq_zero` | `{a b : ℚ₀} (h : Mul.mul a b = 0) (hb : b ≠ 0) : a = 0` |
+| 16 | `newton_seq_pos` | `(q : ℚ₀) (n : Peano.ℕ₂) (hq : 0 < q) (k : ℕ₀) : 0 < newton_raphson_seq q n k` |
+| 17 | `newton_seq_pow_ge` | `(q : ℚ₀) (n : Peano.ℕ₂) (hq : 0 < q) (k : ℕ₀) : q ≤ (newton_raphson_seq q n (σ k)).pow n.val.val` |
+| 18 | `newton_seq_monotone` | `(q : ℚ₀) (n : Peano.ℕ₂) (hq : 0 < q) (k : ℕ₀) : newton_raphson_seq q n (σ (σ k)) ≤ newton_raphson_seq q n (σ k)` |
+| 19 | `newton_seq_le_x1` | `(q : ℚ₀) (n : Peano.ℕ₂) (hq : 0 < q) (k : ℕ₀) : newton_raphson_seq q n (σ k) ≤ newton_raphson_seq q n 1` |
+
+### 6.108w Rationals/Q0RationalLog.lean — `namespace ℚ₀`
+
+Homomorfismo `@[simp]`: `cls_artanhTerm`, `cls_artanhSeq`.
+
+| # | Theorem | Lean signature |
+| --- | --------- | --------------- |
+| 1 | `pow2_zero` | `pow2 𝟘 = 1` |
+| 2 | `pow_pow2_one` | `(m : ℕ₀) : (pow2 𝟙).pow m = pow2 m` |
+| 3 | `pow_absVal_le_pow2` | `{u : ℚ₀} (hu : absVal u ≤ pow2 𝟙) (m : ℕ₀) : (absVal u).pow m ≤ pow2 m` |
+| 4 | `ofNat₀_ne_zero` | `{m : ℕ₀} (hm : m ≠ 𝟘) : ofNat₀ m ≠ 0` |
+| 5 | `artanhTerm_bound` | `{u : ℚ₀} (hu : absVal u ≤ pow2 𝟙) (k : ℕ₀) : absVal (artanhTerm u (σ k)) ≤ pow2 (σ k)` |
+| 6 | `artanhSeq_step` | `{u : ℚ₀} (hu : absVal u ≤ pow2 𝟙) (k : ℕ₀) : absVal (Sub.sub (artanhSeq u (σ k)) (artanhSeq u k)) ≤ pow2 (σ k)` |
+| 7 | `artanhSeq_isCauchy` | `{u : ℚ₀} (hu : absVal u ≤ pow2 𝟙) : IsCauchy (artanhSeq u)` |
+
+### 6.108x Rationals/Q0Bisection.lean — `namespace ℚ₀`
+
+Homomorfismo `@[simp]`: `cls_bisectSeq`.
+
+| # | Theorem | Lean signature |
+| --- | --------- | --------------- |
+| 1 | `isCauchy_of_dyadic_step` | `{f : ℕ₀ → ℚ₀} (h : ∀ k : ℕ₀, absVal (Sub.sub (f (σ k)) (f k)) ≤ pow2 (σ k)) : IsCauchy f` |
+| 2 | `bisectSeq_isCauchy` | `(g : ℕ₀ → ℚ₀ → Bool) (a₀ : ℚ₀) : IsCauchy (bisectSeq g a₀)` |
+
 ## 7. Exports per Module
 
 Estos módulos **no llevan bloque `export`**: por **ADR-021** el bloque es opcional y selectivo,
@@ -965,6 +1091,23 @@ de subtipos y `Coe ℚ₀ ℚ₀cls`; + los 33 teoremas de §6.108l.
 
 (sin defs) los 23 teoremas de §6.108t: orden parcial/total, compatibilidad con `+`/`*`,
 y el valor absoluto (incl. la desigualdad triangular `absVal_add_le`).
+
+### Rationals/Q0Convergence.lean — `ℚ₀`
+
+`IsBounded`, `ConvergesTo`, `IsConvergent`, + los 22 teoremas de §6.108u (lemas de `pow2`,
+puentes `iff`, teoremas transportados de convergencia y `archimedean`).
+
+### Rationals/Q0Roots.lean — `ℚ₀`
+
+`newton_raphson_step`, `newton_raphson_seq`, + los 19 teoremas de §6.108v (potencia, orden y `newton_seq_*`).
+
+### Rationals/Q0RationalLog.lean — `ℚ₀`
+
+`artanhTerm`, `artanhSeq`, + los 7 teoremas de §6.108w (la serie de artanh es de Cauchy).
+
+### Rationals/Q0Bisection.lean — `ℚ₀`
+
+`bisectSeq`, + `isCauchy_of_dyadic_step`, `bisectSeq_isCauchy` (§6.108x).
 
 ### Rationals/Q0Cauchy.lean — `ℚ₀`
 

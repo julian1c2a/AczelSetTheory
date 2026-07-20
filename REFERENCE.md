@@ -184,6 +184,10 @@ Below are the keys for reading and searching theorems.
 | 108r | [`AczelSetTheory/Rationals/Polynomial.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀` | 🚧 Progress (4 sorry: canonicalización tras `add`/`smul`/`mul`/`monomial`) | PList/Basic, Rationals/ℚ₀, Axioms/OrdinalNat | Rationals.lean |
 | 108s | [`AczelSetTheory/Reals/Incompleteness.lean`](doc/REFERENCE-Rationals.md) | `ℝ₀` (namespace de propiedades sobre `ℚ₀`; **no** existe aún un tipo `ℝ₀`/`HFReal` como cociente — ver nota abajo) | 🚧 Progress (3 sorry: irracionalidad de √2 y convergencia) | Rationals/{Q0Cauchy,Irrational} | Reals.lean |
 | 108t | [`AczelSetTheory/Rationals/Q0Order.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀` | ✅ Complete | Rationals/Q0 | Rationals.lean |
+| 108u | [`AczelSetTheory/Rationals/Q0Convergence.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀` | ✅ Complete (nuevo 2026-07-18) | Rationals/{Q0Cauchy,Q0Order,Convergence,Archimedean} | Rationals.lean |
+| 108v | [`AczelSetTheory/Rationals/Q0Roots.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀` | ✅ Complete (nuevo 2026-07-18) | Rationals/{Q0Ops,Q0Order,Roots} | Rationals.lean |
+| 108w | [`AczelSetTheory/Rationals/Q0RationalLog.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀` | ✅ Complete (nuevo 2026-07-18) | Rationals/{Q0Convergence,Q0Roots,RationalLog} | Rationals.lean |
+| 108x | [`AczelSetTheory/Rationals/Q0Bisection.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀` | ✅ Complete (nuevo 2026-07-18) | Rationals/{Q0Convergence,Bisection} | Rationals.lean |
 
 > **Nota histórica (2026-07-12):** hasta el 2026-07-05 (commit `173add2`) existió un
 > primer intento de `ℝ₀` como tipo propio — `Reals/{CauchySeq,Arithmetic,Order,RealAxioms}.lean`,
