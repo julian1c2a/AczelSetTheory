@@ -1,16 +1,20 @@
 # Dependency Diagram — AczelSetTheory
 
-**Last updated:** 2026-05-11
+**Last updated:** 2026-07-20 (nota de alcance refrescada; el diagrama sigue siendo el de la fase inicial)
 **Author**: Julián Calderón Almendros
 
-> **⚠️ Alcance histórico (nota 2026-06-10):** este documento describe la
+> **⚠️ Alcance histórico (nota 2026-07-20):** este documento describe la
 > arquitectura de la **fase inicial** (Fases 1–5: `CList/`, `PList/`, `HFSets`,
-> `Operations/` y `Axioms/` básicos). **No** refleja los ~165 módulos añadidos
-> posteriormente (`VN/`, `Algebra/`, `Integers/`, `Topology/`, `Combinatorics/`).
+> `Operations/` y `Axioms/` básicos). **No** refleja los ~205 módulos añadidos
+> posteriormente (`VN/`, `Algebra/`, `Integers/`, `Rationals/`, `Reals/`,
+> `Topology/`, `Combinatorics/`), incluidas las **capas struct titulares** `ℤ₀`/`ℚ₀`
+> (ADR-023/024) que empaquetan las clases `ℤ₀cls`/`ℚ₀cls`.
 > Para el grafo de dependencias actual y completo usa `lake graph`; para el
-> inventario al día consulta [`REFERENCE.md`](REFERENCE.md) §1 y
-> [`AUDIT-MODULE-MATRIX.md`](AUDIT-MODULE-MATRIX.md). No se regenera aquí por
-> coste prohibitivo a ~180 módulos.
+> inventario al día consulta [`REFERENCE.md`](REFERENCE.md) §1,
+> [`AUDIT-MODULE-MATRIX.md`](AUDIT-MODULE-MATRIX.md) (regenerada por `make audit`), y las
+> jerarquías de dependencias de [`doc/REFERENCE-Integers.md`](doc/REFERENCE-Integers.md) y
+> [`doc/REFERENCE-Rationals.md`](doc/REFERENCE-Rationals.md). No se regenera aquí por
+> coste prohibitivo a ~210 módulos.
 
 ## Capas actuales (vista a nivel de subsistema, 2026-06-10)
 

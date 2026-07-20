@@ -1,16 +1,18 @@
 # Current Project Status — AczelSetTheory
 
-**Last updated:** 2026-07-15
+**Last updated:** 2026-07-20
 **Author**: Julián Calderón Almendros
 
-> ⚠️ **Nota de fiabilidad (2026-07-15, ver INFORME-AUDITORIA-2026-07-15.md):** el
-> resumen ejecutivo y la sección «Architecture» se han corregido contra el estado
-> real (204 ficheros, 14 sorry, 273 jobs, 19 warnings; gate constructivo ahora
-> **exhaustivo**). El "Module Inventory" detallado que sigue **no** se ha reauditado
-> fila por fila en esta pasada — la fuente de verdad módulo a módulo es
-> [`REFERENCE.md`](REFERENCE.md) §1 + `git log`. Conteos reales por subsistema
-> (2026-07-15): CList 7 · PList 4 · Operations 21 · Axioms 43 · VN 49 · Algebra 23 ·
-> Integers 12 · Rationals 21 · Reals 1 · Topology 5 · Combinatorics 1.
+> ⚠️ **Nota de fiabilidad (2026-07-20):** estado real tras la migración de tipos ℤ₀/ℚ₀
+> (ADR-023/024): **211 ficheros, 35 274 líneas, 14 sorry, 280 jobs**, 0 warnings nuevos;
+> gate constructivo **exhaustivo** sobre **3239 declaraciones**, baseline de excepciones = **0**
+> (pureza constructiva TOTAL). El "Module Inventory" detallado que sigue **no** se ha reauditado
+> fila por fila — la fuente de verdad módulo a módulo es [`REFERENCE.md`](REFERENCE.md) §1
+> (+ nodos [`doc/REFERENCE-Integers.md`](doc/REFERENCE-Integers.md) y
+> [`doc/REFERENCE-Rationals.md`](doc/REFERENCE-Rationals.md)) + `AUDIT-MODULE-MATRIX.md`
+> (`make audit`) + `git log`. Conteos reales por subsistema (2026-07-20): CList 7 · PList 4 ·
+> Operations 21 · Axioms 43 · VN 49 · Algebra 23 · **Integers 14** · **Rationals 26** · Reals 1 ·
+> Topology 5 · Combinatorics 1. (Integers +2 y Rationals +5: las capas struct titulares `ℤ₀`/`ℚ₀`.)
 
 ---
 

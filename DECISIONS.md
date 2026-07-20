@@ -1,6 +1,6 @@
 # Design Decisions — AczelSetTheory
 
-**Last updated:** 2026-07-16
+**Last updated:** 2026-07-20
 **Author**: Julián Calderón Almendros
 
 Architectural Decision Records (ADR) for this project.
@@ -832,6 +832,39 @@ Arrastra la cascada completa:
 - Los documentos vivos (README, REFERENCE + nodos, CURRENT-STATUS, NEXT-STEPS, DEPENDENCIES,
   PLANNING) sí se actualizan a la nomenclatura nueva.
 - `AUDIT-MODULE-MATRIX.md` recoge los ficheros nuevos automáticamente vía `make audit` (ADR-022).
+
+---
+
+## ADR-024: Migración de tipos vía coerción + homomorfismo `.cls` + bridges `ext` (sin tocar la clase)
+
+**Date**: 2026-07-20
+**Status**: Accepted (decisión del usuario)
+
+**Context**: Tras ADR-023 (el nombre titular `ℤ₀`/`ℚ₀` pasa al struct empaquetado), había que
+hacer que el proyecto **use** los structs donde antes usaba las clases `ℤ₀cls`/`ℚ₀cls`, sin
+reescribir ni arriesgar las pruebas originales (que son válidas y están sobre la clase).
+
+**Decision**: completar el API de `ℤ₀`/`ℚ₀` como una **fachada** sobre la clase, en tres capas:
+1. **Coerción olvidadiza** `Coe ℤ₀ ℤ₀cls := ⟨.cls⟩` (ídem `ℚ₀`): permite usar el struct donde se
+   espera la clase, sin ambigüedad.
+2. **Homomorfismo `.cls` `@[simp]`**: las ops del struct son `ofCls (op sobre cls)` (o fijan
+   `cls := op`), así que `cls_add`/`cls_mul`/… son `rfl`. Con `@[ext]` (que reduce la igualdad del
+   struct a la de la clase) esto convierte cualquier hecho de la clase en su versión struct en 1 línea.
+3. **Bridges** term-mode/`ext` sobre cada lema de la clase — sin duplicar pruebas.
+Regla operativa: en las firmas de bridges usar `Add.add`/`Mul.mul`/`Neg.neg`/`Sub.sub` **explícito**
+(el elaborador de `+`/`*` choca con la coerción `ℕ₀→ℤ₀`). Los predicados (Cauchy, convergencia) se
+**redefinen nativamente** sobre el struct y se atan a la clase con un `iff`.
+
+**Rationale**: mantener las clases como el *núcleo probado* y los structs como la *cara pública* da
+paridad práctica sin riesgo ni deuda de prueba; el gate exhaustivo (ADR-020) garantiza que la fachada
+no introduce axiomas. Alternativa descartada: reescribir la teoría directamente sobre los structs
+(coste enorme, riesgo de regresión, y los cocientes siguen siendo la construcción natural).
+
+**Consequences**: `ℤ₀` es anillo conmutativo ordenado + teoría de números; `ℚ₀` es cuerpo ordenado
+con Cauchy/convergencia/arquimediano/raíces. El gate pasó de 3042 a 3239 decls, baseline 0. La regla
+8 (nada con `sorry` en REFERENCE) se aplica por footprint de axiomas también a la fachada. La igualdad
+del struct **no** es definicionalmente la de la clase: hace falta `ext` en un sentido y `congrArg .cls`
+en el otro (de ahí `eq_iff_cls`/`ne_zero_iff_cls`).
 
 ---
 

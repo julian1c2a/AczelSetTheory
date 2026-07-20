@@ -1,11 +1,16 @@
 # PLANNING — AczelSetTheory
 
-**Last updated:** 2026-06-10
+**Last updated:** 2026-07-20
 **Author:** Julián Calderón Almendros
 
 > Plan de largo plazo para AczelSetTheory. Cada fase es ejecutable de forma
 > independiente. Las dependencias entre fases están marcadas explícitamente.
-> El detalle inmediato vive en NEXT_STEPS.md.
+> El detalle inmediato vive en [`NEXT-STEPS.md`](NEXT-STEPS.md) (nombre canónico con guión).
+>
+> **Checkpoint 2026-07-20**: FASE B cerrada; pureza constructiva TOTAL (gate exhaustivo, ADR-020);
+> gobernanza coherente (ADR-021/022); **migración de tipos ℤ₀/ℚ₀ completa** (ADR-023/024 — structs
+> titulares con paridad práctica). **Próxima fase: FRENTE 1 — `HFReal`** (cociente de Cauchy en `ℚ₀`),
+> cuyo cimiento (cuerpo ordenado + Cauchy + convergencia + arquimediano) queda ya listo.
 >
 > **Contexto histórico**: El proyecto predecesor Peano fue puesto en feature-freeze
 > el 2026-05-10. Su hoja de ruta original se conserva en

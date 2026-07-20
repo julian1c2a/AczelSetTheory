@@ -6,6 +6,41 @@ All notable changes to this project are documented here.
 
 ---
 
+## [2026-07-20] — Migración de tipos ℤ₀/ℚ₀ + gobernanza coherente + reorganización documental
+
+### Added
+- **Migración de tipos ADR-023 completa**: los tipos titulares `ℤ₀`/`ℚ₀` (estructuras que
+  empaquetan clase + representante canónico + coherencia) alcanzan **paridad práctica** con las
+  clases `ℤ₀cls`/`ℚ₀cls`, vía coerción olvidadiza + homomorfismo `.cls` `@[simp]` + bridges `ext`.
+  Módulos nuevos: `Integers/{Z0Order,Z0NumberTheory}`, `Rationals/{Q0Order,Q0Convergence,Q0Roots,
+  Q0RationalLog,Q0Bisection}` (7 ficheros). `ℤ₀` = anillo conmutativo ordenado + teoría de números
+  (Möbius/Liouville/biyección); `ℚ₀` = cuerpo ordenado + valor absoluto + Cauchy + convergencia +
+  arquimediano + Newton–Raphson + artanh + bisección. `Z0Ops`/`Q0Ops` completan su homomorfismo.
+- **`doc/REFERENCE-Integers.md`** (nodo dedicado): los 14 módulos del subsistema `Integers/`
+  proyectados al estándar §4/§6/§7 (par de `REFERENCE-Rationals.md`).
+- **Gobernanza coherente (ADR-021/022)** y **generador de matriz** `gen-audit-matrix.bash`
+  (`make audit`): la matriz se regenera automáticamente (211 ficheros / 35 274 líneas / 14 sorry).
+
+### Changed
+- **RENOMBRADO ADR-023**: `HFInt`→`ℤ₀`, `HFRat`→`ℚ₀` (titulares); los antiguos `ℤ₀`/`ℚ₀`
+  (cocientes) → `ℤ₀cls`/`ℚ₀cls`; los canónicos → `ℤ₀can`/`ℚ₀can`. Ficheros `HFInt→Z0`, `HFRat→Q0`, etc.
+- **`ADR-021`**: la regla 17 (export obligatorio a raíz) pasa a OPCIONAL/selectiva (era inaplicable
+  — la incumplían 200/204 y romper el build); **REGLA 13 retirada**; fuente de verdad de la
+  proyección = declaraciones no-`private`.
+- **`ADR-022`**: invariante O6 de FASE B desdoblado (O6a duro / O6b solo-encoge / O6c sin warnings nuevos).
+- **`doc/REFERENCE-Rationals.md`**: anexo legacy (18 módulos) migrado al estándar §4/§6/§7 + los 6
+  módulos struct nuevos proyectados; jerarquía de dependencias corregida (estaba factualmente mal).
+- **`doc/REFERENCE-Arithmetic.md`**: retirada la sección de enteros (obsoleta) → puntero al nodo nuevo.
+- **`REFERENCE.md`**: filas Integers enlazadas al nodo dedicado + filas de la capa struct ℤ₀/ℚ₀.
+- **`NEXT-STEPS.md`** reescrito (estaba desfasado 2026-07-12): próximo objetivo FRENTE 1 (`HFReal`),
+  cuyo cimiento (cuerpo ordenado + Cauchy + convergencia) queda ya completo.
+
+### Invariants
+- **Pureza constructiva TOTAL preservada**: el gate exhaustivo (`Meta/AxiomCheck.lean`, ADR-020) pasa
+  de 3042 a **3239 declaraciones**, baseline de excepciones = **0**. Build 280 jobs verde, 0 warnings nuevos.
+
+---
+
 ## [2026-07-15] — Gate constructivo EXHAUSTIVO + auditoría de Classical oculto
 
 ### Added
