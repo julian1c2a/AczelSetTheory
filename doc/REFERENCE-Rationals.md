@@ -52,6 +52,7 @@ FRENTE 1 de [NEXT-STEPS.md](../NEXT-STEPS.md)). Tendrá nodo propio cuando exist
 | 108q | `AczelSetTheory/Rationals/Series.lean` | 🚧 Progress — 3/11 proyectados (6 sorry) |
 | 108r | `AczelSetTheory/Rationals/Polynomial.lean` | 🚧 Progress — 11/17 proyectados (4 sorry) |
 | 108s | `AczelSetTheory/Reals/Incompleteness.lean` | 🚧 Progress — 1/5 proyectados (3 sorry) |
+| 108t | `AczelSetTheory/Rationals/Q0Order.lean` | ✅ Complete (nuevo 2026-07-18 — orden y valor absoluto de `ℚ₀`) |
 
 > **Regla (8)** — *nada que no esté probado entra en REFERENCE*. Los símbolos cuyo footprint
 > contiene `sorryAx` (directa **o indirectamente**) **no se documentan aquí**: ni firma, ni
@@ -66,16 +67,30 @@ FRENTE 1 de [NEXT-STEPS.md](../NEXT-STEPS.md)). Tendrá nodo propio cuando exist
 
 ## Jerarquía de Dependencias
 
+Grafo real de `import` (verificado sobre el código, 2026-07-18; la versión anterior de esta
+sección tenía invertido `PowOrder`↔`Roots` y atribuía a `Roots`/`Archimedean` una dependencia
+de `Bisection` que no existe):
+
 ```
-Basic → AbsVal → Density
-Basic → Inv → CauchySeqAlgebra
-AbsVal, PowOrder → IsCauchy → Convergence → Bisection → Roots
-Bisection → Archimedean → Irrational
-Convergence → RationalLog
-Canonical
-Q0 → Q0Ops → Q0Cauchy → Q0CauchyAlgebra
-Q0Ops → Series ; Q0 → Polynomial
-Q0Cauchy, Irrational → Reals/Incompleteness
+Basic  (raíz del subsistema)
+ ├→ AbsVal ─┬→ Density            (con Basic)
+ │          └→ IsCauchy → Convergence → Bisection
+ ├→ Inv → Roots → PowOrder        (PowOrder también usa AbsVal)
+ ├→ Canonical
+ ├→ Archimedean
+ └→ MinAdd
+
+PowOrder, Bisection, Inv          → RationalLog
+Basic, AbsVal, IsCauchy, Inv, MinAdd → CauchySeqAlgebra
+Roots, Archimedean                → Irrational
+
+-- capa del struct ℚ₀ --
+Basic, Canonical, AbsVal          → Q0 ─┬→ Q0Order
+                                        └→ Polynomial
+Q0, Inv, AbsVal, Roots, PowOrder  → Q0Ops → Series
+Q0Ops, IsCauchy, CauchySeqAlgebra → Q0Cauchy → Q0CauchyAlgebra
+
+Q0Cauchy, Irrational              → Reals/Incompleteness
 ```
 
 ---
@@ -317,6 +332,9 @@ def ℚ₀.ofInt (z : ℤ₀) : ℚ₀
 
 - **Math**: aⁿ, y las inclusiones ℕ₀ ↪ ℚ₀ / ℤ₀ ↪ ℚ₀. Elevadas explícitamente desde `ℚ₀cls`.
 - Computables. Instancias: `Inv ℚ₀`, `Div ℚ₀`.
+- Desde 2026-07-18 el módulo lleva además el **API bridge del cuerpo** (§6.108m): homomorfismo
+  `.cls` de ⁻¹ / `/` / `pow` / `ofNat₀` / `ofInt`, el puente de igualdad `eq_iff_cls` /
+  `ne_zero_iff_cls`, y los lemas de inverso, potencia e inclusión transferidos desde `ℚ₀cls`.
 
 ### 4.108n Rationals/Q0Cauchy.lean — `namespace ℚ₀`
 
@@ -766,6 +784,41 @@ def sqrt2Seq : ℕ₀ → ℚ₀
 | 32 | `ℚ₀.le_pair_iff` | `(a b : ℚ₀) : a ≤ b ↔ a.pair ≤ b.pair` |
 | 33 | `ℚ₀.lt_pair_iff` | `(a b : ℚ₀) : a < b ↔ a.pair < b.pair` |
 
+### 6.108m Rationals/Q0Ops.lean — `namespace ℚ₀`
+
+API bridge del cuerpo: el homomorfismo `.cls` de las operaciones (todo `rfl`), el puente de
+igualdad struct↔clase, y los lemas de `ℚ₀cls` (Inv/PowOrder/Roots) transferidos.
+
+| # | Theorem | Lean signature |
+| --- | --------- | --------------- |
+| 1 | `cls_inv` | `(a : ℚ₀) : (a⁻¹).cls = (a.cls)⁻¹` — `@[simp]` |
+| 2 | `cls_div` | `(a b : ℚ₀) : (a / b).cls = a.cls / b.cls` — `@[simp]` |
+| 3 | `cls_pow` | `(a : ℚ₀) (n : ℕ₀) : (a.pow n).cls = ℚ₀cls.pow a.cls n` — `@[simp]` |
+| 4 | `cls_ofNat₀` | `(n : ℕ₀) : (ofNat₀ n).cls = ℚ₀cls.ofNat₀ n` — `@[simp]` |
+| 5 | `cls_ofInt` | `(z : ℤ₀) : (ofInt z).cls = ℚ₀cls.ofInt z.cls` — `@[simp]` |
+| 6 | `eq_iff_cls` | `{a b : ℚ₀} : a = b ↔ a.cls = b.cls` |
+| 7 | `ne_zero_iff_cls` | `{q : ℚ₀} : q ≠ 0 ↔ q.cls ≠ 0` |
+| 8 | `one_ne_zero` | `(1 : ℚ₀) ≠ 0` |
+| 9 | `mul_inv_cancel` | `{q : ℚ₀} (h : q ≠ 0) : Mul.mul q q⁻¹ = 1` |
+| 10 | `inv_mul_cancel` | `{q : ℚ₀} (h : q ≠ 0) : Mul.mul q⁻¹ q = 1` |
+| 11 | `inv_unique` | `{x y : ℚ₀} (hx : x ≠ 0) (h : Mul.mul x y = 1) : y = x⁻¹` |
+| 12 | `inv_mul_inv` | `(x y : ℚ₀) (hx : x ≠ 0) (hy : y ≠ 0) : (Mul.mul x y)⁻¹ = Mul.mul x⁻¹ y⁻¹` |
+| 13 | `inv_sub_inv_eq` | `(x y : ℚ₀) (hx : x ≠ 0) (hy : y ≠ 0) : Sub.sub x⁻¹ y⁻¹ = Mul.mul (Sub.sub y x) (Mul.mul x y)⁻¹` |
+| 14 | `inv_nonneg` | `{x : ℚ₀} (hx : 0 ≤ x) (h_ne : x ≠ 0) : 0 ≤ x⁻¹` |
+| 15 | `inv_le_one` | `{q : ℚ₀} (hq : 1 ≤ q) : q⁻¹ ≤ 1` |
+| 16 | `pow_zero` | `(a : ℚ₀) : a.pow 𝟘 = 1` |
+| 17 | `pow_succ` | `(a : ℚ₀) (n : ℕ₀) : a.pow (σ n) = Mul.mul a (a.pow n)` |
+| 18 | `pow_one` | `(a : ℚ₀) : a.pow 𝟙 = a` |
+| 19 | `pow_add` | `(a : ℚ₀) (m n : ℕ₀) : a.pow (Peano.Add.add m n) = Mul.mul (a.pow m) (a.pow n)` |
+| 20 | `pow_nonneg` | `{a : ℚ₀} (ha : 0 ≤ a) (n : ℕ₀) : 0 ≤ a.pow n` |
+| 21 | `pow_le_pow_left` | `{a b : ℚ₀} (ha : 0 ≤ a) (hab : a ≤ b) (n : ℕ₀) : a.pow n ≤ b.pow n` |
+| 22 | `one_le_pow` | `{a : ℚ₀} (ha : 1 ≤ a) (n : ℕ₀) : 1 ≤ a.pow n` |
+| 23 | `absVal_pow` | `(a : ℚ₀) (n : ℕ₀) : absVal (a.pow n) = (absVal a).pow n` |
+| 24 | `ofNat₀_add` | `(n m : ℕ₀) : ofNat₀ (Peano.Add.add n m) = Add.add (ofNat₀ n) (ofNat₀ m)` |
+| 25 | `ofNat₀_mul` | `(n m : ℕ₀) : ofNat₀ (Peano.Mul.mul n m) = Mul.mul (ofNat₀ n) (ofNat₀ m)` |
+| 26 | `ofNat₀_nonneg` | `(n : ℕ₀) : 0 ≤ ofNat₀ n` |
+| 27 | `ofNat₀_pos` | `{k : ℕ₀} (hk : k ≠ 𝟘) : 0 < ofNat₀ k` |
+
 ### 6.108n Rationals/Q0Cauchy.lean — `namespace ℚ₀`
 
 | # | Theorem | Lean signature |
@@ -792,6 +845,37 @@ def sqrt2Seq : ℕ₀ → ℚ₀
 | # | Theorem | Lean signature |
 | --- | --------- | --------------- |
 | 1 | `cls_sum` | `(f : ℕ₀ → ℚ₀) (n : ℕ₀) : (sum f n).cls = ℚ₀cls.sum (fun i => (f i).cls) n` |
+
+### 6.108t Rationals/Q0Order.lean — `namespace ℚ₀`
+
+Orden y valor absoluto de `ℚ₀` (cuerpo ordenado). El orden del struct es *por definición* el de
+`.cls`, así que cada lema es un bridge term-mode directo (o `ext` para las igualdades).
+
+| # | Theorem | Lean signature |
+| --- | --------- | --------------- |
+| 1 | `le_refl` | `(a : ℚ₀) : a ≤ a` |
+| 2 | `le_antisymm` | `{a b : ℚ₀} (h1 : a ≤ b) (h2 : b ≤ a) : a = b` |
+| 3 | `le_trans` | `{a b c : ℚ₀} (h1 : a ≤ b) (h2 : b ≤ c) : a ≤ c` |
+| 4 | `le_total` | `(a b : ℚ₀) : a ≤ b ∨ b ≤ a` |
+| 5 | `add_le_add_left` | `{a b : ℚ₀} (h : a ≤ b) (c : ℚ₀) : Add.add c a ≤ Add.add c b` |
+| 6 | `add_le_add_right` | `{a b : ℚ₀} (h : a ≤ b) (c : ℚ₀) : Add.add a c ≤ Add.add b c` |
+| 7 | `add_le_add` | `{a b c d : ℚ₀} (h1 : a ≤ b) (h2 : c ≤ d) : Add.add a c ≤ Add.add b d` |
+| 8 | `neg_le_neg` | `{a b : ℚ₀} (h : a ≤ b) : Neg.neg b ≤ Neg.neg a` |
+| 9 | `mul_nonneg` | `{a b : ℚ₀} (ha : 0 ≤ a) (hb : 0 ≤ b) : 0 ≤ Mul.mul a b` |
+| 10 | `mul_le_mul_right_of_nonneg` | `{a b c : ℚ₀} (h1 : a ≤ b) (h2 : 0 ≤ c) : Mul.mul a c ≤ Mul.mul b c` |
+| 11 | `mul_le_mul_left_of_nonneg` | `{a b c : ℚ₀} (h1 : a ≤ b) (h2 : 0 ≤ c) : Mul.mul c a ≤ Mul.mul c b` |
+| 12 | `mul_le_mul` | `{a b c d : ℚ₀} (h1 : a ≤ b) (h2 : c ≤ d) (h3 : 0 ≤ a) (h4 : 0 ≤ c) : Mul.mul a c ≤ Mul.mul b d` |
+| 13 | `absVal_of_nonneg` | `{q : ℚ₀} (h : 0 ≤ q) : absVal q = q` |
+| 14 | `absVal_of_nonpos` | `{q : ℚ₀} (h : q ≤ 0) : absVal q = Neg.neg q` |
+| 15 | `absVal_zero` | `absVal (0 : ℚ₀) = 0` |
+| 16 | `absVal_nonneg` | `(q : ℚ₀) : 0 ≤ absVal q` |
+| 17 | `absVal_neg` | `(q : ℚ₀) : absVal (Neg.neg q) = absVal q` |
+| 18 | `absVal_zero_iff` | `(q : ℚ₀) : absVal q = 0 ↔ q = 0` |
+| 19 | `absVal_sub_comm` | `(a b : ℚ₀) : absVal (Sub.sub a b) = absVal (Sub.sub b a)` |
+| 20 | `absVal_mul` | `(a b : ℚ₀) : absVal (Mul.mul a b) = Mul.mul (absVal a) (absVal b)` |
+| 21 | `le_absVal` | `(q : ℚ₀) : q ≤ absVal q` |
+| 22 | `neg_le_absVal` | `(q : ℚ₀) : Neg.neg q ≤ absVal q` |
+| 23 | `absVal_add_le` | `(a b : ℚ₀) : absVal (Add.add a b) ≤ Add.add (absVal a) (absVal b)` |
 
 *(sin secciones 6.108r/6.108s: `Polynomial` e `Incompleteness` no tienen ningún teorema libre de `sorry`)*
 
@@ -873,7 +957,14 @@ de subtipos y `Coe ℚ₀ ℚ₀cls`; + los 33 teoremas de §6.108l.
 
 ### Rationals/Q0Ops.lean — `ℚ₀`
 
-`ℚ₀.pow`, `ℚ₀.ofNat₀`, `ℚ₀.ofInt`, instancias `Inv`/`Div` (sin teoremas).
+`ℚ₀.pow`, `ℚ₀.ofNat₀`, `ℚ₀.ofInt`, instancias `Inv`/`Div`, + los 27 teoremas de §6.108m
+(homomorfismo `cls_inv`/`cls_div`/`cls_pow`/`cls_ofNat₀`/`cls_ofInt`, puentes `eq_iff_cls`/
+`ne_zero_iff_cls`, inverso, potencia e inclusiones).
+
+### Rationals/Q0Order.lean — `ℚ₀`
+
+(sin defs) los 23 teoremas de §6.108t: orden parcial/total, compatibilidad con `+`/`*`,
+y el valor absoluto (incl. la desigualdad triangular `absVal_add_le`).
 
 ### Rationals/Q0Cauchy.lean — `ℚ₀`
 

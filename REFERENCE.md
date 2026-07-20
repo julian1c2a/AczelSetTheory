@@ -176,13 +176,14 @@ Below are the keys for reading and searching theorems.
 | 108j | [`AczelSetTheory/Rationals/Archimedean.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀cls` | ✅ Complete | Rationals/Bisection | Rationals/Irrational |
 | 108k | [`AczelSetTheory/Rationals/Irrational.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀cls` | 🚧 Progress (1 sorry: `newton_seq_step_bound`) | Rationals/Archimedean | Rationals.lean, Reals/Incompleteness |
 | 108l | [`AczelSetTheory/Rationals/Q0.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀` | ✅ Complete | Rationals/{Basic,Canonical,AbsVal}, Integers/ℤ₀, `Peano.PeanoNat.{Arith,Primes}` | Q0Ops, Polynomial, Rationals.lean |
-| 108m | [`AczelSetTheory/Rationals/Q0Ops.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀` | ✅ Complete | Rationals/{Q0,Inv,AbsVal,Roots} | Q0Cauchy, Series |
+| 108m | [`AczelSetTheory/Rationals/Q0Ops.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀` | ✅ Complete | Rationals/{Q0,Inv,AbsVal,Roots,PowOrder} | Q0Cauchy, Series |
 | 108n | [`AczelSetTheory/Rationals/Q0Cauchy.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀` | ✅ Complete | Rationals/{Q0Ops,IsCauchy,CauchySeqAlgebra} | Q0CauchyAlgebra, Reals/Incompleteness, Rationals.lean |
 | 108o | [`AczelSetTheory/Rationals/Q0CauchyAlgebra.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀` | ✅ Complete | Rationals/{Q0Cauchy,CauchySeqAlgebra,Q0Ops}, `Peano.PeanoNat.Arith` | Rationals.lean |
 | 108p | [`AczelSetTheory/Rationals/MinAdd.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀cls` | ✅ Complete | Rationals/Basic | Rationals.lean |
 | 108q | [`AczelSetTheory/Rationals/Series.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀cls`, `ℚ₀` | 🚧 Progress (6 sorry: `sum_add`, `sum_mul_left`, `sum_arithmetic`, `sum_geometric` ×2) | Rationals/Q0Ops | Rationals.lean |
 | 108r | [`AczelSetTheory/Rationals/Polynomial.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀` | 🚧 Progress (4 sorry: canonicalización tras `add`/`smul`/`mul`/`monomial`) | PList/Basic, Rationals/ℚ₀, Axioms/OrdinalNat | Rationals.lean |
 | 108s | [`AczelSetTheory/Reals/Incompleteness.lean`](doc/REFERENCE-Rationals.md) | `ℝ₀` (namespace de propiedades sobre `ℚ₀`; **no** existe aún un tipo `ℝ₀`/`HFReal` como cociente — ver nota abajo) | 🚧 Progress (3 sorry: irracionalidad de √2 y convergencia) | Rationals/{Q0Cauchy,Irrational} | Reals.lean |
+| 108t | [`AczelSetTheory/Rationals/Q0Order.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀` | ✅ Complete | Rationals/Q0 | Rationals.lean |
 
 > **Nota histórica (2026-07-12):** hasta el 2026-07-05 (commit `173add2`) existió un
 > primer intento de `ℝ₀` como tipo propio — `Reals/{CauchySeq,Arithmetic,Order,RealAxioms}.lean`,
