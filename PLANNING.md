@@ -44,7 +44,7 @@ Build: 251 jobs ✅, Lean v4.30.0. **FASE B CERRADA**. Inicia FASE C (Análisis 
 Dos frentes de limpieza estructural, gobernados por las **MANDATORIES** de
 [`DECISIONS.md`](DECISIONS.md) (M-4 reutilización de tipos; ADR-019) y por la directiva
 de pureza constructiva (M-1/M-2/M-3; ADR-018). Detalle táctico en
-[`NEXT_STEPS.md`](NEXT_STEPS.md) y [`PLANNING-CONSTRUCTIVE.md`](PLANNING-CONSTRUCTIVE.md).
+[`NEXT-STEPS.md`](NEXT-STEPS.md) y [`PLANNING-CONSTRUCTIVE.md`](PLANNING-CONSTRUCTIVE.md).
 
 ### L1 — Erradicar subtipos que duplican tipos públicos de peanolib (ADR-019)
 
