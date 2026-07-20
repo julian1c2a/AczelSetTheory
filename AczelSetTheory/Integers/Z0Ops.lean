@@ -170,4 +170,40 @@ theorem bezout_coprime {a b : ℤ₀} (h : gcd a b = 1) : ∃ x y : ℤ₀, Add.
   obtain ⟨x, y, hxy⟩ := ℤ₀cls.bezout_coprime h_cls
   exact ⟨ofCls x, ofCls y, by apply ext; exact hxy⟩
 
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Homomorfismo `.cls` de las operaciones (ADR-023, migración de tipos)
+--
+-- Simétrico al de `Q0Ops`: todas las operaciones de arriba son `ofCls (ℤ₀cls.op …)`, así que
+-- `.cls` conmuta con ellas por `rfl`. Con estos `@[simp]` + `@[ext]`, cualquier hecho de
+-- `ℤ₀cls` sobre sign/abs/succ/pred/pow/div/mod/gcd/lcm se transfiere a `ℤ₀` en una línea.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+@[simp] theorem cls_ofNat (n : ℕ₀) : (ofNat n).cls = ℤ₀cls.ofNat n := rfl
+@[simp] theorem cls_sign (a : ℤ₀) : (sign a).cls = ℤ₀cls.sign a.cls := rfl
+@[simp] theorem cls_abs  (a : ℤ₀) : (abs a).cls  = ℤ₀cls.abs a.cls := rfl
+@[simp] theorem cls_succ (a : ℤ₀) : (succ a).cls = ℤ₀cls.succZ a.cls := rfl
+@[simp] theorem cls_pred (a : ℤ₀) : (pred a).cls = ℤ₀cls.predZ a.cls := rfl
+@[simp] theorem cls_pow (a : ℤ₀) (n : ℕ₀) : (pow a n).cls = ℤ₀cls.powZ a.cls n := rfl
+@[simp] theorem cls_div (a b : ℤ₀) : (div a b).cls = ℤ₀cls.divZ a.cls b.cls := rfl
+@[simp] theorem cls_mod (a b : ℤ₀) : (mod a b).cls = ℤ₀cls.modZ a.cls b.cls := rfl
+@[simp] theorem cls_gcd (a b : ℤ₀) : (gcd a b).cls = ℤ₀cls.gcdZ a.cls b.cls := rfl
+@[simp] theorem cls_lcm (a b : ℤ₀) : (lcm a b).cls = ℤ₀cls.lcmZ a.cls b.cls := rfl
+
+/-- `toNat` ya aterriza en `ℕ₀`: no hay clase que proyectar, solo se expone su definición. -/
+@[simp] theorem toNat_eq_cls (a : ℤ₀) : toNat a = ℤ₀cls.toNat a.cls := rfl
+
+/-- La primalidad del empaquetado es, por definición, la de su clase. -/
+theorem isPrime_iff_cls (a : ℤ₀) : isPrime a ↔ ℤ₀cls.isPrimeZ a.cls := Iff.rfl
+
+-- ── Puente de igualdad/desigualdad struct ↔ clase (simétrico a ℚ₀) ──
+
+/-- Dos enteros empaquetados son iguales exactamente cuando lo son sus clases. -/
+theorem eq_iff_cls {a b : ℤ₀} : a = b ↔ a.cls = b.cls :=
+  ⟨congrArg ℤ₀.cls, ext a b⟩
+
+theorem ne_zero_iff_cls {a : ℤ₀} : a ≠ 0 ↔ a.cls ≠ 0 := by
+  constructor
+  · intro h hc; exact h (ext a 0 hc)
+  · intro h ha; exact h (congrArg ℤ₀.cls ha)
+
 end ℤ₀
