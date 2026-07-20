@@ -24,6 +24,7 @@ import AczelSetTheory.Rationals.RationalLog
 import AczelSetTheory.Rationals.Q0
 import AczelSetTheory.Rationals.Q0Ops
 import AczelSetTheory.Rationals.Q0Order
+import AczelSetTheory.Rationals.Q0Convergence
 import AczelSetTheory.Rationals.MinAdd
 import AczelSetTheory.Rationals.Series
 import AczelSetTheory.Rationals.Polynomial
