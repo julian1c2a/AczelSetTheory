@@ -16,7 +16,8 @@
 > [`doc/REFERENCE-CList.md`](doc/REFERENCE-CList.md),
 > [`doc/REFERENCE-PList.md`](doc/REFERENCE-PList.md),
 > [`doc/REFERENCE-HFList.md`](doc/REFERENCE-HFList.md),
-> [`doc/REFERENCE-Arithmetic.md`](doc/REFERENCE-Arithmetic.md),
+> [`doc/REFERENCE-Arithmetic.md`](doc/REFERENCE-Arithmetic.md) (Peano core ℕ₀/ℕ₁),
+> [`doc/REFERENCE-Integers.md`](doc/REFERENCE-Integers.md) (ℤ₀/ℤ₀cls/ℤ₀can, ℤ/nℤ),
 > [`doc/REFERENCE-Paridad-Peano-Aczel.md`](doc/REFERENCE-Paridad-Peano-Aczel.md),
 > [`doc/REFERENCE-Rationals.md`](doc/REFERENCE-Rationals.md) (ℚ₀/ℚ₀cls/ℚ₀can, incl. el
 > subsistema `Reals/`; los 22 módulos proyectados al estándar §4/§6/§7, ADR-023 2026-07-18).
@@ -153,14 +154,18 @@ Below are the keys for reading and searching theorems.
 | 94 | `AczelSetTheory/Algebra/Field.lean` | `HFAlgebra`, `HFAlgebra.HFField`, `HFAlgebra.HFFieldHom`, `HFAlgebra.HFSubfield` | ✅ Complete | Algebra/RingHom, Axioms/Intersection | Algebra/LinearSpace |
 | 95 | `AczelSetTheory/Algebra/Module.lean` | `HFAlgebra`, `HFAlgebra.HFModule`, `HFAlgebra.HFModuleHom`, `HFAlgebra.HFSubmodule` | ✅ Complete | Algebra/Ring, Axioms/Intersection | — |
 | 96 | `AczelSetTheory/Algebra/LinearSpace.lean` | `HFAlgebra`, `HFAlgebra.HFLinearSpace`, `HFAlgebra.HFLinearMap`, `HFAlgebra.HFSubspace` | ✅ Complete | Algebra/Field, Axioms/Intersection | — |
-| 97 | `AczelSetTheory/Integers/Basic.lean` | `ℤ₀cls` | ✅ Complete | PList/Omega0, `Peano.PeanoNat.{Sub,Mul,Decidable}` | Integers/Order, Integers/MobiusLiouville |
-| 98 | `AczelSetTheory/Integers/Order.lean` | `ℤ₀cls` | ✅ Complete | Integers/Basic, `Peano.PeanoNat.Decidable` | Integers/Functions |
-| 99 | `AczelSetTheory/Integers/Functions.lean` | `ℤ₀cls` | ✅ Complete | Integers/Order | Integers/Arithmetic, Integers/Bijection |
-| 100 | `AczelSetTheory/Integers/Arithmetic.lean` | `ℤ₀cls` | ✅ Complete | Integers/Functions, `Peano.PeanoNat.{Div,Arith}` | Integers.lean |
-| 101 | `AczelSetTheory/Integers/Bijection.lean` | `ℤ₀cls` | ✅ Complete | Integers/Functions, `Peano.PeanoNat.Pairing` | Integers.lean |
-| 102 | `AczelSetTheory/Integers/PadicVal.lean` | `ℤ₀cls` | ✅ Complete | PList/Omega0, `Peano.PeanoNat.{Arith,Primes,WellFounded,Div}` | Integers/MobiusLiouville |
-| 103 | `AczelSetTheory/Integers/MobiusLiouville.lean` | `ℤ₀cls` | ✅ Complete | Integers/Basic, Integers/PadicVal | Integers.lean |
-| 104 | `AczelSetTheory/Integers/Bezout.lean` | `ℤ₀cls` | ✅ Complete | Integers/Basic, Integers/Arithmetic, Integers/Order, `Peano.PeanoNat.Arith` | (futuro) Integers/ZModN |
+| 97 | [`AczelSetTheory/Integers/Basic.lean`](doc/REFERENCE-Integers.md) | `ℤ₀cls` | ✅ Complete | PList/Omega0, `Peano.PeanoNat.{Sub,Mul,Decidable}` | Integers/Order, Integers/MobiusLiouville |
+| 98 | [`AczelSetTheory/Integers/Order.lean`](doc/REFERENCE-Integers.md) | `ℤ₀cls` | ✅ Complete | Integers/Basic, `Peano.PeanoNat.Decidable` | Integers/Functions |
+| 99 | [`AczelSetTheory/Integers/Functions.lean`](doc/REFERENCE-Integers.md) | `ℤ₀cls` | ✅ Complete | Integers/Order | Integers/Arithmetic, Integers/Bijection |
+| 100 | [`AczelSetTheory/Integers/Arithmetic.lean`](doc/REFERENCE-Integers.md) | `ℤ₀cls` | ✅ Complete | Integers/Functions, `Peano.PeanoNat.{Div,Arith}` | Integers.lean |
+| 101 | [`AczelSetTheory/Integers/Bijection.lean`](doc/REFERENCE-Integers.md) | `ℤ₀cls` | ✅ Complete | Integers/Functions, `Peano.PeanoNat.Pairing` | Integers.lean |
+| 102 | [`AczelSetTheory/Integers/PadicVal.lean`](doc/REFERENCE-Integers.md) | `ℤ₀cls` | ✅ Complete | PList/Omega0, `Peano.PeanoNat.{Arith,Primes,WellFounded,Div}` | Integers/MobiusLiouville |
+| 103 | [`AczelSetTheory/Integers/MobiusLiouville.lean`](doc/REFERENCE-Integers.md) | `ℤ₀cls` | ✅ Complete | Integers/Basic, Integers/PadicVal | Integers.lean |
+| 104 | [`AczelSetTheory/Integers/Bezout.lean`](doc/REFERENCE-Integers.md) | `ℤ₀cls` | ✅ Complete | Integers/Basic, Integers/Arithmetic, Integers/Order, `Peano.PeanoNat.Arith` | (futuro) Integers/ZModN |
+| 104c | [`AczelSetTheory/Integers/Z0.lean`](doc/REFERENCE-Integers.md) | `ℤ₀can`, `ℤ₀` | ✅ Complete | Integers/{Basic,Canonical,Functions,Arithmetic,Bezout} | Integers/Z0Ops |
+| 104d | [`AczelSetTheory/Integers/Z0Ops.lean`](doc/REFERENCE-Integers.md) | `ℤ₀` | ✅ Complete | Integers/{Z0,Functions,Arithmetic,Bezout} | Integers/{Z0Order,Z0NumberTheory} |
+| 104e | [`AczelSetTheory/Integers/Z0Order.lean`](doc/REFERENCE-Integers.md) | `ℤ₀` | ✅ Complete | Integers/{Z0,Order} | Integers.lean |
+| 104f | [`AczelSetTheory/Integers/Z0NumberTheory.lean`](doc/REFERENCE-Integers.md) | `ℤ₀` | ✅ Complete | Integers/{Z0Ops,MobiusLiouville,Bijection} | Integers.lean |
 | 105 | [`AczelSetTheory/Rationals/Basic.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀cls` | ✅ Complete | Integers/Order (ℤ₀cls), `Peano.{ℕ₁,PeanoNat.*}` | Rationals/AbsVal, Rationals/Density, Rationals.lean |
 | 106 | [`AczelSetTheory/Rationals/AbsVal.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀cls` | ✅ Complete | Rationals/Basic | Rationals/IsCauchy, Rationals/Density, Rationals.lean |
 | 107 | [`AczelSetTheory/Rationals/IsCauchy.lean`](doc/REFERENCE-Rationals.md) | `ℚ₀cls` | ✅ Complete | Rationals/Basic, Rationals/AbsVal, `Peano.PeanoNat.Combinatorics.Pow` | Rationals/Convergence |
@@ -199,12 +204,12 @@ Below are the keys for reading and searching theorems.
 > **todavía no se ha construido** — es el objetivo declarado de FRENTE 1 en
 > [`NEXT-STEPS.md`](NEXT-STEPS.md). Esas 4 filas se documentaban erróneamente como
 > "✅ Complete" en REFERENCE.md pese a llevar borradas desde julio; corregido aquí.
-| 109 | `AczelSetTheory/Integers/ZModN.lean` | `HFAlgebra` | ✅ Complete | Algebra/{Ring,Field}, VN/{Arithmetic,IsNat,CardVN}, `Peano.PeanoNat.NumberTheory.{ModEq,Wilson}` | Integers.lean |
+| 109 | [`AczelSetTheory/Integers/ZModN.lean`](doc/REFERENCE-Integers.md) | `HFAlgebra` | ✅ Complete | Algebra/{Ring,Field}, VN/{Arithmetic,IsNat,CardVN}, `Peano.PeanoNat.NumberTheory.{ModEq,Wilson}` | Integers.lean |
 | 110 | `AczelSetTheory/Topology/Basic.lean` | `HFTopology` | ✅ Complete | HFSets, Axioms/{Union,Intersection,Setminus,Subset,Singleton} | Topology/Interior, Topology/Neighborhoods, Topology/Subspace |
 | 111 | `AczelSetTheory/Topology/Interior.lean` | `HFTopology` | ✅ Complete | Topology/Basic, Axioms/{Separation,Intersection,Setminus} | — |
 | 112 | `AczelSetTheory/Topology/Neighborhoods.lean` | `HFTopology` | ✅ Complete | Topology/Basic, Axioms/{Separation,Powerset} | — |
 | 113 | `AczelSetTheory/Topology/Subspace.lean` | `HFTopology` | ✅ Complete | Topology/Basic, Axioms/{Separation,Powerset} | — |
-| 114 | `AczelSetTheory/Integers/Canonical.lean` | `ℤ₀cls` | ✅ Complete | Integers/Basic, Integers/Order, `Peano.PeanoNat.{Sub,Order}` | Integers.lean |
+| 114 | [`AczelSetTheory/Integers/Canonical.lean`](doc/REFERENCE-Integers.md) | `ℤ₀cls` | ✅ Complete | Integers/Basic, Integers/Order, `Peano.PeanoNat.{Sub,Order}` | Integers.lean |
 | 115 | `AczelSetTheory/Algebra/QuotientRing.lean` | `HFAlgebra` | ✅ Complete | Algebra/{Ring,QuotientGroup}, Axioms/{Separation,Decidable} | Integers/ZModN (futuro) |
 | 116 | `AczelSetTheory/Algebra/HFMatrix.lean` | `HFAlgebra` | ✅ Complete | Algebra/Ring, Axioms/{OrdinalNat,Cardinal}, HFList | Algebra.lean |
 | 117 | `AczelSetTheory/Operations/Order.lean` | `HFSet` | ✅ Complete | Axioms/Subset, Axioms/Relation | Axioms/Order |

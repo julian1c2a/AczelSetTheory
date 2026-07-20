@@ -1,54 +1,57 @@
 # Punto de Reanudación (Next Steps)
-> Actualizado: 2026-07-12
-> **Nota:** este fichero sustituye a `NEXT_STEPS.md` (guión bajo, borrado el
-> 2026-07-12 tras la auditoría cruzada — ver INFORME-AUDITORIA-2026-07-12.md).
-> Ambos coexistían de forma contradictoria; éste es el vigente (nombre canónico
-> con guión, igual que en Peano/FOL/ROBINSON_PlusPlus). El histórico completo de
-> milestones cerrados que llevaba `NEXT_STEPS.md` (M1B–M8B, Sylow, Zassenhaus,
-> etc.) vive en `CHANGELOG.md` y en `git log`; no se duplica aquí.
+> Actualizado: 2026-07-20
+> **Nota:** nombre canónico con guión (igual que Peano/FOL/ROBINSON_PlusPlus). El histórico
+> de milestones cerrados vive en `CHANGELOG.md` y en `git log`; no se duplica aquí.
 
-## Estado Actual (2026-07-12)
-- **FRENTE 4 (Racionales y Secuencias de Cauchy)**: COMPLETADO.
-- **14 `sorry` reales** en el árbol (no 4 — recuento corregido tras la auditoría
-  cruzada 2026-07-12, ver CURRENT-STATUS-PROJECT.md § Known Sorry Locations):
-  - 1 en `Irrational.lean:353` (`newton_seq_step_bound` — cota de descenso por paso).
-  - 4 en `Polynomial.lean` (canonicalización tras `add`/`smul`/`mul`/`monomial`).
-  - 6 en `Series.lean` (`sum_add`, `sum_mul_left`, `sum_arithmetic`, `sum_geometric`).
-  - 3 en `Incompleteness.lean` (irracionalidad algebraica profunda de $\sqrt{2}$ y convergencia).
-- *Deuda técnica*: los 3 de `Incompleteness.lean` requieren propiedades avanzadas de
-  la valuación $p$-ádica (multiplicatividad en paridad) o un lema de descenso
-  infinito en Peano. Se mantienen aparcados para no bloquear el progreso
-  metateórico. Los de `Polynomial.lean`/`Series.lean` son huecos de un módulo
-  recién creado (sin deuda conceptual, solo falta terminarlos).
-- **Corregido 2026-07-12**: `Rationals/Irrational.lean:395` (`newton_seq_eventually_lt`)
-  usaba `Classical.byContradiction`, violando la directiva de pureza constructiva
-  (DECISIONS.md MANDATORY M-1). Reescrito de forma constructiva (búsqueda acotada por
-  decidibilidad de `≤` en `ℚ₀cls`, lema `newton_bounded_search`) y añadido al gate
-  `Meta/AxiomCheck.lean` para que una regresión futura falle el build.
+## Estado Actual (2026-07-20)
 
-## Próximo Objetivo: Iniciar el FRENTE 1
-Al retomar el trabajo, nuestro objetivo es arrancar el **FRENTE 1: Análisis Real Constructivo**.
+- **Build**: 280 jobs ✅ (`lake build AczelSetTheory`), Lean v4.31.0 contra peanolib viva
+  (`E:/Dropbox/GitHub/lean4/Peano`, ya cero-Classical tras su ADR-017 Fase C).
+- **211 ficheros `.lean`, 35 274 LOC, 14 `sorry`** (ver `make audit` → `AUDIT-MODULE-MATRIX.md`).
+- **PUREZA CONSTRUCTIVA TOTAL**: el gate exhaustivo `Meta/AxiomCheck.lean`
+  (`#assert_constructive_footprint`, ADR-020) barre las **3239 declaraciones propias** vía
+  `Lean.collectAxioms` y falla el build si alguna tiene un axioma fuera de
+  `{propext, Quot.sound}` (+ `sorryAx` tolerado). **Baseline de excepciones = 0.**
+- **Gobernanza coherente** (ADR-021 §17 opcional/selectivo, ADR-022 O6 desdoblado + `make audit`).
+- **MIGRACIÓN DE TIPOS ℤ₀/ℚ₀ COMPLETA** (ADR-023): los tipos titulares `ℤ₀`/`ℚ₀` (estructuras
+  que empaquetan clase + representante canónico + coherencia) tienen ya **paridad práctica** con
+  las clases `ℤ₀cls`/`ℚ₀cls`:
+  - `ℤ₀`: anillo conmutativo ordenado + teoría de números (Möbius/Liouville, biyección ℤ₀≃ℕ₀) +
+    homomorfismo `.cls` completo de todas las operaciones.
+  - `ℚ₀`: cuerpo ordenado + valor absoluto + inverso/potencia + sucesiones de Cauchy +
+    convergencia + propiedad arquimediana + Newton–Raphson + serie de artanh + bisección.
+  - Los consumidores reales (`Reals/Incompleteness`, `Series`, `Polynomial`, `Q0Cauchy`,
+    `VN/SignVN`) ya están escritos contra los structs.
 
-### Tareas Inmediatas al Reanudar:
-1. **Definir `HFReal`**:
-   - Crear el tipo de los Números Reales como el cociente de las Sucesiones de Cauchy en `ℚ₀` bajo la relación de equivalencia estándar (sucesiones cuya diferencia tiende a cero).
-2. **Aritmética en `HFReal`**:
-   - Levantar las operaciones de suma, multiplicación y negación desde las sucesiones de Cauchy al espacio cociente `HFReal`.
-3. **Estructura de Cuerpo y Métrica**:
-   - Instanciar `HFReal` como un cuerpo (`HFField`).
-   - Definir la noción de distancia/valor absoluto en los reales.
-4. **Planificación de Completitud**:
-   - Trazar el plan para demostrar que toda sucesión de Cauchy de números reales converge a un número real (Completitud de Cauchy de $\mathbb{R}$).
+### 14 `sorry` reales (deuda aceptada, trazada — no bloquean el frente metateórico)
+- 1 en `Rationals/Irrational.lean` (`newton_seq_step_bound` — cota de descenso por paso).
+- 4 en `Rationals/Polynomial.lean` (canonicalización tras `add`/`smul`/`mul`/`monomial`).
+- 6 en `Rationals/Series.lean` (`sum_add`, `sum_mul_left`, `sum_arithmetic`, `sum_geometric`).
+- 3 en `Reals/Incompleteness.lean` (irracionalidad algebraica de √2 y convergencia).
 
-## FRENTE 2 (tras FRENTE 1) — heredado de `NEXT_STEPS.md`
-- **Propiedades topológicas de ℝ₀ / `HFReal`**: explorar conexidad, compacidad y
-  convergencia real utilizando las bases ya establecidas en `AczelSetTheory/Topology/`.
-  Depende de que `HFReal` exista como tipo (FRENTE 1); no iniciar antes.
+## Próximo Objetivo: FRENTE 1 — Análisis Real Constructivo (`HFReal`)
 
-## Deuda documental pendiente (ver INFORME-AUDITORIA-2026-07-12.md)
-- `doc/REFERENCE-Rationals.md` no cubre `Q0CauchyAlgebra.lean`, `Series.lean`,
-  `Polynomial.lean` ni el subsistema `Reals/`.
-- `AUDIT-MODULE-MATRIX.md` no se regenera desde 2026-06-10.
-- Unificación pendiente de `AI-GUIDE.md`/`NAMING-CONVENTIONS.md`/`DECISIONS.md`/
-  `DEPENDENCIES.md` con los proyectos hermanos (Peano, FOL, ROBINSON_PlusPlus) vía
-  `lean4-project-template` — propuesta en discusión, ver memoria de sesión.
+El cimiento está **completo** tras la migración de tipos: `ℚ₀` es un cuerpo ordenado con teoría
+de Cauchy, convergencia y arquimedianidad, y `Rationals/Q0CauchyAlgebra.lean` da el álgebra de
+sucesiones de Cauchy sobre `ℚ₀` con testigos constructivos de apartness (`Pos`/`ApartZero`).
+
+### Tareas Inmediatas al Reanudar
+1. **Definir `HFReal`**: cociente de `ℚ₀.CauchySeq` bajo `CauchySeq.Equiv` (sucesiones cuya
+   diferencia tiende a 0). Reutilizar la maquinaria ya existente en `Q0CauchyAlgebra`.
+2. **Aritmética en `HFReal`**: levantar `add`/`neg`/`sub`/`mul` (y `inv`/`div` con testigo de
+   apartness) desde `ℚ₀.CauchySeq` al cociente.
+3. **Estructura de cuerpo ordenado**: instanciar `HFReal` como cuerpo; definir `<`/`≤` vía los
+   testigos `Pos`, y el valor absoluto.
+4. **Completitud**: trazar el plan para la completitud de Cauchy de `ℝ` (toda sucesión de Cauchy
+   de reales converge).
+
+## FRENTE 2 (tras FRENTE 1) — Topología de `HFReal`
+Conexidad, compacidad y convergencia real sobre las bases de `AczelSetTheory/Topology/`.
+Depende de que `HFReal` exista como tipo; no iniciar antes.
+
+## Deuda pendiente (menor)
+- **Merge de `migracion-tipos` → main**: al cierre de la sesión 2026-07-20 la rama estaba
+  pusheada; verificar el estado del merge.
+- **Cerrar los 14 `sorry`** del frente `Rationals/`·`Reals/` cuando convenga (no bloquean HFReal).
+- Los `sorry` de `Incompleteness.lean` requieren valuación p-ádica avanzada o descenso infinito
+  en Peano; aparcados para no bloquear el progreso metateórico.

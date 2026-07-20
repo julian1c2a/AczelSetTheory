@@ -1,11 +1,11 @@
 # Matriz de Auditoria Modulo por Modulo
 
-Generado: 2026-07-16 por `gen-audit-matrix.bash` (`make audit`)
+Generado: 2026-07-20 por `gen-audit-matrix.bash` (`make audit`)
 
 ## Resumen Global
 
-- Archivos Lean: 204
-- Lineas totales: 34581
+- Archivos Lean: 211
+- Lineas totales: 35274
 - sorry: 14  (deuda aceptada del frente activo Rationals/Reals — ver ADR-022)
 - admit: 0
 - axiom: 0
@@ -106,7 +106,7 @@ Generado: 2026-07-16 por `gen-audit-matrix.bash` (`make audit`)
 | AczelSetTheory\HFList.lean | HFList.lean | 418 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\HFListOps.lean | HFListOps.lean | 90 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\HFSets.lean | HFSets.lean | 157 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
-| AczelSetTheory\Integers.lean | Integers.lean | 18 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
+| AczelSetTheory\Integers.lean | Integers.lean | 20 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Integers\Arithmetic.lean | Integers | 96 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Integers\Basic.lean | Integers | 515 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Integers\Bezout.lean | Integers | 300 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
@@ -116,8 +116,10 @@ Generado: 2026-07-16 por `gen-audit-matrix.bash` (`make audit`)
 | AczelSetTheory\Integers\MobiusLiouville.lean | Integers | 227 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Integers\Order.lean | Integers | 358 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Integers\PadicVal.lean | Integers | 298 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
-| AczelSetTheory\Integers\Z0.lean | Integers | 260 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
-| AczelSetTheory\Integers\Z0Ops.lean | Integers | 173 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
+| AczelSetTheory\Integers\Z0.lean | Integers | 293 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
+| AczelSetTheory\Integers\Z0NumberTheory.lean | Integers | 104 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
+| AczelSetTheory\Integers\Z0Ops.lean | Integers | 209 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
+| AczelSetTheory\Integers\Z0Order.lean | Integers | 58 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Integers\ZModN.lean | Integers | 256 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Meta\AxiomCheck.lean | Meta | 137 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Notation.lean | Notation.lean | 140 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
@@ -148,7 +150,7 @@ Generado: 2026-07-16 por `gen-audit-matrix.bash` (`make audit`)
 | AczelSetTheory\PList\Fin0.lean | PList | 165 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\PList\Lemmas.lean | PList | 438 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\PList\Omega0.lean | PList | 80 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
-| AczelSetTheory\Rationals.lean | Rationals.lean | 30 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
+| AczelSetTheory\Rationals.lean | Rationals.lean | 37 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Rationals\AbsVal.lean | Rationals | 282 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Rationals\Archimedean.lean | Rationals | 196 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Rationals\Basic.lean | Rationals | 753 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
@@ -163,10 +165,15 @@ Generado: 2026-07-16 por `gen-audit-matrix.bash` (`make audit`)
 | AczelSetTheory\Rationals\MinAdd.lean | Rationals | 40 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Rationals\Polynomial.lean | Rationals | 116 | 4 | 0 | 0 | 0 | 0 | 0 | SORRY:4 (frente activo) |
 | AczelSetTheory\Rationals\PowOrder.lean | Rationals | 88 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
-| AczelSetTheory\Rationals\Q0.lean | Rationals | 377 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
+| AczelSetTheory\Rationals\Q0.lean | Rationals | 399 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
+| AczelSetTheory\Rationals\Q0Bisection.lean | Rationals | 38 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Rationals\Q0Cauchy.lean | Rationals | 43 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Rationals\Q0CauchyAlgebra.lean | Rationals | 123 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
-| AczelSetTheory\Rationals\Q0Ops.lean | Rationals | 44 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
+| AczelSetTheory\Rationals\Q0Convergence.lean | Rationals | 108 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
+| AczelSetTheory\Rationals\Q0Ops.lean | Rationals | 130 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
+| AczelSetTheory\Rationals\Q0Order.lean | Rationals | 70 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
+| AczelSetTheory\Rationals\Q0RationalLog.lean | Rationals | 48 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
+| AczelSetTheory\Rationals\Q0Roots.lean | Rationals | 78 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Rationals\RationalLog.lean | Rationals | 137 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Rationals\Roots.lean | Rationals | 635 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\Rationals\Series.lean | Rationals | 84 | 6 | 0 | 0 | 0 | 0 | 0 | SORRY:6 (frente activo) |
@@ -221,7 +228,7 @@ Generado: 2026-07-16 por `gen-audit-matrix.bash` (`make audit`)
 | AczelSetTheory\VN\QuotientGroupVN.lean | VN | 49 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\VN\RankVN.lean | VN | 37 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\VN\SecondIsomorphismVN.lean | VN | 49 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
-| AczelSetTheory\VN\SignVN.lean | VN | 40 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
+| AczelSetTheory\VN\SignVN.lean | VN | 43 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\VN\SqrtVN.lean | VN | 64 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\VN\SubVN.lean | VN | 93 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
 | AczelSetTheory\VN\SummationVN.lean | VN | 69 | 0 | 0 | 0 | 0 | 0 | 0 | OK |
