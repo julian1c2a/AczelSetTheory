@@ -17,3 +17,4 @@ import AczelSetTheory.Integers.ZModN
 import AczelSetTheory.Integers.Z0
 import AczelSetTheory.Integers.Z0Ops
 import AczelSetTheory.Integers.Z0Order
+import AczelSetTheory.Integers.Z0NumberTheory
