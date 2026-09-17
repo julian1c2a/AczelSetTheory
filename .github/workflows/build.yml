@@ -48,10 +48,10 @@ jobs:
       # ni arranca (falla en 0 s con «workflow file issue»).
       - name: Install Lean toolchain
         run: |
-          # ⚠️ `tr -d ''` NO es decorativo: si `lean-toolchain` llega con CRLF —y el
-          # blob de este repo lo tenía— `cut` devuelve «v4.31.0» y elan contesta
+          # ⚠️ `tr -d '\r'` NO es decorativo: si `lean-toolchain` llega con CRLF —y el
+          # blob de este repo lo tenía— `cut` devuelve «v4.31.0\r» y elan contesta
           # «invalid toolchain name». Medido: la CI murió en 11 s por ese byte.
-          elan toolchain install $(cut -d: -f2 lean-toolchain | tr -d '')
+          elan toolchain install $(cut -d: -f2 lean-toolchain | tr -d '\r')
 
       # ⚠️ Los `path:`/`hashFiles` de un `uses:` NO ven el `working-directory` de arriba:
       # van con el prefijo del subdirectorio.
