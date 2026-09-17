@@ -1,0 +1,6 @@
+# ⚠️ El fichero que le dice a elan qué toolchain instalar NO puede llevar CRLF: en el
+# runner, `cut -d: -f2 lean-toolchain` devuelve «v4.31.0\r» y elan responde
+# «invalid toolchain name». Medido el 2026-09-17: el blob de este repo tenía \r\n y la
+# primera ejecución real de la CI murió en 11 s por eso.
+lean-toolchain text eol=lf
+*.bash text eol=lf
