@@ -4,11 +4,11 @@
 .log
 *.log
 
-/.github
-/.github/*
-.github
-.github/*.json
-.github/*.yml
+# ⚠⚠ Aquí había CINCO reglas ignorando `.github`, y por eso este proyecto nunca ha tenido
+# CI: `lean_action_ci.yml` existe en disco desde hace meses y
+# `gh api repos/julian1c2a/AczelSetTheory/actions/workflows` devolvía `total_count: 0`.
+# Una CI que no existe no da rojo — no dice nada. Retiradas el 2026-09-17.
+
 
 /.claude
 /.claude/*

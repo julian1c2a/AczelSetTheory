@@ -1,0 +1,71 @@
+name: Build
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: lake build
+    runs-on: ubuntu-latest
+
+    # Todos los `run` salen de la raíz de AczelSetTheory, que aquí es un SUBDIRECTORIO del
+    # workspace (ver el comentario de los dos checkouts).
+    # ⚠️ No afecta a los pasos `uses:`: sus rutas siguen siendo relativas al workspace.
+    defaults:
+      run:
+        working-directory: AczelSetTheory
+
+    steps:
+      # ⚠️ DOS CHECKOUTS, COMO HERMANOS. `lakefile.lean` declara
+      #     require peanolib from "../Peano"
+      # es decir, una dependencia LOCAL. El runner necesita el árbol de Peano al lado, y
+      # como `actions/checkout` no admite un `path:` fuera del workspace, ESTE repo también
+      # se clona en un subdirectorio para que `../Peano` caiga dentro.
+      # Sin esto el build muere con «peanolib: package directory not found».
+      - name: Checkout AczelSetTheory
+        uses: actions/checkout@v4
+        with:
+          path: AczelSetTheory
+
+      - name: Checkout Peano (dependencia local hermana)
+        uses: actions/checkout@v4
+        with:
+          repository: julian1c2a/Peano
+          ref: master
+          path: Peano
+
+      - name: Install elan (Lean version manager)
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y --no-modify-path
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+
+      # ⚠️ Escalar de BLOQUE (`run: |`) a propósito. En una sola línea, el `-d:` de `cut`
+      # lleva dos puntos seguidos de espacio y YAML lo interpreta como un mapa: el workflow
+      # ni arranca (falla en 0 s con «workflow file issue»).
+      - name: Install Lean toolchain
+        run: |
+          elan toolchain install $(cut -d: -f2 lean-toolchain)
+
+      # ⚠️ Los `path:`/`hashFiles` de un `uses:` NO ven el `working-directory` de arriba:
+      # van con el prefijo del subdirectorio.
+      - name: Cache Lake packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.elan
+            AczelSetTheory/.lake/packages
+            Peano/.lake
+          key: ${{ runner.os }}-lake-${{ hashFiles('AczelSetTheory/lean-toolchain', 'AczelSetTheory/lakefile.lean', 'Peano/lakefile.lean') }}
+          restore-keys: |
+            ${{ runner.os }}-lake-
+
+      - name: Build
+        run: lake build
+
+      - name: Check for sorry
+        run: bash check-sorry.bash
+        continue-on-error: true   # Warning only — change to false to make it blocking
